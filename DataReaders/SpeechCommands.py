@@ -14,6 +14,7 @@ class SpeechCommands(DataReader):
     root = r"E:\Thesis_Datasets\SpeechCommands"
 
     def __init__(self, extraction_method, test_size=0.2, **kwargs):
+        print('start Speech commands')
         self.sample_rate = 16000
         if self.checkfiles(extraction_method):
             self.readfiles(extraction_method)
@@ -21,7 +22,7 @@ class SpeechCommands(DataReader):
             self.loadfiles()
             self.calculateTaskDataset(extraction_method, **kwargs)
             self.writefiles(extraction_method)
-        self.split_train_test(test_size=test_size)
+        self.split_train_test(test_size=test_size, extraction_method=extraction_method)
         print('Done loading Speech Commands')
 
     def get_path(self):
@@ -107,20 +108,21 @@ class SpeechCommands(DataReader):
         self.taskDataset.inputs = self.calculate_input(method, **kwargs)
         self.validTaskDataset.inputs = self.calculate_input(method, test=True, **kwargs)
 
-    def split_train_test(self, test_size):
+    def split_train_test(self, test_size, extraction_method):
         x_train, x_val, y_train, y_val = \
             train_test_split(self.taskDataset.inputs, self.taskDataset.targets, test_size=test_size) \
-                if test_size > 0 else self.taskDataset.inputs, self.taskDataset.targets, [], []
-        means, stds = self.calculate_scalars(self.taskDataset.inputs)
-        self.trainTaskDataset = TaskDataset(inputs=self.standardize_input(x_train, means, stds), targets=y_train,
+                if test_size > 0 else (self.taskDataset.inputs, [], self.taskDataset.targets, [])
+        self.scale_fit(x_train, extraction_method)
+        self.trainTaskDataset = TaskDataset(inputs=self.scale_transform(x_train, extraction_method), targets=y_train,
                                             name=self.taskDataset.task.name + "_train",
                                             labels=self.taskDataset.task.output_labels,
                                             output_module=self.taskDataset.task.output_module)
-        self.testTaskDataset = TaskDataset(inputs=self.standardize_input(x_val, means, stds), targets=y_val,
-                                           name=self.taskDataset.task.name + "_test",
-                                           labels=self.taskDataset.task.output_labels,
-                                           output_module=self.taskDataset.task.output_module)
-        self.validTaskDataset.inputs = self.standardize_input(self.validTaskDataset.inputs, means, stds)
+        if test_size > 0:
+            self.testTaskDataset = TaskDataset(inputs=self.scale_transform(x_val, extraction_method), targets=y_val,
+                                               name=self.taskDataset.task.name + "_test",
+                                               labels=self.taskDataset.task.output_labels,
+                                               output_module=self.taskDataset.task.output_module)
+        self.validTaskDataset.inputs = self.scale_transform(self.validTaskDataset.inputs, extraction_method)
 
     def toTrainTaskDataset(self):
         return self.trainTaskDataset

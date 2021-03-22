@@ -1,6 +1,7 @@
 from __future__ import print_function, division
 
 import sys
+import numpy as np
 
 from DataReaders.ASVspoof2015 import ASVspoof2015
 from DataReaders.ChenAudiosetDataset import ChenAudiosetDataset
@@ -19,8 +20,8 @@ def main(argv):
         'extraction_method': 'logbank_summary',
         # 'extraction_method': 'logbank',
         'resample_to': 8000,
-        'batch_size': 8,
-        'num_epochs': 500,
+        'batch_size': 64,
+        'num_epochs': 250,
         'learning_rate': 0.001
     }
 
@@ -29,10 +30,10 @@ def main(argv):
         winstep=0.01,
         nfilt=24,
 
-        nfft=1024, #512,
+        nfft=1024,  # 512,
         lowfreq=0,
         highfreq=None,
-        preemph=0 #0.97
+        preemph=0  # 0.97
     )
 
     model_params = dict(
@@ -42,49 +43,55 @@ def main(argv):
 
     test_size = 0.2
 
-    # asvspoof = ASVspoof2015(extraction_method=meta_params['extraction_method'],
-    #                         test_size=0,
-    #                         **extraction_params,
-    #                         resample_to=meta_params['resample_to'])
-    # chenaudio = ChenAudiosetDataset(extraction_method=meta_params['extraction_method'],
-    #                                 test_size=test_size,
-    #                                 **extraction_params,
-    #                                 resample_to=meta_params['resample_to'])
+    print('ASVspoof2015')
+    asvspoof = ASVspoof2015(extraction_method=meta_params['extraction_method'],
+                            test_size=0.2,
+                            **extraction_params,
+                            resample_to=meta_params['resample_to'])
+    print('chenaudio')
+    chenaudio = ChenAudiosetDataset(extraction_method=meta_params['extraction_method'],
+                                    test_size=test_size,
+                                    **extraction_params,
+                                    resample_to=meta_params['resample_to'])
+    print('dcase2017 SS')
     dcaseScene = DCASE2017_SS(extraction_method=meta_params['extraction_method'],
                               test_size=0,
                               **extraction_params,
                               resample_to=meta_params['resample_to'])
-    # fsdkaggle = FSDKaggle2018(extraction_method=meta_params['extraction_method'],
-    #                           test_size=test_size,
-    #                           **extraction_params,
-    #                           resample_to=meta_params['resample_to'])
-    # ravdess = Ravdess(extraction_method=meta_params['extraction_method'],
-    #                   test_size=test_size,
-    #                   **extraction_params,
-    #                   resample_to=meta_params['resample_to'])
-    # speechcommands = SpeechCommands(extraction_method=meta_params['extraction_method'],
-    #                                 test_size=0,
-    #                                 **extraction_params,
-    #                                 resample_to=meta_params['resample_to'])
+    print('fsdkaggle2018')
+    fsdkaggle = FSDKaggle2018(extraction_method=meta_params['extraction_method'],
+                              test_size=test_size,
+                              **extraction_params,
+                              resample_to=meta_params['resample_to'])
+    print('ravdess')
+    ravdess = Ravdess(extraction_method=meta_params['extraction_method'],
+                      test_size=test_size,
+                      **extraction_params,
+                      resample_to=meta_params['resample_to'])
+    print('speechcommands')
+    speechcommands = SpeechCommands(extraction_method=meta_params['extraction_method'],
+                                    test_size=0,
+                                    **extraction_params,
+                                    resample_to=meta_params['resample_to'])
+    print('all loaded')
 
-
-    # asvspoof_t = asvspoof.toTrainTaskDataset()
-    # chen_t = chenaudio.toTrainTaskDataset()
+    asvspoof_t = asvspoof.toTrainTaskDataset()
+    chen_t = chenaudio.toTrainTaskDataset()
     dcasScent_t = dcaseScene.toTrainTaskDataset()
-    # fsdkaggle_t = fsdkaggle.toTrainTaskDataset()
-    # ravdess_t = ravdess.toTrainTaskDataset()
-    # speechcommands_t = speechcommands.toTrainTaskDataset()
-    taskdatasets = [dcasScent_t]
+    fsdkaggle_t = fsdkaggle.toTrainTaskDataset()
+    ravdess_t = ravdess.toTrainTaskDataset()
+    speechcommands_t = speechcommands.toTrainTaskDataset()
+    taskdatasets = [speechcommands_t]
     # taskdatasets = [asvspoof_t, chen_t, dcasScent_t, fsdkaggle_t, ravdess_t, speechcommands_t]
 
-    # asvspoof_e = asvspoof.toValidTaskDataset()
-    # chen_e = chenaudio.toTestTaskDataset()
+    asvspoof_e = asvspoof.toTestTaskDataset()
+    chen_e = chenaudio.toTestTaskDataset()
     dcasScent_e = dcaseScene.toValidTaskDataset()
-    # fsdkaggle_e = fsdkaggle.toTestTaskDataset()
-    # ravdess_e = ravdess.toTestTaskDataset()
-    # speechcommands_e = speechcommands.toValidTaskDataset()
-    evaldatasets = [dcasScent_e]
-    # evaldatasets = [asvspoof_e,  chen_e, dcasScent_e, fsdkaggle_e, ravdess_e, speechcommands_e]
+    fsdkaggle_e = fsdkaggle.toTestTaskDataset()
+    ravdess_e = ravdess.toTestTaskDataset()
+    speechcommands_e = speechcommands.toValidTaskDataset()
+    evaldatasets = [speechcommands_e]
+    # evaldatasets = [asvspoof_e, chen_e, dcasScent_e, fsdkaggle_e, ravdess_e, speechcommands_e]
     print('Done loading')
 
     print('test loop')
@@ -93,7 +100,7 @@ def main(argv):
         training_dataset = ConcatTaskDataset([taskdatasets[i]])
         eval_dataset = ConcatTaskDataset([evaldatasets[i]])
         task_list = training_dataset.get_task_list()
-        model = MultiTaskHardSharing(taskdatasets[i].inputs[0].shape[0], **model_params, task_list=task_list)
+        model = MultiTaskHardSharing(np.prod(taskdatasets[i].inputs[0].shape), **model_params, task_list=task_list)
         model = model.cuda()
         print('Model Created')
 
@@ -113,7 +120,7 @@ def main(argv):
         #     training_dataset = ConcatTaskDataset([taskdatasets[i], taskdatasets[j]])
         #     eval_dataset = ConcatTaskDataset([evaldatasets[i], taskdatasets[j]])
         #     task_list = training_dataset.get_task_list()
-        #     model = MultiTaskHardSharing(taskdatasets[i].inputs[0].shape[0], **model_params, task_list=task_list)
+        #     model = MultiTaskHardSharing(np.prod(taskdatasets[i].inputs[0].shape), **model_params, task_list=task_list)
         #     model = model.cuda()
         #     print('Model Created')
         #

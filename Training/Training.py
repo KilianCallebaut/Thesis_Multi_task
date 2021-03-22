@@ -1,10 +1,12 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
 import torch
 import torch.optim as optim
 from sklearn import metrics
 from torch import nn, Tensor
 from torch.utils.data import ConcatDataset
 from torch.utils.tensorboard import SummaryWriter
-import matplotlib.pyplot as plt
 
 from Tasks.ConcatTaskDataset import ConcatTaskDataset
 from Training.Results import Results
@@ -34,9 +36,7 @@ class Training:
             name += "_" + n.name
         writer = SummaryWriter(comment=name)
 
-        writer.add_graph(model, torch.rand([1, 168]).cuda())
-        for tc in concat_dataset.datasets:
-            writer.add_embedding(torch.stack(tc.inputs), tc.targets)
+        # writer.add_graph(model, torch.rand([2, 2206, 24]).cuda())
 
         # Load Data Example
         train_loader = torch.utils.data.DataLoader(
@@ -138,14 +138,17 @@ class Training:
                 if task_list[t].output_module == "softmax":
                     writer.add_scalar("Accuracy/{}".format(task_name), epoch_metrics[t]['accuracy'], epoch)
                     mat = metrics.confusion_matrix(task_labels[t], task_predictions[t])
+                    fig = plt.figure()
+                    plt.imshow(mat)
+                    writer.add_figure('Confusion matrix/{}'.format(task_list[t]),
+                                      fig, epoch)
                 elif task_list[t].output_module == "sigmoid":
                     writer.add_scalar("Micro AVG F1/{}".format(task_name),
                                       epoch_metrics[t]['micro avg']['f1-score'], epoch)
                     mat = metrics.multilabel_confusion_matrix(task_labels[t], task_predictions[t])
-                plt.figure()
-                plt.imshow(mat)
-                writer.add_figure('Confusion matrix/Eval {}'.format(task_list[t]),
-                                  mat, epoch)
+                    fig = plot_multilabel_confusion(mat, task_list[t].output_labels)
+                    writer.add_figure('Confusion matrix/{}'.format(task_list[t]),
+                                      fig, epoch)
 
                 writer.add_scalar("Macro Avg Precision/{}".format(task_name),
                                   epoch_metrics[t]['macro avg']['precision'], epoch)
@@ -167,12 +170,11 @@ class Training:
         print('Training Done')
         # results.writefiles(True)
 
-
         for t in range(len(task_predictions)):
             mat = []
             print(task_list[t].output_labels)
             if task_list[t].output_module == "softmax":
-                mat = metrics.confusion_matrix(task_labels[t], task_predictions[t])
+                mat = metrics.confusion_matrix(task_labels[t], task_predictions[t], task_list[t].output_labels)
             elif task_list[t].output_module == "sigmoid":
                 mat = metrics.multilabel_confusion_matrix(task_labels[t], task_predictions[t])
             print(mat)
@@ -208,9 +210,7 @@ class Training:
         for n in task_list:
             name += "_" + n.name
 
-        writer = SummaryWriter(comment=name+'_evaluation')
-        for tc in concat_dataset:
-            writer.add_embedding(torch.tensor(tc.inputs), tc.targets)
+        writer = SummaryWriter(comment=name + '_evaluation')
 
         eval_loader = torch.utils.data.DataLoader(
             concat_dataset,
@@ -222,6 +222,9 @@ class Training:
 
         print("Start Evaluation")
         for epoch in range(start_epoch, num_epochs):
+            print('Epoch {}'.format(epoch))
+            print('===========================================================')
+
             training_results.load_model_parameters(epoch, blank_model)
             blank_model.eval()
 
@@ -294,15 +297,18 @@ class Training:
 
                 if task_list[t].output_module == "softmax":
                     writer.add_scalar("Accuracy/Eval {}".format(task_name), epoch_metrics[t]['accuracy'], epoch)
-                    mat = metrics.confusion_matrix(task_labels[t], task_predictions[t])
+                    mat = metrics.confusion_matrix(task_labels[t], task_predictions[t], task_list[t].output_labels)
+                    fig = plt.figure()
+                    plt.imshow(mat)
+                    writer.add_figure('Confusion matrix/Eval {}'.format(task_list[t]),
+                                      fig, epoch)
                 elif task_list[t].output_module == "sigmoid":
                     writer.add_scalar("Micro AVG F1/Eval {}".format(task_name),
                                       epoch_metrics[t]['micro avg']['f1-score'], epoch)
                     mat = metrics.multilabel_confusion_matrix(task_labels[t], task_predictions[t])
-                plt.figure()
-                plt.imshow(mat)
-                writer.add_figure('Confusion matrix/Eval {}'.format(task_list[t]),
-                                  mat, epoch)
+                    fig = plot_multilabel_confusion(mat, task_list[t].output_labels)
+                    writer.add_figure('Confusion matrix/Eval {}'.format(task_list[t]),
+                                      fig, epoch)
 
                 writer.add_scalar("Macro Avg Precision/Eval {}".format(task_name),
                                   epoch_metrics[t]['macro avg']['precision'], epoch)
@@ -315,7 +321,7 @@ class Training:
             mat = []
             print(task_list[t].output_labels)
             if task_list[t].output_module == "softmax":
-                mat = metrics.confusion_matrix(task_labels[t], task_predictions[t])
+                mat = metrics.confusion_matrix(task_labels[t], task_predictions[t], task_list[t].output_labels)
             elif task_list[t].output_module == "sigmoid":
                 mat = metrics.multilabel_confusion_matrix(task_labels[t], task_predictions[t])
             print(mat)
@@ -346,13 +352,29 @@ class Training:
         elif task.output_module == "sigmoid":
             return torch.squeeze(target)
 
-    # tasks, dict
 
-    # def calculate_metrics_epoch_per_task(self, nr_epoch):
-    #     pred_target_per_task = self.calculate_true_predicted_epoch_per_task(nr_epoch)
-    #     return [metrics.classification_report([pred_tar[1].tolist() for pred_tar in pred_target_per_task[task_idx]],
-    #                                           [pred_tar[0].tolist() for pred_tar in pred_target_per_task[task_idx]],
-    #                                           target_names=self.concat_dataset.get_task_list()[
-    #                                               task_idx].output_labels,
-    #                                           output_dict=True)
-    #             for task_idx in range(len(pred_target_per_task))]
+def plot_multilabel_confusion(conf_matrix, labels):
+    fig, ax = plt.subplots(4, 4, figsize=(12, 7))
+
+    for axes, cfs_matrix, label in zip(ax.flatten(), conf_matrix, labels):
+        print_confusion_matrix(cfs_matrix, axes, label, ["N", "Y"])
+
+    fig.tight_layout()
+    plt.imshow()
+    return fig
+
+
+def print_confusion_matrix(confusion_matrix, axes, class_label, class_names, fontsize=14):
+    df_cm = pd.DataFrame(
+        confusion_matrix, index=class_names, columns=class_names,
+    )
+
+    try:
+        heatmap = sns.heatmap(df_cm, annot=True, fmt="d", cbar=False, ax=axes)
+    except ValueError:
+        raise ValueError("Confusion matrix values must be integers.")
+    heatmap.yaxis.set_ticklabels(heatmap.yaxis.get_ticklabels(), rotation=0, ha='right', fontsize=fontsize)
+    heatmap.xaxis.set_ticklabels(heatmap.xaxis.get_ticklabels(), rotation=45, ha='right', fontsize=fontsize)
+    axes.set_ylabel('True label')
+    axes.set_xlabel('Predicted label')
+    axes.set_title("Confusion Matrix for the class - " + class_label)

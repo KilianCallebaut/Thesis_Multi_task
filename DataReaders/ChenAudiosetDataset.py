@@ -1,6 +1,5 @@
 import os
 import random
-import winsound
 from collections import Counter
 from datetime import timedelta
 from timeit import default_timer as timer
@@ -24,7 +23,6 @@ from sklearn.model_selection import train_test_split
 class ChenAudiosetDataset(DataReader):
     root = r'E:\Thesis_Datasets\audioset_chen\audioset_filtered'
     train_dir = "balanced_train_segments"
-    # audioset_path = r"E:\Thesis_Results\Data_Readers\ChenAudiosetDataset.p"
     audioset_path = r"E:\Thesis_Results\Data_Readers\ChenAudiosetDataset"
 
     # Bools for choosing random selection because overrepresented in dataset
@@ -48,13 +46,14 @@ class ChenAudiosetDataset(DataReader):
     target_list = []
 
     def __init__(self, extraction_method, test_size=0.2, **kwargs):
+        print('start chen')
         if self.checkfiles(extraction_method):
             self.readfiles(extraction_method)
         else:
             self.loadfiles()
             self.calculateTaskDataset(extraction_method, **kwargs)
             self.writefiles(extraction_method)
-        self.split_train_test(test_size=test_size)
+        self.split_train_test(test_size=test_size, extraction_method=extraction_method)
         # self.calculateTaskDataset()
         print('done')
 
@@ -200,24 +199,25 @@ class ChenAudiosetDataset(DataReader):
 
         return sampled_inputs, sampled_targets
 
-    def split_train_test(self, test_size):
+    def split_train_test(self, test_size, extraction_method):
         inputs = self.taskDataset.inputs
         targets = self.taskDataset.targets
         if self.limit_speech or self.limit_other:
             inputs, targets = self.sample_label(self.taskDataset)
-
+        a = train_test_split(inputs, targets, test_size=test_size)
         x_train, x_val, y_train, y_val = \
             train_test_split(inputs, targets, test_size=test_size) \
-                if test_size > 0 else self.taskDataset.inputs, self.taskDataset.targets, [], []
-        means, stds = self.calculate_scalars(inputs)
-        self.trainTaskDataset = TaskDataset(inputs=self.standardize_input(x_train, means, stds), targets=y_train,
+                if test_size > 0 else (inputs, [], targets, [])
+        self.scale_fit(x_train, extraction_method)
+        self.trainTaskDataset = TaskDataset(inputs=self.scale_transform(x_train, extraction_method), targets=y_train,
                                             name=self.taskDataset.task.name + "_train",
                                             labels=self.taskDataset.task.output_labels,
                                             output_module=self.taskDataset.task.output_module)
-        self.testTaskDataset = TaskDataset(inputs=self.standardize_input(x_val, means, stds), targets=y_val,
-                                           name=self.taskDataset.task.name + "_test",
-                                           labels=self.taskDataset.task.output_labels,
-                                           output_module=self.taskDataset.task.output_module)
+        if test_size > 0:
+            self.testTaskDataset = TaskDataset(inputs=self.scale_transform(x_val, extraction_method), targets=y_val,
+                                               name=self.taskDataset.task.name + "_test",
+                                               labels=self.taskDataset.task.output_labels,
+                                               output_module=self.taskDataset.task.output_module)
 
     def toTrainTaskDataset(self):
         return self.trainTaskDataset
@@ -362,14 +362,14 @@ class ChenAudiosetDataset(DataReader):
     def findFoldersWithLabels(self, labels: list) -> list:
         return [self.files[x] for x in self.findIndexesFoldersWithLabels(labels)]
 
-    def playAudioFiles(self, toplayindexes: list):
-        for i in toplayindexes:
-            for w in self.files[i]:
-                wav = w['wav_file'].replace('/home/cj/', 'C:\\Users\\mrKC1\\Documents\\TU Delft\\Thesis '
-                                                         '2\\Dataset\\audioset\\')
-                print(wav)
-                print(w['labels'])
-                winsound.PlaySound(wav, winsound.SND_FILENAME)
+    # def playAudioFiles(self, toplayindexes: list):
+    #     for i in toplayindexes:
+    #         for w in self.files[i]:
+    #             wav = w['wav_file'].replace('/home/cj/', 'C:\\Users\\mrKC1\\Documents\\TU Delft\\Thesis '
+    #                                                      '2\\Dataset\\audioset\\')
+    #             print(wav)
+    #             print(w['labels'])
+    #             winsound.PlaySound(wav, winsound.SND_FILENAME)
 
     def printStats(self):
         # total count

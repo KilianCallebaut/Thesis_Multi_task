@@ -1,6 +1,7 @@
 from __future__ import print_function, division
 
 import sys
+import numpy as np
 
 from DataReaders.ASVspoof2015 import ASVspoof2015
 from DataReaders.ChenAudiosetDataset import ChenAudiosetDataset
@@ -23,46 +24,78 @@ def main(argv):
         'learning_rate': 0.001
     }
 
-    data_reader_params = dict(
-        extraction_method='logmel',
-
+    # extraction_params = dict(
+    #     nfft=1024,
+    #     winlen=0.03,
+    #     winstep=0.01,
+    #     nfilt=24,
+    #     lowfreq=0,
+    #     highfreq=None,
+    #     preemph=0,
+    #     numcep=13,
+    #     ceplifter=0,
+    #     appendEnergy=False,
+    #     winfunc=lambda x:np.ones((x,))
+    # )
+    extraction_params = dict(
         nfft=1024,
-        hopsize=320,
-        mel_bins=96,
+        winlen=300,
+        winstep=100,
+        nfilt=24,
         window='hann',
-        lowfreq=50
+        lowfreq=0
     )
 
     model_params = dict(
         hidden_size=64,
         n_hidden=4
     )
+    test_size = 0.2
 
-    dcaseScene = DCASE2017_SS(**data_reader_params)
-    asvspoof = ASVspoof2015(**data_reader_params)
-
-    chenaudio = ChenAudiosetDataset(**data_reader_params)
-    speechcommands = SpeechCommands(**data_reader_params)
-    ravdess = Ravdess(**data_reader_params)
-    fsdkaggle = FSDKaggle2018(**data_reader_params)
+    # asvspoof = ASVspoof2015(extraction_method=meta_params['extraction_method'],
+    #                         test_size=0,
+    #                         **extraction_params,
+    #                         )
+    # chenaudio = ChenAudiosetDataset(extraction_method=meta_params['extraction_method'],
+    #                                 test_size=test_size,
+    #                                 **extraction_params,
+    #                                 )
+    dcaseScene = DCASE2017_SS(extraction_method=meta_params['extraction_method'],
+                              test_size=0,
+                              **extraction_params,
+                              )
+    # fsdkaggle = FSDKaggle2018(extraction_method=meta_params['extraction_method'],
+    #                           test_size=test_size,
+    #                           **extraction_params,
+    #                           )
+    # ravdess = Ravdess(extraction_method=meta_params['extraction_method'],
+    #                   test_size=test_size,
+    #                   **extraction_params,
+    #                   )
+    # speechcommands = SpeechCommands(extraction_method=meta_params['extraction_method'],
+    #                                 test_size=0,
+    #                                 **extraction_params,
+    #                                 )
     #
-    dcasScent_t = dcaseScene.toTrainTaskDataset()
-    asvspoof_t = asvspoof.toTrainTaskDataset()
-    chen_t = chenaudio.toTrainTaskDataset()
-    speechcommands_t = speechcommands.toTrainTaskDataset()
-    ravdess_t = ravdess.toTrainTaskDataset()
-    fsdkaggle_t = fsdkaggle.toTrainTaskDataset()
-    # taskdatasets = [dcasScent_t]
-    taskdatasets = [dcasScent_t, asvspoof_t, chen_t, speechcommands_t, ravdess_t, fsdkaggle_t]
 
-    dcasScent_e = dcaseScene.toTestTaskDataset()
-    asvspoof_e = asvspoof.toTestTaskDataset()
-    chen_e = chenaudio.toTestTaskDataset()
-    speechcommands_e = speechcommands.toTestTaskDataset()
-    ravdess_e = ravdess.toTestTaskDataset()
-    fsdkaggle_e = fsdkaggle.toTestTaskDataset()
-    # evaldatasets = [dcasScent_e]
-    evaldatasets = [dcasScent_e, asvspoof_e, chen_e, speechcommands_e, ravdess_e, fsdkaggle_e]
+
+    # asvspoof_t = asvspoof.toTrainTaskDataset()
+    # chen_t = chenaudio.toTrainTaskDataset()
+    dcasScent_t = dcaseScene.toTrainTaskDataset()
+    # fsdkaggle_t = fsdkaggle.toTrainTaskDataset()
+    # ravdess_t = ravdess.toTrainTaskDataset()
+    # speechcommands_t = speechcommands.toTrainTaskDataset()
+    taskdatasets = [dcasScent_t]
+    # taskdatasets = [asvspoof_t, chen_t, dcasScent_t, fsdkaggle_t, ravdess_t, speechcommands_t]
+
+    # asvspoof_e = asvspoof.toValidTaskDataset()
+    # chen_e = chenaudio.toTestTaskDataset()
+    dcasScent_e = dcaseScene.toValidTaskDataset()
+    # fsdkaggle_e = fsdkaggle.toTestTaskDataset()
+    # ravdess_e = ravdess.toTestTaskDataset()
+    # speechcommands_e = speechcommands.toValidTaskDataset()
+    evaldatasets = [dcasScent_e]
+    # evaldatasets = [asvspoof_e,  chen_e, dcasScent_e, fsdkaggle_e, ravdess_e, speechcommands_e]
 
     print('Done loading')
 

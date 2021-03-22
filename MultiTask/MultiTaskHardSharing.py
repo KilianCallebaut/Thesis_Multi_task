@@ -76,6 +76,7 @@ class MultiTaskHardSharing(nn.Module):
             return F.sigmoid(x)
 
     def forward(self, x):
+        x = x.flatten(1)
         for layer in self.hidden[:-1]:
             x = layer(x)
             x = F.relu(x)

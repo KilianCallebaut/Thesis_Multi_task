@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from python_speech_features import logfbank, mfcc
 from scipy import signal
-from scipy.io import wavfile as wav
+from sklearn.preprocessing import StandardScaler
 
 
 class DataReader(ABC):
@@ -48,7 +48,7 @@ class DataReader(ABC):
         pass
 
     @abstractmethod
-    def split_train_test(self, test_size):
+    def split_train_test(self, test_size, extraction_method):
         pass
 
     @abstractmethod
@@ -107,6 +107,7 @@ class DataReader(ABC):
     # preemph=0.97
     def mfcc(self, sig_samplerate, winlen=0.03, winstep=0.01, nfilt=24, nfft=512, lowfreq=0, highfreq=None,
              preemph=0, numcep=13, ceplifter=0, appendEnergy=False, winfunc=lambda x: np.ones((x,))):
+        # ( , NUMCEP, )
         return torch.tensor(
             mfcc(sig_samplerate[0], sig_samplerate[1], winlen=winlen, winstep=winstep, nfilt=nfilt, nfft=nfft,
                  lowfreq=lowfreq, highfreq=highfreq, preemph=preemph, numcep=numcep, ceplifter=ceplifter,
@@ -134,24 +135,95 @@ class DataReader(ABC):
         return self.extractor.transform(sig)
 
     # TRANSFORMATION
-    def calculate_scalars(self, inputs):
+    def convert_list_of_tensors_to_nparray(self, list_of_tensors):
+        return np.array([t.numpy() for t in list_of_tensors])
+
+    def convert_nparray_to_list_of_tensors(self, arr):
+        return [torch.from_numpy(el) for el in arr]
+
+    def scale_fit(self, inputs, extraction_method):
+        self.scalers = {}
+        inputs = self.convert_list_of_tensors_to_nparray(inputs)
+        if extraction_method in ['logbank_summary', 'logbank']:
+            for i in range(inputs.shape[1]):
+                self.scalers[i] = StandardScaler()
+                self.scalers[i].fit(inputs[:, i, :])
+
+    def scale_transform(self, inputs, extraction_method):
+        inputs = self.convert_list_of_tensors_to_nparray(inputs)
+        ret = inputs
+        if extraction_method in ['logbank_summary', 'logbank']:
+            for i in range(inputs.shape[1]):
+                ret[:, i, :] = torch.from_numpy(self.scalers[i].transform(inputs[:, i, :]))
+        return self.convert_nparray_to_list_of_tensors(ret)
+
+    def scalarization_type(self, extraction_method):
+        if extraction_method in []:
+            return 'row'
+        elif extraction_method in []:
+            return 'column'
+        elif extraction_method in ['logbank_summary', 'logmel', 'logbank', 'mfcc']:
+            return 'general'
+
+    def calculate_scalars(self, inputs, type):
+        if type == 'column':
+            return self.column_scalars(inputs)
+        elif type == 'row':
+            return self.row_scalars(inputs)
+        elif type == 'general':
+            return self.general_scalars(inputs)
+
+    def row_scalars(self, inputs):
         tc = torch.cat(inputs, 1)
         tc_m = torch.mean(tc, 1)
         tc_std = torch.std(tc, 1)
         return tc_m, tc_std
 
-    def standardize_input(self, inputs, means, stds):
-        # tc = torch.cat(inputs, 1)
-        # tc_m = torch.mean(tc, 1)
-        # tc_std = torch.std(tc, 1)
-        ret = []
-        for inp in inputs:
-            r = torch.cat([(inp[i] - means[i]) / stds[i] for i in range(len(inp))])
-            ret.append(r)
-        return ret
+    def column_scalars(self, inputs):
+        tc = torch.cat(inputs, 0)
+        tc_m = torch.mean(tc, 0)
+        tc_std = torch.std(tc, 0)
+        return tc_m, tc_std
 
-    # General standardization
-    # # TRANSFORMATION
+    def general_scalars(self, inputs):
+        tc = torch.cat(inputs, 1)
+        tc_m = torch.mean(tc)
+        tc_std = torch.std(tc)
+        return tc_m, tc_std
+
+    # def standardize_input(self, inputs, means, stds, type):
+    #     if type == 'column':
+    #         return self.column_standardize(inputs, means, stds)
+    #     elif type == 'row':
+    #         return self.row_standardize(inputs, means, stds)
+    #     elif type == 'general':
+    #         return self.general_standardize(inputs, means, stds)
+    #
+    # def column_standardize(self, inputs, means, stds):
+    #     ret = []
+    #     for inp in inputs:
+    #         r = inp.transpose(0, 1)
+    #         r = torch.stack([(inp[i] - means[i]) / stds[i] for i in range(len(r))])
+    #         r = r.transpose(0, 1)
+    #         ret.append(r)
+    #     return ret
+    #
+    # def row_standardize(self, inputs, means, stds):
+    #     ret = []
+    #     for inp in inputs:
+    #         r = torch.stack([(inp[i] - means[i]) / stds[i] for i in range(len(inp))])
+    #         ret.append(r)
+    #     return ret
+    #
+    # def general_standardize(self, inputs, mean, std):
+    #     ret = []
+    #     for inp in inputs:
+    #         r = (inp - mean)/std
+    #         ret.append(r)
+    #     return ret
+
+    # # General standardization CNN
+    # # # TRANSFORMATION
     # def calculate_scalars(self, inputs):
     #     tc = torch.cat(inputs, 1)
     #     tc_m = torch.mean(tc)
@@ -164,22 +236,7 @@ class DataReader(ABC):
     #         r = (inp - means)/stds
     #         ret.append(r)
     #     return ret
-
-    # Standardization per bin
-    # # TRANSFORMATION
-    # def calculate_scalars(self, inputs):
-    #     tc = torch.cat(inputs, 0)
-    #     tc_m = torch.mean(tc, 0)
-    #     tc_std = torch.std(tc, 0)
-    #     return tc_m, tc_std
     #
-    # def standardize_input(self, inputs, means, stds):
-    #     ret = []
-    #     for inp in inputs:
-    #         inpt = inp.T
-    #         r = torch.cat([(inpt[i] - means[i]) / stds[i] for i in range(len(inp))])
-    #         ret.append(r.T)
-    #     return ret
 
 
 class LogMelExtractor:
