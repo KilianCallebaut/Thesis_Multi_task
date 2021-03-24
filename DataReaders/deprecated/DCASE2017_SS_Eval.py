@@ -25,6 +25,8 @@ class DCASE2017_SS_Eval(DataReader):
 
     def __init__(self, extraction_method, **kwargs):
         self.count = 0
+        if 'object_path' in kwargs:
+                  object_path = kwargs.pop('object_path')
         if self.checkfiles(extraction_method):
             self.readfiles(extraction_method)
         else:

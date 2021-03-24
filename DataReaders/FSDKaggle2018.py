@@ -10,12 +10,14 @@ from Tasks.TaskDataset import TaskDataset
 
 
 class FSDKaggle2018(DataReader):
-    audioset_path = r"E:\Thesis_results\Data_Readers\FSDKaggle2018"
+    object_path = r"E:\Thesis_results\Data_Readers\FSDKaggle2018"
     root = r"E:\Thesis_Datasets\FSDKaggle2018\freesound-audio-tagging"
     audio_folder = r"audio_train"
 
     def __init__(self, extraction_method, test_size=0.2, **kwargs):
         print('start FSDKaggle 2018')
+        if 'object_path' in kwargs:
+                  self.object_path = kwargs.pop('object_path')
         if self.checkfiles(extraction_method.name):
             self.readfiles(extraction_method.name)
         else:
@@ -29,7 +31,7 @@ class FSDKaggle2018(DataReader):
         return os.path.join(self.get_base_path(), 'FSDKaggle2018.obj')
 
     def get_base_path(self):
-        return self.audioset_path
+        return self.object_path
 
     def checkfiles(self, extraction_method):
         return TaskDataset.check(self.get_base_path(), extraction_method) and os.path.isfile(self.get_path())

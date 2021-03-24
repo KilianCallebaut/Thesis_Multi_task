@@ -8,11 +8,13 @@ from Tasks.TaskDataset import TaskDataset
 
 
 class Ravdess(DataReader):
-    audioset_path = r"E:\Thesis_Results\Data_Readers\Ravdess"
+    object_path = r"E:\Thesis_Results\Data_Readers\Ravdess"
     root = r"E:\Thesis_Datasets\Ravdess"
 
     def __init__(self, extraction_method, test_size=0.2, **kwargs):
         print('start ravdess')
+        if 'object_path' in kwargs:
+                  self.object_path = kwargs.pop('object_path')
         if self.checkfiles(extraction_method.name):
             self.readfiles(extraction_method.name)
         else:
@@ -26,7 +28,7 @@ class Ravdess(DataReader):
         return os.path.join(self.get_base_path(), 'Ravdess.obj')
 
     def get_base_path(self):
-        return self.audioset_path
+        return self.object_path
 
     def checkfiles(self, extraction_method):
         return TaskDataset.check(self.get_base_path(), extraction_method) and os.path.isfile(self.get_path())

@@ -11,12 +11,15 @@ from Tasks.TaskDataset import TaskDataset
 
 
 class SpeechCommands(DataReader):
-    audioset_path = r"E:\Thesis_Results\Data_Readers\SpeechCommands_{}"
+    object_path = r"E:\Thesis_Results\Data_Readers\SpeechCommands_{}"
     root = r"E:\Thesis_Datasets\SpeechCommands"
 
     def __init__(self, extraction_method, test_size=0.2, **kwargs):
         print('start Speech commands')
+
         self.sample_rate = 16000
+        if 'object_path' in kwargs:
+            self.object_path = kwargs.pop('object_path')
         if self.checkfiles(extraction_method.name):
             self.readfiles(extraction_method.name)
         else:
@@ -30,13 +33,13 @@ class SpeechCommands(DataReader):
         return os.path.join(self.get_base_path(), 'SpeechCommands.obj')
 
     def get_base_path(self):
-        return self.audioset_path.format('train')
+        return self.object_path.format('train')
 
     def get_eval_path(self):
         return os.path.join(self.get_base_path(), 'SpeechCommands.obj')
 
     def get_eval_base_path(self):
-        return self.audioset_path.format('eval')
+        return self.object_path.format('eval')
 
     def checkfiles(self, extraction_method):
         return TaskDataset.check(self.get_base_path(), extraction_method) and \

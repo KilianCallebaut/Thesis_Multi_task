@@ -17,10 +17,12 @@ except BaseException:
 class ASVspoof2015(DataReader):
     Wav_folder = r"E:\Thesis_Datasets\Automatic Speaker Verification Spoofing and Countermeasures Challenge 2015\DS_10283_853\wav"
     Label_folder = r"E:\Thesis_Datasets\Automatic Speaker Verification Spoofing and Countermeasures Challenge 2015\DS_10283_853\Joint_ASV_CM_protocol"
-    audioset_path = r"E:\Thesis_Results\Data_Readers\ASVspoof2015_{}"
+    object_path = r"E:\Thesis_Results\Data_Readers\ASVspoof2015_{}"
 
     def __init__(self, extraction_method, test_size=0.2, **kwargs):
         print('start asvspoof2015')
+        if 'object_path' in kwargs:
+            self.object_path = kwargs.pop('object_path')
         if self.checkfiles(extraction_method=extraction_method.name):
             self.readfiles(extraction_method.name)
         else:
@@ -34,10 +36,10 @@ class ASVspoof2015(DataReader):
         return os.path.join(self.get_base_path(), 'ASVspoof2015.obj')
 
     def get_base_path(self):
-        return self.audioset_path.format('train')
+        return self.object_path.format('train')
 
     def get_eval_base_path(self):
-        return self.audioset_path.format('eval')
+        return self.object_path.format('eval')
 
     def checkfiles(self, extraction_method):
         return TaskDataset.check(self.get_base_path(), extraction_method) \

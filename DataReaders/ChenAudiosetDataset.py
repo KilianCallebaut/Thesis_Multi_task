@@ -23,7 +23,7 @@ from sklearn.model_selection import train_test_split
 class ChenAudiosetDataset(DataReader):
     root = r'E:\Thesis_Datasets\audioset_chen\audioset_filtered'
     train_dir = "balanced_train_segments"
-    audioset_path = r"E:\Thesis_Results\Data_Readers\ChenAudiosetDataset"
+    object_path = r"E:\Thesis_Results\Data_Readers\ChenAudiosetDataset"
 
     # Bools for choosing random selection because overrepresented in dataset
     limit_speech = True
@@ -47,6 +47,8 @@ class ChenAudiosetDataset(DataReader):
 
     def __init__(self, extraction_method, test_size=0.2, **kwargs):
         print('start chen')
+        if 'object_path' in kwargs:
+            self.object_path = kwargs.pop('object_path')
         if self.checkfiles(extraction_method.name):
             self.readfiles(extraction_method.name)
         else:
@@ -54,14 +56,13 @@ class ChenAudiosetDataset(DataReader):
             self.calculateTaskDataset(extraction_method, **kwargs)
             self.writefiles(extraction_method.name)
         self.prepare_taskDatasets(test_size=test_size, extraction_method=extraction_method)
-        # self.calculateTaskDataset()
         print('done')
 
     def get_path(self):
-        return os.path.join(self.audioset_path, "ChenAudiosetDataset.obj")
+        return os.path.join(self.object_path, "ChenAudiosetDataset.obj")
 
     def get_base_path(self):
-        return self.audioset_path
+        return self.object_path
 
     def checkfiles(self, extraction_method):
         return TaskDataset.check(self.get_base_path(), extraction_method) and os.path.isfile(self.get_path())
@@ -113,7 +114,7 @@ class ChenAudiosetDataset(DataReader):
         self.wav_files = wav_files
 
     def readfiles(self, extraction_method):
-        # info = cPickle.load(open(self.audioset_path, 'rb'))
+        # info = cPickle.load(open(self.object_path, 'rb'))
         info = joblib.load(self.get_path())
         self.files = info['files']
         self.np_objects = info['np_objects']

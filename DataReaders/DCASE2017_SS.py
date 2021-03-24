@@ -15,7 +15,7 @@ from Tasks.TaskDataset import TaskDataset
 
 
 class DCASE2017_SS(DataReader):
-    audioset_path = r"E:\Thesis_Results\Data_Readers\DCASE2017_SS_{}"
+    object_path = r"E:\Thesis_Results\Data_Readers\DCASE2017_SS_{}"
     wav_folder = 'C:\\Users\\mrKC1\\PycharmProjects\\Thesis\\ExternalClassifiers\\DCASE2017-baseline-system-master' \
                  '\\applications\\data\\TUT-acoustic-scenes-2017-development\\audio\\'
     wav_folder_eval = 'C:\\Users\\mrKC1\\PycharmProjects\\Thesis\\ExternalClassifiers\\DCASE2017-baseline-system-master' \
@@ -23,6 +23,8 @@ class DCASE2017_SS(DataReader):
 
     def __init__(self, extraction_method, test_size=0.2, **kwargs):
         print('start DCASE2017 SS')
+        if 'object_path' in kwargs:
+                  self.object_path = kwargs.pop('object_path')
         if self.checkfiles(extraction_method.name):
             self.readfiles(extraction_method.name)
         else:
@@ -36,13 +38,13 @@ class DCASE2017_SS(DataReader):
         return os.path.join(self.get_base_path(), 'DCASE2017_SS.obj')
 
     def get_base_path(self):
-        return self.audioset_path.format('train')
+        return self.object_path.format('train')
 
     def get_eval_path(self):
         return os.path.join(self.get_eval_base_path(), 'DCASE2017_SS.obj')
 
     def get_eval_base_path(self):
-        return self.audioset_path.format('eval')
+        return self.object_path.format('eval')
 
     def checkfiles(self, extraction_method):
         return TaskDataset.check(self.get_base_path(), extraction_method) and \
