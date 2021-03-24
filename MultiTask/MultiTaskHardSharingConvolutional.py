@@ -2,11 +2,6 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-from MultiTask.FFNN import FFNN
-from MultiTask.TaskDependentLayers import TaskDependentLayers
-from MultiTask.TaskDependentSoftmax import TaskDependentSoftmax
-from pytorch_lightning.metrics.functional.classification import accuracy
-
 
 class MultiTaskHardSharingConvolutional(nn.Module):
 
