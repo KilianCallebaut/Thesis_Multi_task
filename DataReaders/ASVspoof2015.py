@@ -22,6 +22,7 @@ class ASVspoof2015(DataReader):
     def __init__(self, extraction_method, test_size=0.2, **kwargs):
         print('start asvspoof2015')
         if 'object_path' in kwargs:
+            print('true')
             self.object_path = kwargs.pop('object_path')
         if self.checkfiles(extraction_method=extraction_method.name):
             self.readfiles(extraction_method.name)
