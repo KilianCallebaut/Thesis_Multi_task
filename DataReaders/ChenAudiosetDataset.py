@@ -133,11 +133,11 @@ class ChenAudiosetDataset(DataReader):
     def calculateTaskDataset(self, method, **kwargs):
         print('Calculating input')
         inputs = self.calculate_input(method, **kwargs)
-        print('Filterbanks calculated')
+        print('Input calculated')
 
         targets = [[l[2] for l in x['labels']] for f in
                    self.files for x in f]
-        distinct_targets = list(set([x for l in targets for x in l]))
+        distinct_targets = list(set([x for l in targets for x in l if x != 'None of the above']))
 
         # Targets are translated as binary strings with 1 for each target
         # at the index where it is in distinct_targets order
@@ -170,8 +170,8 @@ class ChenAudiosetDataset(DataReader):
 
         speech_set = [i for i in range(len(sampled_targets))
                       if sampled_targets[i][taskDataset.task.output_labels.index('Speech')] == 1]
-        other_set = [i for i in range(len(sampled_targets))
-                     if sampled_targets[i][taskDataset.task.output_labels.index('None of the above')] == 1]
+        # other_set = [i for i in range(len(sampled_targets))
+        #              if sampled_targets[i][taskDataset.task.output_labels.index('None of the above')] == 1]
 
         if self.limit_speech and limit < len(speech_set):
             random_speech_set = random.sample(speech_set, limit)
@@ -180,12 +180,12 @@ class ChenAudiosetDataset(DataReader):
             sampled_targets = [sampled_targets[i] for i in sorted(random_speech_set + non_speech_set)]
             sampled_inputs = [sampled_inputs[i] for i in sorted(random_speech_set + non_speech_set)]
 
-        if self.limit_other and limit < len(other_set):
-            random_other_set = random.sample(other_set, limit)
-            non_other_set = [i for i in range(len(sampled_targets))
-                             if sampled_targets[i][taskDataset.task.output_labels.index('None of the above')] != 1]
-            sampled_targets = [sampled_targets[i] for i in sorted(random_other_set + non_other_set)]
-            sampled_inputs = [sampled_inputs[i] for i in sorted(random_other_set + non_other_set)]
+        # if self.limit_other and limit < len(other_set):
+        #     random_other_set = random.sample(other_set, limit)
+        #     non_other_set = [i for i in range(len(sampled_targets))
+        #                      if sampled_targets[i][taskDataset.task.output_labels.index('None of the above')] != 1]
+        #     sampled_targets = [sampled_targets[i] for i in sorted(random_other_set + non_other_set)]
+        #     sampled_inputs = [sampled_inputs[i] for i in sorted(random_other_set + non_other_set)]
 
         return sampled_inputs, sampled_targets
 

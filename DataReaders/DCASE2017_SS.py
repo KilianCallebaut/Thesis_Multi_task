@@ -174,7 +174,7 @@ class DCASE2017_SS(DataReader):
             train_test_split(self.taskDataset.inputs, self.taskDataset.targets,
                              test_size=test_size) \
                 if test_size > 0 else (self.taskDataset.inputs, [], self.taskDataset.targets, [])
-        extraction_method.scale_fit(x_train, extraction_method)
+        extraction_method.scale_fit(x_train)
         x_train, y_train = extraction_method.prepare_inputs_targets(x_train, y_train)
         self.trainTaskDataset = TaskDataset(inputs=x_train, targets=y_train,
                                             name=self.taskDataset.task.name + "_train",
