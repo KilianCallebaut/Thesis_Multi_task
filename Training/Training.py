@@ -136,6 +136,7 @@ class Training:
 
             for t in range(len(task_list)):
                 task_name = task_list[t].name
+                print('TASK {}: '.format(task_name), end='')
 
                 if task_list[t].output_module == "softmax":
                     writer.add_scalar("Accuracy/{}".format(task_name), epoch_metrics[t]['accuracy'], epoch)
@@ -144,6 +145,7 @@ class Training:
                     # plt.imshow(mat)
                     # writer.add_figure('Confusion matrix/{}'.format(task_list[t]),
                     #                   fig, epoch)
+                    print('Accuracy {} '.format(epoch_metrics[t]['accuracy']), end='')
                 elif task_list[t].output_module == "sigmoid":
                     writer.add_scalar("Micro AVG F1/{}".format(task_name),
                                       epoch_metrics[t]['micro avg']['f1-score'], epoch)
@@ -151,12 +153,16 @@ class Training:
                     # fig = plot_multilabel_confusion(mat, task_list[t].output_labels)
                     # writer.add_figure('Confusion matrix/{}'.format(task_list[t]),
                     #                   fig, epoch)
+                    print('Micro avg F1 {} '.format(epoch_metrics[t]['micro avg']['f1-score']), end='')
 
                 writer.add_scalar("Macro Avg Precision/{}".format(task_name),
                                   epoch_metrics[t]['macro avg']['precision'], epoch)
+                print('Macro avg Precision {} '.format(epoch_metrics[t]['macro avg']['precision']), end='')
                 writer.add_scalar("Macro Avg F1/{}".format(task_name), epoch_metrics[t]['macro avg']['f1-score'],
                                   epoch)
+                print('Macro avg F1 {}'.format(epoch_metrics[t]['macro avg']['f1-score']), end='')
                 writer.add_scalar("Running loss task/{}".format(task_name), task_running_losses[t].item() / step, epoch)
+                print('Running loss {}'.format(task_running_losses[t].item() / step))
 
             for h in range(len(model.hidden)):
                 writer.add_histogram("hidden weights {}".format(h), model.hidden[h].weight, epoch)
