@@ -101,7 +101,6 @@ class ExtractionMethod(ABC):
                 windowed_targets.append(targets[inp_idx])
 
         assert len(windowed_inputs) == len(windowed_targets)
-        print(len(windowed_inputs), len(windowed_targets))
         return windowed_inputs, windowed_targets
 
 

@@ -22,7 +22,7 @@ class Results:
     audioset_train_path = r"E:\Thesis_Results\Training_Results"
     audioset_eval_path = r"E:\Thesis_Results\Evaluation_Results"
     audioset_file_base = r"Result"
-    audioset_model_path = r"E:\Thesis_Results\Model_Checkpoints"
+    model_checkpoints_path = r"E:\Thesis_Results\Model_Checkpoints"
 
     def __init__(self, concat_dataset: ConcatTaskDataset, nr_epochs: int, *args, **kwargs):
 
@@ -37,6 +37,8 @@ class Results:
         self.nr_epochs = nr_epochs
         self.run_name = self.audioset_file_base + "_" + str(
             datetime.now().strftime("%d_%m_%Y_%H_%M_%S"))
+        if 'model_checkpoints_path' in kwargs:
+            self.model_checkpoints_path = kwargs.pop('model_checkpoints_path')
 
     # epochs, steps, (total_loss_batch, tasks -> [([outputs], [targets], loss))]
     def add_output(self, nr_epoch, output_batch, labels_batch, losses_batch, total_loss_batch):
@@ -46,11 +48,11 @@ class Results:
         self.all_results[nr_epoch].append((total_loss_batch, batch))
 
     def add_model_parameters(self, nr_epoch, model):
-        path = os.path.join(self.audioset_model_path, self.run_name + "epoch_{}.pth".format(nr_epoch))
+        path = os.path.join(self.model_checkpoints_path, self.run_name + "epoch_{}.pth".format(nr_epoch))
         torch.save({'epoch': nr_epoch, 'model_state_dict': model.state_dict()}, path)
 
     def load_model_parameters(self, nr_epoch, model):
-        path = os.path.join(self.audioset_model_path, self.run_name + "epoch_{}.pth".format(nr_epoch))
+        path = os.path.join(self.model_checkpoints_path, self.run_name + "epoch_{}.pth".format(nr_epoch))
         checkpoint = torch.load(path)
         model.load_state_dict(checkpoint['model_state_dict'])
 

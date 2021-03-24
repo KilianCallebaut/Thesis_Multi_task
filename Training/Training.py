@@ -24,13 +24,14 @@ class Training:
                              batch_size=64,
                              learning_rate=0.05,
                              weight_decay=0,
-                             num_epochs=50):
+                             num_epochs=50,
+                             **kwargs):
         criteria = [nn.BCELoss() if d.task.output_module == 'sigmoid' else nn.CrossEntropyLoss()
                     for d in concat_dataset.datasets]
 
         optimizer = optim.SGD(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
         results = Results(concat_dataset=concat_dataset, batch_size=batch_size, learning_rate=learning_rate,
-                          weight_decay=weight_decay, nr_epochs=num_epochs)
+                          weight_decay=weight_decay, nr_epochs=num_epochs, **kwargs)
         task_list = [x.task for x in concat_dataset.datasets]
 
         name = model.name
