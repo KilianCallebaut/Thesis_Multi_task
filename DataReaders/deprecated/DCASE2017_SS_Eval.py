@@ -113,7 +113,7 @@ class DCASE2017_SS_Eval(DataReader):
     def recalculate_features(self, method, **kwargs):
         self.taskDataset.inputs = self.calculate_input(method, **kwargs)
 
-    def split_train_test(self, test_size):
+    def prepare_taskDatasets(self, test_size):
         pass
 
     def toTestTaskDataset(self):

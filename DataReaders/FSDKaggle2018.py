@@ -16,13 +16,13 @@ class FSDKaggle2018(DataReader):
 
     def __init__(self, extraction_method, test_size=0.2, **kwargs):
         print('start FSDKaggle 2018')
-        if self.checkfiles(extraction_method):
-            self.readfiles(extraction_method)
+        if self.checkfiles(extraction_method.name):
+            self.readfiles(extraction_method.name)
         else:
             self.loadfiles()
             self.calculateTaskDataset(extraction_method, **kwargs)
-            self.writefiles(extraction_method)
-        self.split_train_test(test_size=test_size, extraction_method=extraction_method)
+            self.writefiles(extraction_method.name)
+        self.prepare_taskDatasets(test_size=test_size, extraction_method=extraction_method)
         print('done')
 
     def get_path(self):
@@ -59,11 +59,10 @@ class FSDKaggle2018(DataReader):
         for audio_idx in range(len(self.file_labels)):
             path = os.path.join(self.root, self.audio_folder, self.file_labels.loc[audio_idx].fname)
             read_wav = self.load_wav(path, resample_to)
-            inputs.append(self.extract_features(method, read_wav, **kwargs))
+            inputs.append(method.extract_features(read_wav, **kwargs))
             if perc < (audio_idx / len(self.file_labels)) * 100:
                 print("Percentage done: {}".format(perc))
                 perc += 1
-        # return self.standardize_input(inputs)
         return inputs
 
     def calculateTaskDataset(self, method, **kwargs):
@@ -83,17 +82,19 @@ class FSDKaggle2018(DataReader):
     def recalculate_features(self, method, **kwargs):
         self.taskDataset.inputs = self.calculate_input(method, **kwargs)
 
-    def split_train_test(self, test_size, extraction_method):
+    def prepare_taskDatasets(self, test_size, extraction_method):
         x_train, x_val, y_train, y_val = \
             train_test_split(self.taskDataset.inputs, self.taskDataset.targets, test_size=test_size) \
                 if test_size > 0 else (self.taskDataset.inputs, [], self.taskDataset.targets, [])
-        self.scale_fit(x_train, extraction_method)
-        self.trainTaskDataset = TaskDataset(inputs=self.scale_transform(x_train, extraction_method), targets=y_train,
+        extraction_method.scale_fit(x_train)
+        x_train, y_train = extraction_method.prepare_inputs_targets(x_train, y_train)
+        self.trainTaskDataset = TaskDataset(inputs=x_train, targets=y_train,
                                             name=self.taskDataset.task.name + "_train",
                                             labels=self.taskDataset.task.output_labels,
                                             output_module=self.taskDataset.task.output_module)
         if test_size > 0:
-            self.testTaskDataset = TaskDataset(inputs=self.scale_transform(x_val, extraction_method), targets=y_val,
+            x_val, y_val = extraction_method.prepare_inputs_targets(x_val, y_val)
+            self.testTaskDataset = TaskDataset(inputs=x_val, targets=y_val,
                                                name=self.taskDataset.task.name + "_test",
                                                labels=self.taskDataset.task.output_labels,
                                                output_module=self.taskDataset.task.output_module)

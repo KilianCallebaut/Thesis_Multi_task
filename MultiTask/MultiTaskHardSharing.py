@@ -33,7 +33,7 @@ class MultiTaskHardSharing(nn.Module):
             task_list
     ):
         super().__init__()
-
+        self.name = 'dnn'
         self.task_list = task_list
         # self.model = nn.Sequential()
 

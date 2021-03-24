@@ -47,13 +47,13 @@ class ChenAudiosetDataset(DataReader):
 
     def __init__(self, extraction_method, test_size=0.2, **kwargs):
         print('start chen')
-        if self.checkfiles(extraction_method):
-            self.readfiles(extraction_method)
+        if self.checkfiles(extraction_method.name):
+            self.readfiles(extraction_method.name)
         else:
             self.loadfiles()
             self.calculateTaskDataset(extraction_method, **kwargs)
-            self.writefiles(extraction_method)
-        self.split_train_test(test_size=test_size, extraction_method=extraction_method)
+            self.writefiles(extraction_method.name)
+        self.prepare_taskDatasets(test_size=test_size, extraction_method=extraction_method)
         # self.calculateTaskDataset()
         print('done')
 
@@ -130,19 +130,9 @@ class ChenAudiosetDataset(DataReader):
         self.taskDataset.save(self.get_base_path(), extraction_method)
 
     def calculateTaskDataset(self, method, **kwargs):
-        print('Calculating filterbanks')
+        print('Calculating input')
         inputs = self.calculate_input(method, **kwargs)
         print('Filterbanks calculated')
-
-        # # list( len: num_of_folders, dat: list( len: num_of_files, dat: list( len: num_of_labels)))
-        # targets = [[[l[2] for l in x['labels']] for x in f] for f in
-        #            self.files]
-        # distinct_targets = list(set([x for l in targets for f in l for x in f]))
-        # # Targets are translated as binary strings with 1 for each target
-        # # at the index where it is in distinct_targets order
-        # # list( len: num_of_folders, dat: list( len: num_of_files, dat: list( len: num_distinct_labels)))
-        # targets = [[[float(b in f) for b in distinct_targets] for f in l] for l in targets]
-        # # Will transform to list(torch(num_time_steps, num_distinct_labels))
 
         targets = [[l[2] for l in x['labels']] for f in
                    self.files for x in f]
@@ -166,8 +156,7 @@ class ChenAudiosetDataset(DataReader):
         for folder in self.wav_files:
             for file in folder:
                 read_wav = self.load_wav(file, resample_to)
-                inputs.append(self.extract_features(method, read_wav, **kwargs))
-        # return self.standardize_input(inputs)
+                inputs.append(method.extract_features(read_wav, **kwargs))
         return inputs
 
     def recalculate_features(self, method, **kwargs):
@@ -199,22 +188,23 @@ class ChenAudiosetDataset(DataReader):
 
         return sampled_inputs, sampled_targets
 
-    def split_train_test(self, test_size, extraction_method):
+    def prepare_taskDatasets(self, test_size, extraction_method):
         inputs = self.taskDataset.inputs
         targets = self.taskDataset.targets
         if self.limit_speech or self.limit_other:
             inputs, targets = self.sample_label(self.taskDataset)
-        a = train_test_split(inputs, targets, test_size=test_size)
         x_train, x_val, y_train, y_val = \
             train_test_split(inputs, targets, test_size=test_size) \
                 if test_size > 0 else (inputs, [], targets, [])
-        self.scale_fit(x_train, extraction_method)
-        self.trainTaskDataset = TaskDataset(inputs=self.scale_transform(x_train, extraction_method), targets=y_train,
+        extraction_method.scale_fit(x_train)
+        x_train, y_train = extraction_method.prepare_inputs_targets(x_train, y_train)
+        self.trainTaskDataset = TaskDataset(inputs=x_train, targets=y_train,
                                             name=self.taskDataset.task.name + "_train",
                                             labels=self.taskDataset.task.output_labels,
                                             output_module=self.taskDataset.task.output_module)
         if test_size > 0:
-            self.testTaskDataset = TaskDataset(inputs=self.scale_transform(x_val, extraction_method), targets=y_val,
+            x_val, y_val = extraction_method.prepare_inputs_targets(x_val, y_val)
+            self.testTaskDataset = TaskDataset(inputs=x_val, targets=y_val,
                                                name=self.taskDataset.task.name + "_test",
                                                labels=self.taskDataset.task.output_labels,
                                                output_module=self.taskDataset.task.output_module)

@@ -43,8 +43,9 @@ class TaskDataset(Dataset):
         self.pad_after = [0 for _ in range(after)]
 
     def save(self, base_path, extraction_method):
-        in_s = torch.stack(self.inputs)
-        torch.save(in_s, os.path.join(base_path, '{}_inputs.pt'.format(extraction_method)))
+        # in_s = torch.stack(self.inputs)
+        # torch.save(in_s, os.path.join(base_path, '{}_inputs.pt'.format(extraction_method)))
+        joblib.dump(self.inputs, os.path.join(base_path, '{}_inputs.gz'.format(extraction_method)))
         t_s = torch.Tensor(self.targets)
         torch.save(t_s, os.path.join(base_path, 'targets.pt'))
 
@@ -57,8 +58,9 @@ class TaskDataset(Dataset):
         joblib.dump(diction, os.path.join(base_path, 'other.obj'))
 
     def load(self, base_path, extraction_method):
-        in_l = torch.load(os.path.join(base_path, '{}_inputs.pt'.format(extraction_method)))
-        self.inputs = [i for i in in_l]
+        # in_l = torch.load(os.path.join(base_path, '{}_inputs.pt'.format(extraction_method)))
+        # self.inputs = [i for i in in_l]
+        self.inputs = joblib.load(os.path.join(base_path, '{}_inputs.gz'.format(extraction_method)))
         t_l = torch.load(os.path.join(base_path, 'targets.pt'))
         self.targets = [[int(j) for j in i] for i in t_l]
         diction = joblib.load(os.path.join(base_path, 'other.obj'))
@@ -69,5 +71,5 @@ class TaskDataset(Dataset):
 
     @staticmethod
     def check(base_path, extraction_method):
-        return os.path.isfile(os.path.join(base_path, '{}_inputs.pt'.format(extraction_method))) and os.path.isfile(
+        return os.path.isfile(os.path.join(base_path, '{}_inputs.gz'.format(extraction_method))) and os.path.isfile(
             os.path.join(base_path, 'targets.pt')) and os.path.isfile(os.path.join(base_path, 'other.obj'))

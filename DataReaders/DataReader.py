@@ -1,3 +1,4 @@
+import math
 from abc import abstractmethod, ABC
 
 import librosa
@@ -48,7 +49,7 @@ class DataReader(ABC):
         pass
 
     @abstractmethod
-    def split_train_test(self, test_size, extraction_method):
+    def prepare_taskDatasets(self, test_size, extraction_method):
         pass
 
     @abstractmethod
@@ -81,115 +82,101 @@ class DataReader(ABC):
         return sig, fs
 
     # FEATURE EXTRACTION
-    def extract_features(self, method, sig_samplerate, **kwargs):
-        options = {
-            'logbank_summary': self.extract_logbank_summary,
-            'logmel': self.extract_logmel,
-            'logbank': self.logbank,
-            'mfcc': self.mfcc
-        }
-        return options[method](sig_samplerate=sig_samplerate, **kwargs)
+    # def extract_features(self, method, sig_samplerate, **kwargs):
+    #     options = {
+    #         'logbank_summary': self.extract_logbank_summary,
+    #         'logmel': self.extract_logmel,
+    #         'logbank': self.logbank,
+    #         'mfcc': self.mfcc
+    #     }
+    #     return options[method](sig_samplerate=sig_samplerate, **kwargs)
 
     # Logbank Summary
-    def extract_logbank_summary(self, sig_samplerate, **kwargs):
-        lb = self.logbank(sig_samplerate, **kwargs)
-        return self.logbank_summary(lb)
+    # def extract_logbank_summary(self, sig_samplerate, **kwargs):
+    #     lb = self.logbank(sig_samplerate, **kwargs)
+    #     return self.logbank_summary(lb)
 
-    def logbank(self, sig_samplerate, winlen=0.03, winstep=0.01, nfilt=24, nfft=512, lowfreq=0, highfreq=None,
-                preemph=0.97):
-        return torch.transpose(
-            torch.tensor(logfbank(sig_samplerate[0], sig_samplerate[1], winlen=winlen, winstep=winstep,
-                                  nfilt=nfilt, nfft=nfft, lowfreq=lowfreq, highfreq=highfreq,
-                                  preemph=preemph)), 0, 1)
+    # def logbank(self, sig_samplerate, winlen=0.03, winstep=0.01, nfilt=24, nfft=512, lowfreq=0, highfreq=None,
+    #             preemph=0.97):
+    #     return torch.transpose(
+    #         torch.tensor(logfbank(sig_samplerate[0], sig_samplerate[1], winlen=winlen, winstep=winstep,
+    #                               nfilt=nfilt, nfft=nfft, lowfreq=lowfreq, highfreq=highfreq,
+    #                               preemph=preemph)), 0, 1)
 
     # winfunc = np.hamming
     # ceplifter = 22
     # preemph=0.97
-    def mfcc(self, sig_samplerate, winlen=0.03, winstep=0.01, nfilt=24, nfft=512, lowfreq=0, highfreq=None,
-             preemph=0, numcep=13, ceplifter=0, appendEnergy=False, winfunc=lambda x: np.ones((x,))):
-        # ( , NUMCEP, )
-        return torch.tensor(
-            mfcc(sig_samplerate[0], sig_samplerate[1], winlen=winlen, winstep=winstep, nfilt=nfilt, nfft=nfft,
-                 lowfreq=lowfreq, highfreq=highfreq, preemph=preemph, numcep=numcep, ceplifter=ceplifter,
-                 appendEnergy=appendEnergy, winfunc=winfunc)).T
+    # def mfcc(self, sig_samplerate, winlen=0.03, winstep=0.01, nfilt=24, nfft=512, lowfreq=0, highfreq=None,
+    #          preemph=0, numcep=13, ceplifter=0, appendEnergy=False, winfunc=lambda x: np.ones((x,))):
+    #     # ( , NUMCEP, )
+    #     return torch.tensor(
+    #         mfcc(sig_samplerate[0], sig_samplerate[1], winlen=winlen, winstep=winstep, nfilt=nfilt, nfft=nfft,
+    #              lowfreq=lowfreq, highfreq=highfreq, preemph=preemph, numcep=numcep, ceplifter=ceplifter,
+    #              appendEnergy=appendEnergy, winfunc=winfunc)).T
 
-    def logbank_summary(self, lb):
-        # m = torch.min(lb, 1).values
-        # mm = torch.max(lb, 1).values
-        # s = torch.std(lb, 1)
-        # mmm = torch.mean(lb, 1)
-        # mmmm = torch.median(lb, 1).values
-        # p = torch.tensor(np.percentile(lb, 25, axis=1))
-        # pp = torch.tensor(np.percentile(lb, 75, axis=1))
-        return torch.stack([torch.min(lb, 1).values, torch.max(lb, 1).values, torch.std(lb, 1), torch.mean(lb, 1),
-                            torch.median(lb, 1).values, torch.tensor(np.percentile(lb, 25, axis=1)),
-                            torch.tensor(np.percentile(lb, 75, axis=1))])
+    # def logbank_summary(self, lb):
+    #     return torch.stack([torch.min(lb, 1).values, torch.max(lb, 1).values, torch.std(lb, 1), torch.mean(lb, 1),
+    #                         torch.median(lb, 1).values, torch.tensor(np.percentile(lb, 25, axis=1)),
+    #                         torch.tensor(np.percentile(lb, 75, axis=1))])
 
     # Logmel
-    def extract_logmel(self, sig_samplerate, **kwargs):
-        sig = sig_samplerate[0]
-        fs = sig_samplerate[1]
-        if self.extractor is None:
-            self.extractor = LogMelExtractor(fs=fs,
-                                             **kwargs)
-        return self.extractor.transform(sig)
+    # def extract_logmel(self, sig_samplerate, **kwargs):
+    #     sig = sig_samplerate[0]
+    #     fs = sig_samplerate[1]
+    #     if self.extractor is None:
+    #         self.extractor = LogMelExtractor(fs=fs,
+    #                                          **kwargs)
+    #     return self.extractor.transform(sig)
+
+    # # Padding
+    # def max_length(self, inputs, dim=1):
+    #     return max([inp.shape[dim] for inp in inputs])
+    #
+    # def pad(self, list_of_tensors, max_length, dim=1):
+    #     return [torch.cat([l, torch.zeros(l.shape[0], max_length - l.shape[1])], 1) for l in list_of_tensors]
+
+    # Context window
+    # def window_inputs(self, inputs, targets, window_size=64, window_hop=30):
+    #     windowed_inputs = []
+    #     windowed_targets = []
+    #     start_frame = window_size
+    #
+    #     for inp_idx in range(len(inputs)):
+    #         inp = inputs[inp_idx]
+    #         end_frame = window_hop * math.floor(float(inp.shape[1]) / window_hop)
+    #         for frame_idx in range(start_frame, end_frame, window_hop):
+    #             window = inp[:, frame_idx - window_size:frame_idx]
+    #             assert window.shape == (inp.shape[0], window_size)
+    #             windowed_inputs.append(window)
+    #             windowed_targets.append(targets[inp_idx])
+    #
+    #     assert len(windowed_inputs) == len(windowed_targets)
+    #     return windowed_inputs, windowed_targets
+
 
     # TRANSFORMATION
-    def convert_list_of_tensors_to_nparray(self, list_of_tensors):
-        return np.array([t.numpy() for t in list_of_tensors])
+    # def convert_list_of_tensors_to_nparray(self, list_of_tensors):
+    #     return np.array([t.numpy() for t in list_of_tensors])
+    #
+    # def convert_nparray_to_list_of_tensors(self, arr):
+    #     return [torch.from_numpy(el) for el in arr]
 
-    def convert_nparray_to_list_of_tensors(self, arr):
-        return [torch.from_numpy(el) for el in arr]
+    # def scale_fit(self, inputs, extraction_method):
+    #     self.scalers = {}
+    #     inputs = self.convert_list_of_tensors_to_nparray(inputs)
+    #     if extraction_method in ['logbank_summary', 'mfcc']:
+    #         for i in range(inputs.shape[1]):
+    #             self.scalers[i] = StandardScaler()
+    #             self.scalers[i].fit(inputs[:, i, :])
+    #
+    # def scale_transform(self, inputs, extraction_method):
+    #     inputs = self.convert_list_of_tensors_to_nparray(inputs)
+    #     ret = inputs
+    #     if extraction_method in ['logbank_summary', 'logbank']:
+    #         for i in range(inputs.shape[1]):
+    #             ret[:, i, :] = torch.from_numpy(self.scalers[i].transform(inputs[:, i, :]))
+    #     return self.convert_nparray_to_list_of_tensors(ret)
 
-    def scale_fit(self, inputs, extraction_method):
-        self.scalers = {}
-        inputs = self.convert_list_of_tensors_to_nparray(inputs)
-        if extraction_method in ['logbank_summary', 'logbank']:
-            for i in range(inputs.shape[1]):
-                self.scalers[i] = StandardScaler()
-                self.scalers[i].fit(inputs[:, i, :])
-
-    def scale_transform(self, inputs, extraction_method):
-        inputs = self.convert_list_of_tensors_to_nparray(inputs)
-        ret = inputs
-        if extraction_method in ['logbank_summary', 'logbank']:
-            for i in range(inputs.shape[1]):
-                ret[:, i, :] = torch.from_numpy(self.scalers[i].transform(inputs[:, i, :]))
-        return self.convert_nparray_to_list_of_tensors(ret)
-
-    def scalarization_type(self, extraction_method):
-        if extraction_method in []:
-            return 'row'
-        elif extraction_method in []:
-            return 'column'
-        elif extraction_method in ['logbank_summary', 'logmel', 'logbank', 'mfcc']:
-            return 'general'
-
-    def calculate_scalars(self, inputs, type):
-        if type == 'column':
-            return self.column_scalars(inputs)
-        elif type == 'row':
-            return self.row_scalars(inputs)
-        elif type == 'general':
-            return self.general_scalars(inputs)
-
-    def row_scalars(self, inputs):
-        tc = torch.cat(inputs, 1)
-        tc_m = torch.mean(tc, 1)
-        tc_std = torch.std(tc, 1)
-        return tc_m, tc_std
-
-    def column_scalars(self, inputs):
-        tc = torch.cat(inputs, 0)
-        tc_m = torch.mean(tc, 0)
-        tc_std = torch.std(tc, 0)
-        return tc_m, tc_std
-
-    def general_scalars(self, inputs):
-        tc = torch.cat(inputs, 1)
-        tc_m = torch.mean(tc)
-        tc_std = torch.std(tc)
-        return tc_m, tc_std
 
     # def standardize_input(self, inputs, means, stds, type):
     #     if type == 'column':
@@ -272,3 +259,5 @@ class LogMelExtractor:
         feature_logmel = np.concatenate(feature_logmel, axis=0)
 
         return torch.tensor(feature_logmel)
+
+

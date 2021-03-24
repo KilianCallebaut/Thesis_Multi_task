@@ -2,7 +2,6 @@ import os
 
 import joblib
 import pandas as pd
-import numpy as np
 from numpy import long
 from sklearn.model_selection import train_test_split
 
@@ -22,13 +21,13 @@ class ASVspoof2015(DataReader):
 
     def __init__(self, extraction_method, test_size=0.2, **kwargs):
         print('start asvspoof2015')
-        if self.checkfiles(extraction_method=extraction_method):
-            self.readfiles(extraction_method)
+        if self.checkfiles(extraction_method=extraction_method.name):
+            self.readfiles(extraction_method.name)
         else:
             self.loadfiles()
             self.calculateTaskDataset(extraction_method, **kwargs)
-            self.writefiles(extraction_method)
-        self.split_train_test(test_size=test_size, extraction_method=extraction_method)
+            self.writefiles(extraction_method.name)
+        self.prepare_taskDatasets(test_size=test_size, extraction_method=extraction_method)
         print('done')
 
     def get_path(self):
@@ -101,7 +100,7 @@ class ASVspoof2015(DataReader):
         inputs = []
         for audio_idx in range(len(self.files)):
             read_wav = self.load_wav(self.files[audio_idx] + '.wav', resample_to)
-            inputs.append(self.extract_features(method, read_wav, **kwargs))
+            inputs.append(method.extract_features(read_wav, **kwargs))
             if perc < (audio_idx / len(self.files)) * 100:
                 print("Percentage done: {}".format(perc))
                 perc += 1
@@ -111,11 +110,13 @@ class ASVspoof2015(DataReader):
         inputs_val = []
         for audio_idx in range(len(self.files_val)):
             read_wav = self.load_wav(self.files_val[audio_idx] + '.wav', resample_to)
-            inputs_val.append(self.extract_features(method, read_wav, **kwargs))
+            inputs_val.append(method.extract_features(read_wav, **kwargs))
             if perc < (audio_idx / len(self.files_val)) * 100:
                 print("Percentage done: {}".format(perc))
                 perc += 1
 
+        # inputs = self.pad(inputs, max(self.max_length(inputs), self.max_length(inputs_val)))
+        # inputs_val = self.pad(inputs, max(self.max_length(inputs), self.max_length(inputs_val)))
         return inputs, inputs_val
 
     def calculateTaskDataset(self, method, **kwargs):
@@ -132,6 +133,7 @@ class ASVspoof2015(DataReader):
             targets_val.append(target)
 
         inputs, inputs_val = self.calculate_input(method, **kwargs)
+
         self.taskDataset = TaskDataset(inputs=inputs,
                                        targets=targets,
                                        name='ASVspoof2015',
@@ -149,33 +151,25 @@ class ASVspoof2015(DataReader):
         self.taskDataset.inputs = inputs
         self.valTaskDataset.inputs = inputs_val
 
-    def split_train_test(self, test_size, extraction_method):
+    def prepare_taskDatasets(self, test_size, extraction_method):
         x_train, x_val, y_train, y_val = \
             train_test_split(self.taskDataset.inputs, self.taskDataset.targets, test_size=test_size) \
                 if test_size > 0 else (self.taskDataset.inputs, [], self.taskDataset.targets, [])
-        self.scale_fit(x_train, extraction_method)
-        self.trainTaskDataset = TaskDataset(inputs=self.scale_transform(x_train, extraction_method), targets=y_train,
+        extraction_method.scale_fit(x_train)
+        x_train, y_train = extraction_method.prepare_inputs_targets(x_train, y_train)
+        self.trainTaskDataset = TaskDataset(inputs=x_train, targets=y_train,
                                             name=self.taskDataset.task.name + "_train",
                                             labels=self.taskDataset.task.output_labels,
                                             output_module=self.taskDataset.task.output_module)
         if test_size > 0:
-            self.testTaskDataset = TaskDataset(inputs=self.scale_transform(x_val, extraction_method), targets=y_val,
+            x_val, y_val = extraction_method.prepare_inputs_targets(x_val, y_val)
+            self.testTaskDataset = TaskDataset(inputs= x_val, targets=y_val,
                                                name=self.taskDataset.task.name + "_test",
                                                labels=self.taskDataset.task.output_labels,
                                                output_module=self.taskDataset.task.output_module)
 
-        self.valTaskDataset.inputs = self.scale_transform(self.valTaskDataset.inputs, extraction_method)
-        # means, stds = self.calculate_scalars(self.taskDataset.inputs, scalarize_type)
-        # self.trainTaskDataset = TaskDataset(inputs=self.standardize_input(x_train, means, stds, scalarize_type), targets=y_train,
-        #                                     name=self.taskDataset.task.name + "_train",
-        #                                     labels=self.taskDataset.task.output_labels,
-        #                                     output_module=self.taskDataset.task.output_module)
-        # self.testTaskDataset = TaskDataset(inputs=self.standardize_input(x_val, means, stds, scalarize_type), targets=y_val,
-        #                                    name=self.taskDataset.task.name + "_test",
-        #                                    labels=self.taskDataset.task.output_labels,
-        #                                    output_module=self.taskDataset.task.output_module)
-        #
-        # self.valTaskDataset.inputs = self.standardize_input(, means, stds, scalarize_type)
+        self.valTaskDataset.inputs, self.valTaskDataset.targets = extraction_method.prepare_inputs_targets(
+            self.valTaskDataset.inputs, self.valTaskDataset.targets)
 
     def toTrainTaskDataset(self):
         return self.trainTaskDataset
