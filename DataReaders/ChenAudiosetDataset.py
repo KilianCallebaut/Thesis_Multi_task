@@ -45,7 +45,9 @@ class ChenAudiosetDataset(DataReader):
 
     target_list = []
 
-    def __init__(self, extraction_method, test_size=0.2, **kwargs):
+    def __init__(self, extraction_method, **kwargs):
+        self.extraction_method = extraction_method
+
         print('start chen')
         if 'object_path' in kwargs:
             self.object_path = kwargs.pop('object_path')
@@ -55,7 +57,7 @@ class ChenAudiosetDataset(DataReader):
             self.loadfiles()
             self.calculateTaskDataset(extraction_method, **kwargs)
             self.writefiles(extraction_method.name)
-        self.prepare_taskDatasets(test_size=test_size, extraction_method=extraction_method)
+
         print('done')
 
     def get_path(self):
@@ -189,7 +191,7 @@ class ChenAudiosetDataset(DataReader):
 
         return sampled_inputs, sampled_targets
 
-    def prepare_taskDatasets(self, test_size, extraction_method):
+    def prepare_taskDatasets(self, test_size, **kwargs):
         inputs = self.taskDataset.inputs
         targets = self.taskDataset.targets
         if self.limit_speech or self.limit_other:
@@ -197,14 +199,14 @@ class ChenAudiosetDataset(DataReader):
         x_train, x_val, y_train, y_val = \
             train_test_split(inputs, targets, test_size=test_size) \
                 if test_size > 0 else (inputs, [], targets, [])
-        extraction_method.scale_fit(x_train)
-        x_train, y_train = extraction_method.prepare_inputs_targets(x_train, y_train)
+        self.extraction_method.scale_fit(x_train)
+        x_train, y_train = self.extraction_method.prepare_inputs_targets(x_train, y_train)
         self.trainTaskDataset = TaskDataset(inputs=x_train, targets=y_train,
                                             name=self.taskDataset.task.name + "_train",
                                             labels=self.taskDataset.task.output_labels,
                                             output_module=self.taskDataset.task.output_module)
         if test_size > 0:
-            x_val, y_val = extraction_method.prepare_inputs_targets(x_val, y_val)
+            x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val)
             self.testTaskDataset = TaskDataset(inputs=x_val, targets=y_val,
                                                name=self.taskDataset.task.name + "_test",
                                                labels=self.taskDataset.task.output_labels,

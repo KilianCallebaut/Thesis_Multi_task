@@ -49,7 +49,7 @@ class DataReader(ABC):
         pass
 
     @abstractmethod
-    def prepare_taskDatasets(self, test_size, extraction_method):
+    def prepare_taskDatasets(self, test_size, **kwargs):
         pass
 
     @abstractmethod

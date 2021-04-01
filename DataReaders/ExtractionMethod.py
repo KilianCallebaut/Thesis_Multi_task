@@ -27,7 +27,7 @@ class ExtractionMethod(ABC):
         pass
 
     @abstractmethod
-    def prepare_inputs_targets(self, inputs, targets):
+    def prepare_inputs_targets(self, inputs, targets, **kwargs):
         pass
 
     # EXTRACTION
@@ -128,7 +128,7 @@ class LogbankSummary(ExtractionMethod):
         ret = self.scale_transform_3D_2nddim(inputs)
         return self.convert_nparray_to_list_of_tensors(ret)
 
-    def prepare_inputs_targets(self, inputs, targets):
+    def prepare_inputs_targets(self, inputs, targets, **kwargs):
         inputs = self.scale_transform(inputs)
         return inputs, targets
 
@@ -164,9 +164,9 @@ class Mfcc(ExtractionMethod):
             ret.append(self.scale_transform_2D(inputs[i].numpy()))
         return self.convert_nparray_to_list_of_tensors(ret)
 
-    def prepare_inputs_targets(self, inputs, targets):
+    def prepare_inputs_targets(self, inputs, targets, **kwargs):
         inputs = self.scale_transform(inputs)
-        inputs, targets = self.window_inputs(inputs, targets)
+        inputs, targets = self.window_inputs(inputs, targets, **kwargs)
         return inputs, targets
 
 
@@ -192,7 +192,8 @@ class MelSpectrogram(ExtractionMethod):
             ret.append(self.scale_transform_2D(inputs[i].numpy()))
         return self.convert_nparray_to_list_of_tensors(ret)
 
-    def prepare_inputs_targets(self, inputs, targets):
+    def prepare_inputs_targets(self, inputs, targets, **kwargs):
         inputs = self.scale_transform(inputs)
-        inputs, targets = self.window_inputs(inputs, targets)
+        if 'window_size' not in kwargs or ('window_size' in kwargs and kwargs.get('window_size') != 0):
+            inputs, targets = self.window_inputs(inputs, targets, **kwargs)
         return inputs, targets
