@@ -41,7 +41,7 @@ class Training:
             name += "_" + n.name
         writer = SummaryWriter(comment=name)
 
-        # writer.add_graph(model, torch.rand([2, 2206, 24]).cuda())
+        writer.add_graph(model, torch.rand(concat_dataset.datasets[0].__getitem__(0)[0].shape[None, :, :]).cuda())
 
         # Load Data Example
         train_loader = torch.utils.data.DataLoader(

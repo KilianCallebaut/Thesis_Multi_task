@@ -61,8 +61,8 @@ class MultiTaskHardSharingConvolutional(nn.Module):
 
     def forward(self, x):
         '''x: (batch_size, time_steps, mel_bins)'''
-        x = x[None, :, :, :]
-        x = torch.transpose(x, 0, 1)
+        x = x[:, None, :, :]
+        # x = torch.transpose(x, 0, 1)
         '''x: (batch_size, n_channels=1, time_steps, mel_bins)'''
         for layer_id in range(len(self.hidden)):
             x = F.relu_(self.hidden_bn[layer_id](self.hidden[layer_id](x)))

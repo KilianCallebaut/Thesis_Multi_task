@@ -1,12 +1,10 @@
-import math
+import random
 from abc import abstractmethod, ABC
 
 import librosa
 import numpy as np
 import torch
-from python_speech_features import logfbank, mfcc
 from scipy import signal
-from sklearn.preprocessing import StandardScaler
 
 
 class DataReader(ABC):
@@ -48,8 +46,22 @@ class DataReader(ABC):
     def recalculate_features(self, method, **kwargs):
         pass
 
+    def sample_labels(self, taskDataset, dic_of_labels_limits):
+        sampled_targets = taskDataset.targets
+        sampled_inputs = taskDataset.inputs
+
+        for l in dic_of_labels_limits.keys():
+            label_set = [i for i in range(len(sampled_targets))
+                         if sampled_targets[i][taskDataset.task.output_labels.index(l)] == 1]
+            random_label_set = random.sample(label_set, dic_of_labels_limits[l])
+            sampled_targets = [sampled_targets[i] for i in range(len(sampled_targets)) if
+                               (i not in label_set or i in random_label_set)]
+            sampled_inputs = [sampled_inputs[i] for i in range(len(sampled_inputs)) if
+                              (i not in label_set or i in random_label_set)]
+        return sampled_inputs, sampled_targets
+
     @abstractmethod
-    def prepare_taskDatasets(self, test_size, **kwargs):
+    def prepare_taskDatasets(self, test_size, dic_of_labels_limits, **kwargs):
         pass
 
     @abstractmethod
@@ -153,7 +165,6 @@ class DataReader(ABC):
     #     assert len(windowed_inputs) == len(windowed_targets)
     #     return windowed_inputs, windowed_targets
 
-
     # TRANSFORMATION
     # def convert_list_of_tensors_to_nparray(self, list_of_tensors):
     #     return np.array([t.numpy() for t in list_of_tensors])
@@ -176,7 +187,6 @@ class DataReader(ABC):
     #         for i in range(inputs.shape[1]):
     #             ret[:, i, :] = torch.from_numpy(self.scalers[i].transform(inputs[:, i, :]))
     #     return self.convert_nparray_to_list_of_tensors(ret)
-
 
     # def standardize_input(self, inputs, means, stds, type):
     #     if type == 'column':
@@ -259,5 +269,3 @@ class LogMelExtractor:
         feature_logmel = np.concatenate(feature_logmel, axis=0)
 
         return torch.tensor(feature_logmel)
-
-

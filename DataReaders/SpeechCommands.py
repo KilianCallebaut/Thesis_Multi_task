@@ -117,22 +117,11 @@ class SpeechCommands(DataReader):
         self.taskDataset.inputs = self.calculate_input(method, **kwargs)
         self.validTaskDataset.inputs = self.calculate_input(method, test=True, **kwargs)
 
-    def sample_label(self, taskDataset):
-        limit = 5000
-        sampled_targets = taskDataset.targets
-        sampled_inputs = taskDataset.inputs
-
-        other_set = [i for i in range(len(sampled_targets))
-                     if sampled_targets[i][-1] == 1]
-        non_other_set = [i for i in range(len(sampled_targets))
-                         if sampled_targets[i][-1] != 1]
-        random_other_set = random.sample(other_set, limit)
-        sampled_targets = [sampled_targets[i] for i in sorted(random_other_set + non_other_set)]
-        sampled_inputs = [sampled_inputs[i] for i in sorted(random_other_set + non_other_set)]
-        return sampled_inputs, sampled_targets
-
-    def prepare_taskDatasets(self, test_size, **kwargs):
-        inputs, targets = self.sample_label(self.taskDataset)
+    def prepare_taskDatasets(self, test_size, dic_of_labels_limits, **kwargs):
+        inputs = self.taskDataset.inputs
+        targets = self.taskDataset.targets
+        if dic_of_labels_limits:
+            inputs, targets = self.sample_labels(self.taskDataset, dic_of_labels_limits)
 
         x_train, x_val, y_train, y_val = \
             train_test_split(inputs, targets, test_size=test_size) \

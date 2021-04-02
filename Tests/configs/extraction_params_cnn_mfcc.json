@@ -1,0 +1,13 @@
+{
+  "nfft": 1024,
+  "winlen": 0.03,
+  "winstep": 0.01,
+  "nfilt": 24,
+  "lowfreq": 0,
+  "highfreq": null,
+  "preemph": 0,
+  "numcep": 13,
+  "ceplifter": 0,
+  "appendEnergy": false,
+  "extraction_method": "mfcc"
+}

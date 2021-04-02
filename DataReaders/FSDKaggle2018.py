@@ -86,10 +86,15 @@ class FSDKaggle2018(DataReader):
     def recalculate_features(self, method, **kwargs):
         self.taskDataset.inputs = self.calculate_input(method, **kwargs)
 
-    def prepare_taskDatasets(self, test_size, **kwargs):
+    def prepare_taskDatasets(self, test_size, dic_of_labels_limits, **kwargs):
+        inputs = self.taskDataset.inputs
+        targets = self.taskDataset.targets
+        if dic_of_labels_limits:
+            inputs, targets = self.sample_labels(self.taskDataset, dic_of_labels_limits)
+
         x_train, x_val, y_train, y_val = \
-            train_test_split(self.taskDataset.inputs, self.taskDataset.targets, test_size=test_size) \
-                if test_size > 0 else (self.taskDataset.inputs, [], self.taskDataset.targets, [])
+            train_test_split(inputs, targets, test_size=test_size) \
+                if test_size > 0 else (inputs, [], targets, [])
         self.extraction_method.scale_fit(x_train)
         x_train, y_train = self.extraction_method.prepare_inputs_targets(x_train, y_train, **kwargs)
         self.trainTaskDataset = TaskDataset(inputs=x_train, targets=y_train,

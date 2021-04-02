@@ -83,6 +83,7 @@ class ASVspoof2015(DataReader):
         self.valTaskDataset = TaskDataset([], [], '', [])
         self.valTaskDataset.load(self.get_eval_base_path(), extraction_method)
 
+
     def write_files(self, extraction_method):
         dict = {'files': self.files,
                 'truths': self.truths,
@@ -155,10 +156,16 @@ class ASVspoof2015(DataReader):
         self.taskDataset.inputs = inputs
         self.valTaskDataset.inputs = inputs_val
 
-    def prepare_taskDatasets(self, test_size, **kwargs):
+    def prepare_taskDatasets(self, test_size, dic_of_labels_limits, **kwargs):
+        inputs = self.taskDataset.inputs
+        targets = self.taskDataset.targets
+        if dic_of_labels_limits:
+            inputs, targets = self.sample_labels(self.taskDataset, dic_of_labels_limits)
+
         x_train, x_val, y_train, y_val = \
-            train_test_split(self.taskDataset.inputs, self.taskDataset.targets, test_size=test_size) \
-                if test_size > 0 else (self.taskDataset.inputs, [], self.taskDataset.targets, [])
+            train_test_split(inputs, targets, test_size=test_size) \
+                if test_size > 0 else (inputs, [], targets, [])
+
 
         self.extraction_method.scale_fit(x_train)
         x_train, y_train = self.extraction_method.prepare_inputs_targets(x_train, y_train, **kwargs)

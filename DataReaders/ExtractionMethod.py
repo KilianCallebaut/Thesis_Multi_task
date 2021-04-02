@@ -194,6 +194,6 @@ class MelSpectrogram(ExtractionMethod):
 
     def prepare_inputs_targets(self, inputs, targets, **kwargs):
         inputs = self.scale_transform(inputs)
-        if 'window_size' not in kwargs or ('window_size' in kwargs and kwargs.get('window_size') != 0):
+        if 'window_size' in kwargs and kwargs.get('window_size') != 0:
             inputs, targets = self.window_inputs(inputs, targets, **kwargs)
         return inputs, targets

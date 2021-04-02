@@ -1,97 +1,44 @@
 from __future__ import print_function, division
 
 import sys
-import numpy as np
 
-from DataReaders.ASVspoof2015 import ASVspoof2015
+from Tests.config_reader import *
+
+# from DataReaders.ASVspoof2015 import ASVspoof2015
 from DataReaders.ChenAudiosetDataset import ChenAudiosetDataset
-from DataReaders.DCASE2017_SS import DCASE2017_SS
-
-from DataReaders.ExtractionMethod import Mfcc, MelSpectrogram
-from DataReaders.FSDKaggle2018 import FSDKaggle2018
-from DataReaders.Ravdess import Ravdess
-from DataReaders.SpeechCommands import SpeechCommands
-from MultiTask.MultiTaskHardSharing import MultiTaskHardSharing
+# from DataReaders.DCASE2017_SS import DCASE2017_SS
+#
+# from DataReaders.ExtractionMethod import Mfcc, MelSpectrogram
+# from DataReaders.FSDKaggle2018 import FSDKaggle2018
+# from DataReaders.Ravdess import Ravdess
+# from DataReaders.SpeechCommands import SpeechCommands
+# from MultiTask.MultiTaskHardSharing import MultiTaskHardSharing
 from MultiTask.MultiTaskHardSharingConvolutional import MultiTaskHardSharingConvolutional
 from Tasks.ConcatTaskDataset import ConcatTaskDataset
 from Training.Training import Training
 
 
 def main(argv):
-    meta_params = {
-        'extraction_method': MelSpectrogram(),
-        # 'extraction_method': Mfcc(),
-        'batch_size': 1,  # 8,
-        'num_epochs': 200,
-        'learning_rate': 0.001
-    }
+    meta_params = read_config('meta_params_cnn_MelSpectrogram')
+    extraction_params = read_config('extraction_params_cnn_MelSpectrogram')
 
-    # extraction_params = dict(
-    #     nfft=1024,
-    #     winlen=0.03,
-    #     winstep=0.01,
-    #     nfilt=24,
-    #     lowfreq=0,
-    #     highfreq=None,
-    #     preemph=0,
-    #     numcep=13,
-    #     ceplifter=0,
-    #     appendEnergy=False,
-    #     winfunc=lambda x: np.ones((x,))
-    # )
+    # asvspoof = ASVspoof2015(**extraction_params)
+    # asvspoof.prepare_taskDatasets(**read_config('preparation_params_asvspoof_cnn'))
 
-    extraction_params = dict(
-        nfft=1024,
-        winlen=0.03,
-        winstep=0.01,
-        nfilt=96,  # 24,
-        lowfreq=0,
-        highfreq=None,
-        preemph=0,
-        winfunc=lambda x: np.ones((x,))
-    )
+    chenaudio = ChenAudiosetDataset(**extraction_params)
+    chenaudio.prepare_taskDatasets(**read_config('preparation_params_chen_cnn'))
 
-    test_size = 0.2
-
-    preparation_params = dict(
-        window_size=0,  # 64,
-        window_hop=0,  # 32
-    )
-
-    model_params = dict(
-        hidden_size=64,
-        n_hidden=4
-    )
-
-    # asvspoof = ASVspoof2015(extraction_method=meta_params['extraction_method'],
-    #                         **extraction_params,
-    #                         )
-    # asvspoof.prepare_taskDatasets(test_size=0, **preparation_params_val)
-
-    chenaudio = ChenAudiosetDataset(extraction_method=meta_params['extraction_method'],
-                                    **extraction_params,
-                                    )
-    chenaudio.prepare_taskDatasets(test_size=0.2, **preparation_params)
-
-    # dcaseScene = DCASE2017_SS(extraction_method=meta_params['extraction_method'],
-    #                           **extraction_params,
-    #                           )
-    # dcaseScene.prepare_taskDatasets(test_size=0, **preparation_params_val)
+    # dcaseScene = DCASE2017_SS(**extraction_params)
+    # dcaseScene.prepare_taskDatasets(**read_config('preparation_params_dcaseScene_cnn'))
     #
-    # fsdkaggle = FSDKaggle2018(extraction_method=meta_params['extraction_method'],
-    #                           **extraction_params,
-    #                           )
-    # fsdkaggle.prepare_taskDatasets(test_size=0.2, **preparation_params)
+    # fsdkaggle = FSDKaggle2018(**extraction_params)
+    # fsdkaggle.prepare_taskDatasets(**read_config('preparation_params_fsdkaggle_cnn'))
     #
-    # ravdess = Ravdess(extraction_method=meta_params['extraction_method'],
-    #                   **extraction_params,
-    #                   )
-    # ravdess.prepare_taskDatasets(test_size=0.2, **preparation_params)
+    # ravdess = Ravdess(**extraction_params)
+    # ravdess.prepare_taskDatasets(**read_config('preparation_params_ravdess_cnn'))
     #
-    # speechcommands = SpeechCommands(extraction_method=meta_params['extraction_method'],
-    #                                 **extraction_params,
-    #                                 )
-    # speechcommands.prepare_taskDatasets(test_size=0.2, **preparation_params_val)
+    # speechcommands = SpeechCommands(**extraction_params)
+    # speechcommands.prepare_taskDatasets(**read_config('preparation_params_speechcommands_cnn'))
     print('loaded all datasets')
 
     # asvspoof_t = asvspoof.toTrainTaskDataset()
@@ -121,7 +68,7 @@ def main(argv):
         # eval_dataset = ConcatTaskDataset([evaldatasets[i]])
         task_list = training_dataset.get_task_list()
         model = MultiTaskHardSharingConvolutional(1,
-                                                  **model_params,
+                                                  **read_config('model_params_cnn'),
                                                   task_list=task_list)
         model = model.cuda()
         print('Model Created')
