@@ -17,12 +17,12 @@ class Ravdess(DataReader):
         print('start ravdess')
         if 'object_path' in kwargs:
                   self.object_path = kwargs.pop('object_path')
-        if self.checkfiles(extraction_method.name):
-            self.readfiles(extraction_method.name)
+        if self.check_files(extraction_method.name):
+            self.read_files(extraction_method.name)
         else:
-            self.loadfiles()
-            self.calculateTaskDataset(extraction_method, **kwargs)
-            self.writefiles(extraction_method.name)
+            self.load_files()
+            self.calculate_taskDataset(extraction_method, **kwargs)
+            self.write_files(extraction_method.name)
 
         print('Done loading Ravdess')
 
@@ -32,10 +32,10 @@ class Ravdess(DataReader):
     def get_base_path(self):
         return self.object_path
 
-    def checkfiles(self, extraction_method):
+    def check_files(self, extraction_method):
         return TaskDataset.check(self.get_base_path(), extraction_method) and os.path.isfile(self.get_path())
 
-    def loadfiles(self):
+    def load_files(self):
         song_folder = 'Audio_song_actors_01-24'
         speech_folder = 'Audio_Speech_Actors_01-24'
         self.files = []
@@ -56,13 +56,13 @@ class Ravdess(DataReader):
                              }
                         )
 
-    def readfiles(self, extraction_method):
+    def read_files(self, extraction_method):
         info = joblib.load(self.get_path())
         self.files = info['files']
         self.taskDataset = TaskDataset([], [], '', [])
         self.taskDataset.load(self.get_base_path(), extraction_method)
 
-    def writefiles(self, extraction_method):
+    def write_files(self, extraction_method):
         dict = {'files': self.files}
         joblib.dump(dict, self.get_path())
         self.taskDataset.save(self.get_base_path(), extraction_method)
@@ -84,7 +84,7 @@ class Ravdess(DataReader):
                 perc += 1
         return inputs
 
-    def calculateTaskDataset(self, method, **kwargs):
+    def calculate_taskDataset(self, method, **kwargs):
         print('Calculating input')
         inputs = self.calculate_input(method, **kwargs)
 
@@ -103,13 +103,13 @@ class Ravdess(DataReader):
             train_test_split(self.taskDataset.inputs, self.taskDataset.targets, test_size=test_size) \
                 if test_size > 0 else (self.taskDataset.inputs, [], self.taskDataset.targets, [])
         self.extraction_method.scale_fit(x_train)
-        x_train, y_train = self.extraction_method.prepare_inputs_targets(x_train, y_train)
+        x_train, y_train = self.extraction_method.prepare_inputs_targets(x_train, y_train, **kwargs)
         self.trainTaskDataset = TaskDataset(inputs=x_train, targets=y_train,
                                             name=self.taskDataset.task.name + "_train",
                                             labels=self.taskDataset.task.output_labels,
                                             output_module=self.taskDataset.task.output_module)
         if test_size > 0:
-            x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val)
+            x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val, **kwargs)
             self.testTaskDataset = TaskDataset(inputs=x_val, targets=y_val,
                                                name=self.taskDataset.task.name + "_test",
                                                labels=self.taskDataset.task.output_labels,

@@ -25,12 +25,12 @@ class ASVspoof2015(DataReader):
         print('start asvspoof2015')
         if 'object_path' in kwargs:
             self.object_path = kwargs.pop('object_path')
-        if self.checkfiles(extraction_method=self.extraction_method.name):
-            self.readfiles(self.extraction_method.name)
+        if self.check_files(extraction_method=self.extraction_method.name):
+            self.read_files(self.extraction_method.name)
         else:
-            self.loadfiles()
-            self.calculateTaskDataset(self.extraction_method, **kwargs)
-            self.writefiles(self.extraction_method.name)
+            self.load_files()
+            self.calculate_taskDataset(self.extraction_method, **kwargs)
+            self.write_files(self.extraction_method.name)
 
         print('done')
 
@@ -43,11 +43,11 @@ class ASVspoof2015(DataReader):
     def get_eval_base_path(self):
         return self.object_path.format('eval')
 
-    def checkfiles(self, extraction_method):
+    def check_files(self, extraction_method):
         return TaskDataset.check(self.get_base_path(), extraction_method) \
                and os.path.isfile(self.get_path()) and TaskDataset.check(self.get_eval_base_path(), extraction_method)
 
-    def loadfiles(self):
+    def load_files(self):
         self.truths = pd.read_csv(os.path.join(self.Label_folder, 'ASV_male_development.ndx'), sep=' ', header=None,
                                   names=['folder', 'file', 'method', 'source'])
         truths_female = pd.read_csv(os.path.join(self.Label_folder, 'ASV_female_development.ndx'), sep=' ',
@@ -71,7 +71,7 @@ class ASVspoof2015(DataReader):
         self.files = [os.path.join(self.Wav_folder, x[0], x[1]) for x in self.truths.to_numpy()]
         self.files_val = [os.path.join(self.Wav_folder, x[0], x[1]) for x in self.truths_val.to_numpy()]
 
-    def readfiles(self, extraction_method):
+    def read_files(self, extraction_method):
         info = joblib.load(self.get_path())
         self.files = info['files']
         self.truths = info['truths']
@@ -83,7 +83,7 @@ class ASVspoof2015(DataReader):
         self.valTaskDataset = TaskDataset([], [], '', [])
         self.valTaskDataset.load(self.get_eval_base_path(), extraction_method)
 
-    def writefiles(self, extraction_method):
+    def write_files(self, extraction_method):
         dict = {'files': self.files,
                 'truths': self.truths,
                 'files_val': self.files_val,
@@ -123,7 +123,7 @@ class ASVspoof2015(DataReader):
         # inputs_val = self.pad(inputs, max(self.max_length(inputs), self.max_length(inputs_val)))
         return inputs, inputs_val
 
-    def calculateTaskDataset(self, method, **kwargs):
+    def calculate_taskDataset(self, method, **kwargs):
         distinct_labels = self.truths.folder.unique()
         distinct_labels.sort()
         targets = []
@@ -161,13 +161,13 @@ class ASVspoof2015(DataReader):
                 if test_size > 0 else (self.taskDataset.inputs, [], self.taskDataset.targets, [])
 
         self.extraction_method.scale_fit(x_train)
-        x_train, y_train = self.extraction_method.prepare_inputs_targets(x_train, y_train)
+        x_train, y_train = self.extraction_method.prepare_inputs_targets(x_train, y_train, **kwargs)
         self.trainTaskDataset = TaskDataset(inputs=x_train, targets=y_train,
                                             name=self.taskDataset.task.name + "_train",
                                             labels=self.taskDataset.task.output_labels,
                                             output_module=self.taskDataset.task.output_module)
         if test_size > 0:
-            x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val)
+            x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val, **kwargs)
             self.testTaskDataset = TaskDataset(inputs= x_val, targets=y_val,
                                                name=self.taskDataset.task.name + "_test",
                                                labels=self.taskDataset.task.output_labels,

@@ -21,19 +21,19 @@ class DataReader(ABC):
         pass
 
     @abstractmethod
-    def checkfiles(self, extraction_method):
+    def check_files(self, extraction_method):
         pass
 
     @abstractmethod
-    def loadfiles(self):
+    def load_files(self):
         pass
 
     @abstractmethod
-    def readfiles(self, extraction_method):
+    def read_files(self, extraction_method):
         pass
 
     @abstractmethod
-    def writefiles(self, extraction_method):
+    def write_files(self, extraction_method):
         pass
 
     @abstractmethod
@@ -41,7 +41,7 @@ class DataReader(ABC):
         pass
 
     @abstractmethod
-    def calculateTaskDataset(self, method, **kwargs):
+    def calculate_taskDataset(self, method, **kwargs):
         pass
 
     @abstractmethod

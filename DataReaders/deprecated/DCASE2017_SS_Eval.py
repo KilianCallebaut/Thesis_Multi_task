@@ -27,12 +27,12 @@ class DCASE2017_SS_Eval(DataReader):
         self.count = 0
         if 'object_path' in kwargs:
                   object_path = kwargs.pop('object_path')
-        if self.checkfiles(extraction_method):
-            self.readfiles(extraction_method)
+        if self.check_files(extraction_method):
+            self.read_files(extraction_method)
         else:
-            self.loadfiles()
-            self.calculateTaskDataset(extraction_method, **kwargs)
-            self.writefiles(extraction_method)
+            self.load_files()
+            self.calculate_taskDataset(extraction_method, **kwargs)
+            self.write_files(extraction_method)
 
     def get_path(self):
         return os.path.join(self.get_base_path(), 'DCASE2017_SS_Eval.obj')
@@ -40,10 +40,10 @@ class DCASE2017_SS_Eval(DataReader):
     def get_base_path(self):
         return self.audioset_path
 
-    def checkfiles(self, extraction_method):
+    def check_files(self, extraction_method):
         return TaskDataset.check(self.get_base_path(), extraction_method) and os.path.isfile(self.get_path())
 
-    def loadfiles(self):
+    def load_files(self):
         # MetaDataContainer(filename=)
 
         self.evaldataset = TUTAcousticScenes_2017_EvaluationSet(
@@ -60,14 +60,14 @@ class DCASE2017_SS_Eval(DataReader):
         ).initialize()
         self.audio_files = self.evaldataset.audio_files
 
-    def readfiles(self, extraction_method):
+    def read_files(self, extraction_method):
         info = joblib.load(self.get_path())
         self.audio_files = info['audio_files']
         self.taskDataset = TaskDataset([], [], '', [])
         self.taskDataset.load(self.get_base_path(), extraction_method)
         print('Reading SS Eval done')
 
-    def writefiles(self, extraction_method):
+    def write_files(self, extraction_method):
         dict = {'audio_files': self.audio_files}
         joblib.dump(dict, self.get_path())
         self.taskDataset.save(self.get_base_path(), extraction_method)
@@ -75,7 +75,7 @@ class DCASE2017_SS_Eval(DataReader):
     def toTaskDataset(self):
         return self.taskDataset
 
-    def calculateTaskDataset(self, method, **kwargs):
+    def calculate_taskDataset(self, method, **kwargs):
         distinct_labels = self.evaldataset.scene_labels()
         targets = []
 

@@ -86,7 +86,7 @@ class Results:
                 for task_idx in range(len(pred_target_per_task))]
 
 
-    def readfiles(self, name, train):
+    def read_files(self, name, train):
         audioset_path = self.audioset_eval_path
         if train:
             audioset_path = self.audioset_train_path
@@ -99,7 +99,7 @@ class Results:
         self.weight_decay = info['weight_decay']
         self.nr_epochs = info['nr_epochs']
 
-    def writefiles(self, train):
+    def write_files(self, train):
         dict = {'all_results': self.all_results,
                 # 'concat_dataset': self.concat_dataset,
                 'batch_size': self.batch_size,

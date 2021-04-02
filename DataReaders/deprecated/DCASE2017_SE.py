@@ -20,13 +20,13 @@ class DCASE2017_SE(DataReader):
 
     def __init__(self, extraction_method, **kwargs):
         if os.path.isfile(self.audioset_path):
-            self.readfiles()
+            self.read_files()
         else:
-            self.loadfiles()
-            self.calculateTaskDataset(extraction_method, **kwargs)
-            self.writefiles()
+            self.load_files()
+            self.calculate_taskDataset(extraction_method, **kwargs)
+            self.write_files()
 
-    def loadfiles(self):
+    def load_files(self):
         self.devdataset = TUTSoundEvents_2017_DevelopmentSet(
             data_path='C:\\Users\\mrKC1\\PycharmProjects\\Thesis\\ExternalClassifiers\\DCASE2017-baseline-system-master\\applications\\data\\',
             log_system_progress=False,
@@ -38,12 +38,12 @@ class DCASE2017_SE(DataReader):
             storage_name=r'TUT-sound-events-2017-development'
         ).initialize()
 
-    def readfiles(self):
+    def read_files(self):
         info = cPickle.load(open(self.audioset_path, 'rb'))
         self.taskDataset = info['taskDataset']
         self.devdataset = info['devdataset']
 
-    def writefiles(self):
+    def write_files(self):
         dict = {'taskDataset': self.taskDataset,
                 'devdataset': self.devdataset}
         cPickle.dump(dict, open(self.audioset_path, 'wb'))
@@ -67,7 +67,7 @@ class DCASE2017_SE(DataReader):
                 perc += 1
         return self.standardize_input(inputs)
 
-    def calculateTaskDataset(self, method, **kwargs):
+    def calculate_taskDataset(self, method, **kwargs):
         distinct_labels = self.devdataset.scene_labels()
         targets = []
 
@@ -98,13 +98,13 @@ class DCASE2017_SE(DataReader):
     def recalculate_features(self, method, **kwargs):
         self.taskDataset.inputs = self.calculate_input(method, **kwargs)
 
-    # def calculateTaskDataset(self):
+    # def calculate_taskDataset(self):
     #     pass
     #
-    # def readfiles(self):
+    # def read_files(self):
     #     pass
     #
-    # def writefiles(self):
+    # def write_files(self):
     #     pass
 
 

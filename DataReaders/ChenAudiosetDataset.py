@@ -51,12 +51,12 @@ class ChenAudiosetDataset(DataReader):
         print('start chen')
         if 'object_path' in kwargs:
             self.object_path = kwargs.pop('object_path')
-        if self.checkfiles(extraction_method.name):
-            self.readfiles(extraction_method.name)
+        if self.check_files(extraction_method.name):
+            self.read_files(extraction_method.name)
         else:
-            self.loadfiles()
-            self.calculateTaskDataset(extraction_method, **kwargs)
-            self.writefiles(extraction_method.name)
+            self.load_files()
+            self.calculate_taskDataset(extraction_method, **kwargs)
+            self.write_files(extraction_method.name)
 
         print('done')
 
@@ -66,10 +66,10 @@ class ChenAudiosetDataset(DataReader):
     def get_base_path(self):
         return self.object_path
 
-    def checkfiles(self, extraction_method):
+    def check_files(self, extraction_method):
         return TaskDataset.check(self.get_base_path(), extraction_method) and os.path.isfile(self.get_path())
 
-    def loadfiles(self):
+    def load_files(self):
         files = []
         np_objects = []
         wav_files = []
@@ -115,7 +115,7 @@ class ChenAudiosetDataset(DataReader):
         self.np_objects = np_objects
         self.wav_files = wav_files
 
-    def readfiles(self, extraction_method):
+    def read_files(self, extraction_method):
         # info = cPickle.load(open(self.object_path, 'rb'))
         info = joblib.load(self.get_path())
         self.files = info['files']
@@ -125,25 +125,19 @@ class ChenAudiosetDataset(DataReader):
         self.taskDataset = TaskDataset([], [], '', [])
         self.taskDataset.load(self.get_base_path(), extraction_method)
 
-    def writefiles(self, extraction_method):
+    def write_files(self, extraction_method):
         dict = {'files': self.files,
                 'np_objects': self.np_objects,
                 'wav_files': self.wav_files}
         joblib.dump(dict, self.get_path())
         self.taskDataset.save(self.get_base_path(), extraction_method)
 
-    def calculateTaskDataset(self, method, **kwargs):
+    def calculate_taskDataset(self, method, **kwargs):
         print('Calculating input')
         inputs = self.calculate_input(method, **kwargs)
         print('Input calculated')
 
-        targets = [[l[2] for l in x['labels']] for f in
-                   self.files for x in f]
-        distinct_targets = list(set([x for l in targets for x in l if x != 'None of the above']))
-
-        # Targets are translated as binary strings with 1 for each target
-        # at the index where it is in distinct_targets order
-        targets = [[float(b in f) for b in distinct_targets] for f in targets]
+        targets, distinct_targets = self.calculate_targets()
 
         name = "chen_audioset"
         self.taskDataset = TaskDataset(inputs=inputs, targets=targets, name=name, labels=distinct_targets,
@@ -161,6 +155,17 @@ class ChenAudiosetDataset(DataReader):
                 read_wav = self.load_wav(file, resample_to)
                 inputs.append(method.extract_features(read_wav, **kwargs))
         return inputs
+
+    def calculate_targets(self):
+        targets = [[l[2] for l in x['labels']] for f in
+                   self.files for x in f]
+        # distinct_targets = list(set([x for l in targets for x in l if x != 'None of the above']))
+        distinct_targets = list(set([x for l in targets for x in l]))
+
+        # Targets are translated as binary strings with 1 for each target
+        # at the index where it is in distinct_targets order
+        targets = [[float(b in f) for b in distinct_targets] for f in targets]
+        return targets, distinct_targets
 
     def recalculate_features(self, method, **kwargs):
         self.taskDataset.inputs = self.calculate_input(method, **kwargs)
@@ -200,13 +205,13 @@ class ChenAudiosetDataset(DataReader):
             train_test_split(inputs, targets, test_size=test_size) \
                 if test_size > 0 else (inputs, [], targets, [])
         self.extraction_method.scale_fit(x_train)
-        x_train, y_train = self.extraction_method.prepare_inputs_targets(x_train, y_train)
+        x_train, y_train = self.extraction_method.prepare_inputs_targets(x_train, y_train, **kwargs)
         self.trainTaskDataset = TaskDataset(inputs=x_train, targets=y_train,
                                             name=self.taskDataset.task.name + "_train",
                                             labels=self.taskDataset.task.output_labels,
                                             output_module=self.taskDataset.task.output_module)
         if test_size > 0:
-            x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val)
+            x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val, **kwargs)
             self.testTaskDataset = TaskDataset(inputs=x_val, targets=y_val,
                                                name=self.taskDataset.task.name + "_test",
                                                labels=self.taskDataset.task.output_labels,

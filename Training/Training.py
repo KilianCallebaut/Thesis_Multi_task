@@ -1,3 +1,4 @@
+import datetime
 import math
 
 import matplotlib.pyplot as plt
@@ -33,6 +34,7 @@ class Training:
         results = Results(concat_dataset=concat_dataset, batch_size=batch_size, learning_rate=learning_rate,
                           weight_decay=weight_decay, nr_epochs=num_epochs, **kwargs)
         task_list = [x.task for x in concat_dataset.datasets]
+        n_tasks = len(task_list)
 
         name = model.name
         for n in task_list:
@@ -48,7 +50,9 @@ class Training:
             #                                       batch_size=batch_size),
             batch_size=batch_size,
             shuffle=True,
-            num_workers=0)
+            num_workers=4,
+            pin_memory=True
+        )
 
         # Epoch
         for epoch in range(num_epochs):
@@ -65,6 +69,10 @@ class Training:
             model.train()  # Set model to training mode
 
             before = list(model.parameters())[0].clone()
+            perc = 0
+            begin = datetime.datetime.now()
+            ex_mx = datetime.timedelta(0)
+            ex_t = datetime.timedelta(0)
             # iterate over data
             for inputs, labels, names in train_loader:
 
@@ -72,11 +80,10 @@ class Training:
                 #     continue
 
                 # tensors for filtering instances in batch and targets that are not from the task
-                batch_flags = [Tensor([True if t.name == n else False for n in names]).type(torch.bool) for t in
+                batch_flags = [[True if t.name == n else False for n in names] for t in
                                task_list]
-                target_flags = [
-                    Tensor([0 for _ in x.pad_before] + [1 for _ in x.targets[0]] + [0 for _ in x.pad_after]).type(
-                        torch.bool) for x in concat_dataset.datasets]
+                target_flags = [[0 for _ in x.pad_before] + [1 for _ in x.targets[0]] + [0 for _ in x.pad_after]
+                                for x in concat_dataset.datasets]
 
                 losses_batch = [0.0 for _ in task_list]
                 output_batch = [torch.Tensor([]) for _ in task_list]
@@ -92,31 +99,44 @@ class Training:
                 # model
                 output = model(inputs)
 
-                for i in range(len(task_list)):
+                if perc < (step / len(train_loader)) * 100:
+                    perc += 1
+                    perc_s = 'I' * perc
+                    perc_sp = ' ' * (100 - perc)
+                    ex = datetime.datetime.now() - begin
+                    begin = datetime.datetime.now()
+                    ex_mx = ex if ex > ex_mx else ex_mx
+                    ex_t += ex
+                    print('[{}{}], exection time: {}, max time: {}, total time: {}'.format(perc_s, perc_sp, ex, ex_mx,
+                                                                                           ex_t), end='\r')
+
+                for i in range(n_tasks):
                     if sum(batch_flags[i]) == 0:
                         continue
 
                     filtered_output = output[i]
-                    filtered_output = filtered_output[batch_flags[i], :]
+                    filtered_labels = labels
 
-                    filtered_labels = labels[:, target_flags[i]]
-                    filtered_labels = filtered_labels[batch_flags[i], :]
+                    if n_tasks > 1:
+                        filtered_output = filtered_output[batch_flags[i], :]
+
+                        filtered_labels = filtered_labels[:, target_flags[i]]
+                        filtered_labels = filtered_labels[batch_flags[i], :]
 
                     losses_batch[i] = criteria[i](filtered_output,
                                                   Training.calculate_labels(task_list[i].output_module,
-                                                                            filtered_labels))
+                                                                            filtered_labels)).cuda()
                     output_batch[i] = filtered_output
                     labels_batch[i] = filtered_labels
 
                 # training step
-                loss = 0
-                for l in range(len(losses_batch)):
-                    loss = loss + losses_batch[l]
+                loss = sum(losses_batch)
+
                 loss.backward()
                 optimizer.step()
 
                 # Statistics
-                running_loss += loss.item()
+                running_loss += loss.item() * inputs.size(0)
                 step += 1
                 task_labels = [
                     task_labels[t] +
@@ -130,11 +150,12 @@ class Training:
                                        for t in range(len(losses_batch))]
                 # results.add_output(epoch, output_batch, labels_batch, losses_batch, loss.item())
 
+            # Statistics
             writer.add_scalar("Loss/train", running_loss / step, epoch)
             epoch_metrics = [metrics.classification_report(task_labels[t], task_predictions[t], output_dict=True) for t
                              in range(len(task_predictions))]
 
-            for t in range(len(task_list)):
+            for t in range(n_tasks):
                 task_name = task_list[t].name
                 print('TASK {}: '.format(task_name), end='')
                 mat = []
@@ -177,7 +198,7 @@ class Training:
             results.add_model_parameters(epoch, model)
 
         print('Training Done')
-        # results.writefiles(True)
+        # results.write_files(True)
 
         for t in range(len(task_predictions)):
             mat = []
@@ -201,8 +222,6 @@ class Training:
 
         return model, results
 
-
-
     @staticmethod
     def evaluate(blank_model: nn.Module,
                  concat_dataset: ConcatTaskDataset,
@@ -215,6 +234,7 @@ class Training:
                     for d in concat_dataset.datasets]
         # results = Results(concat_dataset=concat_dataset, batch_size=batch_size, nr_epochs=num_epochs)
         task_list = [x.task for x in concat_dataset.datasets]
+        n_tasks = len(task_list)
 
         name = ''
         for n in task_list:
@@ -228,7 +248,9 @@ class Training:
             #                                       batch_size=batch_size),
             batch_size=batch_size,
             shuffle=True,
-            num_workers=0)
+            num_workers=4,
+            pin_memory=True
+        )
 
         print("Start Evaluation")
         for epoch in range(start_epoch, num_epochs):
@@ -264,7 +286,7 @@ class Training:
                 labels = labels.cuda()
                 output = blank_model(inputs)
 
-                for i in range(len(task_list)):
+                for i in range(n_tasks):
                     if sum(batch_flags[i]) == 0:
                         continue
 
@@ -301,7 +323,7 @@ class Training:
             epoch_metrics = [metrics.classification_report(task_labels[t], task_predictions[t], output_dict=True) for t
                              in range(len(task_predictions))]
 
-            for t in range(len(task_list)):
+            for t in range(n_tasks):
                 task_name = task_list[t].name
                 mat = []
 
@@ -364,7 +386,7 @@ class Training:
 
 
 def plot_multilabel_confusion(conf_matrix, labels):
-    fig, ax = plt.subplots(4 * math.floor(len(labels)/4), 4 - len(labels) % 4)
+    fig, ax = plt.subplots(4 * math.floor(len(labels) / 4), 4 - len(labels) % 4)
 
     for axes, cfs_matrix, label in zip(ax.flatten(), conf_matrix, labels):
         print_confusion_matrix(cfs_matrix, axes, label, ["N", "Y"])

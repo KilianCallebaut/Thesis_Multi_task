@@ -30,9 +30,12 @@ class TaskDataset(Dataset):
         self.pad_before = list()
 
     def __getitem__(self, index):
-        return torch.from_numpy(np.array(self.inputs[index])).float(), \
-               torch.from_numpy(np.array(
-                   self.pad_before + self.targets[index] + self.pad_after)), \
+        # return torch.from_numpy(np.array(self.inputs[index])).float(), \
+        #        torch.from_numpy(np.array(
+        #            self.pad_before + self.targets[index] + self.pad_after)), \
+        #        self.task.name
+        return self.inputs[index].float(), \
+               torch.from_numpy(np.array(self.pad_before + self.targets[index] + self.pad_after)), \
                self.task.name
 
     def __len__(self):
