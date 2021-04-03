@@ -1,4 +1,5 @@
 import json
+import math
 import os
 import pathlib
 
@@ -9,6 +10,20 @@ extract_options = {
     Mfcc().name: Mfcc(),
     LogbankSummary().name: LogbankSummary()
 }
+
+dataset_options = [
+    'asvspoof',
+    'chen',
+    'dcaseScene',
+    'fsdkaggle',
+    'ravdess',
+    'speechcommands'
+]
+
+network_options = [
+    'cnn',
+    'dnn'
+]
 
 
 def write_config(name: str, params: dict):
@@ -44,3 +59,18 @@ def write_preparation_params(name: str, split: bool, window: bool, dic_of_labels
         dic_of_labels_limits=dic_of_labels_limits
     )
     write_config(name_comp, param)
+
+def calculate_window_size(extraction_params):
+    # Number of seconds for window size
+    sec = 1
+    winlen = extraction_params['winlen']
+    winstep = extraction_params['winstep']
+    win_size = 1 + math.ceil((sec-winlen)/winstep)
+    win_hop = math.floor(win_size/4)
+    write_config('preparation_params_general_window', dict(window_size=win_size, window_hop=win_hop))
+
+def set_windowed(win: bool, network: str):
+    for d in dataset_options:
+        param = read_config('preparation_params_{}_{}'.format(d, network))
+        write_preparation_params('{}_{}'.format(d, network), param['split'], win, param['dic_of_labels_limits'])
+

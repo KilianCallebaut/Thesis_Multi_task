@@ -2,6 +2,7 @@ import datetime
 import math
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
 import torch
@@ -41,7 +42,8 @@ class Training:
             name += "_" + n.name
         writer = SummaryWriter(comment=name)
 
-        writer.add_graph(model, torch.rand(concat_dataset.datasets[0].__getitem__(0)[0].shape[None, :, :]).cuda())
+        # first_shape = np.array(concat_dataset.datasets[0].__getitem__(0)[0].shape)
+        # writer.add_graph(model, torch.rand(first_shape[None, :, :]).cuda())
 
         # Load Data Example
         train_loader = torch.utils.data.DataLoader(
@@ -50,7 +52,7 @@ class Training:
             #                                       batch_size=batch_size),
             batch_size=batch_size,
             shuffle=True,
-            num_workers=4,
+            num_workers=0,
             pin_memory=True
         )
 

@@ -1,7 +1,6 @@
 import math
 from abc import abstractmethod, ABC
 
-import librosa
 import numpy as np
 import torch
 from python_speech_features import logfbank, mfcc, fbank
@@ -89,16 +88,26 @@ class ExtractionMethod(ABC):
 
         for inp_idx in range(len(inputs)):
             inp = inputs[inp_idx]
-            end_frame = start_frame + window_hop * math.ceil((float(inp.shape[0] - start_frame) / window_hop))
-            for frame_idx in range(start_frame, end_frame, window_hop):
-                if frame_idx > inp.shape[0]:
-                    window = torch.cat([inp[frame_idx - window_size:inp.shape[0], :],
-                                        torch.zeros(inp.shape[0] - frame_idx, inp.shape[1])])
-                else:
-                    window = inp[frame_idx - window_size:frame_idx, :]
+            # end_frame = start_frame + window_hop * math.ceil((float(inp.shape[0] - start_frame) / window_hop))
+            end_frame = start_frame + window_hop * math.floor((float(inp.shape[0] - start_frame) / window_hop))
+            for frame_idx in range(start_frame, end_frame+1, window_hop):
+
+                window = inp[frame_idx - window_size:frame_idx, :]
                 assert window.shape == (window_size, inp.shape[1])
                 windowed_inputs.append(window)
                 windowed_targets.append(targets[inp_idx])
+
+            if start_frame > inp.shape[0]:
+                window = torch.vstack([inp, torch.zeros(start_frame - inp.shape[0], inp.shape[1])])
+                windowed_inputs.append(window)
+                windowed_targets.append(targets[inp_idx])
+            elif end_frame < inp.shape[0]:
+                window = inp[inp.shape[0] - window_size:inp.shape[0], :]
+                windowed_inputs.append(window)
+                windowed_targets.append(targets[inp_idx])
+
+
+
 
         assert len(windowed_inputs) == len(windowed_targets)
         return windowed_inputs, windowed_targets
