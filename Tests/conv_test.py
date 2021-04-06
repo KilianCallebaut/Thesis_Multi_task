@@ -23,11 +23,11 @@ def main(argv):
     calculate_window_size(extraction_params)
     meta_params = read_config('meta_params_cnn_MelSpectrogram')
 
-    asvspoof = ASVspoof2015(**extraction_params)
-    asvspoof.prepare_taskDatasets(**read_config('preparation_params_asvspoof_cnn'))
+    # asvspoof = ASVspoof2015(**extraction_params)
+    # asvspoof.prepare_taskDatasets(**read_config('preparation_params_asvspoof_cnn'))
 
-    chenaudio = ChenAudiosetDataset(**extraction_params)
-    chenaudio.prepare_taskDatasets(**read_config('preparation_params_chen_cnn'))
+    # chenaudio = ChenAudiosetDataset(**extraction_params)
+    # chenaudio.prepare_taskDatasets(**read_config('preparation_params_chen_cnn'))
 
     dcaseScene = DCASE2017_SS(**extraction_params)
     dcaseScene.prepare_taskDatasets(**read_config('preparation_params_dcaseScene_cnn'))
@@ -42,23 +42,25 @@ def main(argv):
     speechcommands.prepare_taskDatasets(**read_config('preparation_params_speechcommands_cnn'))
     print('loaded all datasets')
 
-    asvspoof_t = asvspoof.toTrainTaskDataset()
-    chen_t = chenaudio.toTrainTaskDataset()
+    # asvspoof_t = asvspoof.toTrainTaskDataset()
+    # chen_t = chenaudio.toTrainTaskDataset()
     dcasScent_t = dcaseScene.toTrainTaskDataset()
     fsdkaggle_t = fsdkaggle.toTrainTaskDataset()
     ravdess_t = ravdess.toTrainTaskDataset()
     speechcommands_t = speechcommands.toTrainTaskDataset()
-    # taskdatasets = [chen_t]
-    taskdatasets = [asvspoof_t, chen_t, dcasScent_t, fsdkaggle_t, ravdess_t, speechcommands_t]
 
-    asvspoof_e = asvspoof.toValidTaskDataset()
-    chen_e = chenaudio.toTestTaskDataset()
+    taskdatasets = [dcasScent_t, fsdkaggle_t, ravdess_t, speechcommands_t]
+    # taskdatasets = [asvspoof_t, chen_t, dcasScent_t, fsdkaggle_t, ravdess_t, speechcommands_t]
+
+    # asvspoof_e = asvspoof.toValidTaskDataset()
+    # chen_e = chenaudio.toTestTaskDataset()
     dcasScent_e = dcaseScene.toValidTaskDataset()
     fsdkaggle_e = fsdkaggle.toTestTaskDataset()
     ravdess_e = ravdess.toTestTaskDataset()
     speechcommands_e = speechcommands.toValidTaskDataset()
-    # evaldatasets = [chen_e]
-    evaldatasets = [asvspoof_e,  chen_e, dcasScent_e, fsdkaggle_e, ravdess_e, speechcommands_e]
+
+    evaldatasets = [ dcasScent_e, fsdkaggle_e, ravdess_e, speechcommands_e]
+    # evaldatasets = [asvspoof_e,  chen_e, dcasScent_e, fsdkaggle_e, ravdess_e, speechcommands_e]
 
     print('Done loading')
 

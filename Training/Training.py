@@ -52,7 +52,7 @@ class Training:
             #                                       batch_size=batch_size),
             batch_size=batch_size,
             shuffle=True,
-            num_workers=0,
+            num_workers=2,
             pin_memory=True
         )
 

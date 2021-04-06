@@ -1,0 +1,1 @@
+{"extraction_method": "logbank_summary", "winlen": 0.03, "winstep": 0.01, "nfilt": 24, "nfft": 1024, "lowfreq": 0, "highfreq": null, "preemph": 0, "resample_to": 8000}
