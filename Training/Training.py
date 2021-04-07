@@ -2,7 +2,6 @@ import datetime
 import math
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import seaborn as sns
 import torch
@@ -84,8 +83,9 @@ class Training:
                 # tensors for filtering instances in batch and targets that are not from the task
                 batch_flags = [[True if t.name == n else False for n in names] for t in
                                task_list]
-                target_flags = [[0 for _ in x.pad_before] + [1 for _ in x.targets[0]] + [0 for _ in x.pad_after]
-                                for x in concat_dataset.datasets]
+                target_flags = [
+                    [False for _ in x.pad_before] + [True for _ in x.targets[0]] + [False for _ in x.pad_after]
+                    for x in concat_dataset.datasets]
 
                 losses_batch = [0.0 for _ in task_list]
                 output_batch = [torch.Tensor([]) for _ in task_list]
@@ -250,7 +250,7 @@ class Training:
             #                                       batch_size=batch_size),
             batch_size=batch_size,
             shuffle=True,
-            num_workers=4,
+            num_workers=2,
             pin_memory=True
         )
 
@@ -276,9 +276,9 @@ class Training:
                 # tensors for filtering instances in batch and targets that are not from the task
                 batch_flags = [Tensor([True if t.name == n else False for n in names]).type(torch.bool) for t in
                                task_list]
-                target_flags = [
-                    Tensor([0 for _ in x.pad_before] + [1 for _ in x.targets[0]] + [0 for _ in x.pad_after]).type(
-                        torch.bool) for x in concat_dataset.datasets]
+                target_flags = [Tensor(
+                    [False for _ in x.pad_before] + [True for _ in x.targets[0]] + [False for _ in x.pad_after]).type(
+                    torch.bool) for x in concat_dataset.datasets]
 
                 losses_batch = [0.0 for _ in task_list]
                 output_batch = [torch.Tensor([]) for _ in task_list]

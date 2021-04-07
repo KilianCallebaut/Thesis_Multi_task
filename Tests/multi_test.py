@@ -105,24 +105,24 @@ def main(argv):
 
     print('test loop')
     for i in range(len(taskdatasets)):
-        print(taskdatasets[i].task.name)
-        training_dataset = ConcatTaskDataset([taskdatasets[i]])
-        eval_dataset = ConcatTaskDataset([evaldatasets[i]])
-        task_list = training_dataset.get_task_list()
-        model = MultiTaskHardSharing(np.prod(taskdatasets[i].inputs[0].shape), **model_params, task_list=task_list)
-        model = model.cuda()
-        print('Model Created')
-
-        model, results = Training.run_gradient_descent(model=model,
-                                                       concat_dataset=training_dataset,
-                                                       batch_size=meta_params['batch_size'],
-                                                       num_epochs=meta_params['num_epochs'],
-                                                       learning_rate=meta_params['learning_rate'])
-        Training.evaluate(blank_model=model,
-                          concat_dataset=eval_dataset,
-                          training_results=results,
-                          batch_size=meta_params['batch_size'],
-                          num_epochs=meta_params['num_epochs'])
+        # print(taskdatasets[i].task.name)
+        # training_dataset = ConcatTaskDataset([taskdatasets[i]])
+        # eval_dataset = ConcatTaskDataset([evaldatasets[i]])
+        # task_list = training_dataset.get_task_list()
+        # model = MultiTaskHardSharing(np.prod(taskdatasets[i].inputs[0].shape), **model_params, task_list=task_list)
+        # model = model.cuda()
+        # print('Model Created')
+        #
+        # model, results = Training.run_gradient_descent(model=model,
+        #                                                concat_dataset=training_dataset,
+        #                                                batch_size=meta_params['batch_size'],
+        #                                                num_epochs=meta_params['num_epochs'],
+        #                                                learning_rate=meta_params['learning_rate'])
+        # Training.evaluate(blank_model=model,
+        #                   concat_dataset=eval_dataset,
+        #                   training_results=results,
+        #                   batch_size=meta_params['batch_size'],
+        #                   num_epochs=meta_params['num_epochs'])
 
         for j in range(i + 1, len(taskdatasets)):
             print(taskdatasets[i].task.name + ' combined with ' + taskdatasets[j].task.name)
