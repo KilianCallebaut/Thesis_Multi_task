@@ -181,7 +181,7 @@ class ASVspoof2015(DataReader):
                                                output_module=self.taskDataset.task.output_module)
 
         self.valTaskDataset.inputs, self.valTaskDataset.targets = self.extraction_method.prepare_inputs_targets(
-            self.valTaskDataset.inputs, self.valTaskDataset.targets)
+            self.valTaskDataset.inputs, self.valTaskDataset.targets, **kwargs)
 
     def toTrainTaskDataset(self):
         return self.trainTaskDataset

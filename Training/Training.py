@@ -30,7 +30,9 @@ class Training:
         criteria = [nn.BCELoss() if d.task.output_module == 'sigmoid' else nn.CrossEntropyLoss()
                     for d in concat_dataset.datasets]
 
-        optimizer = optim.SGD(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+        # optimizer = optim.SGD(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+        optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+
         results = Results(concat_dataset=concat_dataset, batch_size=batch_size, learning_rate=learning_rate,
                           weight_decay=weight_decay, nr_epochs=num_epochs, **kwargs)
         task_list = [x.task for x in concat_dataset.datasets]
@@ -150,7 +152,6 @@ class Training:
                     t in range(len(output_batch))]
                 task_running_losses = [task_running_losses[t] + losses_batch[t]
                                        for t in range(len(losses_batch))]
-                # results.add_output(epoch, output_batch, labels_batch, losses_batch, loss.item())
 
             # Statistics
             writer.add_scalar("Loss/train", running_loss / step, epoch)
@@ -186,12 +187,13 @@ class Training:
                 print('Macro avg F1 {}'.format(epoch_metrics[t]['macro avg']['f1-score']), end='')
                 writer.add_scalar("Running loss task/{}".format(task_name), task_running_losses[t].item() / step, epoch)
                 print('Running loss {}'.format(task_running_losses[t].item() / step))
+                print(task_list[t].output_labels)
                 print(mat)
 
-            for h in range(len(model.hidden)):
-                writer.add_histogram("hidden weights {}".format(h), model.hidden[h].weight, epoch)
-            for t in range(len(model.task_nets)):
-                writer.add_histogram("task_nets weights", model.task_nets[t].weight, epoch)
+            # for h in range(len(model.hidden)):
+            #     writer.add_histogram("hidden weights {}".format(h), model.hidden[h].weight, epoch)
+            # for t in range(len(model.task_nets)):
+            #     writer.add_histogram("task_nets weights", model.task_nets[t].weight, epoch)
 
             after = list(model.parameters())[0].clone()
             print("Not updated parameters?")

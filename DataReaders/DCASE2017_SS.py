@@ -26,7 +26,7 @@ class DCASE2017_SS(DataReader):
 
         print('start DCASE2017 SS')
         if 'object_path' in kwargs:
-                  self.object_path = kwargs.pop('object_path')
+            self.object_path = kwargs.pop('object_path')
         if self.check_files(extraction_method.name):
             self.read_files(extraction_method.name)
         else:
@@ -195,7 +195,8 @@ class DCASE2017_SS(DataReader):
                                                output_module=self.taskDataset.task.output_module)
 
         self.valTaskDataset.inputs, self.valTaskDataset.targets \
-            = self.extraction_method.prepare_inputs_targets(self.valTaskDataset.inputs, self.valTaskDataset.targets)
+            = self.extraction_method.prepare_inputs_targets(self.valTaskDataset.inputs, self.valTaskDataset.targets,
+                                                            **kwargs)
 
     def toTrainTaskDataset(self):
         return self.trainTaskDataset

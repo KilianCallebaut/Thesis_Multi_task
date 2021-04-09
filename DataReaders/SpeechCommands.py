@@ -140,7 +140,7 @@ class SpeechCommands(DataReader):
                                                output_module=self.taskDataset.task.output_module)
 
         self.validTaskDataset.inputs, self.validTaskDataset.targets = \
-            self.extraction_method.prepare_inputs_targets(self.validTaskDataset.inputs, self.validTaskDataset.targets)
+            self.extraction_method.prepare_inputs_targets(self.validTaskDataset.inputs, self.validTaskDataset.targets, **kwargs)
 
     def toTrainTaskDataset(self):
         return self.trainTaskDataset

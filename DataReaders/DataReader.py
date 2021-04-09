@@ -53,11 +53,12 @@ class DataReader(ABC):
         for l in dic_of_labels_limits.keys():
             label_set = [i for i in range(len(sampled_targets))
                          if sampled_targets[i][taskDataset.task.output_labels.index(l)] == 1]
-            random_label_set = random.sample(label_set, dic_of_labels_limits[l])
-            sampled_targets = [sampled_targets[i] for i in range(len(sampled_targets)) if
-                               (i not in label_set or i in random_label_set)]
-            sampled_inputs = [sampled_inputs[i] for i in range(len(sampled_inputs)) if
-                              (i not in label_set or i in random_label_set)]
+            if len(label_set) > dic_of_labels_limits[l]:
+                random_label_set = random.sample(label_set, dic_of_labels_limits[l])
+                sampled_targets = [sampled_targets[i] for i in range(len(sampled_targets)) if
+                                   (i not in label_set or i in random_label_set)]
+                sampled_inputs = [sampled_inputs[i] for i in range(len(sampled_inputs)) if
+                                  (i not in label_set or i in random_label_set)]
         return sampled_inputs, sampled_targets
 
     @abstractmethod

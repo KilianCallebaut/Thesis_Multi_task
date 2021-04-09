@@ -14,7 +14,7 @@ class MultiTaskHardSharingConvolutional(nn.Module):
     ):
         super().__init__()
         self.name = 'cnn'
-        self.task_list = task_list
+        self.task_list = [t.output_module for t in task_list]
 
         self.hidden = nn.ModuleList()
         self.hidden_bn = nn.ModuleList()
@@ -32,7 +32,7 @@ class MultiTaskHardSharingConvolutional(nn.Module):
 
         for k in range(len(self.hidden)):
             torch.nn.init.kaiming_uniform_(self.hidden[k].weight)
-            nn.init.constant(self.hidden[k].bias, 0.0)
+            nn.init.constant_(self.hidden[k].bias, 0.0)
             nn.init.normal_(self.hidden_bn[k].weight, 1.0, 0.02)
             nn.init.constant_(self.hidden_bn[k].bias, 0.0)
 
@@ -74,5 +74,5 @@ class MultiTaskHardSharingConvolutional(nn.Module):
         x = torch.transpose(x, 1, 2)
         '''x: (batch_size, time_steps, feature_maps)'''
 
-        return tuple(self.activate(self.task_nets[task_model_id](x), self.task_list[task_model_id].output_module)
+        return tuple(self.activate(self.task_nets[task_model_id](x), self.task_list[task_model_id])
                      for task_model_id in range(len(self.task_list)))

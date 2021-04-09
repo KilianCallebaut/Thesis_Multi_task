@@ -34,7 +34,7 @@ class MultiTaskHardSharing(nn.Module):
     ):
         super().__init__()
         self.name = 'dnn'
-        self.task_list = task_list
+        self.task_list = [t.output_module for t in task_list]
         # self.model = nn.Sequential()
 
         h_sizes = [input_size] + [hidden_size for _ in range(n_hidden)]
@@ -76,5 +76,5 @@ class MultiTaskHardSharing(nn.Module):
             x = layer(x)
             x = F.relu(x)
         x = self.hidden[-1](x)
-        return tuple(self.activate(self.task_nets[task_model_id](x), self.task_list[task_model_id].output_module)
+        return tuple(self.activate(self.task_nets[task_model_id](x), self.task_list[task_model_id])
                      for task_model_id in range(len(self.task_list)))
