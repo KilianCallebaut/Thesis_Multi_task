@@ -11,11 +11,10 @@ from DataReaders.FSDKaggle2018 import FSDKaggle2018
 from DataReaders.Ravdess import Ravdess
 from DataReaders.SpeechCommands import SpeechCommands
 from MultiTask.MultiTaskHardSharingConvolutional import MultiTaskHardSharingConvolutional
-from Tasks.ConcatTaskDataset import ConcatTaskDataset
 from Tests.config_reader import *
-from Training.Training import Training
 from Training.Results import Results
-
+from Training.Training import Training
+from Tasks.ConcatTaskDataset import ConcatTaskDataset
 
 def run_datasets(dataset_list):
     extraction_params = read_config('extraction_params_cnn_MelSpectrogram')
@@ -84,6 +83,12 @@ def run_test(eval_dataset, meta_params, run_name):
                       num_epochs=meta_params['num_epochs'])
 
 
+def get_concat(dataset_list):
+    taskdatasets, evaldatasets = run_datasets(dataset_list)
+    training_dataset = ConcatTaskDataset(taskdatasets)
+    eval_dataset = ConcatTaskDataset(evaldatasets)
+    return training_dataset, eval_dataset
+
 def main(argv):
     extraction_params = read_config('extraction_params_cnn_MelSpectrogram')
     calculate_window_size(extraction_params)
@@ -91,15 +96,14 @@ def main(argv):
     # dataset_list = [0, 1, 2, 4]
     dataset_list = [0, 2]
     # dataset_list = [2]
-    taskdatasets, evaldatasets = run_datasets(dataset_list)
+
 
     print('--------------------------------------------------')
     print('test loop')
-    for i in range(len(taskdatasets)):
-        # print(taskdatasets[i].task.name)
-        # training_dataset = ConcatTaskDataset([taskdatasets[i]])
-        # eval_dataset = ConcatTaskDataset([evaldatasets[i]])
+    for i in range(len(dataset_list)):
+        # training_dataset, eval_dataset = get_concat([dataset_list[i]])
         # task_list = training_dataset.get_task_list()
+        # print(task_list[0].name)
         # model = MultiTaskHardSharingConvolutional(1,
         #                                           **read_config('model_params_cnn'),
         #                                           task_list=task_list)
@@ -117,11 +121,10 @@ def main(argv):
         # torch.cuda.empty_cache()
         # run_test(eval_dataset, meta_params, run_name)
 
-        for j in range(i + 1, len(taskdatasets)):
-            print(taskdatasets[i].task.name + ' combined with ' + taskdatasets[j].task.name)
-            training_dataset = ConcatTaskDataset([taskdatasets[i], taskdatasets[j]])
-            eval_dataset = ConcatTaskDataset([evaldatasets[i], evaldatasets[j]])
+        for j in range(i + 1, len(dataset_list)):
+            training_dataset, eval_dataset = get_concat([dataset_list[i], dataset_list[j]])
             task_list = training_dataset.get_task_list()
+            print(task_list[0].name + ' combined with ' + task_list[1].name)
             model = MultiTaskHardSharingConvolutional(1,
                                                       **read_config('model_params_cnn'),
                                                       task_list=task_list)

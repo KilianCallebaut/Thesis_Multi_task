@@ -27,26 +27,15 @@ class Training:
                              weight_decay=0,
                              num_epochs=50,
                              **kwargs):
-        criteria = [nn.BCELoss().cuda() if d.task.output_module == 'sigmoid' else nn.CrossEntropyLoss().cuda()
-                    for d in concat_dataset.datasets]
-
-        # optimizer = optim.SGD(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
-        optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
-
+        datasets = concat_dataset.datasets
         results = Results(concat_dataset=concat_dataset, batch_size=batch_size, learning_rate=learning_rate,
                           weight_decay=weight_decay, nr_epochs=num_epochs, **kwargs)
         task_list = concat_dataset.get_task_list()
-        n_tasks = len(task_list)
-
-        name = model.name
-        for n in task_list:
-            name += "_" + n.name
-        writer = SummaryWriter(comment=name)
-
-        # first_shape = np.array(concat_dataset.datasets[0].__getitem__(0)[0].shape)
-        # writer.add_graph(model, torch.rand(first_shape[None, :, :]).cuda())
-
-        # Load Data Example
+        criteria = [nn.BCELoss().cuda() if t.output_module == 'sigmoid' else nn.CrossEntropyLoss().cuda()
+                    for t in task_list]
+        target_flags = [
+            [False for _ in x.pad_before] + [True for _ in x.targets[0]] + [False for _ in x.pad_after]
+            for x in datasets]
         train_loader = torch.utils.data.DataLoader(
             concat_dataset,
             # sampler=BalancedBatchSchedulerSampler(dataset=concat_dataset,
@@ -56,10 +45,31 @@ class Training:
             num_workers=4,
             pin_memory=True
         )
-        # split = concat_dataset.split_inputs_targets()
-        # train_loader = FastTensorDataLoader(split[0], split[1], split[2],
-        #                                    batch_size=batch_size,
-        #                                    shuffle=True)
+
+        # # fastloader
+        # results = Results(batch_size=batch_size, learning_rate=learning_rate,
+        #                   weight_decay=weight_decay, nr_epochs=num_epochs, **kwargs)
+        # criteria = [nn.BCELoss().cuda() if t.output_module == 'sigmoid' else nn.CrossEntropyLoss().cuda()
+        #             for t in task_list]
+        # target_flags = [
+        #     [False for _ in range(x[0])] + [True for _ in range(x[1])] + [False for _ in range(x[2])]
+        #     for x in paddings]
+        # train_loader = FastTensorDataLoader(inputs, targets, names,
+        #                                     batch_size=batch_size,
+        #                                     shuffle=True)
+
+        # optimizer = optim.SGD(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+        optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+
+        n_tasks = len(task_list)
+
+        name = model.name
+        for n in task_list:
+            name += "_" + n.name
+        writer = SummaryWriter(comment=name)
+        # first_shape = np.array(datasets[0].__getitem__(0)[0].shape)
+        # writer.add_graph(model, torch.rand(first_shape[None, :, :]).cuda())
+
         model.train()  # Set model to training mode
 
         # Epoch
@@ -90,9 +100,6 @@ class Training:
                 #                range(len(task_list))]
                 batch_flags = [[True if t.name == n else False for n in names] for t in
                                task_list]
-                target_flags = [
-                    [False for _ in x.pad_before] + [True for _ in x.targets[0]] + [False for _ in x.pad_after]
-                    for x in concat_dataset.datasets]
 
                 losses_batch = [torch.tensor([0]).cuda() for _ in task_list]
                 output_batch = [torch.Tensor([]) for _ in task_list]
@@ -240,9 +247,10 @@ class Training:
                  num_epochs=50,
                  start_epoch=0
                  ):
+        datasets = concat_dataset.datasets
         criteria = [nn.BCELoss().cuda() if d.task.output_module == 'sigmoid' else nn.CrossEntropyLoss().cuda()
-                    for d in concat_dataset.datasets]
-        task_list = [x.task for x in concat_dataset.datasets]
+                    for d in datasets]
+        task_list = [x.task for x in datasets]
         n_tasks = len(task_list)
 
         name = blank_model.name
@@ -297,7 +305,7 @@ class Training:
                                    task_list]
                     target_flags = [
                         [False for _ in x.pad_before] + [True for _ in x.targets[0]] + [False for _ in x.pad_after]
-                        for x in concat_dataset.datasets]
+                        for x in datasets]
 
                     losses_batch = [0.0 for _ in task_list]
                     output_batch = [0.0 for _ in task_list]
