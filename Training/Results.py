@@ -1,16 +1,10 @@
-from datetime import datetime
 import os
+from datetime import datetime
 
 import joblib
-import torch
-import numpy as np
-from sklearn import metrics
-
-from Tasks.ConcatTaskDataset import ConcatTaskDataset
 import matplotlib.pyplot as plt
-from typing import Optional
-
-from . import Training
+import torch
+from sklearn import metrics
 
 try:
     import cPickle
@@ -22,21 +16,25 @@ class Results:
     audioset_train_path = r"E:\Thesis_Results\Training_Results"
     audioset_eval_path = r"E:\Thesis_Results\Evaluation_Results"
     audioset_file_base = r"Result"
-    model_checkpoints_path = r"E:\Thesis_Results\Model_Checkpoints"
+    model_checkpoints_path = r"F:\Thesis_Results\Model_Checkpoints"
 
-    def __init__(self, concat_dataset: ConcatTaskDataset, nr_epochs: int, *args, **kwargs):
+    # def __init__(self, concat_dataset: ConcatTaskDataset, nr_epochs: int, *args, **kwargs):
+    def __init__(self, **kwargs):
 
         # epochs, steps, (task -> ([outputs], [targets], loss), total loss)
-        self.all_results = [list() for _ in range(nr_epochs)]
+        self.all_results = [list() for _ in range(kwargs.get('nr_epochs'))]
 
         # (nr_epochs, nr_batches_in_epoch, nr_tasks)
-        self.concat_dataset = concat_dataset
+        self.concat_dataset = kwargs.get('concat_dataset')
         self.batch_size = kwargs.get('batch_size')
         self.learning_rate = kwargs.get('learning_rate')
         self.weight_decay = kwargs.get('weight_decay')
-        self.nr_epochs = nr_epochs
-        self.run_name = self.audioset_file_base + "_" + str(
-            datetime.now().strftime("%d_%m_%Y_%H_%M_%S"))
+        self.nr_epochs = kwargs.get('nr_epochs')
+        if 'run_name' in kwargs:
+            self.run_name = kwargs.get('run_name')
+        else:
+            self.run_name = self.audioset_file_base + "_" + str(
+                datetime.now().strftime("%d_%m_%Y_%H_%M_%S"))
         if 'model_checkpoints_path' in kwargs:
             self.model_checkpoints_path = kwargs.pop('model_checkpoints_path')
 
@@ -55,7 +53,6 @@ class Results:
         path = os.path.join(self.model_checkpoints_path, self.run_name + "epoch_{}.pth".format(nr_epoch))
         checkpoint = torch.load(path)
         model.load_state_dict(checkpoint['model_state_dict'])
-
 
     def flatten_epoch_output_target_per_task(self, nr_epoch):
         return [[(step[1][task_idx][0][idx].tolist(),
@@ -84,7 +81,6 @@ class Results:
         return [metrics.log_loss([pred_tar[1] for pred_tar in pred_target_per_task[task_idx]],
                                  [pred_tar[0] for pred_tar in pred_target_per_task[task_idx]])
                 for task_idx in range(len(pred_target_per_task))]
-
 
     def read_files(self, name, train):
         audioset_path = self.audioset_eval_path
@@ -164,3 +160,7 @@ class Results:
         r = Results(concat_dataset, batch_size, learning_rate, weight_decay, nr_epochs)
         r.all_results = all_results
         return r
+
+    @staticmethod
+    def create_model_loader(name):
+        return Results(run_name=name)

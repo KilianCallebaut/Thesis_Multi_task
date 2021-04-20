@@ -1,8 +1,9 @@
-from collections import Iterable
 from typing import List
+
+import numpy as np
+import torch
 from torch.utils.data import ConcatDataset
 
-from Tasks.Task import Task
 from Tasks.TaskDataset import TaskDataset
 
 
@@ -20,6 +21,13 @@ class ConcatTaskDataset(ConcatDataset):
         super().__init__(datasets)
         self.datasets = datasets
 
-
     def get_task_list(self):
         return [d.task for d in self.datasets]
+
+    def split_inputs_targets(self):
+        inputs = torch.cat([torch.stack(d.inputs) for d in self.datasets]).float()
+        targets = torch.cat([torch.stack(
+            [torch.from_numpy(np.array(d.pad_before + t + d.pad_after)) for t in d.targets]
+        ) for d in self.datasets])
+        names = torch.tensor([d_id for d_id in range(len(self.datasets)) for _ in range(self.datasets[d_id].__len__())])
+        return inputs, targets, names

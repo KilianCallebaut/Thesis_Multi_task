@@ -8,8 +8,9 @@ from Tasks.TaskDataset import TaskDataset
 
 
 class Ravdess(DataReader):
-    object_path = r"E:\Thesis_Results\Data_Readers\Ravdess"
-    root = r"E:\Thesis_Datasets\Ravdess"
+    object_path = r"C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\Ravdess"
+    # object_path = r"E:\Thesis_Results\Data_Readers\Ravdess"
+    root = r"F:\Thesis_Datasets\Ravdess"
 
     def __init__(self, extraction_method, **kwargs):
         self.extraction_method = extraction_method

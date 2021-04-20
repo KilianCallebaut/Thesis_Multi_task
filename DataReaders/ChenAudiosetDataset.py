@@ -16,9 +16,10 @@ from sklearn.model_selection import train_test_split
 
 
 class ChenAudiosetDataset(DataReader):
-    root = r'E:\Thesis_Datasets\audioset_chen\audioset_filtered'
+    root = r'F:\Thesis_Datasets\audioset_chen\audioset_filtered'
     train_dir = "balanced_train_segments"
-    object_path = r"E:\Thesis_Results\Data_Readers\ChenAudiosetDataset"
+    object_path = r"C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\ChenAudiosetDataset"
+    # object_path = r"E:\Thesis_Results\Data_Readers\ChenAudiosetDataset"
 
     # Bools for choosing random selection because overrepresented in dataset
     limit_speech = True

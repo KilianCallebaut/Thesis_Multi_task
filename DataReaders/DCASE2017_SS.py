@@ -15,11 +15,14 @@ from Tasks.TaskDataset import TaskDataset
 
 
 class DCASE2017_SS(DataReader):
-    object_path = r"E:\Thesis_Results\Data_Readers\DCASE2017_SS_{}"
-    wav_folder = 'C:\\Users\\mrKC1\\PycharmProjects\\Thesis\\ExternalClassifiers\\DCASE2017-baseline-system-master' \
-                 '\\applications\\data\\TUT-acoustic-scenes-2017-development\\audio\\'
-    wav_folder_eval = 'C:\\Users\\mrKC1\\PycharmProjects\\Thesis\\ExternalClassifiers\\DCASE2017-baseline-system-master' \
-                      '\\applications\\data\\TUT-acoustic-scenes-2017-evaluation\\audio\\'
+    object_path = r"C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\DCASE2017_SS_{}"
+    # object_path = r"E:\Thesis_Results\Data_Readers\DCASE2017_SS_{}"
+    wav_folder = 'F:\\Thesis_Datasets\\DCASE2017\\TUT-acoustic-scenes-2017-development\\audio\\'
+    wav_folder_eval = 'F:\\Thesis_Datasets\\DCASE2017\\TUT-acoustic-scenes-2017-evaluation\\audio\\'
+    # wav_folder = 'C:\\Users\\mrKC1\\PycharmProjects\\Thesis\\ExternalClassifiers\\DCASE2017-baseline-system-master' \
+    #              '\\applications\\data\\TUT-acoustic-scenes-2017-development\\audio\\'
+    # wav_folder_eval = 'C:\\Users\\mrKC1\\PycharmProjects\\Thesis\\ExternalClassifiers\\DCASE2017-baseline-system-master' \
+    #                   '\\applications\\data\\TUT-acoustic-scenes-2017-evaluation\\audio\\'
 
     def __init__(self, extraction_method, **kwargs):
         self.extraction_method = extraction_method

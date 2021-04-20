@@ -15,9 +15,10 @@ except BaseException:
 
 
 class ASVspoof2015(DataReader):
-    Wav_folder = r"E:\Thesis_Datasets\Automatic Speaker Verification Spoofing and Countermeasures Challenge 2015\DS_10283_853\wav"
-    Label_folder = r"E:\Thesis_Datasets\Automatic Speaker Verification Spoofing and Countermeasures Challenge 2015\DS_10283_853\Joint_ASV_CM_protocol"
-    object_path = r"E:\Thesis_Results\Data_Readers\ASVspoof2015_{}"
+    Wav_folder = r"F:\Thesis_Datasets\Automatic Speaker Verification Spoofing and Countermeasures Challenge 2015\DS_10283_853\wav"
+    Label_folder = r"F:\Thesis_Datasets\Automatic Speaker Verification Spoofing and Countermeasures Challenge 2015\DS_10283_853\Joint_ASV_CM_protocol"
+    object_path = r"C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\ASVspoof2015_{}"
+    # object_path = r"E:\Thesis_Results\Data_Readers\ASVspoof2015_{}"
 
     def __init__(self, extraction_method, **kwargs):
         self.extraction_method = extraction_method

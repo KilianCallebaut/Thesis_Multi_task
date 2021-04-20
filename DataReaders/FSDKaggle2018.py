@@ -10,7 +10,8 @@ from Tasks.TaskDataset import TaskDataset
 
 
 class FSDKaggle2018(DataReader):
-    object_path = r"E:\Thesis_results\Data_Readers\FSDKaggle2018"
+    object_path = r"C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\FSDKaggle2018"
+    # object_path = r"E:\Thesis_results\Data_Readers\FSDKaggle2018"
     root = r"E:\Thesis_Datasets\FSDKaggle2018\freesound-audio-tagging"
     audio_folder = r"audio_train"
 

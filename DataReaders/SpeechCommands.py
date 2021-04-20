@@ -11,7 +11,8 @@ from Tasks.TaskDataset import TaskDataset
 
 
 class SpeechCommands(DataReader):
-    object_path = r"E:\Thesis_Results\Data_Readers\SpeechCommands_{}"
+    object_path = r"C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\SpeechCommands_{}"
+    # object_path = r"E:\Thesis_Results\Data_Readers\SpeechCommands_{}"
     root = r"E:\Thesis_Datasets\SpeechCommands"
 
     def __init__(self, extraction_method, **kwargs):

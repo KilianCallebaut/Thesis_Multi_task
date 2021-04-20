@@ -27,9 +27,12 @@ network_options = [
 
 
 def write_config(name: str, params: dict):
+    path = os.path.abspath(__file__)
+    dir_path = os.path.dirname(path)
     if 'extraction_method' in params.keys():
         params['extraction_method'] = params['extraction_method'].name
-    with open('configs/{}.json'.format(name), 'w') as outfile:
+    with open(os.path.join(dir_path,
+                           'configs/{}.json'.format(name)), 'w') as outfile:
         json.dump(params, outfile)
 
 
