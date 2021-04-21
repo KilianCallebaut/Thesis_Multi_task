@@ -14,6 +14,8 @@ from torch.utils.tensorboard import SummaryWriter
 from Tasks.ConcatTaskDataset import ConcatTaskDataset
 from Training.Results import Results
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
 
 class Training:
 
@@ -29,8 +31,6 @@ class Training:
                              num_epochs=50,
                              start_epoch=0,
                              **kwargs):
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
         datasets = concat_dataset.datasets
         task_list = concat_dataset.get_task_list()
         n_tasks = len(task_list)
@@ -254,7 +254,6 @@ class Training:
                  num_epochs=50,
                  start_epoch=0
                  ):
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         datasets = concat_dataset.datasets
         task_list = [x.task for x in datasets]
@@ -278,7 +277,6 @@ class Training:
             num_workers=0,
             pin_memory=False
         )
-
 
         blank_model.eval()
 
