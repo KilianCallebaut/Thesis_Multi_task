@@ -22,16 +22,27 @@ class Training:
     @staticmethod
     def run_gradient_descent(model: nn.Module,
                              concat_dataset: ConcatTaskDataset,
+                             results: Results,
                              batch_size=64,
                              learning_rate=0.05,
                              weight_decay=0,
                              num_epochs=50,
+                             start_epoch=0,
                              **kwargs):
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
         datasets = concat_dataset.datasets
-        results = Results(concat_dataset=concat_dataset, batch_size=batch_size, learning_rate=learning_rate,
-                          weight_decay=weight_decay, nr_epochs=num_epochs, **kwargs)
         task_list = concat_dataset.get_task_list()
-        criteria = [nn.BCELoss().cuda() if t.output_module == 'sigmoid' else nn.CrossEntropyLoss().cuda()
+        n_tasks = len(task_list)
+
+        name = model.name
+        for n in task_list:
+            name += "_" + n.name
+        writer = SummaryWriter(comment=name)
+        # first_shape = np.array(datasets[0].__getitem__(0)[0].shape)
+        # writer.add_graph(model, torch.rand(first_shape[None, :, :]).to(device))
+
+        criteria = [nn.BCELoss().to(device) if t.output_module == 'sigmoid' else nn.CrossEntropyLoss().to(device)
                     for t in task_list]
         target_flags = [
             [False for _ in x.pad_before] + [True for _ in x.targets[0]] + [False for _ in x.pad_after]
@@ -42,14 +53,14 @@ class Training:
             #                                       batch_size=batch_size),
             batch_size=batch_size,
             shuffle=True,
-            num_workers=4,
-            pin_memory=True
+            num_workers=0,
+            pin_memory=False
         )
 
         # # fastloader
         # results = Results(batch_size=batch_size, learning_rate=learning_rate,
         #                   weight_decay=weight_decay, nr_epochs=num_epochs, **kwargs)
-        # criteria = [nn.BCELoss().cuda() if t.output_module == 'sigmoid' else nn.CrossEntropyLoss().cuda()
+        # criteria = [nn.BCELoss().to(device) if t.output_module == 'sigmoid' else nn.CrossEntropyLoss().to(device)
         #             for t in task_list]
         # target_flags = [
         #     [False for _ in range(x[0])] + [True for _ in range(x[1])] + [False for _ in range(x[2])]
@@ -61,19 +72,10 @@ class Training:
         # optimizer = optim.SGD(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
         optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
 
-        n_tasks = len(task_list)
-
-        name = model.name
-        for n in task_list:
-            name += "_" + n.name
-        writer = SummaryWriter(comment=name)
-        # first_shape = np.array(datasets[0].__getitem__(0)[0].shape)
-        # writer.add_graph(model, torch.rand(first_shape[None, :, :]).cuda())
-
         model.train()  # Set model to training mode
 
         # Epoch
-        for epoch in range(num_epochs):
+        for epoch in range(start_epoch, num_epochs):
 
             print('Epoch {}'.format(epoch))
             print('===========================================================')
@@ -101,13 +103,13 @@ class Training:
                 batch_flags = [[True if t.name == n else False for n in names] for t in
                                task_list]
 
-                losses_batch = [torch.tensor([0]).cuda() for _ in task_list]
+                losses_batch = [torch.tensor([0]).to(device) for _ in task_list]
                 output_batch = [torch.Tensor([]) for _ in task_list]
                 labels_batch = [torch.Tensor([]) for _ in task_list]
 
-                # define .cuda() on dataloader(s) to make it run on gpu
-                inputs = inputs.cuda()
-                labels = labels.cuda()
+                # define .to(device) on dataloader(s) to make it run on gpu
+                inputs = inputs.to(device)
+                labels = labels.to(device)
 
                 # optimizer.zero_grad() to zero parameter gradients
                 optimizer.zero_grad()
@@ -123,8 +125,8 @@ class Training:
                     begin = datetime.datetime.now()
                     ex_mx = ex if ex > ex_mx else ex_mx
                     ex_t += ex
-                    print('[{}{}], exection time: {}, max time: {}, total time: {}'.format(perc_s, perc_sp, ex, ex_mx,
-                                                                                           ex_t), end='\r')
+                    print('[{}{}], execution time: {}, max time: {}, total time: {}'.format(perc_s, perc_sp, ex, ex_mx,
+                                                                                            ex_t), end='\r')
 
                 for i in range(n_tasks):
                     if sum(batch_flags[i]) == 0:
@@ -172,6 +174,7 @@ class Training:
             epoch_metrics = [metrics.classification_report(task_labels[t], task_predictions[t], output_dict=True) for t
                              in range(len(task_predictions))]
 
+            mats = []
             for t in range(n_tasks):
                 task_name = task_list[t].name
                 print('TASK {}: '.format(task_name), end='')
@@ -203,6 +206,10 @@ class Training:
                 print('Running loss {}'.format(task_running_losses[t] / step))
                 print(task_list[t].output_labels)
                 print(mat)
+                mats.append(mat)
+
+            results.add_class_report(epoch, epoch_metrics, train=True)
+            results.add_matrix(epoch, mats, train=True)
 
             # for h in range(len(model.hidden)):
             #     writer.add_histogram("hidden weights {}".format(h), model.hidden[h].weight, epoch)
@@ -247,31 +254,33 @@ class Training:
                  num_epochs=50,
                  start_epoch=0
                  ):
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
         datasets = concat_dataset.datasets
-        criteria = [nn.BCELoss().cuda() if d.task.output_module == 'sigmoid' else nn.CrossEntropyLoss().cuda()
-                    for d in datasets]
         task_list = [x.task for x in datasets]
         n_tasks = len(task_list)
-
         name = blank_model.name
         for n in task_list:
             name += "_" + n.name
-
         writer = SummaryWriter(comment=name + '_evaluation')
 
+        criteria = [nn.BCELoss().to(device) if d.task.output_module == 'sigmoid' else nn.CrossEntropyLoss().to(device)
+                    for d in datasets]
+        target_flags = [
+            [False for _ in x.pad_before] + [True for _ in x.targets[0]] + [False for _ in x.pad_after]
+            for x in datasets]
         eval_loader = torch.utils.data.DataLoader(
             concat_dataset,
             # sampler=BalancedBatchSchedulerSampler(dataset=concat_dataset,
             #                                       batch_size=batch_size),
             batch_size=batch_size,
             shuffle=True,
-            num_workers=4,
-            pin_memory=True
+            num_workers=0,
+            pin_memory=False
         )
-        # split = concat_dataset.split_inputs_targets()
-        # eval_loader = FastTensorDataLoader(split[0], split[1], split[2],
-        #                      batch_size=batch_size,
-        #                      shuffle=True)
+
+
+        blank_model.eval()
 
         with torch.no_grad():
             print("Start Evaluation")
@@ -280,7 +289,6 @@ class Training:
                 print('===========================================================')
 
                 training_results.load_model_parameters(epoch, blank_model)
-                blank_model.eval()
 
                 running_loss = 0.0
                 step = 0
@@ -303,16 +311,13 @@ class Training:
                     #                range(len(task_list))]
                     batch_flags = [[True if t.name == n else False for n in names] for t in
                                    task_list]
-                    target_flags = [
-                        [False for _ in x.pad_before] + [True for _ in x.targets[0]] + [False for _ in x.pad_after]
-                        for x in datasets]
 
-                    losses_batch = [0.0 for _ in task_list]
-                    output_batch = [0.0 for _ in task_list]
-                    labels_batch = [0.0 for _ in task_list]
+                    losses_batch = [torch.tensor([0]).to(device) for _ in task_list]
+                    output_batch = [torch.Tensor([]) for _ in task_list]
+                    labels_batch = [torch.Tensor([]) for _ in task_list]
 
-                    inputs = inputs.cuda()
-                    labels = labels.cuda()
+                    inputs = inputs.to(device)
+                    labels = labels.to(device)
                     output = blank_model(inputs)
 
                     if perc < (step / len(eval_loader)) * 100:
@@ -324,8 +329,9 @@ class Training:
                         ex_mx = ex if ex > ex_mx else ex_mx
                         ex_t += ex
                         print(
-                            '[{}{}], exection time: {}, max time: {}, total time: {}'.format(perc_s, perc_sp, ex, ex_mx,
-                                                                                             ex_t), end='\r')
+                            '[{}{}], execution time: {}, max time: {}, total time: {}'.format(perc_s, perc_sp, ex,
+                                                                                              ex_mx,
+                                                                                              ex_t), end='\r')
 
                     for i in range(n_tasks):
                         if sum(batch_flags[i]) == 0:
@@ -343,8 +349,8 @@ class Training:
                         losses_batch[i] = criteria[i](filtered_output,
                                                       Training.calculate_labels(task_list[i].output_module,
                                                                                 filtered_labels))
-                        output_batch[i] = filtered_output
-                        labels_batch[i] = filtered_labels
+                        output_batch[i] = filtered_output.detach()
+                        labels_batch[i] = filtered_labels.detach()
 
                     loss = sum(losses_batch)
 
@@ -368,6 +374,7 @@ class Training:
                                  for t
                                  in range(len(task_predictions))]
 
+                mats = []
                 for t in range(n_tasks):
                     task_name = task_list[t].name
                     mat = []
@@ -395,7 +402,9 @@ class Training:
                     writer.add_scalar("Running loss task/Eval {}".format(task_name),
                                       task_running_losses[t].item() / step,
                                       epoch)
-
+                    mats.append(mat)
+                training_results.add_class_report(epoch, epoch_metrics, train=False)
+                training_results.add_matrix(epoch, mats, train=False)
         for t in range(len(task_predictions)):
             mat = []
             print(task_list[t].output_labels)
