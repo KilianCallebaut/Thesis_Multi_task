@@ -12,15 +12,15 @@ except BaseException:
     import _pickle as cPickle
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
+drive = 'F'
 # load/save model_checkpoints
 # load/save matrices
 # load/save classification report
 class Results:
-    audioset_train_path = r"D:\Thesis_Results\Training_Results"
-    audioset_eval_path = r"D:\Thesis_Results\Evaluation_Results"
+    audioset_train_path = drive+r":\Thesis_Results\Training_Results"
+    audioset_eval_path = drive+r":\Thesis_Results\Evaluation_Results"
     audioset_file_base = r"Result"
-    model_checkpoints_path = r"F:\Thesis_Results\Model_Checkpoints"
+    model_checkpoints_path = drive+r":\Thesis_Results\Model_Checkpoints"
 
     def __init__(self, **kwargs):
 
@@ -29,6 +29,11 @@ class Results:
         else:
             self.run_name = self.audioset_file_base + "_" + str(
                 datetime.now().strftime("%d_%m_%Y_%H_%M_%S"))
+        if 'audioset_train_path' in kwargs:
+            self.audioset_train_path = kwargs.get('audioset_train_path')
+        if 'audioset_eval_path' in kwargs:
+            self.audioset_eval_path = kwargs.get('audioset_eval_path')
+
         if not os.path.exists(os.path.join(self.audioset_train_path, self.run_name)):
             os.makedirs(os.path.join(self.audioset_train_path, self.run_name))
         if not os.path.exists(os.path.join(self.audioset_eval_path, self.run_name)):
@@ -37,7 +42,7 @@ class Results:
             self.model_checkpoints_path = kwargs.pop('model_checkpoints_path')
 
     def add_model_parameters(self, nr_epoch, model):
-        path = os.path.join(self.model_checkpoints_path, self.run_name, "epoch_{}.pth".format(nr_epoch))
+        path = os.path.join(self.model_checkpoints_path, self.run_name + "epoch_{}.pth".format(nr_epoch))
         torch.save({'epoch': nr_epoch, 'model_state_dict': model.state_dict()}, path)
 
     def load_model_parameters(self, nr_epoch, model):

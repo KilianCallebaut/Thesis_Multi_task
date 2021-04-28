@@ -16,9 +16,9 @@ from Training.Results import Results
 from Training.Training import Training
 from Tasks.ConcatTaskDataset import ConcatTaskDataset
 from Tests.conv_test import *
-
+drive = 'F'
 meta_params = read_config('meta_params_cnn_MelSpectrogram')
-model_checkpoints_path = r"D:\Thesis_Results\Model_Checkpoints"
+model_checkpoints_path = drive+r":\Thesis_Results\Model_Checkpoints"
 dataset_list = [0, 2]
 training_dataset, eval_dataset = get_concat([dataset_list[0], dataset_list[1]])
 task_list = training_dataset.get_task_list()

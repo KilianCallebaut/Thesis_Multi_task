@@ -398,7 +398,7 @@ class Training:
                                       epoch_metrics[t]['macro avg']['f1-score'],
                                       epoch)
                     writer.add_scalar("Running loss task/Eval {}".format(task_name),
-                                      task_running_losses[t].item() / step,
+                                      task_running_losses[t] / step,
                                       epoch)
                     mats.append(mat)
                 training_results.add_class_report(epoch, epoch_metrics, train=False)

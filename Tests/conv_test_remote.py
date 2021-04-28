@@ -1,6 +1,7 @@
 from __future__ import print_function, division
 
 import sys
+import paramiko
 
 import torch
 
@@ -28,7 +29,7 @@ def run_datasets(dataset_list):
 
     if 0 in dataset_list:
         asvspoof = ASVspoof2015(**extraction_params,
-                                object_path='..\data\Data_Readers\ASVspoof2015_{}')
+                                object_path=r'Thesis_Multi_task\data\Data_Readers\ASVspoof2015_{}')
         asvspoof.prepare_taskDatasets(**read_config('preparation_params_asvspoof_cnn'))
         asvspoof_t = asvspoof.toTrainTaskDataset()
         asvspoof_e = asvspoof.toValidTaskDataset()
@@ -36,7 +37,7 @@ def run_datasets(dataset_list):
         evaldatasets.append(asvspoof_e)
     if 1 in dataset_list:
         chenaudio = ChenAudiosetDataset(**extraction_params,
-                                        object_path='..\data\Data_Readers\ChenAudiosetDataset')
+                                        object_path=r'Thesis_Multi_task\data\Data_Readers\ChenAudiosetDataset')
         chenaudio.prepare_taskDatasets(**read_config('preparation_params_chen_cnn'))
         chen_t = chenaudio.toTrainTaskDataset()
         chen_e = chenaudio.toTestTaskDataset()
@@ -44,7 +45,7 @@ def run_datasets(dataset_list):
         evaldatasets.append(chen_e)
     if 2 in dataset_list:
         dcaseScene = DCASE2017_SS(**extraction_params,
-                                  object_path='..\data\Data_Readers\DCASE2017_SS_{}')
+                                  object_path=r'Thesis_Multi_task\data\Data_Readers\DCASE2017_SS_{}')
         dcaseScene.prepare_taskDatasets(**read_config('preparation_params_dcaseScene_cnn'))
         dcasScent_t = dcaseScene.toTrainTaskDataset()
         dcasScent_e = dcaseScene.toValidTaskDataset()
@@ -52,14 +53,14 @@ def run_datasets(dataset_list):
         evaldatasets.append(dcasScent_e)
     if 3 in dataset_list:
         fsdkaggle = FSDKaggle2018(**extraction_params,
-                                  object_path='..\data\Data_Readers\FSDKaggle2018')
+                                  object_path=r'Thesis_Multi_task\data\Data_Readers\FSDKaggle2018')
         fsdkaggle.prepare_taskDatasets(**read_config('preparation_params_fsdkaggle_cnn'))
         fsdkaggle_t = fsdkaggle.toTrainTaskDataset()
         fsdkaggle_e = fsdkaggle.toTestTaskDataset()
         taskdatasets.append(fsdkaggle_t)
         evaldatasets.append(fsdkaggle_e)
     if 4 in dataset_list:
-        ravdess = Ravdess(**extraction_params, object_path='..\data\Data_Readers\Ravdess')
+        ravdess = Ravdess(**extraction_params, object_path=r'Thesis_Multi_task\data\Data_Readers\Ravdess')
         ravdess.prepare_taskDatasets(**read_config('preparation_params_ravdess_cnn'))
         ravdess_t = ravdess.toTrainTaskDataset()
         ravdess_e = ravdess.toTestTaskDataset()
@@ -67,7 +68,7 @@ def run_datasets(dataset_list):
         evaldatasets.append(ravdess_e)
     if 5 in dataset_list:
         speechcommands = SpeechCommands(**extraction_params,
-                                        object_path='..\data\Data_Readers\SpeechCommands_{}')
+                                        object_path=drive + r'Thesis_Multi_task\data\Data_Readers\SpeechCommands_{}')
         speechcommands.prepare_taskDatasets(**read_config('preparation_params_speechcommands_cnn'))
         speechcommands_t = speechcommands.toTrainTaskDataset()
         speechcommands_e = speechcommands.toValidTaskDataset()
@@ -100,7 +101,10 @@ def get_concat(dataset_list):
 
 
 def main(argv):
-    model_checkpoints_path = drive + r":\Thesis_Results\Model_Checkpoints"
+    model_checkpoints_path = "Thesis_Results\Model_Checkpoints"
+    audioset_train_path = 'Thesis_Results\Training_Results'
+    audioset_eval_path = 'Thesis_Results\Evaluation_Results'
+
     extraction_params = read_config('extraction_params_cnn_MelSpectrogram')
     calculate_window_size(extraction_params)
     meta_params = read_config('meta_params_cnn_MelSpectrogram')
@@ -118,7 +122,9 @@ def main(argv):
                                                   task_list=task_list)
         model = model.to(device)
         print('Model Created')
-        results = Results(model_checkpoints_path=model_checkpoints_path)
+        results = Results(model_checkpoints_path=model_checkpoints_path,
+                          audioset_train_path=audioset_train_path,
+                          audioset_eval_path=audioset_eval_path)
         model, results = Training.run_gradient_descent(model=model,
                                                        concat_dataset=training_dataset,
                                                        results=results,
@@ -140,7 +146,9 @@ def main(argv):
                                                       task_list=task_list)
             model = model.to(device)
             print('Model Created')
-            results = Results(model_checkpoints_path=model_checkpoints_path)
+            results = Results(model_checkpoints_path=model_checkpoints_path,
+                              audioset_train_path=audioset_train_path,
+                              audioset_eval_path=audioset_eval_path)
             model, results = Training.run_gradient_descent(model=model,
                                                            concat_dataset=training_dataset,
                                                            results=results,
