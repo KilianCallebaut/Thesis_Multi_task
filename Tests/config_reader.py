@@ -17,7 +17,8 @@ dataset_options = [
     'dcaseScene',
     'fsdkaggle',
     'ravdess',
-    'speechcommands'
+    'speechcommands',
+    'dcaseEvents'
 ]
 
 network_options = [

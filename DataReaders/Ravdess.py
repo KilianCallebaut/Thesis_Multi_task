@@ -122,6 +122,19 @@ class Ravdess(DataReader):
                                                labels=self.taskDataset.task.output_labels,
                                                output_module=self.taskDataset.task.output_module)
 
+    def make_train_test_TaskDatasets(self, x_train, y_train, x_val, y_val, **kwargs):
+        self.extraction_method.scale_fit(x_train)
+        x_train, y_train = self.extraction_method.prepare_inputs_targets(x_train, y_train, **kwargs)
+        self.trainTaskDataset = TaskDataset(inputs=x_train, targets=y_train,
+                                            name=self.taskDataset.task.name + "_train",
+                                            labels=self.taskDataset.task.output_labels,
+                                            output_module=self.taskDataset.task.output_module)
+        x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val, **kwargs)
+        self.testTaskDataset = TaskDataset(inputs=x_val, targets=y_val,
+                                           name=self.taskDataset.task.name + "_test",
+                                           labels=self.taskDataset.task.output_labels,
+                                           output_module=self.taskDataset.task.output_module)
+
     def toTrainTaskDataset(self):
         return self.trainTaskDataset
 

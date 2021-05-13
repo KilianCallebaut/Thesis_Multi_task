@@ -58,7 +58,8 @@ class DCASE2017_SS(DataReader):
     def load_files(self):
         # MetaDataContainer(filename=)
         self.devdataset = TUTAcousticScenes_2017_DevelopmentSet(
-            data_path='C:\\Users\\mrKC1\\PycharmProjects\\Thesis\\ExternalClassifiers\\DCASE2017-baseline-system-master\\applications\\data\\',
+            # data_path='C:\\Users\\mrKC1\\PycharmProjects\\Thesis\\ExternalClassifiers\\DCASE2017-baseline-system-master\\applications\\data\\',
+            data_path='F:\\Thesis_Datasets\\DCASE2017\\',
             log_system_progress=False,
             show_progress_in_console=True,
             use_ascii_progress_bar=True,
@@ -70,8 +71,9 @@ class DCASE2017_SS(DataReader):
 
         ).initialize()
         self.evaldataset = TUTAcousticScenes_2017_EvaluationSet(
-            data_path=r'C:\\Users\\mrKC1\\PycharmProjects\\Thesis\\ExternalClassifiers\\DCASE2017-baseline-system'
-                      r'-master\\applications\\data\\',
+            # data_path=r'C:\\Users\\mrKC1\\PycharmProjects\\Thesis\\ExternalClassifiers\\DCASE2017-baseline-system'
+            #           r'-master\\applications\\data\\',
+            data_path='F:\\Thesis_Datasets\\DCASE2017\\',
             log_system_progress=False,
             show_progress_in_console=True,
             use_ascii_progress_bar=True,
@@ -200,6 +202,19 @@ class DCASE2017_SS(DataReader):
         self.valTaskDataset.inputs, self.valTaskDataset.targets \
             = self.extraction_method.prepare_inputs_targets(self.valTaskDataset.inputs, self.valTaskDataset.targets,
                                                             **kwargs)
+
+    def make_train_test_TaskDatasets(self, x_train, y_train, x_val, y_val, **kwargs):
+        self.extraction_method.scale_fit(x_train)
+        x_train, y_train = self.extraction_method.prepare_inputs_targets(x_train, y_train, **kwargs)
+        self.trainTaskDataset = TaskDataset(inputs=x_train, targets=y_train,
+                                            name=self.taskDataset.task.name + "_train",
+                                            labels=self.taskDataset.task.output_labels,
+                                            output_module=self.taskDataset.task.output_module)
+        x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val, **kwargs)
+        self.testTaskDataset = TaskDataset(inputs=x_val, targets=y_val,
+                                           name=self.taskDataset.task.name + "_test",
+                                           labels=self.taskDataset.task.output_labels,
+                                           output_module=self.taskDataset.task.output_module)
 
     def toTrainTaskDataset(self):
         return self.trainTaskDataset

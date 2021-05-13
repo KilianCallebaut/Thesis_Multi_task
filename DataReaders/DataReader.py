@@ -5,6 +5,7 @@ import librosa
 import numpy as np
 import torch
 from scipy import signal
+from sklearn.model_selection import KFold
 
 
 class DataReader(ABC):
@@ -61,8 +62,42 @@ class DataReader(ABC):
                                   (i not in label_set or i in random_label_set)]
         return sampled_inputs, sampled_targets
 
+    def k_folds(self, dic_of_labels_limits, taskDataset):
+        # Examples
+        # --------
+        # >> > import numpy as np
+        # >> > from sklearn.model_selection import KFold
+        # >> > X = np.array([[1, 2], [3, 4], [1, 2], [3, 4]])
+        # >> > y = np.array([1, 2, 3, 4])
+        # >> > kf = KFold(n_splits=2)
+        # >> > kf.get_n_splits(X)
+        # 2
+        # >> > print(kf)
+        # KFold(n_splits=2, random_state=None, shuffle=False)
+        # >> > for train_index, test_index in kf.split(X):
+        #     ...
+        #     print("TRAIN:", train_index, "TEST:", test_index)
+        # ...
+        # X_train, X_test = X[train_index], X[test_index]
+        # ...
+        # y_train, y_test = y[train_index], y[test_index]
+        # TRAIN: [2 3]
+        # TEST: [0 1]
+        # TRAIN: [0 1]
+        # TEST: [2 3]
+
+        kf = KFold(n_splits=5)
+        inputs = taskDataset.inputs
+        if dic_of_labels_limits:
+            inputs, _ = self.sample_labels(taskDataset, dic_of_labels_limits)
+        kf.split(inputs)
+
     @abstractmethod
     def prepare_taskDatasets(self, test_size, dic_of_labels_limits, **kwargs):
+        pass
+
+    @abstractmethod
+    def make_train_test_TaskDatasets(self, x_train, y_train, x_val, y_val, **kwargs):
         pass
 
     @abstractmethod

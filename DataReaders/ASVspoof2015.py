@@ -18,6 +18,7 @@ class ASVspoof2015(DataReader):
     Wav_folder = r"F:\Thesis_Datasets\Automatic Speaker Verification Spoofing and Countermeasures Challenge 2015\DS_10283_853\wav"
     Label_folder = r"F:\Thesis_Datasets\Automatic Speaker Verification Spoofing and Countermeasures Challenge 2015\DS_10283_853\Joint_ASV_CM_protocol"
     object_path = r"C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\ASVspoof2015_{}"
+
     # object_path = r"E:\Thesis_Results\Data_Readers\ASVspoof2015_{}"
 
     def __init__(self, extraction_method, **kwargs):
@@ -83,7 +84,6 @@ class ASVspoof2015(DataReader):
 
         self.valTaskDataset = TaskDataset([], [], '', [])
         self.valTaskDataset.load(self.get_eval_base_path(), extraction_method)
-
 
     def write_files(self, extraction_method):
         dict = {'files': self.files,
@@ -167,7 +167,6 @@ class ASVspoof2015(DataReader):
             train_test_split(inputs, targets, test_size=test_size) \
                 if test_size > 0 else (inputs, [], targets, [])
 
-
         self.extraction_method.scale_fit(x_train)
         x_train, y_train = self.extraction_method.prepare_inputs_targets(x_train, y_train, **kwargs)
         self.trainTaskDataset = TaskDataset(inputs=x_train, targets=y_train,
@@ -176,13 +175,26 @@ class ASVspoof2015(DataReader):
                                             output_module=self.taskDataset.task.output_module)
         if test_size > 0:
             x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val, **kwargs)
-            self.testTaskDataset = TaskDataset(inputs= x_val, targets=y_val,
+            self.testTaskDataset = TaskDataset(inputs=x_val, targets=y_val,
                                                name=self.taskDataset.task.name + "_test",
                                                labels=self.taskDataset.task.output_labels,
                                                output_module=self.taskDataset.task.output_module)
 
         self.valTaskDataset.inputs, self.valTaskDataset.targets = self.extraction_method.prepare_inputs_targets(
             self.valTaskDataset.inputs, self.valTaskDataset.targets, **kwargs)
+
+    def make_train_test_TaskDatasets(self, x_train, y_train, x_val, y_val, **kwargs):
+        self.extraction_method.scale_fit(x_train)
+        x_train, y_train = self.extraction_method.prepare_inputs_targets(x_train, y_train, **kwargs)
+        self.trainTaskDataset = TaskDataset(inputs=x_train, targets=y_train,
+                                            name=self.taskDataset.task.name + "_train",
+                                            labels=self.taskDataset.task.output_labels,
+                                            output_module=self.taskDataset.task.output_module)
+        x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val, **kwargs)
+        self.testTaskDataset = TaskDataset(inputs=x_val, targets=y_val,
+                                           name=self.taskDataset.task.name + "_test",
+                                           labels=self.taskDataset.task.output_labels,
+                                           output_module=self.taskDataset.task.output_module)
 
     def toTrainTaskDataset(self):
         return self.trainTaskDataset

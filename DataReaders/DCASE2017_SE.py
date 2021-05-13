@@ -1,24 +1,22 @@
 import os
 
 import joblib
-import tensorflow_datasets as tfds
+from dcase_util.datasets import TUTSoundEvents_2017_DevelopmentSet
+from numpy import long
 from sklearn.model_selection import train_test_split
 
 from DataReaders.DataReader import DataReader
 from Tasks.TaskDataset import TaskDataset
 
 
-class SpeechCommands(DataReader):
-    object_path = r"C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\SpeechCommands_{}"
-    # object_path = r"E:\Thesis_Results\Data_Readers\SpeechCommands_{}"
-    root = r"F:\Thesis_Datasets\SpeechCommands"
+class DCASE2017_SE(DataReader):
+    object_path = r"C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\DCASE2017_SE_{}"
+    wav_folder = 'F:\\Thesis_Datasets\\DCASE2017\\TUT-sound-events-2017-development\\audio\\'
 
     def __init__(self, extraction_method, **kwargs):
         self.extraction_method = extraction_method
 
-        print('start Speech commands')
-
-        self.sample_rate = 16000
+        print('start DCASE2017 SE')
         if 'object_path' in kwargs:
             self.object_path = kwargs.pop('object_path')
         if self.check_files(extraction_method.name):
@@ -27,95 +25,91 @@ class SpeechCommands(DataReader):
             self.load_files()
             self.calculate_taskDataset(extraction_method, **kwargs)
             self.write_files(extraction_method.name)
-
-        print('Done loading Speech Commands')
+        print('done')
 
     def get_path(self):
-        return os.path.join(self.get_base_path(), 'SpeechCommands.obj')
+        return os.path.join(self.get_base_path(), 'DCASE2017_SE.obj')
 
     def get_base_path(self):
         return self.object_path.format('train')
 
-    def get_eval_path(self):
-        return os.path.join(self.get_base_path(), 'SpeechCommands.obj')
-
-    def get_eval_base_path(self):
-        return self.object_path.format('eval')
-
     def check_files(self, extraction_method):
-        return TaskDataset.check(self.get_base_path(), extraction_method) and \
-               TaskDataset.check(self.get_eval_base_path(), extraction_method) and os.path.isfile(self.get_path())
+        return TaskDataset.check(self.get_base_path(), extraction_method) and os.path.isfile(self.get_path())
 
     def load_files(self):
-        self.ds, self.ds_info = tfds.load('speech_commands', split=['train', 'test'], shuffle_files=True,
-                                          data_dir=self.root, with_info=True)
-        print('Done loading Speech Commands dataset')
+        self.devdataset = TUTSoundEvents_2017_DevelopmentSet(
+            data_path='F:\\Thesis_Datasets\\DCASE2017\\',
+            log_system_progress=False,
+            show_progress_in_console=True,
+            use_ascii_progress_bar=True,
+            name='TUTSoundEvents_2017_DevelopmentSet',
+            fold_list=[1, 2, 3, 4],
+            evaluation_mode='folds',
+            storage_name='TUT-sound-events-2017-development'
+
+        ).initialize()
+
+        self.audio_files = self.devdataset.audio_files
 
     def read_files(self, extraction_method):
-        self.load_files()
+        info = joblib.load(self.get_path())
+        self.audio_files = info['audio_files']
         self.taskDataset = TaskDataset([], [], '', [])
         self.taskDataset.load(self.get_base_path(), extraction_method)
-
-        self.validTaskDataset = TaskDataset([], [], '', [])
-        self.validTaskDataset.load(self.get_eval_base_path(), extraction_method)
+        print('Reading SS done')
 
     def write_files(self, extraction_method):
-        dict = {}
+        dict = {'audio_files': self.audio_files}
         joblib.dump(dict, self.get_path())
-        joblib.dump(dict, self.get_eval_path())
-        self.taskDataset.save(self.get_base_path(), extraction_method=extraction_method)
-        self.validTaskDataset.save(self.get_eval_base_path(), extraction_method=extraction_method)
+        self.taskDataset.save(self.get_base_path(), extraction_method)
 
     def calculate_input(self, method, **kwargs):
-        inputs = []
-        ds_id = 0
-
         resample_to = None
         if 'resample_to' in kwargs:
             resample_to = kwargs.pop('resample_to')
 
-        if 'test' in kwargs and kwargs.pop('test'):
-            ds_id = 1
+        files = self.audio_files
+        inputs = self.calculate_features(files, method, resample_to, **kwargs)
+        print("Calculating input done")
+        return inputs
 
-        for audio_label in self.ds[ds_id].as_numpy_iterator():
-            audio = audio_label["audio"]
-            fs = self.sample_rate
-            if resample_to is not None:
-                audio, fs = self.resample(audio, self.sample_rate, resample_to)
-            inputs.append(method.extract_features((audio, fs), **kwargs))
-
+    def calculate_features(self, files, method, resample_to, **kwargs):
+        inputs = []
+        perc = 0
+        for audio_idx in range(len(files)):
+            read_wav = self.load_wav(files[audio_idx], resample_to)
+            inputs.append(method.extract_features(read_wav, **kwargs))
+            if perc < (audio_idx / len(files)) * 100:
+                print("Percentage done: {}".format(perc))
+                perc += 1
+        print("Calculating input done")
         return inputs
 
     def calculate_taskDataset(self, method, **kwargs):
-        # Training Set
-        print("Calculate Training Set")
+        distinct_labels = self.devdataset.scene_labels()
         targets = []
-        for audio_label in self.ds[0].as_numpy_iterator():
-            targets.append(audio_label["label"])
-        distinct_targets = list(set(targets))
+
+        for file_id in range(len(self.audio_files)):
+            # targets in the form list Tensor 2d (nr_frames, nr_labels) of length nr_files
+            annotations = self.devdataset.meta.filter(self.audio_files[file_id])
+            target = annotations.to_event_roll(label_list=self.devdataset.event_labels(),
+                                               time_resolution=1)
+
+            targets.append(target)
+
+            print(file_id / len(self.audio_files))
 
         inputs = self.calculate_input(method, **kwargs)
-        targets = [[float(b == f) for b in distinct_targets] for f in targets]
 
-        self.taskDataset = TaskDataset(inputs=inputs, targets=targets, name="SpeechCommands",
-                                       labels=self.ds_info.features['label'].names,
+        self.taskDataset = TaskDataset(inputs=inputs,
+                                       targets=targets,
+                                       name='DCASE2017_SE',
+                                       labels=distinct_labels,
                                        output_module='softmax')
 
-        print("Calculate Test Set")
-        # Test Set
-        targets_t = []
-        for audio_label in self.ds[1].as_numpy_iterator():
-            targets_t.append(audio_label["label"])
-        inputs_t = self.calculate_input(method=method, test=True, **kwargs)
-        targets_t = [[float(b == f) for b in distinct_targets] for f in targets_t]
-
-        self.validTaskDataset = TaskDataset(inputs=inputs_t, targets=targets_t,
-                                            name="SpeechCommandsTest",
-                                            labels=self.ds_info.features['label'].names, output_module='softmax')
-
     def recalculate_features(self, method, **kwargs):
-        self.taskDataset.inputs = self.calculate_input(method, **kwargs)
-        self.validTaskDataset.inputs = self.calculate_input(method, test=True, **kwargs)
+        inputs = self.calculate_input(method, **kwargs)
+        self.taskDataset.inputs = inputs
 
     def prepare_taskDatasets(self, test_size, dic_of_labels_limits, **kwargs):
         inputs = self.taskDataset.inputs
@@ -124,7 +118,8 @@ class SpeechCommands(DataReader):
             inputs, targets = self.sample_labels(self.taskDataset, dic_of_labels_limits)
 
         x_train, x_val, y_train, y_val = \
-            train_test_split(inputs, targets, test_size=test_size) \
+            train_test_split(inputs, targets,
+                             test_size=test_size) \
                 if test_size > 0 else (inputs, [], targets, [])
         self.extraction_method.scale_fit(x_train)
         x_train, y_train = self.extraction_method.prepare_inputs_targets(x_train, y_train, **kwargs)
@@ -138,10 +133,6 @@ class SpeechCommands(DataReader):
                                                name=self.taskDataset.task.name + "_test",
                                                labels=self.taskDataset.task.output_labels,
                                                output_module=self.taskDataset.task.output_module)
-
-        self.validTaskDataset.inputs, self.validTaskDataset.targets = \
-            self.extraction_method.prepare_inputs_targets(self.validTaskDataset.inputs, self.validTaskDataset.targets,
-                                                          **kwargs)
 
     def make_train_test_TaskDatasets(self, x_train, y_train, x_val, y_val, **kwargs):
         self.extraction_method.scale_fit(x_train)
@@ -163,4 +154,4 @@ class SpeechCommands(DataReader):
         return self.testTaskDataset
 
     def toValidTaskDataset(self):
-        return self.validTaskDataset
+        pass

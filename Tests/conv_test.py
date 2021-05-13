@@ -7,6 +7,7 @@ import torch
 from DataReaders.ASVspoof2015 import ASVspoof2015
 from DataReaders.ChenAudiosetDataset import ChenAudiosetDataset
 from DataReaders.DCASE2017_SS import DCASE2017_SS
+from DataReaders.DCASE2017_SE import DCASE2017_SE
 from DataReaders.FSDKaggle2018 import FSDKaggle2018
 from DataReaders.Ravdess import Ravdess
 from DataReaders.SpeechCommands import SpeechCommands
@@ -21,14 +22,15 @@ drive = 'F'
 
 
 def run_datasets(dataset_list):
-    extraction_params = read_config('extraction_params_cnn_MelSpectrogram')
+    # extraction_params = read_config('extraction_params_cnn_MelSpectrogram')
+    extraction_params = read_config('extraction_params_cnn_mfcc')
     calculate_window_size(extraction_params)
     taskdatasets = []
     evaldatasets = []
 
     if 0 in dataset_list:
         asvspoof = ASVspoof2015(**extraction_params,
-                                object_path='..\data\Data_Readers\ASVspoof2015_{}')
+                                object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\ASVspoof2015_{}')
         asvspoof.prepare_taskDatasets(**read_config('preparation_params_asvspoof_cnn'))
         asvspoof_t = asvspoof.toTrainTaskDataset()
         asvspoof_e = asvspoof.toValidTaskDataset()
@@ -36,7 +38,7 @@ def run_datasets(dataset_list):
         evaldatasets.append(asvspoof_e)
     if 1 in dataset_list:
         chenaudio = ChenAudiosetDataset(**extraction_params,
-                                        object_path='..\data\Data_Readers\ChenAudiosetDataset')
+                                        object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\ChenAudiosetDataset')
         chenaudio.prepare_taskDatasets(**read_config('preparation_params_chen_cnn'))
         chen_t = chenaudio.toTrainTaskDataset()
         chen_e = chenaudio.toTestTaskDataset()
@@ -44,7 +46,7 @@ def run_datasets(dataset_list):
         evaldatasets.append(chen_e)
     if 2 in dataset_list:
         dcaseScene = DCASE2017_SS(**extraction_params,
-                                  object_path='..\data\Data_Readers\DCASE2017_SS_{}')
+                                  object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\DCASE2017_SS_{}')
         dcaseScene.prepare_taskDatasets(**read_config('preparation_params_dcaseScene_cnn'))
         dcasScent_t = dcaseScene.toTrainTaskDataset()
         dcasScent_e = dcaseScene.toValidTaskDataset()
@@ -52,14 +54,14 @@ def run_datasets(dataset_list):
         evaldatasets.append(dcasScent_e)
     if 3 in dataset_list:
         fsdkaggle = FSDKaggle2018(**extraction_params,
-                                  object_path='..\data\Data_Readers\FSDKaggle2018')
+                                  object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\FSDKaggle2018')
         fsdkaggle.prepare_taskDatasets(**read_config('preparation_params_fsdkaggle_cnn'))
         fsdkaggle_t = fsdkaggle.toTrainTaskDataset()
         fsdkaggle_e = fsdkaggle.toTestTaskDataset()
         taskdatasets.append(fsdkaggle_t)
         evaldatasets.append(fsdkaggle_e)
     if 4 in dataset_list:
-        ravdess = Ravdess(**extraction_params, object_path='..\data\Data_Readers\Ravdess')
+        ravdess = Ravdess(**extraction_params, object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\Ravdess')
         ravdess.prepare_taskDatasets(**read_config('preparation_params_ravdess_cnn'))
         ravdess_t = ravdess.toTrainTaskDataset()
         ravdess_e = ravdess.toTestTaskDataset()
@@ -67,12 +69,20 @@ def run_datasets(dataset_list):
         evaldatasets.append(ravdess_e)
     if 5 in dataset_list:
         speechcommands = SpeechCommands(**extraction_params,
-                                        object_path='..\data\Data_Readers\SpeechCommands_{}')
+                                        object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\SpeechCommands_{}')
         speechcommands.prepare_taskDatasets(**read_config('preparation_params_speechcommands_cnn'))
         speechcommands_t = speechcommands.toTrainTaskDataset()
         speechcommands_e = speechcommands.toValidTaskDataset()
         taskdatasets.append(speechcommands_t)
         evaldatasets.append(speechcommands_e)
+    if 6 in dataset_list:
+        dcaseEvents = DCASE2017_SE(**extraction_params,
+                                  object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\DCASE2017_SE_{}')
+        dcaseEvents.prepare_taskDatasets(**read_config('preparation_params_dcaseScene_cnn'))
+        dcaseEvents_t = dcaseEvents.toTrainTaskDataset()
+        dcaseEvents_e = dcaseEvents.toValidTaskDataset()
+        taskdatasets.append(dcaseEvents_t)
+        evaldatasets.append(dcaseEvents_e)
     print('loaded all datasets')
 
     return taskdatasets, evaldatasets
@@ -101,11 +111,9 @@ def get_concat(dataset_list):
 
 def main(argv):
     model_checkpoints_path = drive + r":\Thesis_Results\Model_Checkpoints"
-    extraction_params = read_config('extraction_params_cnn_MelSpectrogram')
-    calculate_window_size(extraction_params)
     meta_params = read_config('meta_params_cnn_MelSpectrogram')
-    dataset_list = [0, 1, 2, 4]
-    # dataset_list = [0, 4]
+    dataset_list = [0, 1, 2, 4, 5]
+    run_datasets(dataset_list)
 
     print('--------------------------------------------------')
     print('test loop')
