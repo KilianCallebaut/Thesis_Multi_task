@@ -44,9 +44,6 @@ class ASVspoof2015(DataReader):
         return self.object_path.format('eval')
 
     def check_files(self, extraction_method):
-        print(TaskDataset.check(self.get_base_path(), extraction_method))
-        print(os.path.isfile(self.get_path()))
-        print(TaskDataset.check(self.get_eval_base_path(), extraction_method))
         return TaskDataset.check(self.get_base_path(), extraction_method) \
                and os.path.isfile(self.get_path()) and TaskDataset.check(self.get_eval_base_path(), extraction_method)
 

@@ -73,6 +73,9 @@ def run_test(eval_dataset, meta_params, results):
 
 def run_five_fold(dataset_list):
     model_checkpoints_path = "/data/Thesis_Results/Model_Checkpoints"
+    results_train = "/data/Thesis_Results/Training_Results"
+    results_eval = '/data/Thesis_Results/Evaluation_Results'
+
     meta_params = read_config('meta_params_cnn_MelSpectrogram')
     extraction_params = read_config('extraction_params_cnn_MelSpectrogram')
     # extraction_params = read_config('extraction_params_cnn_mfcc')
@@ -116,6 +119,7 @@ def run_five_fold(dataset_list):
         run_name += "_fold_{}".format(i)
 
         results = Results(model_checkpoints_path=model_checkpoints_path,
+                          audioset_train_path=results_train, audioset_eval_path=results_eval,
                           run_name=run_name, num_epochs=meta_params['num_epochs'])
         model, results = Training.run_gradient_descent(model=model,
                                                        concat_dataset=concat_training,
