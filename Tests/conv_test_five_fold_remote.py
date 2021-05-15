@@ -28,31 +28,31 @@ def run_datasets(dataset_list, extraction_params):
 
     if 0 in dataset_list:
         asvspoof = ASVspoof2015(**extraction_params,
-                                object_path=r'.\data\Data_Readers\ASVspoof2015_{}')
+                                object_path=r'\data\Thesis_Multi_task\data\Data_Readers\ASVspoof2015_{}')
         taskDatasets.append(asvspoof.taskDataset)
     if 1 in dataset_list:
         chenaudio = ChenAudiosetDataset(**extraction_params,
-                                        object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\ChenAudiosetDataset')
+                                        object_path=r'\data\Thesis_Multi_task\data\Data_Readers\ChenAudiosetDataset')
         taskDatasets.append(chenaudio.taskDataset)
     if 2 in dataset_list:
         dcaseScene = DCASE2017_SS(**extraction_params,
-                                  object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\DCASE2017_SS_{}')
+                                  object_path=r'\data\Thesis_Multi_task\data\Data_Readers\DCASE2017_SS_{}')
         taskDatasets.append(dcaseScene.taskDataset)
     if 3 in dataset_list:
         fsdkaggle = FSDKaggle2018(**extraction_params,
-                                  object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\FSDKaggle2018')
+                                  object_path=r'\data\Thesis_Multi_task\data\Data_Readers\FSDKaggle2018')
         taskDatasets.append(fsdkaggle.taskDataset)
     if 4 in dataset_list:
         ravdess = Ravdess(**extraction_params,
-                          object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\Ravdess')
+                          object_path=r'\data\Thesis_Multi_task\data\Data_Readers\Ravdess')
         taskDatasets.append(ravdess.taskDataset)
     if 5 in dataset_list:
         speechcommands = SpeechCommands(**extraction_params,
-                                        object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\SpeechCommands_{}')
+                                        object_path=r'\data\Thesis_Multi_task\data\Data_Readers\SpeechCommands_{}')
         taskDatasets.append(speechcommands.taskDataset)
     if 6 in dataset_list:
         dcaseEvents = DCASE2017_SE(**extraction_params,
-                                   object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\DCASE2017_SE_{}')
+                                   object_path=r'\data\Thesis_Multi_task\data\Data_Readers\DCASE2017_SE_{}')
         taskDatasets.append(dcaseEvents.taskDataset)
     print('loaded all datasets')
 
