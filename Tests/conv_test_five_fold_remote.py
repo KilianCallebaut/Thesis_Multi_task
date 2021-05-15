@@ -136,21 +136,22 @@ def run_five_fold(dataset_list):
 
 
 def main(argv):
-    dataset_list = [0, 1, 2, 4, 5]
+    dataset_list = [1, 0, 2, 4, 5]
     # dataset_list = [0]
 
     print('--------------------------------------------------')
     print('test loop')
     print('--------------------------------------------------')
     for i in range(len(dataset_list)):
+        run_five_fold([dataset_list[i]])
         for j in range(i + 1, len(dataset_list)):
             run_five_fold([dataset_list[i], dataset_list[j]])
-        run_five_fold([dataset_list[i]])
 
     return 0
 
 # PYTHONPATH=. python3 Tests/conv_test_five_fold_remote.py
 # tensorboard --logdir Tests/runs
+# ssh ubuntu@145.100.57.141
 if __name__ == "__main__":
     try:
         sys.exit(main(sys.argv))
