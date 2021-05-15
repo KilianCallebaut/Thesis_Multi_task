@@ -112,14 +112,12 @@ class ChenAudiosetDataset(DataReader):
         self.wav_files = wav_files
 
     def read_files(self, extraction_method):
-        # info = cPickle.load(open(self.object_path, 'rb'))
         info = joblib.load(self.get_path())
         self.files = info['files']
         self.np_objects = info['np_objects']
         self.wav_files = info['wav_files']
 
         self.taskDataset = TaskDataset([], [], '', [])
-        print("stillworking")
         self.taskDataset.load(self.get_base_path(), extraction_method)
 
     def write_files(self, extraction_method):
