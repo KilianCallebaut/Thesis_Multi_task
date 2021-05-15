@@ -28,7 +28,7 @@ def run_datasets(dataset_list, extraction_params):
 
     if 0 in dataset_list:
         asvspoof = ASVspoof2015(**extraction_params,
-                                object_path=r'..\data\Data_Readers\ASVspoof2015_{}')
+                                object_path=r'.\data\Data_Readers\ASVspoof2015_{}')
         taskDatasets.append(asvspoof.taskDataset)
     if 1 in dataset_list:
         chenaudio = ChenAudiosetDataset(**extraction_params,
