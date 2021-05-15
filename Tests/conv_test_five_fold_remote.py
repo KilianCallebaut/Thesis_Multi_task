@@ -136,7 +136,7 @@ def run_five_fold(dataset_list):
 
 
 def main(argv):
-    dataset_list = [1, 0, 2, 4, 5]
+    dataset_list = [2, 1, 0, 4, 5]
     # dataset_list = [0]
 
     print('--------------------------------------------------')

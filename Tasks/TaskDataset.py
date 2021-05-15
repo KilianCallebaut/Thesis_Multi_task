@@ -54,14 +54,10 @@ class TaskDataset(Dataset):
         joblib.dump(diction, os.path.join(base_path, 'other.obj'))
 
     def load(self, base_path, extraction_method):
-        print('1')
         self.inputs = joblib.load(os.path.join(base_path, '{}_inputs.gz'.format(extraction_method)))
-        print('2')
         t_l = torch.load(os.path.join(base_path, 'targets.pt'))
-        print('3')
         self.targets = [[int(j) for j in i] for i in t_l]
         diction = joblib.load(os.path.join(base_path, 'other.obj'))
-        print('4')
         self.task = diction['task']
         self.pad_after = diction['pad_after']
         self.pad_before = diction['pad_before']
