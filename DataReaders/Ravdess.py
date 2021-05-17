@@ -4,6 +4,7 @@ import joblib
 from sklearn.model_selection import train_test_split
 
 from DataReaders.DataReader import DataReader
+from DataReaders.ExtractionMethod import extract_options
 from Tasks.TaskDataset import TaskDataset
 
 
@@ -13,17 +14,17 @@ class Ravdess(DataReader):
     root = r"F:\Thesis_Datasets\Ravdess"
 
     def __init__(self, extraction_method, **kwargs):
-        self.extraction_method = extraction_method
+        self.extraction_method = extract_options[extraction_method]
 
         print('start ravdess')
         if 'object_path' in kwargs:
-                  self.object_path = kwargs.pop('object_path')
-        if self.check_files(extraction_method.name):
-            self.read_files(extraction_method.name)
+            self.object_path = kwargs.pop('object_path')
+        if self.check_files(extraction_method):
+            self.read_files()
         else:
             self.load_files()
-            self.calculate_taskDataset(extraction_method, **kwargs)
-            self.write_files(extraction_method.name)
+            self.calculate_taskDataset(**kwargs)
+            self.write_files()
 
         print('Done loading Ravdess')
 
@@ -48,27 +49,29 @@ class Ravdess(DataReader):
                         self.files.append(
                             {'modality': mod,  # (01 = full-AV, 02 = video-only, 03 = audio-only)
                              'vocal_channel': voc,  # (01 = speech, 02 = song)
-                             'emotion': em, # (01 = neutral, 02 = calm, 03 = happy, 04 = sad, 05 = angry, 06 = fearful, 07 = disgust, 08 = surprised)
+                             'emotion': em,
+                             # (01 = neutral, 02 = calm, 03 = happy, 04 = sad, 05 = angry, 06 = fearful, 07 = disgust, 08 = surprised)
                              'emotional_intensity': emi,  # (01 = normal, 02 = strong)
-                             'statement': stat, # 01 = "Kids are talking by the door", 02 = "Dogs are sitting by the door"
+                             'statement': stat,
+                             # 01 = "Kids are talking by the door", 02 = "Dogs are sitting by the door"
                              'repetition': rep,  # 1st or 2nd rep
                              'actor': act,  # Odd numbered are male, even female
                              'file': os.path.join(self.root, song_folder, ss_dir, file)
                              }
                         )
 
-    def read_files(self, extraction_method):
-        info = joblib.load(self.get_path())
-        self.files = info['files']
-        self.taskDataset = TaskDataset([], [], '', [])
-        self.taskDataset.load(self.get_base_path(), extraction_method)
+    def read_files(self):
+        # info = joblib.load(self.get_path())
+        # self.files = info['files']
+        self.taskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_base_path())
+        self.taskDataset.load(self.get_base_path())
 
-    def write_files(self, extraction_method):
+    def write_files(self):
         dict = {'files': self.files}
         joblib.dump(dict, self.get_path())
-        self.taskDataset.save(self.get_base_path(), extraction_method)
+        self.taskDataset.save(self.get_base_path())
 
-    def calculate_input(self, method, **kwargs):
+    def calculate_input(self, **kwargs):
         inputs = []
         perc = 0
 
@@ -79,25 +82,23 @@ class Ravdess(DataReader):
         for file_idx in range(len(self.files)):
             file = self.files[file_idx]
             read_wav = self.load_wav(file['file'], resample_to)
-            inputs.append(method.extract_features(read_wav, **kwargs))
+            inputs.append(self.extraction_method.extract_features(read_wav, **kwargs))
             if perc < (file_idx / len(self.files)) * 100:
                 print("Percentage done: {}".format(perc))
                 perc += 1
         return inputs
 
-    def calculate_taskDataset(self, method, **kwargs):
+    def calculate_taskDataset(self, **kwargs):
         print('Calculating input')
-        inputs = self.calculate_input(method, **kwargs)
+        inputs = self.calculate_input(**kwargs)
 
         targets = [f['emotion'] for f in self.files]
         distinct_targets = list(set(targets))
         targets = [[float(b == f) for b in distinct_targets] for f in targets]
 
         self.taskDataset = TaskDataset(inputs=inputs, targets=targets, name="Ravdess", labels=distinct_targets,
-                                       output_module='softmax')
-
-    def recalculate_features(self, method, **kwargs):
-        self.taskDataset.inputs = self.calculate_input(method, **kwargs)
+                                       extraction_method=self.extraction_method,
+                                       base_path=self.get_base_path(), output_module='softmax')
 
     def prepare_taskDatasets(self, test_size, dic_of_labels_limits, **kwargs):
 
@@ -114,26 +115,17 @@ class Ravdess(DataReader):
         self.trainTaskDataset = TaskDataset(inputs=x_train, targets=y_train,
                                             name=self.taskDataset.task.name + "_train",
                                             labels=self.taskDataset.task.output_labels,
+                                            extraction_method=self.extraction_method,
+                                            base_path=self.get_base_path(),
                                             output_module=self.taskDataset.task.output_module)
         if test_size > 0:
             x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val, **kwargs)
             self.testTaskDataset = TaskDataset(inputs=x_val, targets=y_val,
                                                name=self.taskDataset.task.name + "_test",
                                                labels=self.taskDataset.task.output_labels,
+                                               extraction_method=self.extraction_method,
+                                               base_path=self.get_base_path(),
                                                output_module=self.taskDataset.task.output_module)
-
-    def make_train_test_TaskDatasets(self, x_train, y_train, x_val, y_val, **kwargs):
-        self.extraction_method.scale_fit(x_train)
-        x_train, y_train = self.extraction_method.prepare_inputs_targets(x_train, y_train, **kwargs)
-        self.trainTaskDataset = TaskDataset(inputs=x_train, targets=y_train,
-                                            name=self.taskDataset.task.name + "_train",
-                                            labels=self.taskDataset.task.output_labels,
-                                            output_module=self.taskDataset.task.output_module)
-        x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val, **kwargs)
-        self.testTaskDataset = TaskDataset(inputs=x_val, targets=y_val,
-                                           name=self.taskDataset.task.name + "_test",
-                                           labels=self.taskDataset.task.output_labels,
-                                           output_module=self.taskDataset.task.output_module)
 
     def toTrainTaskDataset(self):
         return self.trainTaskDataset

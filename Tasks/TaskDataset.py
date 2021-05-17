@@ -1,5 +1,6 @@
 import os
 import random
+import types
 
 import joblib
 import numpy as np
@@ -19,15 +20,25 @@ class TaskDataset(Dataset):
             targets,
             name,
             labels,
-            output_module='softmax'  # 'sigmoid'
+            extraction_method,
+            base_path,
+            output_module='softmax',  # 'sigmoid'
+            index_mode=False
     ):
         self.inputs = inputs  # List of tensors
         self.targets = targets  # List of binary strings
         # self.name = name # String
         # self.labels = labels # List of strings
         self.task = Task(name, labels, output_module)
+        self.extraction_method = extraction_method
+        self.base_path = base_path
         self.pad_after = list()
         self.pad_before = list()
+        self.index_mode = index_mode
+
+        if index_mode:
+            self.__getitem__ = types.MethodType(get_item_index_mode, self)
+            self.get_split_by_index = types.MethodType(get_split_by_index_index_mode, self)
 
     def __getitem__(self, index):
         return self.inputs[index].float(), \
@@ -41,8 +52,8 @@ class TaskDataset(Dataset):
         self.pad_before = [0 for _ in range(before)]
         self.pad_after = [0 for _ in range(after)]
 
-    def save(self, base_path, extraction_method):
-        joblib.dump(self.inputs, os.path.join(base_path, '{}_inputs.gz'.format(extraction_method)))
+    def save(self, base_path):
+        joblib.dump(self.inputs, os.path.join(base_path, '{}_inputs.gz'.format(self.extraction_method.name)))
         t_s = torch.Tensor(self.targets)
         torch.save(t_s, os.path.join(base_path, 'targets.pt'))
 
@@ -53,8 +64,8 @@ class TaskDataset(Dataset):
         }
         joblib.dump(diction, os.path.join(base_path, 'other.obj'))
 
-    def load(self, base_path, extraction_method):
-        self.inputs = joblib.load(os.path.join(base_path, '{}_inputs.gz'.format(extraction_method)))
+    def load(self, base_path):
+        self.inputs = joblib.load(os.path.join(base_path, '{}_inputs.gz'.format(self.extraction_method.name)))
         t_l = torch.load(os.path.join(base_path, 'targets.pt'))
         self.targets = [[int(j) for j in i] for i in t_l]
         diction = joblib.load(os.path.join(base_path, 'other.obj'))
@@ -78,7 +89,7 @@ class TaskDataset(Dataset):
         self.inputs = sampled_inputs
         self.targets = sampled_targets
 
-    def k_folds(self, dic_of_labels_limits):
+    def k_folds(self, dic_of_labels_limits, random_state=None):
         # Examples
         # --------
         # >> > import numpy as np
@@ -102,18 +113,17 @@ class TaskDataset(Dataset):
         # TRAIN: [0 1]
         # TEST: [2 3]
 
-        kf = KFold(n_splits=5, shuffle=True)
+        kf = KFold(n_splits=5, shuffle=True, random_state=random_state)
         if dic_of_labels_limits:
             self.sample_labels(dic_of_labels_limits)
         inputs = self.inputs
         return kf.split(inputs)
 
-    def get_split_by_index(self, train_index, test_index, extraction_method, **kwargs):
+    def get_split_by_index(self, train_index, test_index, **kwargs):
         '''
 
         :param train_index: indexes of the training set
         :param test_index: indexes of the test set
-        :param extraction_method: extraction_method object
         :param kwargs: extra arguments for prepare_inputs_targets, namely window_size and window_hop
         :return: the taskdataset for the training and test data
         '''
@@ -123,16 +133,73 @@ class TaskDataset(Dataset):
         x_val = [self.inputs[i] for i in range(len(self.inputs)) if i in test_index]
         y_val = [self.targets[i] for i in range(len(self.targets)) if i in test_index]
 
-        extraction_method.scale_fit(x_train)
-        x_train, y_train = extraction_method.prepare_inputs_targets(x_train, y_train, **kwargs)
+        self.extraction_method.scale_fit(x_train)
+        x_train, y_train = self.extraction_method.prepare_inputs_targets(x_train, y_train, **kwargs)
         train_taskdataset = TaskDataset(inputs=x_train, targets=y_train, name=self.task.name + "_train",
-                                        labels=self.task.output_labels, output_module=self.task.output_module)
-        x_val, y_val = extraction_method.prepare_inputs_targets(x_val, y_val, **kwargs)
+                                        labels=self.task.output_labels, extraction_method=self.extraction_method,
+                                        base_path=self.base_path, output_module=self.task.output_module)
+        x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val, **kwargs)
         test_taskdataset = TaskDataset(inputs=x_val, targets=y_val, name=self.task.name + "_test",
-                                       labels=self.task.output_labels, output_module=self.task.output_module)
+                                       labels=self.task.output_labels, extraction_method=self.extraction_method,
+                                       base_path=self.base_path, output_module=self.task.output_module)
         return train_taskdataset, test_taskdataset
+
+    def to_index_mode(self):
+        # save inputs in separate files (if not done so already)
+        separated_dir = os.path.join(self.base_path, '{}_separated'.format(self.extraction_method.name))
+        if not os.path.exists(separated_dir):
+            os.mkdir(separated_dir)
+
+        if not os.listdir(separated_dir):
+            for i in range(len(self.inputs)):
+                input_path = os.path.join(separated_dir, 'input_{}.pickle'.format(i))
+                torch.save(self.inputs[i], input_path)
+
+        # replace inputs with index lists
+        self.inputs = [i for i in range(len(self.inputs))]
+
+        # replace getitem, get_split_by_index by index based functions
+        self.__getitem__ = types.MethodType(get_item_index_mode, self)
+        self.get_split_by_index = types.MethodType(get_split_by_index_index_mode, self)
+
 
     @staticmethod
     def check(base_path, extraction_method):
         return os.path.isfile(os.path.join(base_path, '{}_inputs.gz'.format(extraction_method))) and os.path.isfile(
             os.path.join(base_path, 'targets.pt')) and os.path.isfile(os.path.join(base_path, 'other.obj'))
+
+
+def get_item_index_mode(self, index):
+    separated_dir = os.path.join(self.base_path, '{}_separated'.format(self.extraction_method.name))
+    x = [torch.load(os.path.join(separated_dir, 'input_{}.pickle'.format(index))).float()]
+    y = [self.targets[index]]
+    x, y = self.extraction_method.prepare_inputs_targets(x, y, **self.prepare_args)
+    return x[0], \
+           torch.from_numpy(np.array(self.pad_before + y[0] + self.pad_after)), \
+           self.task.name
+
+
+def get_split_by_index_index_mode(self, train_index, test_index, **kwargs):
+    '''
+
+        :param train_index: indexes of the training set
+        :param test_index: indexes of the test set
+        :param kwargs: extra arguments for prepare_inputs_targets, namely window_size and window_hop
+        :return: the taskdataset for the training and test data
+        '''
+    self.prepare_args = kwargs
+    separated_dir = os.path.join(self.base_path, '{}_separated'.format(self.extraction_method.name))
+
+    x_train = [torch.load(os.path.join(separated_dir, 'input_{}.pickle'.format(i))).float() for i in train_index]
+    y_train = [self.targets[i] for i in range(len(self.targets)) if i in train_index]
+    x_val = [torch.load(os.path.join(separated_dir, 'input_{}.pickle'.format(i))).float() for i in test_index]
+    y_val = [self.targets[i] for i in range(len(self.targets)) if i in test_index]
+
+    self.extraction_method.scale_fit(x_train)
+    train_taskdataset = TaskDataset(inputs=train_index, targets=y_train, name=self.task.name + "_train",
+                                    labels=self.task.output_labels, extraction_method=self.extraction_method,
+                                    base_path=self.base_path, output_module=self.task.output_module, index_mode=True)
+    test_taskdataset = TaskDataset(inputs=test_index, targets=y_val, name=self.task.name + "_test",
+                                   labels=self.task.output_labels, extraction_method=self.extraction_method,
+                                   base_path=self.base_path, output_module=self.task.output_module, index_mode=True)
+    return train_taskdataset, test_taskdataset

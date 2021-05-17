@@ -1,6 +1,7 @@
 from __future__ import print_function, division
 
 import sys
+from datetime import datetime
 
 import torch
 
@@ -16,7 +17,6 @@ from Tasks.ConcatTaskDataset import ConcatTaskDataset
 from Tests.config_reader import *
 from Training.Results import Results
 from Training.Training import Training
-from datetime import datetime
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 drive = 'F'
@@ -73,67 +73,77 @@ def run_test(eval_dataset, meta_params, results):
 
 
 def run_five_fold(dataset_list):
-    model_checkpoints_path = drive + r":\Thesis_Results\Model_Checkpoints"
-    meta_params = read_config('meta_params_cnn_MelSpectrogram')
     extraction_params = read_config('extraction_params_cnn_MelSpectrogram')
     # extraction_params = read_config('extraction_params_cnn_mfcc')
     taskDatasets = run_datasets(dataset_list, extraction_params)
     task_iterators = []
+
+    print("Create iterators")
     for t in taskDatasets:
-        task_iterators.append(t.k_folds(**read_config('dic_of_labels_limits_{}'.format(t.task.name))))
+        task_iterators.append(t.k_folds(**read_config('dic_of_labels_limits_{}'.format(t.task.name)), random_state=123))
+
+    print("Start iteration")
     i = 0
     for train_index, test_index in task_iterators[0]:
         training_tasks = []
         test_tasks = []
         train, test = taskDatasets[0].get_split_by_index(train_index, test_index,
-                                                         extraction_params.get("extraction_method"),
                                                          **read_config('preparation_params_general_window'))
         training_tasks.append(train)
         test_tasks.append(test)
         if len(task_iterators) > 1:
             for it_id in range(len(task_iterators[1:])):
-                it = task_iterators[it_id]
-                train_nxt_id, test_nxt_id = it.__next__()
-                train, test = taskDatasets[0].get_split_by_index(train_nxt_id, test_nxt_id, extraction_params.get("extraction_method"),
-                                                 **read_config('preparation_params_general_window'))
+                it = task_iterators[it_id + 1]
+                train_nxt_id, test_nxt_id = next(it)
+                train, test = taskDatasets[it_id + 1].get_split_by_index(train_nxt_id, test_nxt_id,
+                                                                         **read_config(
+                                                                             'preparation_params_general_window'))
                 training_tasks.append(train)
                 test_tasks.append(test)
 
         concat_training = ConcatTaskDataset(training_tasks)
         concat_test = ConcatTaskDataset(test_tasks)
-        task_list = concat_training.get_task_list()
-        model = MultiTaskHardSharingConvolutional(1,
-                                                  **read_config('model_params_cnn'),
-                                                  task_list=task_list)
-        model = model.to(device)
-        print('Model Created')
 
-        # run_name creation
-        run_name = "Result_" + str(
-            datetime.now().strftime("%d_%m_%Y_%H_%M_%S")) + "_" + model.name
-        for n in task_list:
-            run_name += "_" + n.name
-        run_name += "_fold_{}".format(i)
-
-        results = Results(model_checkpoints_path=model_checkpoints_path,
-                          run_name=run_name, num_epochs=meta_params['num_epochs'])
-        model, results = Training.run_gradient_descent(model=model,
-                                                       concat_dataset=concat_training,
-                                                       results=results,
-                                                       batch_size=meta_params['batch_size'],
-                                                       num_epochs=meta_params['num_epochs'],
-                                                       learning_rate=meta_params['learning_rate'])
-
-        del model
-        torch.cuda.empty_cache()
-        run_test(concat_test, meta_params, results)
+        # Run multi task
+        run_set(concat_training, concat_test, i)
 
         i += 1
 
 
+def run_set(concat_training, concat_test, fold):
+    model_checkpoints_path = drive + r":\Thesis_Results\Model_Checkpoints"
+    meta_params = read_config('meta_params_cnn_MelSpectrogram')
+
+    task_list = concat_training.get_task_list()
+    model = MultiTaskHardSharingConvolutional(1,
+                                              **read_config('model_params_cnn'),
+                                              task_list=task_list)
+    model = model.to(device)
+    print('Model Created')
+
+    # run_name creation
+    run_name = "Result_" + str(
+        datetime.now().strftime("%d_%m_%Y_%H_%M_%S")) + "_" + model.name
+    for n in task_list:
+        run_name += "_" + n.name
+    run_name += "_fold_{}".format(fold)
+
+    results = Results(model_checkpoints_path=model_checkpoints_path,
+                      run_name=run_name, num_epochs=meta_params['num_epochs'])
+    model, results = Training.run_gradient_descent(model=model,
+                                                   concat_dataset=concat_training,
+                                                   results=results,
+                                                   batch_size=meta_params['batch_size'],
+                                                   num_epochs=meta_params['num_epochs'],
+                                                   learning_rate=meta_params['learning_rate'])
+
+    del model
+    torch.cuda.empty_cache()
+    run_test(concat_test, meta_params, results)
+
+
 def main(argv):
-    # dataset_list = [0, 1, 2, 4, 5]
-    dataset_list = [1, 2, 4, 5]
+    dataset_list = [2, 5, 0, 4, 1]
 
     print('--------------------------------------------------')
     print('test loop')
@@ -142,6 +152,7 @@ def main(argv):
         for j in range(i + 1, len(dataset_list)):
             run_five_fold([dataset_list[i], dataset_list[j]])
         run_five_fold([dataset_list[i]])
+
 
     return 0
 

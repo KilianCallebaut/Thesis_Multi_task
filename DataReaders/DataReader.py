@@ -28,24 +28,21 @@ class DataReader(ABC):
         pass
 
     @abstractmethod
-    def read_files(self, extraction_method):
+    def read_files(self):
         pass
 
     @abstractmethod
-    def write_files(self, extraction_method):
+    def write_files(self):
         pass
 
     @abstractmethod
-    def calculate_input(self, method, **kwargs):
+    def calculate_input(self,  **kwargs):
         pass
 
     @abstractmethod
-    def calculate_taskDataset(self, method, **kwargs):
+    def calculate_taskDataset(self, **kwargs):
         pass
 
-    @abstractmethod
-    def recalculate_features(self, method, **kwargs):
-        pass
 
     def sample_labels(self, taskDataset, dic_of_labels_limits):
         sampled_targets = taskDataset.targets
@@ -94,10 +91,6 @@ class DataReader(ABC):
 
     @abstractmethod
     def prepare_taskDatasets(self, test_size, dic_of_labels_limits, **kwargs):
-        pass
-
-    @abstractmethod
-    def make_train_test_TaskDatasets(self, x_train, y_train, x_val, y_val, **kwargs):
         pass
 
     @abstractmethod

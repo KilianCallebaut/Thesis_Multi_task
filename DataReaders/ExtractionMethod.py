@@ -1,8 +1,11 @@
 import math
+import os
 from abc import abstractmethod, ABC
 
 import numpy as np
 import torch
+import joblib
+import pickle
 from python_speech_features import logfbank, mfcc, fbank
 from sklearn.preprocessing import StandardScaler
 
@@ -90,8 +93,7 @@ class ExtractionMethod(ABC):
             inp = inputs[inp_idx]
             # end_frame = start_frame + window_hop * math.ceil((float(inp.shape[0] - start_frame) / window_hop))
             end_frame = start_frame + window_hop * math.floor((float(inp.shape[0] - start_frame) / window_hop))
-            for frame_idx in range(start_frame, end_frame+1, window_hop):
-
+            for frame_idx in range(start_frame, end_frame + 1, window_hop):
                 window = inp[frame_idx - window_size:frame_idx, :]
                 assert window.shape == (window_size, inp.shape[1])
                 windowed_inputs.append(window)
@@ -105,9 +107,6 @@ class ExtractionMethod(ABC):
                 window = inp[inp.shape[0] - window_size:inp.shape[0], :]
                 windowed_inputs.append(window)
                 windowed_targets.append(targets[inp_idx])
-
-
-
 
         assert len(windowed_inputs) == len(windowed_targets)
         return windowed_inputs, windowed_targets
@@ -206,3 +205,10 @@ class MelSpectrogram(ExtractionMethod):
         if 'window_size' in kwargs and kwargs.get('window_size') != 0:
             inputs, targets = self.window_inputs(inputs, targets, **kwargs)
         return inputs, targets
+
+
+extract_options = {
+    MelSpectrogram().name: MelSpectrogram(),
+    Mfcc().name: Mfcc(),
+    LogbankSummary().name: LogbankSummary()
+}

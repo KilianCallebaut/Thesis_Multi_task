@@ -5,6 +5,8 @@ from timeit import default_timer as timer
 import joblib
 import numpy as np
 
+from DataReaders.ExtractionMethod import extract_options
+
 try:
     import cPickle
 except BaseException:
@@ -42,17 +44,17 @@ class ChenAudiosetDataset(DataReader):
     target_list = []
 
     def __init__(self, extraction_method, **kwargs):
-        self.extraction_method = extraction_method
+        self.extraction_method = extract_options[extraction_method]
 
         print('start chen')
         if 'object_path' in kwargs:
             self.object_path = kwargs.pop('object_path')
-        if self.check_files(extraction_method.name):
-            self.read_files(extraction_method.name)
+        if self.check_files(extraction_method):
+            self.read_files()
         else:
             self.load_files()
-            self.calculate_taskDataset(extraction_method, **kwargs)
-            self.write_files(extraction_method.name)
+            self.calculate_taskDataset(**kwargs)
+            self.write_files()
 
         print('done')
 
@@ -111,34 +113,35 @@ class ChenAudiosetDataset(DataReader):
         self.np_objects = np_objects
         self.wav_files = wav_files
 
-    def read_files(self, extraction_method):
-        info = joblib.load(self.get_path())
-        self.files = info['files']
-        self.np_objects = info['np_objects']
-        self.wav_files = info['wav_files']
+    def read_files(self):
+        # info = joblib.load(self.get_path())
+        # self.files = info['files']
+        # self.np_objects = info['np_objects']
+        # self.wav_files = info['wav_files']
 
-        self.taskDataset = TaskDataset([], [], '', [])
-        self.taskDataset.load(self.get_base_path(), extraction_method)
+        self.taskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_base_path())
+        self.taskDataset.load(self.get_base_path())
 
-    def write_files(self, extraction_method):
+    def write_files(self):
         dict = {'files': self.files,
                 'np_objects': self.np_objects,
                 'wav_files': self.wav_files}
         joblib.dump(dict, self.get_path())
-        self.taskDataset.save(self.get_base_path(), extraction_method)
+        self.taskDataset.save(self.get_base_path())
 
-    def calculate_taskDataset(self, method, **kwargs):
+    def calculate_taskDataset(self, **kwargs):
         print('Calculating input')
-        inputs = self.calculate_input(method, **kwargs)
+        inputs = self.calculate_input(**kwargs)
         print('Input calculated')
 
         targets, distinct_targets = self.calculate_targets()
 
         name = "chen_audioset"
         self.taskDataset = TaskDataset(inputs=inputs, targets=targets, name=name, labels=distinct_targets,
+                                       extraction_method=self.extraction_method, base_path=self.get_base_path(),
                                        output_module='sigmoid')
 
-    def calculate_input(self, method, **kwargs):
+    def calculate_input(self,  **kwargs):
         inputs = []
 
         resample_to = None
@@ -148,7 +151,7 @@ class ChenAudiosetDataset(DataReader):
         for folder in self.wav_files:
             for file in folder:
                 read_wav = self.load_wav(file, resample_to)
-                inputs.append(method.extract_features(read_wav, **kwargs))
+                inputs.append(self.extraction_method.extract_features(read_wav, **kwargs))
         return inputs
 
     def calculate_targets(self):
@@ -161,9 +164,6 @@ class ChenAudiosetDataset(DataReader):
         # at the index where it is in distinct_targets order
         targets = [[float(b in f) for b in distinct_targets] for f in targets]
         return targets, distinct_targets
-
-    def recalculate_features(self, method, **kwargs):
-        self.taskDataset.inputs = self.calculate_input(method, **kwargs)
 
     def prepare_taskDatasets(self, test_size, dic_of_labels_limits, **kwargs):
         inputs = self.taskDataset.inputs
@@ -179,12 +179,16 @@ class ChenAudiosetDataset(DataReader):
         self.trainTaskDataset = TaskDataset(inputs=x_train, targets=y_train,
                                             name=self.taskDataset.task.name + "_train",
                                             labels=self.taskDataset.task.output_labels,
+                                            extraction_method=self.extraction_method,
+                                            base_path=self.get_base_path(),
                                             output_module=self.taskDataset.task.output_module)
         if test_size > 0:
             x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val, **kwargs)
             self.testTaskDataset = TaskDataset(inputs=x_val, targets=y_val,
                                                name=self.taskDataset.task.name + "_test",
                                                labels=self.taskDataset.task.output_labels,
+                                               extraction_method=self.extraction_method,
+                                               base_path=self.get_base_path(),
                                                output_module=self.taskDataset.task.output_module)
 
     def make_train_test_TaskDatasets(self, x_train, y_train, x_val, y_val, **kwargs):
@@ -193,11 +197,15 @@ class ChenAudiosetDataset(DataReader):
         self.trainTaskDataset = TaskDataset(inputs=x_train, targets=y_train,
                                             name=self.taskDataset.task.name + "_train",
                                             labels=self.taskDataset.task.output_labels,
+                                            extraction_method=self.extraction_method,
+                                            base_path=self.get_base_path(),
                                             output_module=self.taskDataset.task.output_module)
         x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val, **kwargs)
         self.testTaskDataset = TaskDataset(inputs=x_val, targets=y_val,
                                            name=self.taskDataset.task.name + "_test",
                                            labels=self.taskDataset.task.output_labels,
+                                           extraction_method=self.extraction_method,
+                                           base_path=self.get_base_path(),
                                            output_module=self.taskDataset.task.output_module)
 
     def toTrainTaskDataset(self):

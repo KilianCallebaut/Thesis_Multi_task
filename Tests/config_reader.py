@@ -3,13 +3,6 @@ import math
 import os
 import pathlib
 
-from DataReaders.ExtractionMethod import MelSpectrogram, Mfcc, LogbankSummary
-
-extract_options = {
-    MelSpectrogram().name: MelSpectrogram(),
-    Mfcc().name: Mfcc(),
-    LogbankSummary().name: LogbankSummary()
-}
 
 dataset_options = [
     'asvspoof',
@@ -43,8 +36,6 @@ def read_config(name: str):
     with open(os.path.join(dir_path,
                            'configs/{}.json'.format(name))) as outfile:
         data = json.load(outfile)
-        if 'extraction_method' in data.keys():
-            data['extraction_method'] = extract_options[data['extraction_method']]
         if 'split' in data.keys():
             data['test_size'] = read_config('test_size_split') if data.pop('split') else read_config('test_size_val')
             data['test_size'] = data['test_size']['test_size']

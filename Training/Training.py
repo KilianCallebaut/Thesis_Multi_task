@@ -9,7 +9,6 @@ import torch.optim as optim
 from sklearn import metrics
 from torch import nn
 from torch.utils.data import ConcatDataset
-from torch.utils.tensorboard import SummaryWriter
 
 from Tasks.ConcatTaskDataset import ConcatTaskDataset
 from Training.Results import Results
@@ -35,13 +34,6 @@ class Training:
         task_list = concat_dataset.get_task_list()
         n_tasks = len(task_list)
 
-        # name = model.name
-        # for n in task_list:
-        #     name += "_" + n.name
-        # writer = SummaryWriter(comment=name)
-        # first_shape = np.array(datasets[0].__getitem__(0)[0].shape)
-        # writer.add_graph(model, torch.rand(first_shape[None, :, :]).to(device))
-
         criteria = [nn.BCELoss().to(device) if t.output_module == 'sigmoid' else nn.CrossEntropyLoss().to(device)
                     for t in task_list]
         target_flags = [
@@ -49,12 +41,10 @@ class Training:
             for x in datasets]
         train_loader = torch.utils.data.DataLoader(
             concat_dataset,
-            # sampler=BalancedBatchSchedulerSampler(dataset=concat_dataset,
-            #                                       batch_size=batch_size),
             batch_size=batch_size,
             shuffle=True,
             num_workers=0,
-            pin_memory=False
+            pin_memory=True
         )
 
         # optimizer = optim.SGD(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
@@ -74,7 +64,6 @@ class Training:
             task_labels = [[] for _ in task_list]
             task_running_losses = [0 for _ in task_list]
 
-            # before = list(model.parameters())[0].clone()
             perc = 0
             begin = datetime.datetime.now()
             ex_mx = datetime.timedelta(0)
@@ -86,8 +75,6 @@ class Training:
                 #     continue
 
                 # tensors for filtering instances in batch and targets that are not from the task
-                # batch_flags = [[True if t_id == n else False for n in names] for t_id in
-                #                range(len(task_list))]
                 batch_flags = [[True if t.name == n else False for n in names] for t in
                                task_list]
 
@@ -114,7 +101,8 @@ class Training:
                     ex_mx = ex if ex > ex_mx else ex_mx
                     ex_t += ex
                     print('[{}{}], execution time: {}, max time: {}, total time: {}'.format(perc_s, perc_sp, ex, ex_mx,
-                                                                                            ex_t), end='\r')
+                                                                                            ex_t),
+                          end='\r' if perc != 100 else '\n')
 
                 for i in range(n_tasks):
                     if sum(batch_flags[i]) == 0:
@@ -158,7 +146,6 @@ class Training:
                 torch.cuda.empty_cache()
 
             # Statistics
-            # writer.add_scalar("Loss/train", running_loss / step, epoch)
             results.add_loss_to_curve(epoch, step, running_loss, True)
             epoch_metrics = [metrics.classification_report(task_labels[t], task_predictions[t], output_dict=True) for t
                              in range(len(task_predictions))]
@@ -169,60 +156,20 @@ class Training:
                 print('TASK {}: '.format(task_name), end='')
                 results.add_class_report(epoch, epoch_metrics[t], task_list[t], True)
                 results.add_loss_to_curve_task(epoch, step, task_running_losses[t], task_list[t], True)
-
                 mat = []
                 if task_list[t].output_module == "softmax":
-                    # writer.add_scalar("Accuracy/{}".format(task_name), epoch_metrics[t]['accuracy'], epoch)
                     mat = metrics.confusion_matrix(task_labels[t], task_predictions[t])
                     results.add_confusion_matrix(epoch, mat, task_list[t], True)
-                    # fig = plt.figure()
-                    # plt.imshow(mat)
-                    # writer.add_figure('Confusion matrix/{}'.format(task_list[t]),
-                    #                   fig, epoch)
-                    # print('Accuracy {} '.format(epoch_metrics[t]['accuracy']), end='')
                 elif task_list[t].output_module == "sigmoid":
-                    # writer.add_scalar("Micro AVG F1/{}".format(task_name),
-                    #                   epoch_metrics[t]['micro avg']['f1-score'], epoch)
                     mat = metrics.multilabel_confusion_matrix(task_labels[t], task_predictions[t])
-                    # fig = plot_multilabel_confusion(mat, task_list[t].output_labels)
-                    # writer.add_figure('Confusion matrix/{}'.format(task_list[t]),
-                    #                   fig, epoch)
-                    # print('Micro avg F1 {} '.format(epoch_metrics[t]['micro avg']['f1-score']), end='')
 
-                # writer.add_scalar("Macro Avg Precision/{}".format(task_name),
-                #                   epoch_metrics[t]['macro avg']['precision'], epoch)
-                # print('Macro avg Precision {} '.format(epoch_metrics[t]['macro avg']['precision']), end='')
-                # writer.add_scalar("Macro Avg F1/{}".format(task_name), epoch_metrics[t]['macro avg']['f1-score'],
-                #                   epoch)
-                # print('Macro avg F1 {}'.format(epoch_metrics[t]['macro avg']['f1-score']), end='')
-                # writer.add_scalar("Running loss task/{}".format(task_name), task_running_losses[t] / step, epoch)
-                # print('Running loss {}'.format(task_running_losses[t] / step))
                 print(task_list[t].output_labels)
-                print(mat)
                 mats.append(mat)
 
             results.add_model_parameters(epoch, model)
 
         print('Training Done')
 
-        # for t in range(len(task_predictions)):
-        #     mat = []
-        #     print(task_list[t].output_labels)
-        #     if task_list[t].output_module == "softmax":
-        #         mat = metrics.confusion_matrix(task_labels[t], task_predictions[t])
-        #         fig = plt.figure()
-        #         plt.imshow(mat)
-        #         writer.add_figure('Confusion matrix/{}'.format(task_list[t]),
-        #                           fig, epoch)
-        #     elif task_list[t].output_module == "sigmoid":
-        #         mat = metrics.multilabel_confusion_matrix(task_labels[t], task_predictions[t])
-        #         fig = plot_multilabel_confusion(mat, task_list[t].output_labels)
-        #         writer.add_figure('Confusion matrix/{}'.format(task_list[t]),
-        #                           fig, epoch)
-        #     print(mat)
-
-        # writer.flush()
-        # writer.close()
         results.flush_writer()
         print('Wrote Training Results')
 
@@ -241,11 +188,6 @@ class Training:
         task_list = [x.task for x in datasets]
         n_tasks = len(task_list)
 
-        # name = blank_model.name
-        # for n in task_list:
-        #     name += "_" + n.name
-        # writer = SummaryWriter(comment=name + '_evaluation')
-
         criteria = [nn.BCELoss().to(device) if d.task.output_module == 'sigmoid' else nn.CrossEntropyLoss().to(device)
                     for d in datasets]
         target_flags = [
@@ -253,12 +195,10 @@ class Training:
             for x in datasets]
         eval_loader = torch.utils.data.DataLoader(
             concat_dataset,
-            # sampler=BalancedBatchSchedulerSampler(dataset=concat_dataset,
-            #                                       batch_size=batch_size),
             batch_size=batch_size,
             shuffle=True,
             num_workers=0,
-            pin_memory=False
+            pin_memory=True
         )
 
         blank_model.eval()
@@ -287,9 +227,6 @@ class Training:
                     # if len(labels) != batch_size:
                     #     continue
 
-                    # tensors for filtering instances in batch and targets that are not from the task
-                    # batch_flags = [[True if t_id == n else False for n in names] for t_id in
-                    #                range(len(task_list))]
                     batch_flags = [[True if t.name == n else False for n in names] for t in
                                    task_list]
 
@@ -312,7 +249,8 @@ class Training:
                         print(
                             '[{}{}], execution time: {}, max time: {}, total time: {}'.format(perc_s, perc_sp, ex,
                                                                                               ex_mx,
-                                                                                              ex_t), end='\r')
+                                                                                              ex_t),
+                            end='\r' if perc != 100 else '\n')
 
                     for i in range(n_tasks):
                         if sum(batch_flags[i]) == 0:
@@ -351,8 +289,6 @@ class Training:
                     torch.cuda.empty_cache()
 
                 # Statistics
-
-                # writer.add_scalar("Loss/eval", running_loss / step, epoch)
                 training_results.add_loss_to_curve(epoch, step, running_loss, False)
                 epoch_metrics = [metrics.classification_report(task_labels[t], task_predictions[t], output_dict=True)
                                  for t in range(len(task_predictions))]
@@ -367,39 +303,11 @@ class Training:
                     mat = []
 
                     if task_list[t].output_module == "softmax":
-                        # writer.add_scalar("Accuracy/Eval {}".format(task_name), epoch_metrics[t]['accuracy'], epoch)
                         mat = metrics.confusion_matrix(task_labels[t], task_predictions[t])
                         training_results.add_confusion_matrix(epoch, mat, task_list[t], False)
-                        # fig = plt.figure()
-                        # plt.imshow(mat)
-                        # writer.add_figure('Confusion matrix/Eval {}'.format(task_list[t]),
-                        #                   fig, epoch)
                     elif task_list[t].output_module == "sigmoid":
-                        # writer.add_scalar("Micro AVG F1/Eval {}".format(task_name),
-                        #                   epoch_metrics[t]['micro avg']['f1-score'], epoch)
                         mat = metrics.multilabel_confusion_matrix(task_labels[t], task_predictions[t])
-                        # fig = plot_multilabel_confusion(mat, task_list[t].output_labels)
-                        # writer.add_figure('Confusion matrix/Eval {}'.format(task_list[t]),
-                        #                   fig, epoch)
-
-                    # writer.add_scalar("Macro Avg Precision/Eval {}".format(task_name),
-                    #                   epoch_metrics[t]['macro avg']['precision'], epoch)
-                    # writer.add_scalar("Macro Avg F1/Eval {}".format(task_name),
-                    #                   epoch_metrics[t]['macro avg']['f1-score'],
-                    #                   epoch)
-                    # writer.add_scalar("Running loss task/Eval {}".format(task_name),
-                    #                   task_running_losses[t] / step,
-                    #                   epoch)
                     mats.append(mat)
-
-        # for t in range(len(task_predictions)):
-        #     mat = []
-        #     print(task_list[t].output_labels)
-        #     if task_list[t].output_module == "softmax":
-        #         mat = metrics.confusion_matrix(task_labels[t], task_predictions[t])
-        #     elif task_list[t].output_module == "sigmoid":
-        #         mat = metrics.multilabel_confusion_matrix(task_labels[t], task_predictions[t])
-        #     print(mat)
 
         training_results.flush_writer()
         training_results.close_writer()

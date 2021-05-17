@@ -23,7 +23,7 @@ class DCASE2017_SE(DataReader):
             self.read_files()
         else:
             self.load_files()
-            self.calculate_taskDataset(extraction_method, **kwargs)
+            self.calculate_taskDataset(**kwargs)
             self.write_files()
 
     def load_files(self):
@@ -51,7 +51,7 @@ class DCASE2017_SE(DataReader):
     def toTaskDataset(self):
         return self.taskDataset
 
-    def calculate_input(self, method, **kwargs):
+    def calculate_input(self,  **kwargs):
         inputs = []
         perc = 0
 
@@ -67,7 +67,7 @@ class DCASE2017_SE(DataReader):
                 perc += 1
         return self.standardize_input(inputs)
 
-    def calculate_taskDataset(self, method, **kwargs):
+    def calculate_taskDataset(self, **kwargs):
         distinct_labels = self.devdataset.scene_labels()
         targets = []
 
@@ -88,15 +88,16 @@ class DCASE2017_SE(DataReader):
 
             print(file_id / len(self.devdataset.audio_files))
 
-        inputs = self.calculate_input(method, **kwargs)
+        inputs = self.calculate_input(**kwargs)
         self.taskDataset = TaskDataset(inputs=inputs,
                                        targets=targets,
                                        name='DCASE2017_SS',
                                        labels=distinct_labels,
+                                       base_path=self.get_base_path(),
                                        output_module='softmax')
 
     def recalculate_features(self, method, **kwargs):
-        self.taskDataset.inputs = self.calculate_input(method, **kwargs)
+        self.taskDataset.inputs = self.calculate_input(**kwargs)
 
     # def calculate_taskDataset(self):
     #     pass

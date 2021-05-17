@@ -72,13 +72,12 @@ def run_test(eval_dataset, meta_params, results):
 
 
 def run_five_fold(dataset_list):
-    model_checkpoints_path = "/data/Thesis_Results/Model_Checkpoints"
     results_train = "/data/Thesis_Results/Training_Results"
     results_eval = '/data/Thesis_Results/Evaluation_Results'
 
-    meta_params = read_config('meta_params_cnn_MelSpectrogram')
     extraction_params = read_config('extraction_params_cnn_MelSpectrogram')
     # extraction_params = read_config('extraction_params_cnn_mfcc')
+
     taskDatasets = run_datasets(dataset_list, extraction_params)
     task_iterators = []
     for t in taskDatasets:
@@ -104,35 +103,44 @@ def run_five_fold(dataset_list):
 
         concat_training = ConcatTaskDataset(training_tasks)
         concat_test = ConcatTaskDataset(test_tasks)
-        task_list = concat_training.get_task_list()
-        model = MultiTaskHardSharingConvolutional(1,
-                                                  **read_config('model_params_cnn'),
-                                                  task_list=task_list)
-        model = model.to(device)
-        print('Model Created')
-
-        # run_name creation
-        run_name = "Result_" + str(
-            datetime.now().strftime("%d_%m_%Y_%H_%M_%S")) + "_" + model.name
-        for n in task_list:
-            run_name += "_" + n.name
-        run_name += "_fold_{}".format(i)
-
-        results = Results(model_checkpoints_path=model_checkpoints_path,
-                          audioset_train_path=results_train, audioset_eval_path=results_eval,
-                          run_name=run_name, num_epochs=meta_params['num_epochs'])
-        model, results = Training.run_gradient_descent(model=model,
-                                                       concat_dataset=concat_training,
-                                                       results=results,
-                                                       batch_size=meta_params['batch_size'],
-                                                       num_epochs=meta_params['num_epochs'],
-                                                       learning_rate=meta_params['learning_rate'])
-
-        del model
-        torch.cuda.empty_cache()
-        run_test(concat_test, meta_params, results)
+        run_set(concat_training, concat_test, i)
 
         i += 1
+
+
+def run_set(concat_training, concat_test, fold):
+    model_checkpoints_path = "/data/Thesis_Results/Model_Checkpoints"
+    results_train = "/data/Thesis_Results/Training_Results"
+    results_eval = '/data/Thesis_Results/Evaluation_Results'
+    meta_params = read_config('meta_params_cnn_MelSpectrogram')
+
+    task_list = concat_training.get_task_list()
+    model = MultiTaskHardSharingConvolutional(1,
+                                              **read_config('model_params_cnn'),
+                                              task_list=task_list)
+    model = model.to(device)
+    print('Model Created')
+
+    # run_name creation
+    run_name = "Result_" + str(
+        datetime.now().strftime("%d_%m_%Y_%H_%M_%S")) + "_" + model.name
+    for n in task_list:
+        run_name += "_" + n.name
+    run_name += "_fold_{}".format(fold)
+
+    results = Results(model_checkpoints_path=model_checkpoints_path,
+                      audioset_train_path=results_train, audioset_eval_path=results_eval,
+                      run_name=run_name, num_epochs=meta_params['num_epochs'])
+    model, results = Training.run_gradient_descent(model=model,
+                                                   concat_dataset=concat_training,
+                                                   results=results,
+                                                   batch_size=meta_params['batch_size'],
+                                                   num_epochs=meta_params['num_epochs'],
+                                                   learning_rate=meta_params['learning_rate'])
+
+    del model
+    torch.cuda.empty_cache()
+    run_test(concat_test, meta_params, results)
 
 
 def main(argv):
@@ -148,6 +156,7 @@ def main(argv):
             run_five_fold([dataset_list[i], dataset_list[j]])
 
     return 0
+
 
 # PYTHONPATH=. python3 Tests/conv_test_five_fold_remote.py
 # tensorboard --logdir Tests/runs
