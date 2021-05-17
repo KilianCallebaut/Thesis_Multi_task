@@ -80,7 +80,7 @@ def run_five_fold(dataset_list):
     taskDatasets = run_datasets(dataset_list, extraction_params)
     task_iterators = []
     for t in taskDatasets:
-        task_iterators.append(t.k_folds(**read_config('dic_of_labels_limits_{}'.format(t.task.name))))
+        task_iterators.append(t.k_folds(**read_config('dic_of_labels_limits_{}'.format(t.task.name)), random_state=123))
     i = 0
     for train_index, test_index in task_iterators[0]:
         training_tasks = []
