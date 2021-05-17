@@ -54,6 +54,8 @@ def run_datasets(dataset_list, extraction_params):
                                    object_path=r'/data/Thesis_Multi_task/data/Data_Readers/DCASE2017_SE_{}')
         taskDatasets.append(dcaseEvents.taskDataset)
     print('loaded all datasets')
+    for t in taskDatasets:
+        t.to_index_mode()
 
     return taskDatasets
 
@@ -72,9 +74,6 @@ def run_test(eval_dataset, meta_params, results):
 
 
 def run_five_fold(dataset_list):
-    results_train = "/data/Thesis_Results/Training_Results"
-    results_eval = '/data/Thesis_Results/Evaluation_Results'
-
     extraction_params = read_config('extraction_params_cnn_MelSpectrogram')
     # extraction_params = read_config('extraction_params_cnn_mfcc')
 
@@ -87,17 +86,16 @@ def run_five_fold(dataset_list):
         training_tasks = []
         test_tasks = []
         train, test = taskDatasets[0].get_split_by_index(train_index, test_index,
-                                                         extraction_params.get("extraction_method"),
                                                          **read_config('preparation_params_general_window'))
         training_tasks.append(train)
         test_tasks.append(test)
         if len(task_iterators) > 1:
             for it_id in range(len(task_iterators[1:])):
-                it = task_iterators[it_id]
-                train_nxt_id, test_nxt_id = it.__next__()
-                train, test = taskDatasets[0].get_split_by_index(train_nxt_id, test_nxt_id,
-                                                                 extraction_params.get("extraction_method"),
-                                                                 **read_config('preparation_params_general_window'))
+                it = task_iterators[it_id + 1]
+                train_nxt_id, test_nxt_id = next(it)
+                train, test = taskDatasets[it_id + 1].get_split_by_index(train_nxt_id, test_nxt_id,
+                                                                         **read_config(
+                                                                             'preparation_params_general_window'))
                 training_tasks.append(train)
                 test_tasks.append(test)
 

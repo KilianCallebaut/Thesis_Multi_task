@@ -146,6 +146,7 @@ class TaskDataset(Dataset):
 
     def to_index_mode(self):
         # save inputs in separate files (if not done so already)
+        self.index_mode = True
         separated_dir = os.path.join(self.base_path, '{}_separated'.format(self.extraction_method.name))
         if not os.path.exists(separated_dir):
             os.mkdir(separated_dir)
@@ -161,7 +162,6 @@ class TaskDataset(Dataset):
         # replace getitem, get_split_by_index by index based functions
         self.__getitem__ = types.MethodType(get_item_index_mode, self)
         self.get_split_by_index = types.MethodType(get_split_by_index_index_mode, self)
-
 
     @staticmethod
     def check(base_path, extraction_method):
