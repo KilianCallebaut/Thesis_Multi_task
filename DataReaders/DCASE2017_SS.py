@@ -28,19 +28,9 @@ class DCASE2017_SS(DataReader):
     #                   '\\applications\\data\\TUT-acoustic-scenes-2017-evaluation\\audio\\'
 
     def __init__(self, extraction_method, **kwargs):
-        self.extraction_method = extract_options[extraction_method]
-
         print('start DCASE2017 SS')
-        if 'object_path' in kwargs:
-            self.object_path = kwargs.pop('object_path')
-        if self.check_files(extraction_method):
-            self.read_files()
-        else:
-            self.load_files()
-            self.calculate_taskDataset(**kwargs)
-            self.write_files()
-
-        print('done')
+        super().__init__(extraction_method, **kwargs)
+        print('done DCASE2017 SS')
 
     def get_path(self):
         return os.path.join(self.get_base_path(), 'DCASE2017_SS.obj')
@@ -92,7 +82,8 @@ class DCASE2017_SS(DataReader):
     def read_files(self):
         # info = joblib.load(self.get_path())
         # self.audio_files = info['audio_files']
-        self.taskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_base_path())
+        self.taskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_base_path(),
+                                       index_mode=self.index_mode)
         self.taskDataset.load(self.get_base_path())
 
         # info = joblib.load(self.get_eval_path())
@@ -167,7 +158,8 @@ class DCASE2017_SS(DataReader):
                                        labels=distinct_labels,
                                        extraction_method=self.extraction_method,
                                        base_path=self.get_base_path(),
-                                       output_module='softmax')
+                                       output_module='softmax',
+                                       index_mode=self.index_mode)
 
         self.valTaskDataset = TaskDataset(inputs=inputs_val,
                                           targets=targets_val,
@@ -175,7 +167,8 @@ class DCASE2017_SS(DataReader):
                                           labels=distinct_labels,
                                           extraction_method=self.extraction_method,
                                           base_path=self.get_base_path(),
-                                          output_module='softmax'
+                                          output_module='softmax',
+                                          index_mode=self.index_mode
                                           )
 
     def prepare_taskDatasets(self, test_size, dic_of_labels_limits, **kwargs):
@@ -195,7 +188,8 @@ class DCASE2017_SS(DataReader):
                                             labels=self.taskDataset.task.output_labels,
                                             extraction_method=self.extraction_method,
                                             base_path=self.get_base_path(),
-                                            output_module=self.taskDataset.task.output_module)
+                                            output_module=self.taskDataset.task.output_module,
+                                            index_mode=self.index_mode)
         if test_size > 0:
             x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val, **kwargs)
             self.testTaskDataset = TaskDataset(inputs=x_val, targets=y_val,
@@ -203,7 +197,8 @@ class DCASE2017_SS(DataReader):
                                                labels=self.taskDataset.task.output_labels,
                                                extraction_method=self.extraction_method,
                                                base_path=self.get_base_path(),
-                                               output_module=self.taskDataset.task.output_module)
+                                               output_module=self.taskDataset.task.output_module,
+                                               index_mode=self.index_mode)
 
         self.valTaskDataset.inputs, self.valTaskDataset.targets \
             = self.extraction_method.prepare_inputs_targets(self.valTaskDataset.inputs, self.valTaskDataset.targets,

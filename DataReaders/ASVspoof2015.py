@@ -6,8 +6,8 @@ from numpy import long
 from sklearn.model_selection import train_test_split
 
 from DataReaders.DataReader import DataReader
-from Tasks.TaskDataset import TaskDataset
 from DataReaders.ExtractionMethod import extract_options
+from Tasks.TaskDataset import TaskDataset
 
 try:
     import cPickle
@@ -21,19 +21,9 @@ class ASVspoof2015(DataReader):
     object_path = r"C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\ASVspoof2015_{}"
 
     def __init__(self, extraction_method, **kwargs):
-        self.extraction_method = extract_options[extraction_method]
-
         print('start asvspoof2015')
-        if 'object_path' in kwargs:
-            self.object_path = kwargs.pop('object_path')
-        if self.check_files(extraction_method=self.extraction_method.name):
-            self.read_files()
-        else:
-            self.load_files()
-            self.calculate_taskDataset( **kwargs)
-            self.write_files()
-
-        print('done')
+        super().__init__(extraction_method, **kwargs)
+        print('done asvspoof2015')
 
     def get_path(self):
         return os.path.join(self.get_base_path(), 'ASVspoof2015.obj')
@@ -46,7 +36,7 @@ class ASVspoof2015(DataReader):
 
     def check_files(self, extraction_method):
         return TaskDataset.check(self.get_base_path(), extraction_method) \
-               and os.path.isfile(self.get_path()) and TaskDataset.check(self.get_eval_base_path(), extraction_method)
+               and TaskDataset.check(self.get_eval_base_path(), extraction_method) and os.path.isfile(self.get_path())
 
     def load_files(self):
         self.truths = pd.read_csv(os.path.join(self.Label_folder, 'ASV_male_development.ndx'), sep=' ', header=None,
@@ -78,7 +68,8 @@ class ASVspoof2015(DataReader):
         # self.truths = info['truths']
         # self.files_val = info['files_val']
         # self.truths_val = info['truths_val']
-        self.taskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_base_path())
+        self.taskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_base_path(),
+                                       index_mode=self.index_mode)
         self.taskDataset.load(self.get_base_path())
 
         # self.valTaskDataset = TaskDataset([], [], '', [])
@@ -95,7 +86,7 @@ class ASVspoof2015(DataReader):
         self.valTaskDataset.save(self.get_eval_base_path())
 
     # which = develop, evaluation
-    def calculate_input(self,  **kwargs):
+    def calculate_input(self, **kwargs):
         resample_to = None
         if 'resample_to' in kwargs:
             resample_to = kwargs.pop('resample_to')
@@ -145,7 +136,8 @@ class ASVspoof2015(DataReader):
                                        labels=distinct_labels,
                                        extraction_method=self.extraction_method,
                                        output_module='softmax',
-                                       base_path=self.get_base_path())
+                                       base_path=self.get_base_path(),
+                                       index_mode=self.index_mode)
 
         self.valTaskDataset = TaskDataset(inputs=inputs_val,
                                           targets=targets_val,
@@ -153,7 +145,8 @@ class ASVspoof2015(DataReader):
                                           labels=distinct_labels,
                                           extraction_method=self.extraction_method,
                                           output_module='softmax',
-                                          base_path=self.get_base_path())
+                                          base_path=self.get_base_path(),
+                                          index_mode=self.index_mode)
 
     def prepare_taskDatasets(self, test_size, dic_of_labels_limits, **kwargs):
         inputs = self.taskDataset.inputs
@@ -172,7 +165,8 @@ class ASVspoof2015(DataReader):
                                             labels=self.taskDataset.task.output_labels,
                                             extraction_method=self.extraction_method,
                                             output_module=self.taskDataset.task.output_module,
-                                            base_path=self.get_base_path())
+                                            base_path=self.get_base_path(),
+                                            index_mode=self.index_mode)
         if test_size > 0:
             x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val, **kwargs)
             self.testTaskDataset = TaskDataset(inputs=x_val, targets=y_val,
@@ -180,7 +174,8 @@ class ASVspoof2015(DataReader):
                                                labels=self.taskDataset.task.output_labels,
                                                extraction_method=self.extraction_method,
                                                output_module=self.taskDataset.task.output_module,
-                                               base_path=self.get_base_path())
+                                               base_path=self.get_base_path(),
+                                               index_mode=self.index_mode)
 
         self.valTaskDataset.inputs, self.valTaskDataset.targets = self.extraction_method.prepare_inputs_targets(
             self.valTaskDataset.inputs, self.valTaskDataset.targets, **kwargs)

@@ -27,35 +27,40 @@ def run_datasets(dataset_list, extraction_params):
 
     if 0 in dataset_list:
         asvspoof = ASVspoof2015(**extraction_params,
-                                object_path=r'/data/Thesis_Multi_task/data/Data_Readers/ASVspoof2015_{}')
+                                object_path=r'/data/Thesis_Multi_task/data/Data_Readers/ASVspoof2015_{}',
+                                index_mode=True)
         taskDatasets.append(asvspoof.taskDataset)
     if 1 in dataset_list:
         chenaudio = ChenAudiosetDataset(**extraction_params,
-                                        object_path=r'/data/Thesis_Multi_task/data/Data_Readers/ChenAudiosetDataset')
+                                        object_path=r'/data/Thesis_Multi_task/data/Data_Readers/ChenAudiosetDataset',
+                                        index_mode=True)
         taskDatasets.append(chenaudio.taskDataset)
     if 2 in dataset_list:
         dcaseScene = DCASE2017_SS(**extraction_params,
-                                  object_path=r'/data/Thesis_Multi_task/data/Data_Readers/DCASE2017_SS_{}')
+                                  object_path=r'/data/Thesis_Multi_task/data/Data_Readers/DCASE2017_SS_{}',
+                                  index_mode=True)
         taskDatasets.append(dcaseScene.taskDataset)
     if 3 in dataset_list:
         fsdkaggle = FSDKaggle2018(**extraction_params,
-                                  object_path=r'/data/Thesis_Multi_task/data/Data_Readers/FSDKaggle2018')
+                                  object_path=r'/data/Thesis_Multi_task/data/Data_Readers/FSDKaggle2018',
+                                  index_mode=True)
         taskDatasets.append(fsdkaggle.taskDataset)
     if 4 in dataset_list:
         ravdess = Ravdess(**extraction_params,
-                          object_path=r'/data/Thesis_Multi_task/data/Data_Readers/Ravdess')
+                          object_path=r'/data/Thesis_Multi_task/data/Data_Readers/Ravdess',
+                          index_mode=True)
         taskDatasets.append(ravdess.taskDataset)
     if 5 in dataset_list:
         speechcommands = SpeechCommands(**extraction_params,
-                                        object_path=r'/data/Thesis_Multi_task/data/Data_Readers/SpeechCommands_{}')
+                                        object_path=r'/data/Thesis_Multi_task/data/Data_Readers/SpeechCommands_{}',
+                                        index_mode=True)
         taskDatasets.append(speechcommands.taskDataset)
     if 6 in dataset_list:
         dcaseEvents = DCASE2017_SE(**extraction_params,
-                                   object_path=r'/data/Thesis_Multi_task/data/Data_Readers/DCASE2017_SE_{}')
+                                   object_path=r'/data/Thesis_Multi_task/data/Data_Readers/DCASE2017_SE_{}',
+                                   index_mode=True)
         taskDatasets.append(dcaseEvents.taskDataset)
     print('loaded all datasets')
-    for t in taskDatasets:
-        t.to_index_mode()
 
     return taskDatasets
 

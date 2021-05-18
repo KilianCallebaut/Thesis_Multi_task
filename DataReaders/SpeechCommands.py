@@ -15,20 +15,9 @@ class SpeechCommands(DataReader):
     root = r"F:\Thesis_Datasets\SpeechCommands"
 
     def __init__(self, extraction_method, **kwargs):
-        self.extraction_method = extract_options[extraction_method]
-
-        print('start Speech commands')
-
         self.sample_rate = 16000
-        if 'object_path' in kwargs:
-            self.object_path = kwargs.pop('object_path')
-        if self.check_files(extraction_method):
-            self.read_files()
-        else:
-            self.load_files()
-            self.calculate_taskDataset(**kwargs)
-            self.write_files()
-
+        print('start Speech commands')
+        super().__init__(extraction_method, **kwargs)
         print('Done loading Speech Commands')
 
     def get_path(self):
@@ -54,7 +43,8 @@ class SpeechCommands(DataReader):
 
     def read_files(self):
         # self.load_files()
-        self.taskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_base_path())
+        self.taskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_base_path(),
+                                       index_mode=self.index_mode)
         self.taskDataset.load(self.get_base_path())
 
         # self.validTaskDataset = TaskDataset([], [], '', [])
@@ -101,7 +91,8 @@ class SpeechCommands(DataReader):
         self.taskDataset = TaskDataset(inputs=inputs, targets=targets, name="SpeechCommands",
                                        labels=self.ds_info.features['label'].names,
                                        extraction_method=self.extraction_method, base_path=self.get_base_path(),
-                                       output_module='softmax')
+                                       output_module='softmax',
+                                       index_mode=self.index_mode)
 
         print("Calculate Test Set")
         # Test Set
@@ -115,7 +106,8 @@ class SpeechCommands(DataReader):
                                             name="SpeechCommandsTest",
                                             extraction_method=self.extraction_method,
                                             labels=self.ds_info.features['label'].names,
-                                            base_path=self.get_base_path(), output_module='softmax')
+                                            base_path=self.get_base_path(), output_module='softmax',
+                                            index_mode=self.index_mode)
 
     def prepare_taskDatasets(self, test_size, dic_of_labels_limits, **kwargs):
         inputs = self.taskDataset.inputs
@@ -133,7 +125,8 @@ class SpeechCommands(DataReader):
                                             labels=self.taskDataset.task.output_labels,
                                             extraction_method=self.extraction_method,
                                             base_path=self.get_base_path(),
-                                            output_module=self.taskDataset.task.output_module)
+                                            output_module=self.taskDataset.task.output_module,
+                                            index_mode=self.index_mode)
         if test_size > 0:
             x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val, **kwargs)
             self.testTaskDataset = TaskDataset(inputs=x_val, targets=y_val,
@@ -141,7 +134,8 @@ class SpeechCommands(DataReader):
                                                labels=self.taskDataset.task.output_labels,
                                                extraction_method=self.extraction_method,
                                                base_path=self.get_base_path(),
-                                               output_module=self.taskDataset.task.output_module)
+                                               output_module=self.taskDataset.task.output_module,
+                                               index_mode=self.index_mode)
 
         self.validTaskDataset.inputs, self.validTaskDataset.targets = \
             self.extraction_method.prepare_inputs_targets(self.validTaskDataset.inputs, self.validTaskDataset.targets,
