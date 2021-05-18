@@ -228,7 +228,6 @@ def get_split_by_index_index_mode(self, train_index, test_index, **kwargs):
         x_train = [torch.load(os.path.join(separated_dir, 'input_{}.pickle'.format(i))).float() for i in train_index]
         self.extraction_method.scale_fit(x_train)
 
-    print('kwargswobwob')
     self.prepare_args = kwargs
     y_train = [self.targets[i] for i in range(len(self.targets)) if i in train_index]
     y_val = [self.targets[i] for i in range(len(self.targets)) if i in test_index]
@@ -239,6 +238,9 @@ def get_split_by_index_index_mode(self, train_index, test_index, **kwargs):
     test_taskdataset = TaskDataset(inputs=test_index, targets=y_val, name=self.task.name + "_test",
                                    labels=self.task.output_labels, extraction_method=self.extraction_method,
                                    base_path=self.base_path, output_module=self.task.output_module, index_mode=True)
+    train_taskdataset.prepare_args = kwargs
+    test_taskdataset.prepare_args = kwargs
+
     return train_taskdataset, test_taskdataset
 
 
