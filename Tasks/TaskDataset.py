@@ -274,6 +274,4 @@ def load_index_mode(self, base_path):
     self.task = diction['task']
     self.pad_after = diction['pad_after']
     self.pad_before = diction['pad_before']
-    print('inputs and targets same?')
-    print(len(self.inputs))
-    print(len(self.targets))
+

@@ -46,6 +46,7 @@ class Training:
             num_workers=0,
             pin_memory=True
         )
+        print(len(train_loader))
 
         # optimizer = optim.SGD(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
         optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
