@@ -37,7 +37,7 @@ class SpeechCommands(DataReader):
                TaskDataset.check(self.get_eval_base_path(), extraction_method) and os.path.isfile(self.get_path())
 
     def load_files(self):
-        self.ds, self.ds_info = tfds.load('speech_commands', split=['train', 'test'], shuffle_files=True,
+        self.ds, self.ds_info = tfds.load('speech_commands', split=['train', 'test'], shuffle_files=False,
                                           data_dir=self.root, with_info=True)
         print('Done loading Speech Commands dataset')
 
@@ -83,10 +83,9 @@ class SpeechCommands(DataReader):
         targets = []
         for audio_label in self.ds[0].as_numpy_iterator():
             targets.append(audio_label["label"])
-        distinct_targets = list(set(targets))
 
         inputs = self.calculate_input(**kwargs)
-        targets = [[float(b == f) for b in distinct_targets] for f in targets]
+        targets = [[float(b == f) for b in range(len(self.ds_info.features['label'].names))] for f in targets]
 
         self.taskDataset = TaskDataset(inputs=inputs, targets=targets, name="SpeechCommands",
                                        labels=self.ds_info.features['label'].names,
@@ -100,7 +99,7 @@ class SpeechCommands(DataReader):
         for audio_label in self.ds[1].as_numpy_iterator():
             targets_t.append(audio_label["label"])
         inputs_t = self.calculate_input(test=True, **kwargs)
-        targets_t = [[float(b == f) for b in distinct_targets] for f in targets_t]
+        targets_t = [[float(b == f) for b in range(len(self.ds_info.features['label'].names))] for f in targets_t]
 
         self.validTaskDataset = TaskDataset(inputs=inputs_t, targets=targets_t,
                                             name="SpeechCommandsTest",

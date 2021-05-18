@@ -56,8 +56,8 @@ def run_datasets(dataset_list, extraction_params):
         taskDatasets.append(dcaseEvents.taskDataset)
     print('loaded all datasets')
     for t in taskDatasets:
-        t.to_index_mode()
         t.save_split_scalers(**read_config('dic_of_labels_limits_{}'.format(t.task.name)), random_state=123)
+        t.to_index_mode()
 
     return taskDatasets
 

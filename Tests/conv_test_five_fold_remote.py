@@ -147,8 +147,8 @@ def run_set(concat_training, concat_test, fold):
 
 
 def main(argv):
-    dataset_list = [2, 1, 0, 4, 5]
-    # dataset_list = [0]
+    dataset_list = [5, 4, 2, 1, 0]
+
 
     print('--------------------------------------------------')
     print('test loop')
