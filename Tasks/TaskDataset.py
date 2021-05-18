@@ -26,6 +26,9 @@ class TaskDataset(Dataset):
             output_module='softmax',  # 'sigmoid'
             index_mode=False
     ):
+        if index_mode:
+            self.switch_index_methods()
+
         self.inputs = inputs  # List of tensors
         self.targets = targets  # List of binary strings
         # self.name = name # String
@@ -36,9 +39,6 @@ class TaskDataset(Dataset):
         self.pad_after = list()
         self.pad_before = list()
         self.index_mode = index_mode
-
-        if index_mode:
-            self.switch_index_methods()
 
     def __getitem__(self, index):
         return self.get_item(index)
@@ -168,8 +168,8 @@ class TaskDataset(Dataset):
 
     def load_split_scalers(self, fold, random_state):
         path = os.path.join(self.base_path,
-                                'scaler_method_{}_state_{}_fold_{}.pickle'.format(self.extraction_method.name,
-                                                                                  random_state, fold))
+                            'scaler_method_{}_state_{}_fold_{}.pickle'.format(self.extraction_method.name,
+                                                                              random_state, fold))
         self.extraction_method.scalers = joblib.load(path)
 
     def to_index_mode(self):
@@ -274,3 +274,6 @@ def load_index_mode(self, base_path):
     self.task = diction['task']
     self.pad_after = diction['pad_after']
     self.pad_before = diction['pad_before']
+    print('inputs and targets same?')
+    print(len(self.inputs))
+    print(len(self.targets))
