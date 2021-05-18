@@ -41,6 +41,9 @@ class TaskDataset(Dataset):
             self.switch_index_methods()
 
     def __getitem__(self, index):
+        return self.get_item(index)
+
+    def get_item(self, index):
         return self.inputs[index].float(), \
                torch.from_numpy(np.array(self.pad_before + self.targets[index] + self.pad_after)), \
                self.task.name
@@ -187,7 +190,7 @@ class TaskDataset(Dataset):
 
     def switch_index_methods(self):
         # replace getitem, get_split_by_index by index based functions
-        self.__getitem__ = types.MethodType(get_item_index_mode, self)
+        self.get_item = types.MethodType(get_item_index_mode, self)
         self.get_split_by_index = types.MethodType(get_split_by_index_index_mode, self)
         self.save = types.MethodType(save_index_mode, self)
         self.load = types.MethodType(load_index_mode, self)
