@@ -228,6 +228,7 @@ def get_split_by_index_index_mode(self, train_index, test_index, **kwargs):
         x_train = [torch.load(os.path.join(separated_dir, 'input_{}.pickle'.format(i))).float() for i in train_index]
         self.extraction_method.scale_fit(x_train)
 
+    print('kwargswobwob')
     self.prepare_args = kwargs
     y_train = [self.targets[i] for i in range(len(self.targets)) if i in train_index]
     y_val = [self.targets[i] for i in range(len(self.targets)) if i in test_index]
