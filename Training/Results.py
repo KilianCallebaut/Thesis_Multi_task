@@ -63,6 +63,7 @@ class Results:
         fig = plt.figure()
         plt.imshow(mat)
         self.writer.add_figure('{}/Confusion matrix/{}'.format(phase, task.name), fig, epoch)
+        plt.close(fig)
         print(mat)
 
     def load_confusion_matrix(self, epoch, task, train):

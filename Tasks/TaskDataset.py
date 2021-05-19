@@ -217,7 +217,7 @@ class TaskDataset(Dataset):
 
 def get_item_index_mode(self, index):
     separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
-    x = torch.load(os.path.join(separated_dir, os.listdir(separated_dir)[self.inputs[index]])).float()
+    x = torch.load(os.path.join(separated_dir, self.inputs[index])).float()
     # separated_dir_tar = os.path.join(self.base_path, 'target_{}_separated'.format(self.extraction_method.name))
     # y = joblib.load(os.path.join(separated_dir_tar, os.listdir(separated_dir_tar)[index]))
     y = self.targets[index]

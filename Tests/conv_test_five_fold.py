@@ -72,7 +72,7 @@ def run_test(eval_dataset, meta_params, results):
                       num_epochs=meta_params['num_epochs'])
 
 
-def run_five_fold(dataset_list):
+def run_five_fold(dataset_list, **kwargs):
     extraction_params = read_config('extraction_params_cnn_MelSpectrogram')
     # extraction_params = read_config('extraction_params_cnn_mfcc')
     taskDatasets = run_datasets(dataset_list, extraction_params)
@@ -85,6 +85,15 @@ def run_five_fold(dataset_list):
     print("Start iteration")
     i = 0
     for train_index, test_index in task_iterators[0]:
+        if 'start_fold' in kwargs and kwargs.get('start_fold') > i:
+            if len(task_iterators) > 1:
+                for it_id in range(len(task_iterators[1:])):
+                    it = task_iterators[it_id + 1]
+                    _, _ = next(it)
+                i += 1
+                continue
+
+
         training_tasks = []
         test_tasks = []
         train, test = taskDatasets[0].get_split_by_index(train_index, test_index,
