@@ -215,7 +215,7 @@ def get_item_index_mode(self, index):
     separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
     x = torch.load(os.path.join(separated_dir, os.listdir(separated_dir)[index])).float()
     separated_dir_tar = os.path.join(self.base_path, 'target_{}_separated'.format(self.extraction_method.name))
-    y = joblib.load(os.path.join(separated_dir_tar, os.listdir(separated_dir_tar)[index])).float()
+    y = joblib.load(os.path.join(separated_dir_tar, os.listdir(separated_dir_tar)[index]))
     return x, \
            torch.from_numpy(np.array(self.pad_before + y + self.pad_after)), \
            self.task.name
