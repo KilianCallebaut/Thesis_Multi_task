@@ -120,6 +120,7 @@ class TaskDataset(Dataset):
         if dic_of_labels_limits:
             self.sample_labels(dic_of_labels_limits)
         inputs = self.inputs
+        print('still working')
         return kf.split(inputs)
 
     def get_split_by_index(self, train_index, test_index, **kwargs):

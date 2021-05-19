@@ -84,7 +84,6 @@ def run_five_fold(dataset_list):
 
     taskDatasets = run_datasets(dataset_list, extraction_params)
     task_iterators = []
-    print('still working')
     for t in taskDatasets:
         task_iterators.append(t.k_folds(**read_config('dic_of_labels_limits_{}'.format(t.task.name)), random_state=123))
     i = 0
