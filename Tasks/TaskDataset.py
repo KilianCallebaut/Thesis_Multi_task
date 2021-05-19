@@ -11,6 +11,10 @@ from torch.utils.data import Dataset
 
 from Tasks.Task import Task
 
+# In index mode:
+# before save -> full tensors in input list
+# after save or after to_index -> fragment id's in inputs
+# when splitting into train and test -> filenames in inputs
 
 class TaskDataset(Dataset):
 
@@ -232,14 +236,18 @@ def get_split_by_index_index_mode(self, train_index, test_index, **kwargs):
 
     separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
     total_inputs = os.listdir(separated_dir)
-    x_train_window = [ind for ind in range(len(total_inputs)) if int(total_inputs[ind].split('_')[1]) in train_index]
-    x_val_window = [ind for ind in range(len(total_inputs)) if int(total_inputs[ind].split('_')[1]) in test_index]
+    x_train_window = [total_inputs[ind] for ind in range(len(total_inputs)) if
+                      int(total_inputs[ind].split('_')[1]) in train_index]
+    x_val_window = [total_inputs[ind] for ind in range(len(total_inputs)) if
+                    int(total_inputs[ind].split('_')[1]) in test_index]
 
     separated_dir_tar = os.path.join(self.base_path, 'target_{}_separated'.format(self.extraction_method.name))
     total_targets = os.listdir(separated_dir_tar)
-    y_train_window = [joblib.load(os.path.join(separated_dir_tar, total_targets[ind])) for ind in range(len(total_targets)) if
+    y_train_window = [joblib.load(os.path.join(separated_dir_tar, total_targets[ind])) for ind in
+                      range(len(total_targets)) if
                       int(total_targets[ind].split('_')[1]) in train_index]
-    y_val_window = [joblib.load(os.path.join(separated_dir_tar, total_targets[ind])) for ind in range(len(total_targets)) if
+    y_val_window = [joblib.load(os.path.join(separated_dir_tar, total_targets[ind])) for ind in
+                    range(len(total_targets)) if
                     int(total_targets[ind].split('_')[1]) in test_index]
 
     if 'fold' and 'random_state' in kwargs:
@@ -247,7 +255,7 @@ def get_split_by_index_index_mode(self, train_index, test_index, **kwargs):
         random_state = kwargs.pop('random_state')
         self.load_split_scalers(fold, random_state)
     else:
-        x_train = [torch.load(os.path.join(separated_dir, total_inputs[ind])).float()
+        x_train = [torch.load(os.path.join(separated_dir, ind)).float()
                    for ind in x_train_window]
         self.extraction_method.scale_fit(x_train)
 
