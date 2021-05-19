@@ -120,7 +120,6 @@ class TaskDataset(Dataset):
         if dic_of_labels_limits:
             self.sample_labels(dic_of_labels_limits)
         inputs = self.inputs
-        print('still working')
         return kf.split(inputs)
 
     def get_split_by_index(self, train_index, test_index, **kwargs):
@@ -237,9 +236,9 @@ def get_split_by_index_index_mode(self, train_index, test_index, **kwargs):
 
     separated_dir_tar = os.path.join(self.base_path, 'target_{}_separated'.format(self.extraction_method.name))
     total_targets = os.listdir(separated_dir_tar)
-    y_train_window = [joblib.load(total_targets[ind]) for ind in range(len(total_targets)) if
+    y_train_window = [joblib.load(os.path.join(separated_dir_tar, total_targets[ind])) for ind in range(len(total_targets)) if
                       int(total_targets[ind].split('_')[1]) in train_index]
-    y_val_window = [joblib.load(total_targets[ind]) for ind in range(len(total_targets)) if
+    y_val_window = [joblib.load(os.path.join(separated_dir_tar, total_targets[ind])) for ind in range(len(total_targets)) if
                     int(total_targets[ind].split('_')[1]) in test_index]
 
     if 'fold' and 'random_state' in kwargs:
