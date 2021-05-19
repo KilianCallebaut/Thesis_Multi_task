@@ -91,7 +91,7 @@ def run_five_fold(dataset_list):
         training_tasks = []
         test_tasks = []
         train, test = taskDatasets[0].get_split_by_index(train_index, test_index,
-                                                         **read_config('preparation_params_general_window'))
+                                                         fold=i, random_state=123)
         training_tasks.append(train)
         test_tasks.append(test)
         if len(task_iterators) > 1:
@@ -99,8 +99,7 @@ def run_five_fold(dataset_list):
                 it = task_iterators[it_id + 1]
                 train_nxt_id, test_nxt_id = next(it)
                 train, test = taskDatasets[it_id + 1].get_split_by_index(train_nxt_id, test_nxt_id,
-                                                                         **read_config(
-                                                                             'preparation_params_general_window'))
+                                                                         fold=i, random_state=123)
                 training_tasks.append(train)
                 test_tasks.append(test)
 
@@ -148,7 +147,6 @@ def run_set(concat_training, concat_test, fold):
 
 def main(argv):
     dataset_list = [0]
-
 
     print('--------------------------------------------------')
     print('test loop')
