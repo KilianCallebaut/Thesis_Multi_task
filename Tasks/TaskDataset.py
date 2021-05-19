@@ -218,8 +218,6 @@ class TaskDataset(Dataset):
 def get_item_index_mode(self, index):
     separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
     x = torch.load(os.path.join(separated_dir, self.inputs[index])).float()
-    # separated_dir_tar = os.path.join(self.base_path, 'target_{}_separated'.format(self.extraction_method.name))
-    # y = joblib.load(os.path.join(separated_dir_tar, os.listdir(separated_dir_tar)[index]))
     y = self.targets[index]
     return x, \
            torch.from_numpy(np.array(self.pad_before + y + self.pad_after)), \
@@ -251,10 +249,12 @@ def get_split_by_index_index_mode(self, train_index, test_index, **kwargs):
                     int(total_targets[ind].split('_')[1]) in test_index]
 
     if 'fold' and 'random_state' in kwargs:
+        print('loading scalers')
         fold = kwargs.pop('fold')
         random_state = kwargs.pop('random_state')
         self.load_split_scalers(fold, random_state)
     else:
+        print('calculating scalers')
         x_train = [torch.load(os.path.join(separated_dir, ind)).float()
                    for ind in x_train_window]
         self.extraction_method.scale_fit(x_train)
@@ -305,7 +305,7 @@ def load_index_mode(self, base_path):
         if num > max_frag:
             max_frag = num
 
-    self.inputs = [i for i in range(max_frag)]
+    self.inputs = [i for i in range(max_frag+1)]
     t_l = torch.load(os.path.join(base_path, 'targets.pt'))
     self.targets = [[int(j) for j in i] for i in t_l]
     diction = joblib.load(os.path.join(base_path, 'other.obj'))
