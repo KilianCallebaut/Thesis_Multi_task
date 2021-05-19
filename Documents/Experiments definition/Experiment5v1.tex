@@ -1,0 +1,8 @@
+\section{Experiment 5}
+
+\textbf{Introduction}
+In previous research, observations have been made that the multi-task setting is affected by the label overlap between classes. One example of this is in (REFERENCE), where they observe that, when combining AED and ASC, that the accuracy of the ASC task improved when an output label (i.e. a scene) did not share any output labels (i.e. sound events) with other scenes. When 2 scenes did share a number of sound events, the set-up had more difficulty differentiating the scenes correctly. In the same vein, it has been observed (REFERENCE) that including an Environmental Sound Classification task (i.e. AED task, but without speech-related labels) can improve speech domain tasks. This experiment will investigate the effect of keeping certain instances out of a task, compared to the case where the tasks have overlapping label relationships. \\
+
+\textbf{Research Question:} How does class overlap affect combinations in the multi-task setting?\\
+
+\textbf{Research Method:} Identify the task relationships in terms of overlap between labels and compare the results when training the network on a dataset where instances with these labels are left out.\\

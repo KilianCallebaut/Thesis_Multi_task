@@ -143,7 +143,7 @@ def run_set(concat_training, concat_test, fold):
 
 
 def main(argv):
-    dataset_list = [2, 5, 0, 4, 1]
+    dataset_list = [2, 5, 4, 0, 1]
 
     print('--------------------------------------------------')
     print('test loop')
@@ -152,7 +152,6 @@ def main(argv):
         for j in range(i + 1, len(dataset_list)):
             run_five_fold([dataset_list[i], dataset_list[j]])
         run_five_fold([dataset_list[i]])
-
 
     return 0
 

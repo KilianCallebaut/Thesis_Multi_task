@@ -1,0 +1,647 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  29 APR 2021 11:15
+entering extended mode
+**./Definition.tex
+(Definition.tex
+LaTeX2e <2020-02-02> patch level 5
+L3 programming layer <2020-08-07>
+(C:\Users\mrKC1\AppData\Local\Programs\MiKTeX\tex/latex/base\report.cls
+Document Class: report 2019/12/20 v1.4l Standard LaTeX document class
+(C:\Users\mrKC1\AppData\Local\Programs\MiKTeX\tex/latex/base\size12.clo
+File: size12.clo 2019/12/20 v1.4l Standard LaTeX file (size option)
+)
+\c@part=\count168
+\c@chapter=\count169
+\c@section=\count170
+\c@subsection=\count171
+\c@subsubsection=\count172
+\c@paragraph=\count173
+\c@subparagraph=\count174
+\c@figure=\count175
+\c@table=\count176
+\abovecaptionskip=\skip47
+\belowcaptionskip=\skip48
+\bibindent=\dimen134
+)
+(C:\Users\mrKC1\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
+Package: graphicx 2019/11/30 v1.2a Enhanced LaTeX Graphics (DPC,SPQR)
+
+(C:\Users\mrKC1\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks15
+)
+(C:\Users\mrKC1\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
+Package: graphics 2019/11/30 v1.4a Standard LaTeX Graphics (DPC,SPQR)
+
+(C:\Users\mrKC1\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+)
+(C:\Users\mrKC1\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphics.c
+fg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: pdftex.def on input line 105.
+
+(C:\Users\mrKC1\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pdftex.def
+File: pdftex.def 2018/01/08 v1.0l Graphics/color driver for pdftex
+))
+\Gin@req@height=\dimen135
+\Gin@req@width=\dimen136
+) (C:\Users\mrKC1\AppData\Local\Programs\MiKTeX\tex/latex/natbib\natbib.sty
+Package: natbib 2010/09/13 8.31b (PWD, AO)
+\bibhang=\skip49
+\bibsep=\skip50
+LaTeX Info: Redefining \cite on input line 694.
+\c@NAT@ctr=\count177
+)
+(C:\Users\mrKC1\AppData\Local\Programs\MiKTeX\tex/latex/tabu\tabu.sty
+Package: tabu 2019/01/11 v2.9 - flexible LaTeX tabulars (FC+tabu-fixed)
+
+(C:\Users\mrKC1\AppData\Local\Programs\MiKTeX\tex/latex/tools\array.sty
+Package: array 2019/08/31 v2.4l Tabular extension package (FMi)
+\col@sep=\dimen137
+\ar@mcellbox=\box45
+\extrarowheight=\dimen138
+\NC@list=\toks16
+\extratabsurround=\skip51
+\backup@length=\skip52
+\ar@cellbox=\box46
+)
+(C:\Users\mrKC1\AppData\Local\Programs\MiKTeX\tex/latex/varwidth\varwidth.sty
+Package: varwidth 2009/03/30 ver 0.92;  Variable-width minipages
+\@vwid@box=\box47
+\sift@deathcycles=\count178
+\@vwid@loff=\dimen139
+\@vwid@roff=\dimen140
+)
+\c@taburow=\count179
+\tabu@nbcols=\count180
+\tabu@cnt=\count181
+\tabu@Xcol=\count182
+\tabu@alloc=\count183
+\tabu@nested=\count184
+\tabu@target=\dimen141
+\tabu@spreadtarget=\dimen142
+\tabu@naturalX=\dimen143
+\tabucolX=\dimen144
+\tabu@Xsum=\dimen145
+\extrarowdepth=\dimen146
+\abovetabulinesep=\dimen147
+\belowtabulinesep=\dimen148
+\tabustrutrule=\dimen149
+\tabu@thebody=\toks17
+\tabu@footnotes=\toks18
+\tabu@box=\box48
+\tabu@arstrutbox=\box49
+\tabu@hleads=\box50
+\tabu@vleads=\box51
+\tabu@cellskip=\skip53
+)
+(C:\Users\mrKC1\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdf
+mode.def
+File: l3backend-pdfmode.def 2020-08-07 L3 backend support: PDF mode
+\l__kernel_color_stack_int=\count185
+\l__pdf_internal_box=\box52
+) (Definition.aux)
+\openout1 = `Definition.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+
+(C:\Users\mrKC1\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
+ii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count186
+\scratchdimen=\dimen150
+\scratchbox=\box53
+\nofMPsegments=\count187
+\nofMParguments=\count188
+\everyMPshowfont=\toks19
+\MPscratchCnt=\count189
+\MPscratchDim=\dimen151
+\MPnumerator=\count190
+\makeMPintoPDFobject=\count191
+\everyMPtoPDFconversion=\toks20
+)
+(C:\Users\mrKC1\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-b
+ase.sty
+Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+85.
+)
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <14.4> on input line 20.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 20.
+ [1
+
+{C:/Users/mrKC1/AppData/Local/MiKTeX/pdftex/config/pdftex.map}]
+(Definition.toc
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 2.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 2.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 2.
+)
+\tf@toc=\write3
+\openout3 = `Definition.toc'.
+
+ (Introduction.tex [1
+
+]
+Chapter 1.
+
+Underfull \hbox (badness 10000) in paragraph at lines 28--29
+
+ []
+
+[2
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 30--31
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 45--45
+[]|\OT1/cmr/m/n/12 Panchapagesan
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 48--48
+[]|\OT1/cmr/m/n/12 Sakti et al.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 51--51
+[]|\OT1/cmr/m/n/12 Georgiev
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 51--51
+\OT1/cmr/m/n/12 [2017]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 51--51
+\OT1/cmr/m/n/12 Georgiev
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 58--58
+[]|\OT1/cmr/m/n/12 Kim et al.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 67--67
+[]|\OT1/cmr/m/n/12 Nwe et al.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 68--68
+[]|\OT1/cmr/m/n/12 Sun et al.
+ []
+
+
+Underfull \hbox (badness 1406) in paragraph at lines 71--71
+[]|\OT1/cmr/m/n/12 Kremer et al.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 72--72
+[]|\OT1/cmr/m/n/12 Morfi and
+ []
+
+
+Underfull \hbox (badness 5985) in paragraph at lines 81--82
+[]\OT1/cmr/m/n/12 Speech Com-mand Recog-ni-tion (Key-word
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 90--90
+[]|\OT1/cmr/m/n/12 Lopez-Espejo
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 93--93
+[]|\OT1/cmr/m/n/12 Pankajakshan
+ []
+
+
+Underfull \hbox (badness 1264) in paragraph at lines 96--96
+[]|\OT1/cmr/m/n/12 Tonami et al.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 98--98
+[]|\OT1/cmr/m/n/12 CRNN for
+ []
+
+
+Overfull \hbox (36.0pt too wide) in paragraph at lines 35--101
+ [][] 
+ []
+
+
+LaTeX Warning: Float too large for page by 120.81633pt on input line 101.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 111--111
+[]|\OT1/cmr/m/n/12 Xia et al.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 117--117
+[]|\OT1/cmr/m/n/12 Zeng et al.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 120--120
+[]|\OT1/cmr/m/n/12 Zeng et al.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 123--123
+[]|\OT1/cmr/m/n/12 Abrol and
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 124--124
+[]|\OT1/cmr/m/n/12 Deshmukh
+ []
+
+
+Underfull \hbox (badness 4913) in paragraph at lines 130--130
+[]|\OT1/cmr/m/n/12 Huang et al.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 132--132
+[]|\OT1/cmr/m/n/12 CNN PT/PS
+ []
+
+
+Underfull \hbox (badness 4913) in paragraph at lines 133--133
+[]|\OT1/cmr/m/n/12 Huang et al.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 136--136
+[]|\OT1/cmr/m/n/12 Tagliasacchi
+ []
+
+
+Overfull \hbox (36.0pt too wide) in paragraph at lines 106--158
+ [][] 
+ []
+
+
+LaTeX Warning: Float too large for page by 7.68306pt on input line 158.
+
+) (ResearchGoalv2.tex [3] [4] [5]
+Chapter 2.
+
+Overfull \hbox (12.0pt too wide) in paragraph at lines 7--23
+ [][] 
+ []
+
+) [6
+
+]
+Chapter 3.
+(Experiment1v2.tex
+Underfull \hbox (badness 10000) in paragraph at lines 3--5
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 6--7
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8--9
+
+ []
+
+[7
+
+]
+Overfull \hbox (13.9958pt too wide) in paragraph at lines 15--16
+[]\OT1/cmr/m/n/12 Keyword Spot-ting aims at de-tect-ing pre-de-fined key-words 
+in au-dio streams. 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 26--27
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 29--31
+
+ []
+
+<NN.PNG, id=31, 368.1253pt x 196.48407pt>
+File: NN.PNG Graphic file (type png)
+<use NN.PNG>
+Package pdftex.def Info: NN.PNG  used on input line 34.
+(pdftex.def)             Requested size: 350.99762pt x 187.35735pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 46--47
+
+ []
+
+[8]
+Underfull \hbox (badness 10000) in paragraph at lines 48--49
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 50--51
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 52--53
+
+ []
+
+[9 <./NN.PNG>]
+Underfull \hbox (badness 10000) in paragraph at lines 54--56
+
+ []
+
+[10]
+Underfull \hbox (badness 10000) in paragraph at lines 102--103
+
+ []
+
+[11] [12]) (Experiment2v1.tex
+Underfull \hbox (badness 10000) in paragraph at lines 3--4
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 5--6
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 7--9
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 10--11
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 14--15
+
+ []
+
+[13]) (Experiment3v1.tex
+Underfull \hbox (badness 10000) in paragraph at lines 3--5
+
+ []
+
+
+Overfull \hbox (5.70119pt too wide) in paragraph at lines 6--7
+[]\OT1/cmr/bx/n/12 Research Method: \OT1/cmr/m/n/12 Im-ple-ment dif-fer-ent aux
+-il-iary tasks specif-i-cally aimed
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 6--7
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8--9
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 10--11
+
+ []
+
+[14]
+Underfull \hbox (badness 10000) in paragraph at lines 35--36
+
+ []
+
+[15] [16]
+Overfull \hbox (0.67378pt too wide) in paragraph at lines 57--58
+\OT1/cmr/m/n/12 achieved by defin-ing the task of AED as two sep-a-rate tasks, 
+namely
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 69--70
+
+ []
+
+) (Experiment4v1.tex
+Underfull \hbox (badness 10000) in paragraph at lines 4--5
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 6--7
+
+ []
+
+[17]) (Experiment5v1.tex
+Underfull \hbox (badness 10000) in paragraph at lines 3--5
+
+ []
+
+[18]
+Underfull \hbox (badness 10000) in paragraph at lines 6--7
+
+ []
+
+)
+Underfull \hbox (badness 10000) in paragraph at lines 8--50
+
+ []
+
+[19]
+Chapter 4.
+
+Underfull \hbox (badness 3088) in paragraph at lines 140--140
+[]|\OT1/cmr/m/n/12 TUT SED 2016 for
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 140--140
+\OT1/cmr/m/n/12 over-lap-ping AED;
+ []
+
+
+Underfull \hbox (badness 8038) in paragraph at lines 140--140
+\OT1/cmr/m/n/12 TUT Sound Events
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 140--140
+\OT1/cmr/m/n/12 2016; TUT Sound
+ []
+
+
+Underfull \hbox (badness 3088) in paragraph at lines 140--140
+[]|\OT1/cmr/m/n/12 TUT SED 2016 for
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 140--140
+\OT1/cmr/m/n/12 Over-lap-ping AED;
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 141--141
+[]|\OT1/cmr/m/n/12 Automatic Speaker
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 141--141
+\OT1/cmr/m/n/12 Ver-i-fi-ca-tion Spoof-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 141--141
+\OT1/cmr/m/n/12 ing and Counter
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 141--141
+\OT1/cmr/m/n/12 mea-sures chal-lenge;
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 141--141
+\OT1/cmr/m/n/12 Cloning Toolkit;
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 141--141
+\OT1/cmr/m/n/12 FSD Kag-gle 2018;
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 141--141
+[]|\OT1/cmr/m/n/12 Automatic Speaker
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 141--141
+\OT1/cmr/m/n/12 Ver-i-fi-ca-tion Spoof-ing
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 141--141
+\OT1/cmr/m/n/12 FSD Kag-gle 2018;
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 142--142
+[]|\OT1/cmr/m/n/12 Keyword
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 142--142
+[]|\OT1/cmr/m/n/12 TIMIT con-tin-u-ous
+ []
+
+
+Underfull \hbox (badness 3492) in paragraph at lines 142--142
+\OT1/cmr/m/n/12 speech cor-pus; FSD
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 143--143
+[]|\OT1/cmr/m/n/12 Music/Speech
+ []
+
+
+Underfull \hbox (badness 1558) in paragraph at lines 144--144
+[]|\OT1/cmr/m/n/12 Voice Ac-tiv-ity
+ []
+
+
+Underfull \hbox (badness 1694) in paragraph at lines 144--144
+[]|\OT1/cmr/m/n/12 AMI Meet-ing; NIST
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 145--145
+[]|\OT1/cmr/m/n/12 Emotion De-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 145--145
+[]|\OT1/cmr/m/n/12 Emotional Prosody
+ []
+
+
+Underfull \hbox (badness 1342) in paragraph at lines 147--147
+\OT1/cmr/m/n/12 Ur-ban SED; DCASE
+ []
+
+
+Overfull \hbox (60.00595pt too wide) in paragraph at lines 134--151
+ [][] 
+ []
+
+(Definition.bbl [20
+
+] [21]
+Underfull \hbox (badness 2951) in paragraph at lines 35--41
+[]\OT1/cmr/m/n/12 Tharindu Fer-nando, Sridha Srid-ha-ran, Mitchell McLaren, Dar
+-shana
+ []
+
+[22
+
+] [23]
+Underfull \hbox (badness 1910) in paragraph at lines 182--185
+\OT1/cmr/m/n/12 ing for far-field small-footprint key-word spot-ting.  \OT1/cmr
+/m/it/12 arXiv preprint
+ []
+
+[24]) [25] (Definition.aux) ) 
+Here is how much of TeX's memory you used:
+ 2437 strings out of 481212
+ 36310 string characters out of 2905973
+ 291371 words of memory out of 3000000
+ 18021 multiletter control sequences out of 15000+200000
+ 541239 words of font info for 49 fonts, out of 3000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 36i,10n,33p,1632b,251s stack positions out of 5000i,500n,10000p,200000b,50000s
+ <C:\Users\mrKC1\AppData\Local\MiKTeX\fonts/pk/ljf
+our/jknappen/ec/dpi600\tcrm1200.pk><C:/Users/mrKC1/AppData/Local/Programs/MiKTe
+X/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/mrKC1/AppData/Local/Progr
+ams/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/mrKC1/AppData/Loc
+al/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/mrKC1/App
+Data/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb>
+Output written on Definition.pdf (26 pages, 129587 bytes).
+PDF statistics:
+ 110 PDF objects out of 1000 (max. 8388607)
+ 0 named destinations out of 1000 (max. 500000)
+ 6 words of extra memory for PDF output out of 10000 (max. 10000000)
+

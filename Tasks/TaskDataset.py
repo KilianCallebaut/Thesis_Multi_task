@@ -172,17 +172,27 @@ class TaskDataset(Dataset):
                                                                               random_state, fold))
         self.extraction_method.scalers = joblib.load(path)
 
-    def to_index_mode(self):
+    def to_index_mode(self, **kwargs):
         # save inputs in separate files (if not done so already)
         self.index_mode = True
-        separated_dir = os.path.join(self.base_path, '{}_separated'.format(self.extraction_method.name))
+        separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
         if not os.path.exists(separated_dir):
             os.mkdir(separated_dir)
 
+        separated_dir_tar = os.path.join(self.base_path, 'target_{}_separated'.format(self.extraction_method.name))
+        if not os.path.exists(separated_dir_tar):
+            os.mkdir(separated_dir_tar)
+
         if not os.listdir(separated_dir):
             for i in range(len(self.inputs)):
-                input_path = os.path.join(separated_dir, 'input_{}.pickle'.format(i))
-                torch.save(self.inputs[i], input_path)
+                windowed_i, windowed_t = self.extraction_method.prepare_inputs_targets([self.inputs[i]],
+                                                                                       [self.targets[i]],
+                                                                                       **kwargs)
+                for w in range(len(windowed_i)):
+                    input_path = os.path.join(separated_dir, 'input_{}_window_{}.pickle'.format(i, w))
+                    torch.save(windowed_i[w], input_path)
+                    target_path = os.path.join(separated_dir_tar, 'target_{}_window_{}.pickle'.format(i, w))
+                    joblib.dump(windowed_t[w], target_path, protocol=pickle.HIGHEST_PROTOCOL)
 
         # replace inputs with index lists
         self.inputs = [i for i in range(len(self.inputs))]
@@ -202,12 +212,12 @@ class TaskDataset(Dataset):
 
 
 def get_item_index_mode(self, index):
-    separated_dir = os.path.join(self.base_path, '{}_separated'.format(self.extraction_method.name))
-    x = [torch.load(os.path.join(separated_dir, 'input_{}.pickle'.format(index))).float()]
-    y = [self.targets[index]]
-    x, y = self.extraction_method.prepare_inputs_targets(x, y, **self.prepare_args)
-    return x[0], \
-           torch.from_numpy(np.array(self.pad_before + y[0] + self.pad_after)), \
+    separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
+    x = torch.load(os.path.join(separated_dir, os.listdir(separated_dir)[index])).float()
+    separated_dir_tar = os.path.join(self.base_path, 'target_{}_separated'.format(self.extraction_method.name))
+    y = torch.load(os.path.join(separated_dir_tar, os.listdir(separated_dir_tar)[index])).float()
+    return x, \
+           torch.from_numpy(np.array(self.pad_before + y + self.pad_after)), \
            self.task.name
 
 
@@ -219,27 +229,33 @@ def get_split_by_index_index_mode(self, train_index, test_index, **kwargs):
         :return: the taskdataset for the training and test data
     '''
 
-    separated_dir = os.path.join(self.base_path, '{}_separated'.format(self.extraction_method.name))
+    separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
+    total_inputs = os.listdir(separated_dir)
+    x_train_window = [ind for ind in range(len(total_inputs)) if int(total_inputs[ind].split('_')[1]) in train_index]
+    x_val_window = [ind for ind in range(len(total_inputs)) if int(total_inputs[ind].split('_')[1]) in test_index]
+
+    separated_dir_tar = os.path.join(self.base_path, 'target_{}_separated'.format(self.extraction_method.name))
+    total_targets = os.listdir(separated_dir_tar)
+    y_train_window = [joblib.load(total_targets[ind]) for ind in range(len(total_targets)) if
+                      int(total_targets[ind].split('_')[1]) in train_index]
+    y_val_window = [joblib.load(total_targets[ind]) for ind in range(len(total_targets)) if
+                    int(total_targets[ind].split('_')[1]) in test_index]
+
     if 'fold' and 'random_state' in kwargs:
         fold = kwargs.pop('fold')
         random_state = kwargs.pop('random_state')
         self.load_split_scalers(fold, random_state)
     else:
-        x_train = [torch.load(os.path.join(separated_dir, 'input_{}.pickle'.format(i))).float() for i in train_index]
+        x_train = [torch.load(os.path.join(separated_dir, total_inputs[ind])).float()
+                   for ind in x_train_window]
         self.extraction_method.scale_fit(x_train)
 
-    self.prepare_args = kwargs
-    y_train = [self.targets[i] for i in range(len(self.targets)) if i in train_index]
-    y_val = [self.targets[i] for i in range(len(self.targets)) if i in test_index]
-
-    train_taskdataset = TaskDataset(inputs=train_index, targets=y_train, name=self.task.name + "_train",
+    train_taskdataset = TaskDataset(inputs=x_train_window, targets=y_train_window, name=self.task.name + "_train",
                                     labels=self.task.output_labels, extraction_method=self.extraction_method,
                                     base_path=self.base_path, output_module=self.task.output_module, index_mode=True)
-    test_taskdataset = TaskDataset(inputs=test_index, targets=y_val, name=self.task.name + "_test",
+    test_taskdataset = TaskDataset(inputs=x_val_window, targets=y_val_window, name=self.task.name + "_test",
                                    labels=self.task.output_labels, extraction_method=self.extraction_method,
                                    base_path=self.base_path, output_module=self.task.output_module, index_mode=True)
-    train_taskdataset.prepare_args = kwargs
-    test_taskdataset.prepare_args = kwargs
 
     return train_taskdataset, test_taskdataset
 
@@ -249,13 +265,19 @@ def save_index_mode(self, base_path):
     if not os.path.exists(separated_dir):
         os.mkdir(separated_dir)
 
+    separated_dir_tar = os.path.join(self.base_path, 'target_{}_separated'.format(self.extraction_method.name))
+    if not os.path.exists(separated_dir_tar):
+        os.mkdir(separated_dir_tar)
+
     if not os.listdir(separated_dir):
         for i in range(len(self.inputs)):
-            input_path = os.path.join(separated_dir, 'input_{}.pickle'.format(i))
-            torch.save(self.inputs[i], input_path)
-
-    t_s = torch.Tensor(self.targets)
-    torch.save(t_s, os.path.join(base_path, 'targets.pt'))
+            windowed_i, windowed_t = self.extraction_method.prepare_inputs_targets([self.inputs[i]], [self.targets[i]])
+            for w in range(len(windowed_i)):
+                input_path = os.path.join(separated_dir, 'input_{}_window_{}.pickle'.format(i, w))
+                torch.save(windowed_i, input_path)
+                target_path = os.path.join(separated_dir_tar, 'target_{}_window_{}.pickle'.format(i, w))
+                joblib.dump(windowed_t, target_path, protocol=pickle.HIGHEST_PROTOCOL)
+    self.inputs = [i for i in range(len(self.inputs))]
 
     diction = {
         'task': self.task,
@@ -266,12 +288,18 @@ def save_index_mode(self, base_path):
 
 
 def load_index_mode(self, base_path):
-    separated_dir = os.path.join(self.base_path, '{}_separated'.format(self.extraction_method.name))
-    self.inputs = [i for i in os.listdir(separated_dir)]
+    separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
+    dir_list = os.listdir(separated_dir)
+    max_frag = 0
+    for d in dir_list:
+        num = int(d.split('_')[1])
+        if num > max_frag:
+            max_frag = num
+
+    self.inputs = [i for i in range(max_frag)]
     t_l = torch.load(os.path.join(base_path, 'targets.pt'))
     self.targets = [[int(j) for j in i] for i in t_l]
     diction = joblib.load(os.path.join(base_path, 'other.obj'))
     self.task = diction['task']
     self.pad_after = diction['pad_after']
     self.pad_before = diction['pad_before']
-

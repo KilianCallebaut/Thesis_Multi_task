@@ -1,0 +1,162 @@
+\chapter{Introduction \& Background}
+	
+	\section{Audio Sensing}
+	
+	There is a growing and varied amount of labelled audio datasets available, which has made it possible for a large amount of audio classes to be recognised, for different purposes. Audio sensing tasks usually have a sense-transform-classify organisation with the purpose of categorising activity and behaviour \cite{georgiev2017heterogeneous}. Tasks are performed by taking a labelled audio fragment, extracting features and then run a classification algorithm like SVM, GMM or deep neural networks like CNN, RNN, CRNN or DNN. The tasks aim to correctly identify sound events (e.g. a word, the sound of an object, etc) or contexts (e.g. the scene where the audio was captured). 
+	
+	In order to reliably perform audio sensing tasks, complex and expensive networks are usually built, to perform the specific task. However, there are problems that arise with this, in certain contexts. For one, focusing on single tasks may ignore valuable discriminative information which can improve the task, in terms of correct detection of its target classes. Another one is that performing a number of tasks in parallel is expensive both on the memory and computational performance of a device. 
+	
+	
+	% tasks are mostly focused on their own
+	% Ignores valuable discriminative information that can exist between tasks - tasks can improve each other
+	% Necessity to combine for on-device sensing that need to perform multiple tasks
+	% General purpose classifiers often have to deal with unreliability for a certain class = i.e. AED with speech
+	% Research doesn't usually focus on these relationships between different tasks
+	% Sensing tasks in dnn, rnn
+	
+%	An important aspect to a lot of technological developments has always been the support and augmentation of human bodily functions, from developing hearing aids to improve auditory perception to robotic exoskeletons for supporting human movement. One such functions is human memory, the augmentation of which is targeted by developing life logging technology. Typically memory aids come in the form of photographs, notes or diaries, but all of these require planning and physical effort which may not be possible or fast enough at all times. Lifelogging however, can counter these shortcomings and help mitigate memory lapses. According to \citet{harvey2016remembering}, lifelogging is a "form of pervasive computing, consisting of a unified digital record of the totality of an individuals experiences, captured multi-modally through digital sensors and stored permanently as a personal multimedia archive". Lifelogging, in other words, is a digital diary of events and environments, stored not only for the aid, but the augmentation of human memory by means of retrieval and representation of data recorded by cameras and wearable sensors \cite{harvey2016remembering}.\\
+	
+%	Lifelogging also has capabilities outside of memory related functionalities. According to \citet{tzelepis2016event}, the goal of lifelogging is analyzing bahavior and experiences in terms of events, states and relationships. This reveals a more digital surveillance side, which has seen applications in health monitoring \cite{hamid2017survey}, workplace safety \cite{lee2020evidence} and personal recommendation systems \cite{yamano2009browsing}. It can help us analyze what is happening during a day and find and track correlations we might not have been able to perform ourselves, on a personal basis as well as on a group basis. A challenging problem to this however is recognizing specific events and environments after identifying the boundaries first \cite{tzelepis2016event}. This is necessary for efficient semantically annotating of captured data for later retrieval and/or analysis.\\
+	
+%	While there are some systems that only focus on lifelogging through audio (Kapture, Vemuri,S., S. Chris. & B. Walter. iRemember: a Personal, Long-term Memory Prosthesis. 3rd ACM Workshop on Continous Archival and Retrieval of Persoanl Experiences CARPE' 06: 65-74 (2006)., ) \cite{shah2012lifelogging}, it has largely been disregarded. Sources for lifelogs mostly come from images, video, GPS and Physiological data (e.g. step counters), with audio sources being seen as more contested, additional information to those \cite{harvey2016remembering}. However, as \citet{yamano2009browsing} point out, audio from speech can provide information on conversations and ambient background noise can identify the environment and its characteristics better than only using previous sources. Audio sensors also offer the benefits of easy deployment, omnidirectional coverage and specular reflections of the signal can be used as a form of audio input (e.g. to derive the spaciousness of the room) \cite{chandrakala2019environmental}. This demonstrates how audio can improve context and event recognition capabilities for building a lifelog of events during the day. \\
+	
+%	The primary functions of a sensor based lifelogging system are described by \citet{ali2019insight} as "determining a set of target events and associating sensory data and other inputs as contexts to the events". Determining both the type as well as the beginning and end time of acoustic activity events is referred to Acoustic Event Detection (AED) and has seen a growing interest from the scientific community. While conventional pattern recognition methods like SVM's, GMM's and HMM's have been applied for this task, they have fallen short when audio events are overlapping or when strong labels (both the type of event and the temporal boundaries) are not available \cite{xia2019survey}. In real life audio recordings, events are often overlapping . Neural Network-based deep learning approaches have tried to address these problems in AED. Neural network methods adopted for AED include Deep Neural Networks (DNN) (CITE), Recurrent Neural Networks (RNN) (CITE), Convolutional Neural Networks (CNN) (CITE) and Convolutional Recurrent Neural Networks (CRNN) (CITE). Works in AED typically consider the task as a classification problem where each frame of audio can be tagged by multiple labels \cite{xia2019multi}. Only very recently Multi-Task learning has been proposed to AED \cite{xia2019multi}, which means using information from multiple related tasks for improving the generalization performance of all the tasks \cite{zhang2017survey}. This could be especially useful for labelling real life audio data, which are often noisy and lack varied, strongly labeled datasets. \\
+	
+%	This research will be focused on building an efficient audio event detection system for acoustic-based lifelogging to semantically annotate recorded audio, based on multi-task deep learning classification techniques. As AED research often only focus on classification performance, this work will also evaluate a multi-task and single task approach in terms of computational performance and memory usage and evaluate its feasibility to run on mobile devices. The reason for this is that lifelogging systems based on external sensors usually rely on sensors from mobile devices (e.g. smartphones, smart badges, smart watches, ...). These would benefit from offline detection algorithms for performance (e.g. distributed computation), restrictions (e.g. no reliable connection for continuous sending of recorded data to central server) and privacy reasons (e.g. only send inferred data which protects the user's identity or non-relevant information).
+	
+	\section{Multi-task learning}
+	Multitask learning has progressively seen more interest in the past few years in the field of acoustic analysis tasks. This interest has seen two main sides: performance improvement and resource efficiency.  While the prevailing approach is still to build a single model addressing multiple classes at once, recent work has seen success when learning a shared representation between two tasks leading to a more robust representation of the signal. On the resource efficiency side, Multi-task learning has been proposed and used as a way to combine multiple different analysis tasks with little increase in resource usage, while maintaining performance.\\
+	
+	In work done by (2017 Georgiev et al. Low-resource Multi-task Audio Sensing for Mobile and Embedded Devices via Shared Deep Neural Network Representations), diverse tasks have been combined in an adaptive way, optimizing for defined resource efficiency criteria. They found that emotion recognition, ambient scene analysis, keyword spotting and speaker verification could successfully be combined outperforming the single task models sometimes even when all tasks are combined with shared layers. However, they did not report on which tasks improved each other, the change in individual class performances or try to define why their set-up works.\\
+	
+		\begin{table}[ht]
+		\caption{Tried Combinations} % title of Table
+		\centering % used for centering table
+		\begin{tabular}{p{0.2\textwidth}p{0.6\textwidth}p{0.2\textwidth}} % centered columns (4 columns)
+			\hline\hline %inserts double horizontal lines
+			Title & Tasks & Classifier   \\ [0.5ex] % inserts table
+			%heading
+			\hline % inserts single horizontal line
+			\citet{lu2004multitask} & Automatic Speech Recognition;
+			
+			Speech Enhancement;
+			
+			Gender Detection & RNN \\ \hline
+			\citet{panchapagesan2016multi} & Keyword Spotting; 
+			
+			Large Vocabulary Continuous Speech Recognition Senones Targets Recognition & \\ \hline
+			\citet{sakti2016deep} & Automatic Speech Recognition; 
+			
+			Acoustic Event Detection & DNN \\ \hline
+			\citet{georgiev2017heterogeneous} \citet{georgiev2017low} & Speaker Identification; 
+			
+			Emotion Detection; 
+			
+			Stress Detection; 
+			
+			Acoustic Scene Classification & DNN \\ \hline
+			\citet{kim2017speech} & Emotion Detection; 
+			
+			\textbf{Auxiliary tasks:} 
+			
+			Arousal Level; 
+			
+			Valence Level; 
+			
+			Gender Detection & CNN \\ \hline
+			\citet{nwe2017convolutional} & Acoustic Scene Classification (Grouped scenes as different tasks) & \\ \hline
+			\citet{sun2017compressed} & Keyword Spotting; 
+			
+			Large Vocabulary Continuous Speech Recognition Phone Targets Recognition & \\ \hline
+			\citet{kremer2018inductive} & Word Error Rate and Character-Level Automatic Speech Recognition & CNN \\ \hline
+			\citet{morfi2018deep} & Audio Tagging; 
+			
+			Event Activity Detection & DNN \\ \hline
+			\citet{lee2019label} & \textbf{Main Tasks:}
+			
+			Audio Tagging; 
+			
+			Speaker Identification; 
+			
+			Speech Command Recognition (Keyword Spotting); 
+			
+			\textbf{Auxiliary Tasks: }
+			
+			Next-Step prediction; 
+			
+			Noise Reduction; 
+			
+			Upsampling &  \\ \hline
+			\citet{lopez2019keyword} & Keyword Spotting; 
+			
+			Own-voice/External Speaker Detection & \\ \hline
+			\citet{pankajakshan2019polyphonic} & Sound Activity Detection (Event Activity Detection); 
+			
+			Sound Event Detection (Audio Tagging) & CRNN \\ \hline
+			\citet{tonami2019joint} & Acoustic Event Detection; 
+			
+			Acoustic Scene Classification & CRNN for AED, CNN for ASC  \\ \hline
+		\end{tabular}
+		\label{table:combinations} % is used to refer this table in the text
+	\end{table}
+	
+	\begin{table}[ht]
+		\caption{Tried Combinations (Continued)} % title of Table
+		\centering % used for centering table
+		\begin{tabular}{p{0.2\textwidth}p{0.6\textwidth}p{0.2\textwidth}} % centered columns (4 columns)
+			\hline\hline %inserts double horizontal lines
+			Title & Tasks & Classifier   \\ [0.5ex] % inserts table
+			%heading
+			\hline % inserts single horizontal line
+			\citet{xia2019multi} & Acoustic Event Type Detection (Audio Tagging); 
+			
+			Predict frame position information (Event Activity Detection) & CNN \\ \hline
+			\citet{xu2019multi} & Acoustic Event Detection; 
+			
+			Acoustic Scene Classification & \\ \hline
+			\citet{zeng2019spectrogram} (1) & Emotion Detection; 
+			
+			Music/Speech Classification & DNN \\ \hline
+			\citet{zeng2019spectrogram} (2) & Accent Recognition; 
+			
+			Speaker Identification & DNN \\ \hline
+			\citet{abrol2020learning} & Fine and Coarse Labels Acoustic Scene Classification & DNN \\ \hline
+			\citet{deshmukh2020multi} & Acoustic Event Detection; 
+			
+			Reconstruct Time Frequency Representation of Audio &  CNN \\ \hline
+			\citet{fernando2020temporarily} & Acoustic Event Type Detection (Audio Tagging); 
+			
+			Predict Frame Position Information (Event Activity Detection) & LSTM \\ \hline
+			\citet{huang2020guided} & Audio Tagging; 
+			
+			Temporal Detection (Event Activity Detection) & CNN PT/PS model \\ \hline
+			\citet{huang2020multi} & Audio Tagging; 
+			
+			Event Boundary Detection (Event Activity Detection) & CNN \\ \hline
+			\citet{tagliasacchi2020multi} & Keyword Spotting; 
+			
+			Speaker Identification; 
+			
+			Language Identification; 
+			
+			Music/Speech Classification; 
+			
+			Bird Audio Detection; 
+			
+			Urban Acoustic Scene Classification; 
+			
+			Music Instrument Pitch Detection; 
+			
+			Music Instrument Detection & CNN  \\ \hline
+			\citet{wu2020domain} & Keyword Spotting; 
+			
+			Domain Prediction & \\
+			[1ex] % [1ex] adds vertical space
+			\hline %inserts single line
+		\end{tabular}
+		\label{table:combinations2} % is used to refer this table in the text
+	\end{table}
+	
+	\section{Research gap}
+	This signifies a wider lack of investigation in MTL for audio sensing tasks. When MTL works is an active research question in Multi-task learning. Some work has been done to try to answer this in NLP in work done by (2017 Martinez Alonso and Plank. When is multitask learning effective? Semantic sequence prediction under varying data conditions) and (2017 Bingel and Sogaard. Identifying beneficial task relations for multi-task learning in deep neural networks). In these works, the focus is mainly in finding out why, which and when one task improves another, for performance improvement. However in audio sensing, the fact should be pointed out again that there is significant interest in combining tasks for efficiency purposes.
+	

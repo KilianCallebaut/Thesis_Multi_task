@@ -1,0 +1,161 @@
+\documentclass[12pt]{report}
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{tabu}
+
+\title{Thesis}
+\author{Kilian Callebaut}
+
+\begin{document}
+	
+	% include table of which combinations to compare
+	% clearer in what kind of framework to plug
+	% specify the combinations of what you're comparing
+	% what are the most critical questions
+	% strip complexity of the test
+	% Clarity on measures you are actually using
+	% resource efficiency
+	% really only on the predictive power
+	
+	\maketitle
+	
+	\tableofcontents
+	
+	% Research gap fix
+	\input{Introduction.tex}
+
+	
+	% fix this
+	% fix questions
+	
+%	\input{ResearchGoal.tex}
+	\input{ResearchGoalv2.tex}
+	
+	\chapter{Method}
+	% \input{Experiment1v1.tex}
+	
+	% streamline experiments define in the beginning
+	% revisit literature
+	% start each experiment reviewing literature
+	% next meeting: done with the first exp
+	% give presentation
+	% allows them to assist
+	
+	\input{Experiment1v2.tex}
+	\input{Experiment2v1.tex}
+	\input{Experiment3v1.tex}
+	
+	\input{Experiment4v1.tex}
+	\input{Experiment5v1.tex}
+	
+	\chapter{Schedule}
+	% Additional supervisor meetings
+	% Clarifying what will be presented
+	% Think about the kind of meetings and feedback
+	% write down in an email indicating the week of the yesr = make it specific
+	% ask specific date for meeting
+	% send something if you expect feedback and what kind of feedback = part of the supervision schedule
+	% first draft feedback when
+	% send request for putting in the calendar end of this week or next week
+	
+	
+	The first experiment will be about implementing and evaluating the main tasks and their combination in a multi-task setting.
+	\begin{itemize}
+		\item DNN classifier done 15/1
+		\item Main task implementation done (4) 24/1
+		\item Task inference experiments done 31/1
+	\end{itemize}
+	
+	The second experiment
+	\begin{itemize}
+		\item done 14/2
+	\end{itemize}
+	
+	The third experiment
+	\begin{itemize}
+		\item done 21/3
+	\end{itemize}
+	
+	The fourth experiment
+	\begin{itemize}
+		\item done 11/4
+	\end{itemize}
+
+	The fifth experiment
+	\begin{itemize}
+		\item done 2/5
+	\end{itemize}
+
+	Finishing report done 30/5
+
+	Done 
+	
+	% Extra experiments we should consider:
+	% - the data input method variation (summary vs time sensitive features)
+	
+	
+	
+	
+%	\chapter{Workplan}
+%	
+%	\section{Actions}
+%	\begin{table}[ht]
+%		\caption{Actions} % title of Table
+%		\centering % used for centering table
+%		\begin{tabular}{p{0.5\textwidth}p{0.5\textwidth}} % centered columns (4 columns)
+%				\hline\hline %inserts double horizontal lines
+%				Action & Question  \\ [0.5ex] % inserts table
+%				%heading
+%				\hline % inserts single horizontal line
+%				Train and evaluate DNN on each task, take measurements of learning &  \\
+%				Train and evaluate DNN on each task pair, take measurements of learning, compare to single task performance & Which tasks improve each other in a multi-task setting? \\
+%				Build regression to predict duo performance from dataset and single inference task measurements & What dataset and single inference task measurements are predictive of multi-task success? \\
+%				Train and evaluate DNN on each possible task combination, compareto single and duo task performance & Which tasks can be combined without a (significant) degration in performance? Can we predict multi-task success from single and dual inference tasks? \\
+%				Build regression to predict multi performance from dataset and single inference task measurements & What dataset and single and dual inference task measurements are predictive of multi-task combinability? \\
+%				Include a task which is the coarse grained version of another task & (Observation from the literature) Can a coarse grained version of a task improve the finer grained detection task? \\
+%				Include tasks from the Speech, Music, Environment and general domain and observe their performance & What effect does the combining tasks with different domains have on performance in the multi-task setting? \\
+%				Include a task that can be learned on a different or the same dataset as another & What is the effect of choosing the same or different dataset for a task in a multi-task setting? \\
+%				Include a test where all the detectable classes in two tasks are correlated/uncorrelated with each other & Observation from the literature) Does a multi-task setting suffer when some classes in one task are completely correlated to classes in another? \\ [1ex] % [1ex] adds vertical space
+%				\hline %inserts single line
+%		\end{tabular}
+%		\label{table:questions} % is used to refer this table in the text
+%	\end{table}
+%	
+%	\begin{itemize}
+%		\item Does using a task with more coarse grained labels as an aux task improve performance?
+%		\item Does combining Speech/music/environmental domains lead to better results than only using a single domain? Can they be used to improve detection performance in certain classes?
+%		\item Does learning an auxiliary to improve performance work better when performed on a different dataset or the same?
+%		\item What is the effect of label conjecture?
+%	\end{itemize}
+%
+	\begin{table}[ht]
+		\caption{Datasets} % title of Table
+		\centering % used for centering table
+		\begin{tabular}{p{0.2\textwidth}p{0.3\textwidth}p{0.1\textwidth}p{0.3\textwidth}p{0.1\textwidth}} % centered columns (4 columns)
+			\hline\hline %inserts double horizontal lines
+			Tasks & Datasets & Count & Available & Count  \\ [0.5ex] % inserts table
+			%heading
+			\hline % inserts single horizontal line
+			Acoustic Scene Classification & LITIS ROUEN; TUT Acoustic Scenes 2016 & 2 & TUT Acoustic Scenes 2016 & 1 \\
+			Acoustic Event Detection & TUT SED 2016 for overlapping AED; DCASE 2020 Task 4; TUT Sound Events 2016; TUT Sound Events 2017; AudioSet adaptation & 5 & TUT SED 2016 for Overlapping AED; DCASE 2020 Task 4; AudioSet Adaptation & 3 \\
+			Speaker Identification & Automatic Speaker Verification Spoofing and Counter measures challenge; LIBRISPEECH; Voice Cloning Toolkit; FSD Kaggle 2018; LibriAdapt & 5 & Automatic Speaker Verification Spoofing and Counter measures challenge; Librispeech; Voice Cloning Toolkit; FSD Kaggle 2018; LibriAdapt & 5 \\
+			Keyword detection & TIMIT continuous speech corpus; FSD Kaggle 2018 & 2 & FSD Kaggle 2018 & 1 \\
+			Music/Speech detection & Musan MUS dataset; RAVDESS & 2 & Musan MUS dataset; RAVDESS & 2 \\
+			Voice Activity Detection & AMI Meeting; NIST OPEN SAT & 2 & AMI Meeting; & 1 \\
+			Emotion Detection & Emotional Prosody Speech and Transcript Library; RAVDESS & 2 & RAVDESS & 1 \\
+			Gender Detection & LibriAdapt & 1 & LibriAdapt & 1 \\
+			Audio Tagging & DCASE 2020 Task 4; Urban SED; DCASE 2018 Task 4; FSD Kaggle 2018 & 4 & DCASE 2020 Task 4; Urban SED; FSD Kaggle 2018 & 3 \\ [1ex] % [1ex] adds vertical space
+			\hline %inserts single line
+		\end{tabular}
+		\label{table:datasets} % is used to refer this table in the text
+	\end{table}
+%	
+%	\section{Deep Learning Model}
+%	A DNN will be made, sharing the same number of representations, with no task specific adjustments being made. The aim is to follow the model by Georgiev et al., both for comparing results as well as it being a good approach for multiple acoustic detection tasks.\\
+%	
+%	Afterwards logistic regression will be performed to determine the predictiveness of the performance results using the dataset and task inference measurements.\\
+	
+	\bibliographystyle{plainnat} 
+	\bibliography{references}
+
+\end{document}    

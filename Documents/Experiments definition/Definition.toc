@@ -1,0 +1,12 @@
+\contentsline {chapter}{\numberline {1}Introduction \& Background}{2}%
+\contentsline {section}{\numberline {1.1}Audio Sensing}{2}%
+\contentsline {section}{\numberline {1.2}Multi-task learning}{2}%
+\contentsline {section}{\numberline {1.3}Research gap}{3}%
+\contentsline {chapter}{\numberline {2}Research goal}{6}%
+\contentsline {chapter}{\numberline {3}Method}{7}%
+\contentsline {section}{\numberline {3.1}Experiment 1}{7}%
+\contentsline {section}{\numberline {3.2}Experiment 2}{13}%
+\contentsline {section}{\numberline {3.3}Experiment 3}{14}%
+\contentsline {section}{\numberline {3.4}Experiment 4}{17}%
+\contentsline {section}{\numberline {3.5}Experiment 5}{19}%
+\contentsline {chapter}{\numberline {4}Schedule}{20}%

@@ -1,0 +1,54 @@
+This is BibTeX, Version 0.99d
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: Definition.aux
+Reallocating 'name_of_file' (item size: 1) to 9 items.
+The style file: plainnat.bst
+Reallocating 'name_of_file' (item size: 1) to 11 items.
+Database file #1: references.bib
+Repeated entry---line 279 of file references.bib
+ : @article{xia2019multi
+ :                      ,
+I'm skipping whatever remains of this entry
+Warning--empty journal in georgiev2017heterogeneous
+You've used 27 entries,
+            2773 wiz_defined-function locations,
+            729 strings with 11085 characters,
+and the built_in function-call counts, 15900 in all, are:
+= -- 1389
+> -- 1150
+< -- 16
++ -- 385
+- -- 357
+* -- 1343
+:= -- 2411
+add.period$ -- 89
+call.type$ -- 27
+change.case$ -- 200
+chr.to.int$ -- 26
+cite$ -- 55
+duplicate$ -- 674
+empty$ -- 1137
+format.name$ -- 392
+if$ -- 3357
+int.to.chr$ -- 2
+int.to.str$ -- 1
+missing$ -- 27
+newline$ -- 143
+num.names$ -- 108
+pop$ -- 422
+preamble$ -- 1
+purify$ -- 173
+quote$ -- 0
+skip$ -- 561
+stack$ -- 0
+substring$ -- 537
+swap$ -- 128
+text.length$ -- 11
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 297
+warning$ -- 1
+while$ -- 124
+width$ -- 0
+write$ -- 356
+(There was 1 error message)

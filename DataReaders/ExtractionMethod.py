@@ -91,7 +91,6 @@ class ExtractionMethod(ABC):
 
         for inp_idx in range(len(inputs)):
             inp = inputs[inp_idx]
-            # end_frame = start_frame + window_hop * math.ceil((float(inp.shape[0] - start_frame) / window_hop))
             end_frame = start_frame + window_hop * math.floor((float(inp.shape[0] - start_frame) / window_hop))
             for frame_idx in range(start_frame, end_frame + 1, window_hop):
                 window = inp[frame_idx - window_size:frame_idx, :]

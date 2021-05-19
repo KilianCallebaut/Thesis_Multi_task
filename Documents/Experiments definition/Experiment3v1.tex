@@ -1,0 +1,72 @@
+\section{Experiment 3}
+	
+	\textbf{Research Question:} 
+	Can auxiliary tasks be added to the multi-task set-up, to improve classification performance of (certain) main tasks? \\
+	
+	\textbf{Research Method:} Implement different auxiliary tasks specifically aimed at improving performance of one or more main tasks. The classification model will be the same DNN without any extra adjustments. The auxiliary tasks are chosen from the multi-task audio sensing literature, where they have proven to show positive results when combined with one of the main tasks. The aim is to find whether and which results are somewhat replicable in the current set-up, as well as again figuring out which factors can be related to positive improvements. All auxiliary tasks will be treated as main tasks in this experiment, in the sense that they will also be tested in combination with each other without any main task necessarily being present.\\
+	
+	\textbf{Task choice:}\\
+	
+	Auxiliary Tasks\\
+	
+	\begin{itemize}
+		\item Music/Speech Detection
+		\item Voice Activity Detection
+		\item Emotion Detection
+		\item Gender Detection
+		\item Audio Tagging
+		\item Event Activity Detection
+		\item Stress Detection
+		\item Music Instrument detection
+	\end{itemize}
+	
+	
+	%-- WHAT ARE AUXILIARY TASKS\\
+	%- Smaller label set, simpler task\\
+	%- Used to improve performance in other task\\
+	%-- REASONS WHY FOR THESE TASKS (use in other and general interest)\\
+	%- Used in literature\\
+	%- M/S, Event activity detection and VAD used to explicitly learn how to differentiate between what is in the audio\\
+	%- Emotion detection, stress detection and gender detection as semantic detection in speech domain, demonstrate whether it improves speech detection in other tasks, as well as performance of tasks in speech domain\\
+%	- Music Instrument detection same as previous but for music domain\\
+%	- Audio Tagging as a different specificity level compared to general audio event detection\\
+%	-- REFER TO USE IN PAPERS\\
+	
+	The previous mentioned main tasks are supplemented by a list of auxiliary tasks, which are generally simpler tasks that are not often the main research goal but added as a side task to explicitly improve the main task. They often can be performed on the same dataset as the main task. Each task is treated as a main task and combined with all the other tasks. These are still mentioned as separate, as they are explicitly chosen for a specific relationship with at least one of the main tasks. Some tasks - e.g. Emotion detection - are also only considered auxiliary tasks in this context therefore. \\
+	
+	The reason for each inclusion will be disclosed next. There are three main categories the reasons of inclusion fall in, which relation to the main tasks this work aims to investigate: Simple differentiation, semantic detection in a specific domain and different specificity level. 
+	
+	\begin{itemize}
+		\item With simple differentiation, the Music/Speech detection, Voice Activity Detection and Event Activity Detection tasks fall under this. These tasks simply try to differentiate if activity of a certain type is or isn't happening at a certain point. The hypothesis is that simple differentiation helps to build a representation that would make less errors for tasks where wrongfully differentiating the target labels of these tasks leads to prediction errors in its own results. 
+		\begin{itemize}
+			\item Music/Speech Detection: The task of classifying audio in a stream between Music, Speech or neither. This is included as it learns to differentiate between different domains which might be beneficial for all (main) tasks
+			\item Voice Activity Detection: The task of detecting voice activity in a stream. This learns a representation that can differentiate specifically between what sound is or is not coming from a voice, which might lower the number of classification errors happening in SI and KS when the sound is not a voice, as well as AED for discriminating the speech label.
+			\item Event Activity Detection: The task of detecting whether or not a sound event is happening at a certain point. In the literature (REFERENCE) AED has often been defined as a multi-task problem, by splitting the tasks of detecting an event and determining the type of event (Audio Tagging) in two, while still learning them simultaneously and combining the results afterwards. This has lead to better performance to baseline single task AED systems. This inclusion might be beneficial for lowering detection errors when no (target) sound event is present AED, SI and KS. 
+		\end{itemize}
+	
+		\item Next is semantic detection, which here means the Emotion detection, stress detection, gender detection in the speech domain and music instrument detection in the music domain. These try to identify a certain property of events in the audio. The idea of including this is to check whether identifying more complex properties of speech and music having a less direct link to the purposes of the main tasks can be beneficial for performance.
+		\begin{itemize}
+			\item Emotion Detection: The task of detecting emotion from speech and music. This was included in the work done by Georgiev as well as others. Emotion Detection is not expected to have any direct link to any of the main tasks, except perhaps a loose one with the speech domain tasks. 
+			\item Gender Detection: The task of detecting gender of a speaker. This is directly linked to speaker identification, as the same speaker will have the same gender. 
+			\item  Stress Detection: The task of detecting stress in speech audio. This was also included in the work done by Georgiev. Stress detection has a loose connection with the speech domain, but a direct one with Emotion Detection. It has a smaller target labelset size than Emotion Detection, in which we are interested due to previous observations that tasks with smaller target label sets make for better auxiliary tasks.
+			\item  Music Instrument detection: The task of detecting which music instrument is played in an audio clip. This has a loose connection with the music domain, which might be interesting for better detection of music audio, leading to less wrongful labels for events that are out of target for the main tasks.
+		\end{itemize}
+	
+		\item The last one is different specificity level, under which only audio tagging falls directly, as it is a simpler version of AED (you only need to identify what is happening in the whole clip and not when it is or is not present). The first category can be seen as a more specific subset of this with a small target label set though. The interest for this class is different, in the sense that it is more about reporting the difference adding a simplified version of the same task makes as well as comparing its interaction with the other tasks to the specific version.
+		\begin{itemize}
+			\item Audio Tagging: In AED research, improved results have been achieved by defining the task of AED as two separate tasks, namely Audio Tagging and Event Activity Detection, learned simultaneously in a multi-task framework. Besides this, work done by Huang et al. achieved the best results in the 2019 AED challenge by adding additional branches of audio tagging tasks (with different pooling methods) besides the main Audio Tagging/Event Detection branch. Therefore the interest lies in its comparison with the performance compared to single task AED as well as its interaction with other tasks in a multi-task framework.
+		\end{itemize}
+	\end{itemize}
+	
+
+
+	% This might be a different research question:
+	% - How does splitting up AED in EAD and AT tasks affect the multi-task set-up?
+	% - How does a general AED into different set-ups affect the multi-task set-up?
+
+	
+	
+	\textbf{Evaluation:}\\
+	
+	Aside from the Evaluation metrics described in the previous experiment, this will also include qualitative comparisons with results from the literature, including the difference in set-up, in order to evaluate how the difference in set-up affects multi-task performance.
+

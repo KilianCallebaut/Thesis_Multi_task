@@ -1,0 +1,20 @@
+\section{Experiment 2}
+
+\textbf{Research Question:} What measurements can predict success in the multi-task set-up? \\
+
+\textbf{Research Method:} Build a regression analysis system to compute the pearson correlation between the dataset and single task measurements and the multi-task performance shift. The goal of the investigation is to assess whether improved performance for one of the tasks in a dual task learning set-up can be predicted from the dataset and single inference task measurements through regression analysis.\\
+
+\textbf{Dataset measurements:}\\
+The dataset and single task measurements are described in Experiment 1 (except for the non-numetric factors). The same structure as \citet{bingel2017identifying} will be used for the regression as it is a good evaluation template, as well as making it possible to compare whether similar measurements are good predictors between NLP and Audio tasks. \\
+
+\textbf{Regression Analysis} \\
+
+
+
+\textbf{Evaluation:}\\
+
+Any consistency in measurements that are good predictors for multi-task success between tasks will be looked for. The logistic regression will take the binarized results of the micro-averaged F1 scores from Experiment 1 (and the results from subsequent experiments) and be used to predict the benefits or detriments of MTL setups based on the computed features. An observation from the NLP research to verify is that multi-task gains seemed to be more likely for main tasks that quickly plateau with non-plateauing tasks, which might hold for audio tasks. \citet{bingel2017identifying} uses the mean performance of 100 runs of randomized five-fold cross-validation.
+
+\begin{itemize}
+	\item Pearson coefficient: Measure for correlation between two variables. In this case, this will be the correlation of the numeric measurements from the dataset. For this a regression analysis system will be built.
+\end{itemize}
