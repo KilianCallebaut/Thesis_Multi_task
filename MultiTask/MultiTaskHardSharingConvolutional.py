@@ -10,7 +10,8 @@ class MultiTaskHardSharingConvolutional(nn.Module):
             input_channels,
             hidden_size,  # 64
             n_hidden,
-            task_list
+            task_list,
+            drop_rate
     ):
         super().__init__()
         self.name = 'cnn'
@@ -18,6 +19,8 @@ class MultiTaskHardSharingConvolutional(nn.Module):
 
         self.hidden = nn.ModuleList()
         self.hidden_bn = nn.ModuleList()
+        self.drop_rate = drop_rate
+
         for k in range(n_hidden):
             in_chan = input_channels if k == 0 else hidden_size
             self.hidden.append(
@@ -64,7 +67,9 @@ class MultiTaskHardSharingConvolutional(nn.Module):
         x = x[:, None, :, :]
         '''x: (batch_size, n_channels=1, time_steps, mel_bins)'''
         for layer_id in range(len(self.hidden)):
-            x = F.relu_(self.hidden_bn[layer_id](self.hidden[layer_id](x)))
+            x = F.dropout(F.relu_(self.hidden_bn[layer_id](self.hidden[layer_id](x))),
+                          p=self.drop_rate,
+                          training=self.training)
             x = F.max_pool2d(x, kernel_size=(2, 2), stride=(2, 2))
 
         # Global max pooling

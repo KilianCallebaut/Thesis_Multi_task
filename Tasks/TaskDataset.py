@@ -155,7 +155,6 @@ class TaskDataset(Dataset):
         targets = self.targets
 
         targets = LabelEncoder().fit_transform([''.join(str(l)) for l in targets])
-        print(type_of_target(targets))
         return kf.split(inputs, targets)
 
     def get_split_by_index(self, train_index, test_index, **kwargs):

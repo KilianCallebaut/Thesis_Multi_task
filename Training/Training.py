@@ -51,10 +51,9 @@ class Training:
         # optimizer = optim.SGD(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
         optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
 
-        model.train()  # Set model to training mode
-
         # Epoch
         for epoch in range(start_epoch, num_epochs):
+            model.train()  # Set model to training mode
 
             print('Epoch {}'.format(epoch))
             print('===========================================================')
@@ -146,6 +145,8 @@ class Training:
 
                 torch.cuda.empty_cache()
 
+
+
             # Statistics
             results.add_loss_to_curve(epoch, step, running_loss, True)
             epoch_metrics = [metrics.classification_report(task_labels[t], task_predictions[t], output_dict=True) for t
@@ -169,8 +170,15 @@ class Training:
 
             results.add_model_parameters(epoch, model)
 
+            if 'test_dataset' in kwargs:
+                Training.evaluate(model,
+                                  kwargs.get('test_dataset'),
+                                  results,
+                                  batch_size,
+                                  num_epochs=epoch+1,
+                                  start_epoch=epoch,
+                                  blank=False)
         print('Training Done')
-
         results.flush_writer()
         print('Wrote Training Results')
 
@@ -182,8 +190,8 @@ class Training:
                  training_results: Results,
                  batch_size=64,
                  num_epochs=50,
-                 start_epoch=0
-                 ):
+                 start_epoch=0,
+                 blank=True):
 
         datasets = concat_dataset.datasets
         task_list = [x.task for x in datasets]
@@ -210,7 +218,8 @@ class Training:
                 print('Epoch {}'.format(epoch))
                 print('===========================================================')
 
-                training_results.load_model_parameters(epoch, blank_model)
+                if blank:
+                    training_results.load_model_parameters(epoch, blank_model)
 
                 running_loss = 0.0
                 step = 0
@@ -311,8 +320,9 @@ class Training:
                     mats.append(mat)
 
         training_results.flush_writer()
-        training_results.close_writer()
+        # training_results.close_writer()
         print('Wrote Evaluation Results')
+
 
     @staticmethod
     def calculate_labels(output_module, output):

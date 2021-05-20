@@ -94,7 +94,6 @@ def run_five_fold(dataset_list, **kwargs):
                 i += 1
                 continue
 
-
         training_tasks = []
         test_tasks = []
         train, test = taskDatasets[0].get_split_by_index(train_index, test_index,
@@ -145,11 +144,16 @@ def run_set(concat_training, concat_test, fold):
                                                    results=results,
                                                    batch_size=meta_params['batch_size'],
                                                    num_epochs=meta_params['num_epochs'],
-                                                   learning_rate=meta_params['learning_rate'])
+                                                   learning_rate=meta_params['learning_rate'],
+                                                   test_dataset=concat_test)
 
     del model
     torch.cuda.empty_cache()
-    run_test(concat_test, meta_params, results)
+    # run_test(concat_test, meta_params, results)
+    results.write_loss_curve_tasks()
+    results.write_loss_curves()
+    results.close_writer()
+
 
 def check_distributions(dataset_list):
     extraction_params = read_config('extraction_params_cnn_MelSpectrogram')
@@ -172,15 +176,15 @@ def check_distributions(dataset_list):
 
         print('task {}'.format(taskDatasets[0].task.name))
         print(tot)
-        print([tot[i]/sum(tot) for i in range(len(tot))])
+        print([tot[i] / sum(tot) for i in range(len(tot))])
 
         tot_t = [0 for _ in test.targets[0]]
         for tar in test.targets:
             tot_t = [tot_t[i] + tar[i] for i in range(len(tot_t))]
 
         print(tot_t)
-        print([tot_t[i]/sum(tot_t) for i in range(len(tot_t))])
-        print([tot[i]/sum(tot) - tot_t[i]/sum(tot_t) for i in range(len(tot))])
+        print([tot_t[i] / sum(tot_t) for i in range(len(tot_t))])
+        print([tot[i] / sum(tot) - tot_t[i] / sum(tot_t) for i in range(len(tot))])
 
         if len(task_iterators) > 1:
             for it_id in range(len(task_iterators[1:])):
@@ -196,7 +200,7 @@ def check_distributions(dataset_list):
                 for tar in train.targets:
                     tot = [tot[i] + tar[i] for i in range(len(tot))]
 
-                print('task {}'.format(taskDatasets[it_id+1].task.name))
+                print('task {}'.format(taskDatasets[it_id + 1].task.name))
                 print(tot)
                 print([tot[i] / sum(tot) for i in range(len(tot))])
 
@@ -206,23 +210,22 @@ def check_distributions(dataset_list):
 
                 print(tot_t)
                 print([tot_t[i] / sum(tot_t) for i in range(len(tot_t))])
-                print([tot[i]/sum(tot) - tot_t[i]/sum(tot_t) for i in range(len(tot))])
+                print([tot[i] / sum(tot) - tot_t[i] / sum(tot_t) for i in range(len(tot))])
         fold += 1
 
 
-
 def main(argv):
-    dataset_list = [1, 2, 5, 4, 0]
+    dataset_list = [2, 5, 4, 1, 0]
 
     print('--------------------------------------------------')
     print('test loop')
     print('--------------------------------------------------')
     for i in range(len(dataset_list)):
-        # for j in range(i + 1, len(dataset_list)):
+        run_five_fold([dataset_list[i]])
+        for j in range(i + 1, len(dataset_list)):
             # check_distributions([dataset_list[i], dataset_list[j]])
-            # run_five_fold([dataset_list[i], dataset_list[j]])
-        check_distributions([dataset_list[i]])
-        # run_five_fold([dataset_list[i]])
+            run_five_fold([dataset_list[i], dataset_list[j]])
+        # check_distributions([dataset_list[i]])
 
     return 0
 

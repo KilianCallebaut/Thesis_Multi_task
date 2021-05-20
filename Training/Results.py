@@ -3,22 +3,22 @@ from datetime import datetime
 
 import joblib
 import matplotlib.pyplot as plt
-import torch
-from sklearn import metrics
-from torch.utils.tensorboard import SummaryWriter
 import numpy as np
-
+import torch
+from torch.utils.tensorboard import SummaryWriter
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 drive = 'F'
+
+
 # load/save model_checkpoints
 # load/save matrices
 # load/save classification report
 class Results:
-    audioset_train_path = drive+r":\Thesis_Results\Training_Results"
-    audioset_eval_path = drive+r":\Thesis_Results\Evaluation_Results"
+    audioset_train_path = drive + r":\Thesis_Results\Training_Results"
+    audioset_eval_path = drive + r":\Thesis_Results\Evaluation_Results"
     audioset_file_base = r"Result"
-    model_checkpoints_path = drive+r":\Thesis_Results\Model_Checkpoints"
+    model_checkpoints_path = drive + r":\Thesis_Results\Model_Checkpoints"
 
     def __init__(self, **kwargs):
 
@@ -39,10 +39,12 @@ class Results:
         if 'model_checkpoints_path' in kwargs:
             self.model_checkpoints_path = kwargs.pop('model_checkpoints_path')
 
-        self.writer = SummaryWriter(log_dir='experiments/'+self.run_name)
+        self.writer = SummaryWriter(log_dir=os.path.join(self.audioset_train_path, 'experiments', self.run_name))
         self.num_epochs = kwargs.get('num_epochs')
         self.training_curve = np.zeros(self.num_epochs)
         self.evaluation_curve = np.zeros(self.num_epochs)
+        self.training_curve_task = {}
+        self.evaluation_curve_task = {}
 
     def add_model_parameters(self, nr_epoch, model):
         path = os.path.join(self.model_checkpoints_path, self.run_name + "epoch_{}.pth".format(nr_epoch))
@@ -59,7 +61,8 @@ class Results:
         if train:
             path = self.audioset_train_path
             phase = 'Train'
-        joblib.dump(mat, os.path.join(path, self.run_name, "{}_conf_mat_{}_epoch_{}".format(phase, task.name, epoch)))
+        joblib.dump(mat,
+                    os.path.join(path, self.run_name, "{}_conf_mat_{}_epoch_{}.gz".format(phase, task.name, epoch)))
         fig = plt.figure()
         plt.imshow(mat)
         self.writer.add_figure('{}/Confusion matrix/{}'.format(phase, task.name), fig, epoch)
@@ -72,7 +75,8 @@ class Results:
         if train:
             path = self.audioset_train_path
             phase = 'Train'
-        return joblib.load(os.path.join(path, self.run_name, "{}_conf_mat_{}_epoch_{}".format(phase, task.name, epoch)))
+        return joblib.load(
+            os.path.join(path, self.run_name, "{}_conf_mat_{}_epoch_{}.gz".format(phase, task.name, epoch)))
 
     def add_class_report(self, epoch, report, task, train):
         path = self.audioset_eval_path
@@ -80,7 +84,8 @@ class Results:
         if train:
             path = self.audioset_train_path
             phase = 'Train'
-        joblib.dump(report, os.path.join(path, self.run_name, "{}_class_report_{}_epoch_{}".format(phase, task.name, epoch)))
+        joblib.dump(report,
+                    os.path.join(path, self.run_name, "{}_class_report_{}_epoch_{}.gz".format(phase, task.name, epoch)))
 
         for key, value in report.items():
             if type(value) is dict:
@@ -96,20 +101,16 @@ class Results:
         if train:
             path = self.audioset_train_path
             phase = 'Train'
-        return joblib.load(os.path.join(path, self.run_name, "{}_class_report_{}_epoch_{}".format(phase, task.name, epoch)))
+        return joblib.load(
+            os.path.join(path, self.run_name, "{}_class_report_{}_epoch_{}.gz".format(phase, task.name, epoch)))
 
     def add_loss_to_curve(self, epoch, step, loss, train):
-
         if train:
-            path = self.audioset_train_path
             phase = 'Train'
             self.training_curve[epoch] = loss
-            joblib.dump(self.training_curve, os.path.join(path, self.run_name, "{}_losscurve".format(phase)))
         else:
-            path = self.audioset_eval_path
             phase = 'Evaluation'
             self.evaluation_curve[epoch] = loss
-            joblib.dump(self.evaluation_curve, os.path.join(path, self.run_name, "{}_losscurve".format(phase)))
         self.writer.add_scalar("{}/Loss".format(phase), loss / step, epoch)
 
     def load_loss_curve(self, train):
@@ -118,19 +119,27 @@ class Results:
         if train:
             path = self.audioset_train_path
             phase = 'Train'
-        return joblib.load(os.path.join(path, self.run_name, "{}_losscurve".format(phase)))
+        return joblib.load(os.path.join(path, self.run_name, "{}_losscurve.gz".format(phase)))
+
+    def write_loss_curves(self):
+        phase = 'Train'
+        path = self.audioset_train_path
+        joblib.dump(self.training_curve, os.path.join(path, self.run_name, "{}_losscurve.gz".format(phase)))
+        phase = 'Evaluation'
+        path = self.audioset_eval_path
+        joblib.dump(self.evaluation_curve, os.path.join(path, self.run_name, "{}_losscurve.gz".format(phase)))
 
     def add_loss_to_curve_task(self, epoch, step, loss, task, train):
         if train:
-            path = self.audioset_train_path
             phase = 'Train'
-            self.training_curve[epoch] = loss
-            joblib.dump(self.training_curve, os.path.join(path, self.run_name, "{}_losscurve_{}".format(phase, task.name)))
+            if task.name not in self.training_curve_task:
+                self.training_curve_task[task.name] = np.zeros(self.num_epochs)
+            self.training_curve_task[task.name][epoch] = loss
         else:
-            path = self.audioset_eval_path
             phase = 'Evaluation'
-            self.evaluation_curve[epoch] = loss
-            joblib.dump(self.evaluation_curve, os.path.join(path, self.run_name, "{}_losscurve_{}".format(phase, task.name)))
+            if task.name not in self.evaluation_curve_task:
+                self.evaluation_curve_task[task.name] = np.zeros(self.num_epochs)
+            self.evaluation_curve_task[task.name][epoch] = loss
 
         self.writer.add_scalar("{}/Loss/{}".format(phase, task.name), loss / step, epoch)
 
@@ -140,7 +149,16 @@ class Results:
         if train:
             path = self.audioset_train_path
             phase = 'Train'
-        return joblib.load(os.path.join(path, self.run_name, "{}_losscurve_{}".format(phase, task.name)))
+        return joblib.load(os.path.join(path, self.run_name, "{}_losscurve_tasks.gz".format(phase, task.name)))
+
+    def write_loss_curve_tasks(self):
+        path = self.audioset_train_path
+        phase = 'Train'
+        joblib.dump(self.training_curve_task, os.path.join(path, self.run_name, "{}_losscurve_tasks.gz".format(phase)))
+        path = self.audioset_eval_path
+        phase = 'Evaluation'
+        joblib.dump(self.evaluation_curve_task,
+                    os.path.join(path, self.run_name, "{}_losscurve_tasks.gz".format(phase)))
 
     def flush_writer(self):
         self.writer.flush()
