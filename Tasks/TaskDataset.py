@@ -6,10 +6,13 @@ import types
 import joblib
 import numpy as np
 import torch
-from sklearn.model_selection import KFold
+from sklearn.model_selection import StratifiedKFold
+from sklearn.preprocessing import LabelEncoder
+from sklearn.utils.multiclass import type_of_target
 from torch.utils.data import Dataset
 
 from Tasks.Task import Task
+
 
 # In index mode:
 # before save -> full tensors in input list
@@ -120,11 +123,40 @@ class TaskDataset(Dataset):
         # TRAIN: [0 1]
         # TEST: [2 3]
 
-        kf = KFold(n_splits=5, shuffle=True, random_state=random_state)
+        # Stratified KFold
+        # Examples
+        # --------
+        # >> > import numpy as np
+        # >> > from sklearn.model_selection import StratifiedKFold
+        # >> > X = np.array([[1, 2], [3, 4], [1, 2], [3, 4]])
+        # >> > y = np.array([0, 0, 1, 1])
+        # >> > skf = StratifiedKFold(n_splits=2)
+        # >> > skf.get_n_splits(X, y)
+        # 2
+        # >> > print(skf)
+        # StratifiedKFold(n_splits=2, random_state=None, shuffle=False)
+        # >> > for train_index, test_index in skf.split(X, y):
+        #     ...
+        #     print("TRAIN:", train_index, "TEST:", test_index)
+        # ...
+        # X_train, X_test = X[train_index], X[test_index]
+        # ...
+        # y_train, y_test = y[train_index], y[test_index]
+        # TRAIN: [1 3]
+        # TEST: [0 2]
+        # TRAIN: [0 2]
+        # TEST: [1 3]
+
+        # kf = KFold(n_splits=5, shuffle=True, random_state=random_state)
+        kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=random_state)
         if dic_of_labels_limits:
             self.sample_labels(dic_of_labels_limits)
         inputs = self.inputs
-        return kf.split(inputs)
+        targets = self.targets
+
+        targets = LabelEncoder().fit_transform([''.join(str(l)) for l in targets])
+        print(type_of_target(targets))
+        return kf.split(inputs, targets)
 
     def get_split_by_index(self, train_index, test_index, **kwargs):
         '''
@@ -305,7 +337,7 @@ def load_index_mode(self, base_path):
         if num > max_frag:
             max_frag = num
 
-    self.inputs = [i for i in range(max_frag+1)]
+    self.inputs = [i for i in range(max_frag + 1)]
     t_l = torch.load(os.path.join(base_path, 'targets.pt'))
     self.targets = [[int(j) for j in i] for i in t_l]
     diction = joblib.load(os.path.join(base_path, 'other.obj'))

@@ -80,6 +80,7 @@ def run_five_fold(dataset_list, **kwargs):
 
     print("Create iterators")
     for t in taskDatasets:
+        print(t.task.name)
         task_iterators.append(t.k_folds(**read_config('dic_of_labels_limits_{}'.format(t.task.name)), random_state=123))
 
     print("Start iteration")
@@ -150,17 +151,78 @@ def run_set(concat_training, concat_test, fold):
     torch.cuda.empty_cache()
     run_test(concat_test, meta_params, results)
 
+def check_distributions(dataset_list):
+    extraction_params = read_config('extraction_params_cnn_MelSpectrogram')
+    taskDatasets = run_datasets(dataset_list, extraction_params)
+    task_iterators = []
+
+    print("Create iterators")
+    for t in taskDatasets:
+        task_iterators.append(t.k_folds(**read_config('dic_of_labels_limits_{}'.format(t.task.name)), random_state=123))
+    fold = 0
+    for train_index, test_index in task_iterators[0]:
+        print('fold {}'.format(fold))
+        training_tasks = []
+        test_tasks = []
+        train, test = taskDatasets[0].get_split_by_index(train_index, test_index,
+                                                         **read_config('preparation_params_general_window'))
+        tot = [0 for _ in train.targets[0]]
+        for tar in train.targets:
+            tot = [tot[i] + tar[i] for i in range(len(tot))]
+
+        print('task {}'.format(taskDatasets[0].task.name))
+        print(tot)
+        print([tot[i]/sum(tot) for i in range(len(tot))])
+
+        tot_t = [0 for _ in test.targets[0]]
+        for tar in test.targets:
+            tot_t = [tot_t[i] + tar[i] for i in range(len(tot_t))]
+
+        print(tot_t)
+        print([tot_t[i]/sum(tot_t) for i in range(len(tot_t))])
+        print([tot[i]/sum(tot) - tot_t[i]/sum(tot_t) for i in range(len(tot))])
+
+        if len(task_iterators) > 1:
+            for it_id in range(len(task_iterators[1:])):
+                it = task_iterators[it_id + 1]
+                train_nxt_id, test_nxt_id = next(it)
+                train, test = taskDatasets[it_id + 1].get_split_by_index(train_nxt_id, test_nxt_id,
+                                                                         **read_config(
+                                                                             'preparation_params_general_window'))
+                training_tasks.append(train)
+                test_tasks.append(test)
+
+                tot = [0 for _ in train.targets[0]]
+                for tar in train.targets:
+                    tot = [tot[i] + tar[i] for i in range(len(tot))]
+
+                print('task {}'.format(taskDatasets[it_id+1].task.name))
+                print(tot)
+                print([tot[i] / sum(tot) for i in range(len(tot))])
+
+                tot_t = [0 for _ in test.targets[0]]
+                for tar in test.targets:
+                    tot_t = [tot_t[i] + tar[i] for i in range(len(tot_t))]
+
+                print(tot_t)
+                print([tot_t[i] / sum(tot_t) for i in range(len(tot_t))])
+                print([tot[i]/sum(tot) - tot_t[i]/sum(tot_t) for i in range(len(tot))])
+        fold += 1
+
+
 
 def main(argv):
-    dataset_list = [2, 5, 4, 0, 1]
+    dataset_list = [1, 2, 5, 4, 0]
 
     print('--------------------------------------------------')
     print('test loop')
     print('--------------------------------------------------')
     for i in range(len(dataset_list)):
-        for j in range(i + 1, len(dataset_list)):
-            run_five_fold([dataset_list[i], dataset_list[j]])
-        run_five_fold([dataset_list[i]])
+        # for j in range(i + 1, len(dataset_list)):
+            # check_distributions([dataset_list[i], dataset_list[j]])
+            # run_five_fold([dataset_list[i], dataset_list[j]])
+        check_distributions([dataset_list[i]])
+        # run_five_fold([dataset_list[i]])
 
     return 0
 
