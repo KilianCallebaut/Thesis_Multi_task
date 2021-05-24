@@ -172,8 +172,9 @@ class Mfcc(ExtractionMethod):
         return self.convert_nparray_to_list_of_tensors(ret)
 
     def prepare_inputs_targets(self, inputs, targets, **kwargs):
+        if 'window_size' in kwargs and kwargs.get('window_size') != 0:
+            inputs, targets = self.window_inputs(inputs, targets, **kwargs)
         inputs = self.scale_transform(inputs)
-        inputs, targets = self.window_inputs(inputs, targets, **kwargs)
         return inputs, targets
 
 
@@ -200,9 +201,10 @@ class MelSpectrogram(ExtractionMethod):
         return self.convert_nparray_to_list_of_tensors(ret)
 
     def prepare_inputs_targets(self, inputs, targets, **kwargs):
-        inputs = self.scale_transform(inputs)
         if 'window_size' in kwargs and kwargs.get('window_size') != 0:
             inputs, targets = self.window_inputs(inputs, targets, **kwargs)
+        inputs = self.scale_transform(inputs)
+
         return inputs, targets
 
 

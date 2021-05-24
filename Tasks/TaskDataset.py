@@ -8,7 +8,6 @@ import numpy as np
 import torch
 from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import LabelEncoder
-from sklearn.utils.multiclass import type_of_target
 from torch.utils.data import Dataset
 
 from Tasks.Task import Task
@@ -99,7 +98,23 @@ class TaskDataset(Dataset):
         self.inputs = sampled_inputs
         self.targets = sampled_targets
 
-    def k_folds(self, dic_of_labels_limits, random_state=None):
+    def sample_dataset(self, random_state=None):
+        """
+            Takes 1/5th of complete dataset
+            :return: sampled datasets
+        """
+        it = self.k_folds(random_state=random_state)
+        _, sample = next(it)
+        return TaskDataset(
+            inputs=[self.inputs[i] for i in sample],
+            targets=[self.targets[i] for i in sample],
+            name=self.task.name,
+            labels=self.task.output_labels,
+            extraction_method=self.extraction_method,
+            base_path=self.base_path, output_module=self.task.output_module
+        )
+
+    def k_folds(self, dic_of_labels_limits=None, random_state=None):
         # Examples
         # --------
         # >> > import numpy as np
@@ -148,6 +163,8 @@ class TaskDataset(Dataset):
         # TEST: [1 3]
 
         # kf = KFold(n_splits=5, shuffle=True, random_state=random_state)
+        if dic_of_labels_limits is None:
+            dic_of_labels_limits = {}
         kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=random_state)
         if dic_of_labels_limits:
             self.sample_labels(dic_of_labels_limits)
@@ -166,10 +183,10 @@ class TaskDataset(Dataset):
         :return: the taskdataset for the training and test data
         '''
 
-        x_train = [self.inputs[i] for i in range(len(self.inputs)) if i in train_index]
-        y_train = [self.targets[i] for i in range(len(self.targets)) if i in train_index]
-        x_val = [self.inputs[i] for i in range(len(self.inputs)) if i in test_index]
-        y_val = [self.targets[i] for i in range(len(self.targets)) if i in test_index]
+        x_train = [self.inputs[i] for i in train_index]
+        y_train = [self.targets[i] for i in train_index]
+        x_val = [self.inputs[i] for i in test_index]
+        y_val = [self.targets[i] for i in test_index]
 
         if 'fold' and 'random_state' in kwargs:
             fold = kwargs.pop('fold')

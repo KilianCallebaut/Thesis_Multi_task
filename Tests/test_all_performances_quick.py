@@ -84,8 +84,12 @@ def run_five_fold(dataset_list, **kwargs):
     extraction_params = read_config('extraction_params_cnn_MelSpectrogram')
     # extraction_params = read_config('extraction_params_cnn_mfcc')
     taskDatasets = run_datasets(dataset_list, extraction_params)
-    taskDatasets = sample_datasets(taskDatasets)
-    taskDatasets = sample_datasets(taskDatasets)
+    if 2 in dataset_list or 5 in dataset_list:
+        # taskDatasets = sample_datasets(taskDatasets)
+        taskDatasets = sample_datasets(taskDatasets)
+    if 1 in dataset_list or 0 in dataset_list:
+        taskDatasets = sample_datasets(taskDatasets)
+
     task_iterators = []
 
     print("Create iterators")
@@ -130,6 +134,7 @@ def run_five_fold(dataset_list, **kwargs):
         run_set(concat_training, concat_test, i)
 
         i += 1
+        break
 
 
 def run_set(concat_training, concat_test, fold):
@@ -138,10 +143,10 @@ def run_set(concat_training, concat_test, fold):
 
     task_list = concat_training.get_task_list()
 
-    # model = MultiTaskHardSharingConvolutional(1,
-    #                                           **read_config('model_params_cnn'),
-    #                                           task_list=task_list)
-    model = BaselineCnn(len(task_list[0].output_labels))
+    model = MultiTaskHardSharingConvolutional(1,
+                                              **read_config('model_params_cnn'),
+                                              task_list=task_list)
+    # model = BaselineCnn(len(task_list[0].output_labels))
 
     model = model.to(device)
     print('Model Created')
@@ -232,7 +237,7 @@ def check_distributions(dataset_list):
 
 def main(argv):
     # dataset_list = [2, 5, 4, 1, 0]
-    dataset_list = [2]
+    dataset_list = [2, 0, 1, 4, 5]
 
     print('--------------------------------------------------')
     print('test loop')
