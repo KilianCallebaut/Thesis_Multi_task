@@ -36,8 +36,6 @@ class FSDKaggle2018(DataReader):
     def read_files(self):
         info = joblib.load(self.get_path())
         self.file_labels = info['file_labels']
-        self.taskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_base_path(),
-                                       index_mode=self.index_mode)
         self.taskDataset.load(self.get_base_path())
 
     def write_files(self):

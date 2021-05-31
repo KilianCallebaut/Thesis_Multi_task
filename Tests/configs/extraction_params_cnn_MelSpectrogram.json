@@ -1,5 +1,5 @@
 {
-  "nfft": 1024,
+  "nfft": 2048,
   "winlen": 0.03,
   "winstep": 0.01,
   "nfilt": 96,

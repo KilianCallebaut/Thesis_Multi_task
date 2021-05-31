@@ -32,6 +32,7 @@ class DCASE2017_SS(DataReader):
         super().__init__(extraction_method, **kwargs)
         print('done DCASE2017 SS')
 
+
     def get_path(self):
         return os.path.join(self.get_base_path(), 'DCASE2017_SS.obj')
 
@@ -82,14 +83,13 @@ class DCASE2017_SS(DataReader):
     def read_files(self):
         # info = joblib.load(self.get_path())
         # self.audio_files = info['audio_files']
-        self.taskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_base_path(),
-                                       index_mode=self.index_mode)
         self.taskDataset.load(self.get_base_path())
 
         # info = joblib.load(self.get_eval_path())
         # self.audio_files_eval = info['audio_files_eval']
-        # self.valTaskDataset = TaskDataset([], [], '', [])
-        # self.valTaskDataset.load(self.get_eval_base_path(), extraction_method)
+        self.valTaskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_base_path(),
+                                          index_mode=self.index_mode)
+        self.valTaskDataset.load(self.get_eval_base_path())
         print('Reading SS done')
 
     def write_files(self):
@@ -114,7 +114,7 @@ class DCASE2017_SS(DataReader):
 
         return inputs, inputs_val
 
-    def calculate_features(self, files, method, resample_to, **kwargs):
+    def calculate_features(self, files, resample_to, **kwargs):
         inputs = []
         perc = 0
         for audio_idx in range(len(files)):
@@ -151,6 +151,7 @@ class DCASE2017_SS(DataReader):
             print(file_id / len(self.audio_files_eval))
 
         inputs, inputs_val = self.calculate_input(**kwargs)
+
 
         self.taskDataset = TaskDataset(inputs=inputs,
                                        targets=targets,

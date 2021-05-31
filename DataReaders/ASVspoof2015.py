@@ -68,12 +68,12 @@ class ASVspoof2015(DataReader):
         # self.truths = info['truths']
         # self.files_val = info['files_val']
         # self.truths_val = info['truths_val']
-        self.taskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_base_path(),
-                                       index_mode=self.index_mode)
+
         self.taskDataset.load(self.get_base_path())
 
-        # self.valTaskDataset = TaskDataset([], [], '', [])
-        # self.valTaskDataset.load(self.get_eval_base_path(), extraction_method)
+        self.valTaskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_eval_base_path(),
+                                          index_mode=self.index_mode)
+        self.valTaskDataset.load(self.get_eval_base_path())
 
     def write_files(self):
         dict = {'files': self.files,
@@ -129,7 +129,6 @@ class ASVspoof2015(DataReader):
             targets_val.append(target)
 
         inputs, inputs_val = self.calculate_input(**kwargs)
-
         self.taskDataset = TaskDataset(inputs=inputs,
                                        targets=targets,
                                        name='ASVspoof2015',
@@ -141,7 +140,7 @@ class ASVspoof2015(DataReader):
 
         self.valTaskDataset = TaskDataset(inputs=inputs_val,
                                           targets=targets_val,
-                                          name='ASVspoof2015_val',
+                                          name='ASVspoof2015_eval',
                                           labels=distinct_labels,
                                           extraction_method=self.extraction_method,
                                           output_module='softmax',

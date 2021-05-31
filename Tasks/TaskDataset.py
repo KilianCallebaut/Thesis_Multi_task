@@ -8,6 +8,7 @@ import numpy as np
 import torch
 from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import LabelEncoder
+from skmultilearn.model_selection import IterativeStratification
 from torch.utils.data import Dataset
 
 from Tasks.Task import Task
@@ -21,6 +22,7 @@ from Tasks.Task import Task
 class TaskDataset(Dataset):
 
     # data_lists: lists of lists of instances per task
+    # now requires sampling to be called beforehand, save scalers to be called beforehand
     def __init__(
             self,
             inputs,
@@ -34,7 +36,9 @@ class TaskDataset(Dataset):
     ):
         if index_mode:
             self.switch_index_methods()
-
+        else:
+            self.scaled = False
+        self.index_mode = index_mode
         self.inputs = inputs  # List of tensors
         self.targets = targets  # List of binary strings
         # self.name = name # String
@@ -44,12 +48,14 @@ class TaskDataset(Dataset):
         self.base_path = base_path
         self.pad_after = list()
         self.pad_before = list()
-        self.index_mode = index_mode
 
     def __getitem__(self, index):
         return self.get_item(index)
 
     def get_item(self, index):
+        if not self.scaled:
+            self.inputs = self.extraction_method.scale_transform(self.inputs)
+            self.scaled = True
         return self.inputs[index].float(), \
                torch.from_numpy(np.array(self.pad_before + self.targets[index] + self.pad_after)), \
                self.task.name
@@ -82,14 +88,17 @@ class TaskDataset(Dataset):
         self.pad_after = diction['pad_after']
         self.pad_before = diction['pad_before']
 
-    def sample_labels(self, dic_of_labels_limits):
+    def sample_labels(self, dic_of_labels_limits, random_state=None):
         sampled_targets = self.targets
         sampled_inputs = self.inputs
+        if random_state is not None:
+            random.seed(random_state)
 
         for l in dic_of_labels_limits.keys():
             label_set = [i for i in range(len(sampled_targets))
                          if sampled_targets[i][self.task.output_labels.index(l)] == 1]
             if len(label_set) > dic_of_labels_limits[l]:
+
                 random_label_set = random.sample(label_set, dic_of_labels_limits[l])
                 sampled_targets = [sampled_targets[i] for i in range(len(sampled_targets)) if
                                    (i not in label_set or i in random_label_set)]
@@ -114,7 +123,8 @@ class TaskDataset(Dataset):
             base_path=self.base_path, output_module=self.task.output_module
         )
 
-    def k_folds(self, dic_of_labels_limits=None, random_state=None):
+    # k_folds splitting
+    def k_folds(self, random_state=None):
         # Examples
         # --------
         # >> > import numpy as np
@@ -163,15 +173,20 @@ class TaskDataset(Dataset):
         # TEST: [1 3]
 
         # kf = KFold(n_splits=5, shuffle=True, random_state=random_state)
-        if dic_of_labels_limits is None:
-            dic_of_labels_limits = {}
-        kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=random_state)
-        if dic_of_labels_limits:
-            self.sample_labels(dic_of_labels_limits)
+        # if dic_of_labels_limits is None:
+        #     dic_of_labels_limits = {}
+        # if dic_of_labels_limits:
+        #     self.sample_labels(dic_of_labels_limits)
         inputs = self.inputs
         targets = self.targets
 
-        targets = LabelEncoder().fit_transform([''.join(str(l)) for l in targets])
+        if self.task.output_module == 'softmax':
+            kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=random_state)
+            targets = LabelEncoder().fit_transform([''.join(str(l)) for l in targets])
+        else:
+            kf = IterativeStratification(n_splits=5)
+            targets = np.array(targets)
+
         return kf.split(inputs, targets)
 
     def get_split_by_index(self, train_index, test_index, **kwargs):
@@ -179,7 +194,7 @@ class TaskDataset(Dataset):
 
         :param train_index: indexes of the training set
         :param test_index: indexes of the test set
-        :param kwargs: extra arguments for prepare_inputs_targets, namely window_size and window_hop
+        :param kwargs: extra arguments for loading scalers
         :return: the taskdataset for the training and test data
         '''
 
@@ -188,27 +203,21 @@ class TaskDataset(Dataset):
         x_val = [self.inputs[i] for i in test_index]
         y_val = [self.targets[i] for i in test_index]
 
-        if 'fold' and 'random_state' in kwargs:
-            fold = kwargs.pop('fold')
-            random_state = kwargs.pop('random_state')
-            self.load_split_scalers(fold, random_state)
-        else:
+        if not self.extraction_method.scalers:
             self.extraction_method.scale_fit(x_train)
 
-        x_train, y_train = self.extraction_method.prepare_inputs_targets(x_train, y_train, **kwargs)
         train_taskdataset = TaskDataset(inputs=x_train, targets=y_train, name=self.task.name + "_train",
                                         labels=self.task.output_labels, extraction_method=self.extraction_method,
                                         base_path=self.base_path, output_module=self.task.output_module)
-        x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val, **kwargs)
         test_taskdataset = TaskDataset(inputs=x_val, targets=y_val, name=self.task.name + "_test",
                                        labels=self.task.output_labels, extraction_method=self.extraction_method,
                                        base_path=self.base_path, output_module=self.task.output_module)
         return train_taskdataset, test_taskdataset
 
     # normal_mode method
-    def save_split_scalers(self, dic_of_labels_limits, random_state):
+    def save_split_scalers(self, random_state):
         i = 0
-        for train, _ in self.k_folds(dic_of_labels_limits, random_state):
+        for train, _ in self.k_folds(random_state):
             x_train = [self.inputs[i] for i in range(len(self.inputs)) if i in train]
             self.extraction_method.scale_fit(x_train)
             scalers = self.extraction_method.scalers
@@ -224,27 +233,30 @@ class TaskDataset(Dataset):
                                                                               random_state, fold))
         self.extraction_method.scalers = joblib.load(path)
 
-    def to_index_mode(self, **kwargs):
+    def save_scalers(self):
+        self.extraction_method.scale_fit(self.inputs)
+        scalers = self.extraction_method.scalers
+        path = os.path.join(self.base_path,
+                            'scaler_method_{}.pickle'.format(self.extraction_method.name))
+        joblib.dump(value=scalers, filename=path, protocol=pickle.HIGHEST_PROTOCOL)
+
+    def load_scalers(self):
+        path = os.path.join(self.base_path,
+                            'scaler_method_{}.pickle'.format(self.extraction_method.name))
+        self.extraction_method.scalers = joblib.load(path)
+
+    # index mode transition
+    def to_index_mode(self):
         # save inputs in separate files (if not done so already)
         self.index_mode = True
         separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
         if not os.path.exists(separated_dir):
             os.mkdir(separated_dir)
 
-        separated_dir_tar = os.path.join(self.base_path, 'target_{}_separated'.format(self.extraction_method.name))
-        if not os.path.exists(separated_dir_tar):
-            os.mkdir(separated_dir_tar)
-
         if not os.listdir(separated_dir):
             for i in range(len(self.inputs)):
-                windowed_i, windowed_t = self.extraction_method.prepare_inputs_targets([self.inputs[i]],
-                                                                                       [self.targets[i]],
-                                                                                       **kwargs)
-                for w in range(len(windowed_i)):
-                    input_path = os.path.join(separated_dir, 'input_{}_window_{}.pickle'.format(i, w))
-                    torch.save(windowed_i[w], input_path)
-                    target_path = os.path.join(separated_dir_tar, 'target_{}_window_{}.pickle'.format(i, w))
-                    joblib.dump(windowed_t[w], target_path, protocol=pickle.HIGHEST_PROTOCOL)
+                input_path = os.path.join(separated_dir, 'input_{}.pickle'.format(self.inputs[i]))
+                torch.save(self.inputs[i], input_path)
 
         # replace inputs with index lists
         self.inputs = [i for i in range(len(self.inputs))]
@@ -257,6 +269,9 @@ class TaskDataset(Dataset):
         self.save = types.MethodType(save_index_mode, self)
         self.load = types.MethodType(load_index_mode, self)
 
+    def prepare_inputs(self, **kwargs):
+        self.inputs = self.extraction_method.prepare_inputs(self.inputs, **kwargs)
+
     @staticmethod
     def check(base_path, extraction_method):
         return os.path.isfile(os.path.join(base_path, '{}_inputs.gz'.format(extraction_method))) and os.path.isfile(
@@ -265,7 +280,7 @@ class TaskDataset(Dataset):
 
 def get_item_index_mode(self, index):
     separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
-    x = torch.load(os.path.join(separated_dir, self.inputs[index])).float()
+    x = self.extraction_method.scale_transform([torch.load(os.path.join(separated_dir, self.inputs[index])).float()])[0]
     y = self.targets[index]
     return x, \
            torch.from_numpy(np.array(self.pad_before + y + self.pad_after)), \
@@ -276,34 +291,20 @@ def get_split_by_index_index_mode(self, train_index, test_index, **kwargs):
     '''
         :param train_index: indexes of the training set
         :param test_index: indexes of the test set
-        :param kwargs: extra arguments for prepare_inputs_targets, namely window_size and window_hop
+        :param kwargs: extra arguments for loading scalers
         :return: the taskdataset for the training and test data
     '''
 
     separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
-    total_inputs = os.listdir(separated_dir)
-    x_train_window = [total_inputs[ind] for ind in range(len(total_inputs)) if
-                      int(total_inputs[ind].split('_')[1]) in train_index]
-    x_val_window = [total_inputs[ind] for ind in range(len(total_inputs)) if
-                    int(total_inputs[ind].split('_')[1]) in test_index]
+    x_train_window = train_index
+    x_val_window = test_index
 
-    separated_dir_tar = os.path.join(self.base_path, 'target_{}_separated'.format(self.extraction_method.name))
-    total_targets = os.listdir(separated_dir_tar)
-    y_train_window = [joblib.load(os.path.join(separated_dir_tar, total_targets[ind])) for ind in
-                      range(len(total_targets)) if
-                      int(total_targets[ind].split('_')[1]) in train_index]
-    y_val_window = [joblib.load(os.path.join(separated_dir_tar, total_targets[ind])) for ind in
-                    range(len(total_targets)) if
-                    int(total_targets[ind].split('_')[1]) in test_index]
+    y_train_window = [self.targets[i] for i in train_index]
+    y_val_window = [self.targets[i] for i in test_index]
 
-    if 'fold' and 'random_state' in kwargs:
-        print('loading scalers')
-        fold = kwargs.pop('fold')
-        random_state = kwargs.pop('random_state')
-        self.load_split_scalers(fold, random_state)
-    else:
+    if not self.extraction_method.scalers:
         print('calculating scalers')
-        x_train = [torch.load(os.path.join(separated_dir, ind)).float()
+        x_train = [torch.load(os.path.join(separated_dir, 'input_{}.pickle'.format(ind))).float()
                    for ind in x_train_window]
         self.extraction_method.scale_fit(x_train)
 
@@ -318,23 +319,8 @@ def get_split_by_index_index_mode(self, train_index, test_index, **kwargs):
 
 
 def save_index_mode(self, base_path):
-    separated_dir = os.path.join(self.base_path, '{}_separated'.format(self.extraction_method.name))
-    if not os.path.exists(separated_dir):
-        os.mkdir(separated_dir)
-
-    separated_dir_tar = os.path.join(self.base_path, 'target_{}_separated'.format(self.extraction_method.name))
-    if not os.path.exists(separated_dir_tar):
-        os.mkdir(separated_dir_tar)
-
-    if not os.listdir(separated_dir):
-        for i in range(len(self.inputs)):
-            windowed_i, windowed_t = self.extraction_method.prepare_inputs_targets([self.inputs[i]], [self.targets[i]])
-            for w in range(len(windowed_i)):
-                input_path = os.path.join(separated_dir, 'input_{}_window_{}.pickle'.format(i, w))
-                torch.save(windowed_i, input_path)
-                target_path = os.path.join(separated_dir_tar, 'target_{}_window_{}.pickle'.format(i, w))
-                joblib.dump(windowed_t, target_path, protocol=pickle.HIGHEST_PROTOCOL)
-    self.inputs = [i for i in range(len(self.inputs))]
+    t_s = torch.Tensor(self.targets)
+    torch.save(t_s, os.path.join(base_path, 'targets.pt'))
 
     diction = {
         'task': self.task,
@@ -347,13 +333,7 @@ def save_index_mode(self, base_path):
 def load_index_mode(self, base_path):
     separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
     dir_list = os.listdir(separated_dir)
-    max_frag = 0
-    for d in dir_list:
-        num = int(d.split('_')[1])
-        if num > max_frag:
-            max_frag = num
-
-    self.inputs = [i for i in range(max_frag + 1)]
+    self.inputs = [i for i in range(len(dir_list))]
     t_l = torch.load(os.path.join(base_path, 'targets.pt'))
     self.targets = [[int(j) for j in i] for i in t_l]
     diction = joblib.load(os.path.join(base_path, 'other.obj'))

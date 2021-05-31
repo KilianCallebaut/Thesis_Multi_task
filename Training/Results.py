@@ -78,6 +78,25 @@ class Results:
         return joblib.load(
             os.path.join(path, self.run_name, "{}_conf_mat_{}_epoch_{}.gz".format(phase, task.name, epoch)))
 
+    def add_multi_confusion_matrix(self, epoch, mat, task, train):
+        path = self.audioset_eval_path
+        phase = 'Evaluation'
+        if train:
+            path = self.audioset_train_path
+            phase = 'Train'
+        joblib.dump(mat,
+                    os.path.join(path, self.run_name, "{}_conf_mat_{}_epoch_{}.gz".format(phase, task.name, epoch)))
+        print(mat)
+
+    def load_multi_confusion_matrix(self, epoch, task, train):
+        path = self.audioset_eval_path
+        phase = 'Evaluation'
+        if train:
+            path = self.audioset_train_path
+            phase = 'Train'
+        return joblib.load(
+            os.path.join(path, self.run_name, "{}_conf_mat_{}_epoch_{}.gz".format(phase, task.name, epoch)))
+
     def add_class_report(self, epoch, report, task, train):
         path = self.audioset_eval_path
         phase = 'Evaluation'

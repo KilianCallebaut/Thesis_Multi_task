@@ -11,6 +11,7 @@ from torch import nn
 from torch.utils.data import ConcatDataset
 
 from Tasks.ConcatTaskDataset import ConcatTaskDataset
+from Tasks.Samplers.MultiTaskSampler import MultiTaskSampler
 from Training.Results import Results
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -41,10 +42,9 @@ class Training:
             for x in datasets]
         train_loader = torch.utils.data.DataLoader(
             concat_dataset,
-            batch_size=batch_size,
-            shuffle=True,
             num_workers=0,
-            pin_memory=True
+            pin_memory=True,
+            batch_sampler=MultiTaskSampler(dataset=concat_dataset, batch_size=batch_size)
         )
         print(len(train_loader))
 
@@ -93,7 +93,8 @@ class Training:
                 output = model(inputs)
 
                 if perc < (step / len(train_loader)) * 100:
-                    perc += 1
+                    while perc < (step / len(train_loader)) * 100:
+                        perc += 1
                     perc_s = 'I' * perc
                     perc_sp = ' ' * (100 - perc)
                     ex = datetime.datetime.now() - begin
@@ -145,8 +146,6 @@ class Training:
 
                 torch.cuda.empty_cache()
 
-
-
             # Statistics
             results.add_loss_to_curve(epoch, step, running_loss, True)
             epoch_metrics = [metrics.classification_report(task_labels[t], task_predictions[t], output_dict=True) for t
@@ -164,6 +163,7 @@ class Training:
                     results.add_confusion_matrix(epoch, mat, task_list[t], True)
                 elif task_list[t].output_module == "sigmoid":
                     mat = metrics.multilabel_confusion_matrix(task_labels[t], task_predictions[t])
+                    results.add_multi_confusion_matrix(epoch, mat, task_list[t], True)
 
                 print(task_list[t].output_labels)
                 mats.append(mat)
@@ -175,7 +175,7 @@ class Training:
                                   kwargs.get('test_dataset'),
                                   results,
                                   batch_size,
-                                  num_epochs=epoch+1,
+                                  num_epochs=epoch + 1,
                                   start_epoch=epoch,
                                   blank=False)
         print('Training Done')
@@ -204,10 +204,9 @@ class Training:
             for x in datasets]
         eval_loader = torch.utils.data.DataLoader(
             concat_dataset,
-            batch_size=batch_size,
-            shuffle=True,
             num_workers=0,
-            pin_memory=True
+            pin_memory=True,
+            batch_sampler=MultiTaskSampler(dataset=concat_dataset, batch_size=batch_size)
         )
 
         blank_model.eval()
@@ -249,7 +248,8 @@ class Training:
                     output = blank_model(inputs)
 
                     if perc < (step / len(eval_loader)) * 100:
-                        perc += 1
+                        while perc < (step / len(eval_loader)) * 100:
+                            perc += 1
                         perc_s = 'I' * perc
                         perc_sp = ' ' * (100 - perc)
                         ex = datetime.datetime.now() - begin
@@ -317,12 +317,13 @@ class Training:
                         training_results.add_confusion_matrix(epoch, mat, task_list[t], False)
                     elif task_list[t].output_module == "sigmoid":
                         mat = metrics.multilabel_confusion_matrix(task_labels[t], task_predictions[t])
+                        training_results.add_multi_confusion_matrix(epoch, mat, task_list[t], False)
+                    print(task_list[t].output_labels)
                     mats.append(mat)
 
         training_results.flush_writer()
         # training_results.close_writer()
         print('Wrote Evaluation Results')
-
 
     @staticmethod
     def calculate_labels(output_module, output):
@@ -373,51 +374,3 @@ def print_confusion_matrix(confusion_matrix, axes, class_label, class_names, fon
     axes.set_ylabel('True label')
     axes.set_xlabel('Predicted label')
     axes.set_title("Confusion Matrix for the class - " + class_label)
-
-
-class FastTensorDataLoader:
-    """
-    A DataLoader-like object for a set of tensors that can be much faster than
-    TensorDataset + DataLoader because dataloader grabs individual indices of
-    the dataset and calls cat (slow).
-    Source: https://discuss.pytorch.org/t/dataloader-much-slower-than-manual-batching/27014/6
-    """
-
-    def __init__(self, *tensors, batch_size=32, shuffle=False):
-        """
-        Initialize a FastTensorDataLoader.
-        :param *tensors: tensors to store. Must have the same length @ dim 0.
-        :param batch_size: batch size to load.
-        :param shuffle: if True, shuffle the data *in-place* whenever an
-            iterator is created out of this object.
-        :returns: A FastTensorDataLoader.
-        """
-        assert all(t.shape[0] == tensors[0].shape[0] for t in tensors)
-        self.tensors = tensors
-
-        self.dataset_len = self.tensors[0].shape[0]
-        self.batch_size = batch_size
-        self.shuffle = shuffle
-
-        # Calculate # batches
-        n_batches, remainder = divmod(self.dataset_len, self.batch_size)
-        if remainder > 0:
-            n_batches += 1
-        self.n_batches = n_batches
-
-    def __iter__(self):
-        if self.shuffle:
-            r = torch.randperm(self.dataset_len)
-            self.tensors = [t[r] for t in self.tensors]
-        self.i = 0
-        return self
-
-    def __next__(self):
-        if self.i >= self.dataset_len:
-            raise StopIteration
-        batch = tuple(t[self.i:self.i + self.batch_size] for t in self.tensors)
-        self.i += self.batch_size
-        return batch
-
-    def __len__(self):
-        return self.n_batches

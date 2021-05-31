@@ -26,8 +26,8 @@ class MultiTaskHardSharingConvolutional(nn.Module):
             self.hidden.append(
                 nn.Conv2d(in_channels=in_chan,
                           out_channels=hidden_size,
-                          kernel_size=(5, 5), stride=(1, 1),
-                          padding=(1, 1), bias=False)
+                          kernel_size=(5, 5), stride=1,
+                          padding=1, bias=False)
             )
             self.hidden_bn.append(
                 nn.BatchNorm2d(hidden_size)
@@ -58,7 +58,6 @@ class MultiTaskHardSharingConvolutional(nn.Module):
             return x
         elif activation == 'sigmoid':
             x = torch.sigmoid(x)
-            (x, _) = torch.max(x, dim=1)
             return x
 
     def forward(self, x):
@@ -69,13 +68,12 @@ class MultiTaskHardSharingConvolutional(nn.Module):
             x = F.dropout(F.relu_(self.hidden_bn[layer_id](self.hidden[layer_id](x))),
                           p=self.drop_rate,
                           training=self.training)
-            x = F.max_pool2d(x, kernel_size=(2, 2), stride=(2, 2))
+            x = F.max_pool2d(x, kernel_size=(2, 2), stride=2)
 
         # Global max pooling
-        # (x, _) = torch.max(x, dim=3)
         x = F.max_pool2d(x, kernel_size=x.shape[2:])
         x = x.view(x.shape[0:2])
-        '''x: (batch_size, feature_maps, time_steps)'''
+        '''x: (batch_size, feature_maps)'''
 
         return tuple(self.activate(self.task_nets[task_model_id](x), self.task_list[task_model_id])
                      for task_model_id in range(len(self.task_list)))

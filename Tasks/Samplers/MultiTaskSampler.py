@@ -1,0 +1,45 @@
+import math
+import random
+
+import torch
+from torch.utils.data import RandomSampler, BatchSampler
+
+
+class MultiTaskSampler(torch.utils.data.sampler.BatchSampler):
+    """
+    iterate over tasks and provide a balanced batch per task in each mini-batch
+    """
+
+    def __init__(self, dataset, batch_size):
+        self.dataset = dataset
+        self.batch_size = batch_size
+        self.number_of_datasets = len(dataset.datasets)
+
+        samplers_list = []
+        sampler_iterators = []
+        for dataset_idx in range(self.number_of_datasets):
+            cur_dataset = self.dataset.datasets[dataset_idx]
+            sampler = BatchSampler(RandomSampler(cur_dataset), self.batch_size, False)
+            samplers_list.append(sampler)
+            cur_sampler_iterator = sampler.__iter__()
+            sampler_iterators.append(cur_sampler_iterator)
+
+        push_index_val = [0] + self.dataset.cumulative_sizes[:-1]
+        final_samples_list = []  # this is a list of indexes from the combined dataset
+        for i in range(self.number_of_datasets):
+            for sample in sampler_iterators[i]:
+                final_samples_list.append([push_index_val[i] + s for s in sample])
+        random.shuffle(final_samples_list)
+        self.final_samples_list = final_samples_list
+        self.iterator = iter(self.final_samples_list)
+
+    def __len__(self):
+        return sum([math.ceil(len(d) / self.batch_size) for d in self.dataset.datasets])
+
+    def __iter__(self):
+        while True:
+            try:
+                yield next(self.iterator)
+            except StopIteration:
+                self.iterator = iter(self.final_samples_list)
+                break

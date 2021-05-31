@@ -3,18 +3,19 @@ from abc import abstractmethod, ABC
 
 import librosa
 import numpy as np
+import soundfile
 import torch
 from scipy import signal
 from sklearn.model_selection import KFold
 
 from DataReaders.ExtractionMethod import extract_options
+from Tasks.TaskDataset import TaskDataset
 
 
 class DataReader(ABC):
     extractor = None
 
     def __init__(self, extraction_method, **kwargs):
-        self.extraction_method = extract_options[extraction_method]
         if 'object_path' in kwargs:
             self.object_path = kwargs.pop('object_path')
         if 'index_mode' in kwargs:
@@ -22,12 +23,19 @@ class DataReader(ABC):
         else:
             self.index_mode = False
 
+        self.extraction_method = extract_options[extraction_method]
+        self.taskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_base_path(),
+                                       index_mode=self.index_mode)
+
         if self.check_files(extraction_method):
+            print('reading')
             self.read_files()
         else:
+            print('calculating')
             self.load_files()
             self.calculate_taskDataset(**kwargs)
             self.write_files()
+
 
     @abstractmethod
     def get_path(self):
@@ -103,8 +111,10 @@ class DataReader(ABC):
     #     return sig, fs
 
     def load_wav(self, loc, resample_to=None):
-        if resample_to is not None:
-            sig, fs = librosa.load(loc, sr=resample_to, mono=False, dtype=np.float32)
-        else:
-            sig, fs = librosa.load(loc, mono=False, dtype=np.float32)
+        sig, fs = soundfile.read(loc)
+        if len(sig.shape) > 1:
+            sig = np.mean(sig, axis=1)
+        if resample_to is not None and resample_to != fs:
+            librosa.core.resample(sig, fs, resample_to)
+
         return sig, fs

@@ -53,8 +53,6 @@ class Ravdess(DataReader):
     def read_files(self):
         # info = joblib.load(self.get_path())
         # self.files = info['files']
-        self.taskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_base_path(),
-                                       index_mode=self.index_mode)
         self.taskDataset.load(self.get_base_path())
 
     def write_files(self):
@@ -86,7 +84,6 @@ class Ravdess(DataReader):
         targets = [f['emotion'] for f in self.files]
         distinct_targets = list(set(targets))
         targets = [[float(b == f) for b in distinct_targets] for f in targets]
-
         self.taskDataset = TaskDataset(inputs=inputs, targets=targets, name="Ravdess", labels=distinct_targets,
                                        extraction_method=self.extraction_method,
                                        base_path=self.get_base_path(),

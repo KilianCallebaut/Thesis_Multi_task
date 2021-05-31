@@ -43,12 +43,11 @@ class SpeechCommands(DataReader):
 
     def read_files(self):
         # self.load_files()
-        self.taskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_base_path(),
-                                       index_mode=self.index_mode)
         self.taskDataset.load(self.get_base_path())
 
-        # self.validTaskDataset = TaskDataset([], [], '', [])
-        # self.validTaskDataset.load(self.get_eval_base_path(), extraction_method)
+        self.validTaskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_eval_base_path(),
+                                            index_mode=self.index_mode)
+        self.validTaskDataset.load(self.get_eval_base_path())
 
     def write_files(self):
         dict = {}
@@ -87,12 +86,6 @@ class SpeechCommands(DataReader):
         inputs = self.calculate_input(**kwargs)
         targets = [[float(b == f) for b in range(len(self.ds_info.features['label'].names))] for f in targets]
 
-        self.taskDataset = TaskDataset(inputs=inputs, targets=targets, name="SpeechCommands",
-                                       labels=self.ds_info.features['label'].names,
-                                       extraction_method=self.extraction_method, base_path=self.get_base_path(),
-                                       output_module='softmax',
-                                       index_mode=self.index_mode)
-
         print("Calculate Test Set")
         # Test Set
         targets_t = []
@@ -101,8 +94,13 @@ class SpeechCommands(DataReader):
         inputs_t = self.calculate_input(test=True, **kwargs)
         targets_t = [[float(b == f) for b in range(len(self.ds_info.features['label'].names))] for f in targets_t]
 
+        self.taskDataset = TaskDataset(inputs=inputs, targets=targets, name="SpeechCommands",
+                                       labels=self.ds_info.features['label'].names,
+                                       extraction_method=self.extraction_method, base_path=self.get_base_path(),
+                                       output_module='softmax',
+                                       index_mode=self.index_mode)
         self.validTaskDataset = TaskDataset(inputs=inputs_t, targets=targets_t,
-                                            name="SpeechCommandsTest",
+                                            name="SpeechCommands_eval",
                                             extraction_method=self.extraction_method,
                                             labels=self.ds_info.features['label'].names,
                                             base_path=self.get_base_path(), output_module='softmax',

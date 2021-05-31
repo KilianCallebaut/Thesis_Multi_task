@@ -13,19 +13,18 @@ from DataReaders.FSDKaggle2018 import FSDKaggle2018
 from DataReaders.Ravdess import Ravdess
 from DataReaders.SpeechCommands import SpeechCommands
 from MultiTask.MultiTaskHardSharingConvolutional import MultiTaskHardSharingConvolutional
-from Tasks.ConcatTaskDataset import ConcatTaskDataset, TaskDataset
+from Tasks.TrainingSetCreator import ConcatTrainingSetCreator
 from Tests.config_reader import *
 from Training.Results import Results
 from Training.Training import Training
-from MultiTask.AdaptedBaselineCnn import BaselineCnn
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 drive = 'F'
 
 
 def run_datasets(dataset_list, extraction_params):
-    calculate_window_size(extraction_params)
     taskDatasets = []
+    testDatasets = []
 
     if 0 in dataset_list:
         asvspoof = ASVspoof2015(**extraction_params,
@@ -39,6 +38,7 @@ def run_datasets(dataset_list, extraction_params):
         dcaseScene = DCASE2017_SS(**extraction_params,
                                   object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\DCASE2017_SS_{}')
         taskDatasets.append(dcaseScene.taskDataset)
+        testDatasets.append(dcaseScene.valTaskDataset)
     if 3 in dataset_list:
         fsdkaggle = FSDKaggle2018(**extraction_params,
                                   object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\FSDKaggle2018')
@@ -51,13 +51,14 @@ def run_datasets(dataset_list, extraction_params):
         speechcommands = SpeechCommands(**extraction_params,
                                         object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\SpeechCommands_{}')
         taskDatasets.append(speechcommands.taskDataset)
+        testDatasets.append(speechcommands.validTaskDataset)
     if 6 in dataset_list:
         dcaseEvents = DCASE2017_SE(**extraction_params,
                                    object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\DCASE2017_SE_{}')
         taskDatasets.append(dcaseEvents.taskDataset)
     print('loaded all datasets')
 
-    return taskDatasets
+    return taskDatasets, testDatasets
 
 
 def sample_datasets(datasets):
@@ -83,52 +84,20 @@ def run_test(eval_dataset, meta_params, results):
 def run_five_fold(dataset_list, **kwargs):
     extraction_params = read_config('extraction_params_cnn_MelSpectrogram')
     # extraction_params = read_config('extraction_params_cnn_mfcc')
-    taskDatasets = run_datasets(dataset_list, extraction_params)
-    taskDatasets = sample_datasets(taskDatasets)
-    taskDatasets = sample_datasets(taskDatasets)
-    task_iterators = []
-
-    print("Create iterators")
-    for t in taskDatasets:
-        print(t.task.name)
-        task_iterators.append(t.k_folds(**read_config('dic_of_labels_limits_{}'.format(t.task.name)), random_state=123))
-
+    taskDatasets, testDatasets = run_datasets(dataset_list, extraction_params)
     print("Start iteration")
     i = 0
-    for train_index, test_index in task_iterators[0]:
-        if 'start_fold' in kwargs and kwargs.get('start_fold') > i:
-            if len(task_iterators) > 1:
-                for it_id in range(len(task_iterators[1:])):
-                    it = task_iterators[it_id + 1]
-                    _, _ = next(it)
-                i += 1
-                continue
-
-        print('train length: {}'.format(len(train_index)))
-        print('test length: {}'.format(len(test_index)))
-
-        training_tasks = []
-        test_tasks = []
-        train, test = taskDatasets[0].get_split_by_index(train_index, test_index,
-                                                         **read_config('preparation_params_general_window'))
-        training_tasks.append(train)
-        test_tasks.append(test)
-        if len(task_iterators) > 1:
-            for it_id in range(len(task_iterators[1:])):
-                it = task_iterators[it_id + 1]
-                train_nxt_id, test_nxt_id = next(it)
-                train, test = taskDatasets[it_id + 1].get_split_by_index(train_nxt_id, test_nxt_id,
-                                                                         **read_config(
-                                                                             'preparation_params_general_window'))
-                training_tasks.append(train)
-                test_tasks.append(test)
-
-        concat_training = ConcatTaskDataset(training_tasks)
-        concat_test = ConcatTaskDataset(test_tasks)
-
-        # Run multi task
-        run_set(concat_training, concat_test, i)
-
+    ctsc = ConcatTrainingSetCreator(training_sets=taskDatasets,
+                                    dics_of_labels_limits=[read_config('dic_of_labels_limits_{}'.format(t.task.name))[
+                                                               'dic_of_labels_limits'] for t in taskDatasets],
+                                    random_state=123,
+                                    test_sets=testDatasets)
+    ctsc.prepare_scalers()
+    for train, test in ctsc.generate_concats():
+        if 'fold' in kwargs and kwargs.get('fold') > i:
+            i += 1
+            continue
+        run_set(train, test, i)
         i += 1
 
 
@@ -138,10 +107,10 @@ def run_set(concat_training, concat_test, fold):
 
     task_list = concat_training.get_task_list()
 
-    # model = MultiTaskHardSharingConvolutional(1,
-    #                                           **read_config('model_params_cnn'),
-    #                                           task_list=task_list)
-    model = BaselineCnn(len(task_list[0].output_labels))
+    model = MultiTaskHardSharingConvolutional(1,
+                                              **read_config('model_params_cnn'),
+                                              task_list=task_list)
+    # model = BaselineCnn(len(task_list[0].output_labels))
 
     model = model.to(device)
     print('Model Created')
@@ -184,8 +153,7 @@ def check_distributions(dataset_list):
         print('fold {}'.format(fold))
         training_tasks = []
         test_tasks = []
-        train, test = taskDatasets[0].get_split_by_index(train_index, test_index,
-                                                         **read_config('preparation_params_general_window'))
+        train, test = taskDatasets[0].get_split_by_index(train_index, test_index)
         tot = [0 for _ in train.targets[0]]
         for tar in train.targets:
             tot = [tot[i] + tar[i] for i in range(len(tot))]
@@ -206,9 +174,7 @@ def check_distributions(dataset_list):
             for it_id in range(len(task_iterators[1:])):
                 it = task_iterators[it_id + 1]
                 train_nxt_id, test_nxt_id = next(it)
-                train, test = taskDatasets[it_id + 1].get_split_by_index(train_nxt_id, test_nxt_id,
-                                                                         **read_config(
-                                                                             'preparation_params_general_window'))
+                train, test = taskDatasets[it_id + 1].get_split_by_index(train_nxt_id, test_nxt_id)
                 training_tasks.append(train)
                 test_tasks.append(test)
 
@@ -232,22 +198,26 @@ def check_distributions(dataset_list):
 
 def main(argv):
     # dataset_list = [2, 5, 4, 1, 0]
-    dataset_list = [2]
+    dataset_list_single = [2, 1]
+    # dataset_list_double = [[0, 1], [0, 2], [0, 4], [0, 5], [1, 2], [1, 4], [1, 5], [2, 4], [2, 5], [4, 5]]
+    dataset_list_double = [[0, 1], [0, 2], [0, 4], [0, 5], [1, 2], [1, 4], [1, 5], [2, 4], [4, 5]]
 
     print('--------------------------------------------------')
     print('test loop')
     print('--------------------------------------------------')
-    for i in range(len(dataset_list)):
-        run_five_fold([dataset_list[i]])
+    for i in range(len(dataset_list_single)):
+        run_five_fold([dataset_list_single[i]])
         # for j in range(i + 1, len(dataset_list)):
-        #     # check_distributions([dataset_list[i], dataset_list[j]])
-        #     run_five_fold([dataset_list[i], dataset_list[j]])
-        # # check_distributions([dataset_list[i]])
+        #     #     # check_distributions([dataset_list[i], dataset_list[j]])
+        #     run_five_fold([dataset_list[i], dataset_list[j]], fold=4)
+        # # # check_distributions([dataset_list[i]])
+    # for i in dataset_list_double:
+    #     run_five_fold(i)
 
     return 0
 
 
-# tensorboard --logdir Tests/runs
+# tensorboard --logdir F:\Thesis_Results\Training_Results\experiments
 if __name__ == "__main__":
     try:
         sys.exit(main(sys.argv))

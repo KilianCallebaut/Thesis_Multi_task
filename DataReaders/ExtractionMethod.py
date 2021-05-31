@@ -1,5 +1,6 @@
 import math
 import os
+import statistics
 from abc import abstractmethod, ABC
 
 import numpy as np
@@ -29,7 +30,7 @@ class ExtractionMethod(ABC):
         pass
 
     @abstractmethod
-    def prepare_inputs_targets(self, inputs, targets, **kwargs):
+    def prepare_inputs(self, inputs, **kwargs):
         pass
 
     # EXTRACTION
@@ -110,6 +111,17 @@ class ExtractionMethod(ABC):
         assert len(windowed_inputs) == len(windowed_targets)
         return windowed_inputs, windowed_targets
 
+    def frame_inputs(self, inputs, window_size):
+        framed_inputs = []
+
+        for inp_idx in range(len(inputs)):
+            inp = inputs[inp_idx]
+            if window_size > len(inp):
+                frame = torch.vstack([inp, torch.zeros((window_size - inp.shape[0], inp.shape[1]))])
+            else:
+                frame = inp[0:window_size]
+            framed_inputs.append(frame)
+        return framed_inputs
 
 class LogbankSummary(ExtractionMethod):
 
@@ -135,9 +147,9 @@ class LogbankSummary(ExtractionMethod):
         ret = self.scale_transform_3D_2nddim(inputs)
         return self.convert_nparray_to_list_of_tensors(ret)
 
-    def prepare_inputs_targets(self, inputs, targets, **kwargs):
-        inputs = self.scale_transform(inputs)
-        return inputs, targets
+    def prepare_inputs(self, inputs, **kwargs):
+        # inputs = self.scale_transform(inputs)
+        return inputs
 
 
 class Mfcc(ExtractionMethod):
@@ -171,11 +183,17 @@ class Mfcc(ExtractionMethod):
             ret.append(self.scale_transform_2D(inputs[i].numpy()))
         return self.convert_nparray_to_list_of_tensors(ret)
 
-    def prepare_inputs_targets(self, inputs, targets, **kwargs):
-        if 'window_size' in kwargs and kwargs.get('window_size') != 0:
-            inputs, targets = self.window_inputs(inputs, targets, **kwargs)
-        inputs = self.scale_transform(inputs)
-        return inputs, targets
+    def prepare_inputs(self, inputs, **kwargs):
+        cum_sizes = [len(i) for i in inputs]
+
+        if 'window_size' in kwargs:
+            inputs = self.frame_inputs(inputs, kwargs.get('window_size'))
+        elif max(cum_sizes) != min(cum_sizes):
+            median = statistics.median(cum_sizes)
+            inputs = self.frame_inputs(inputs, median)
+        # inputs = self.scale_transform(inputs)
+
+        return inputs
 
 
 class MelSpectrogram(ExtractionMethod):
@@ -185,7 +203,13 @@ class MelSpectrogram(ExtractionMethod):
         self.name = 'MelSpectrogram'
 
     def extract_features(self, sig_samplerate, **kwargs):
-        """(numframes, nfilt)"""
+        """
+        (numframes=1 + int(math.ceil((1.0*sig_len - frame_len=winlen*samplerate)/frame_step=winstep*samplerate)), nfilt)
+        for winlen=0.03, winstep=0.01, sr=44100:
+            numframes= 1 + math.ceil((sig_len - 1323.0)/441)
+        for 1 sec:
+            numframes = 1 + math.ceil((44100 - 1323)/441)
+        """
         return torch.tensor(fbank(sig_samplerate[0], sig_samplerate[1],
                                   **kwargs)[0])
 
@@ -200,12 +224,16 @@ class MelSpectrogram(ExtractionMethod):
             ret.append(self.scale_transform_2D(inputs[i].numpy()))
         return self.convert_nparray_to_list_of_tensors(ret)
 
-    def prepare_inputs_targets(self, inputs, targets, **kwargs):
-        if 'window_size' in kwargs and kwargs.get('window_size') != 0:
-            inputs, targets = self.window_inputs(inputs, targets, **kwargs)
-        inputs = self.scale_transform(inputs)
+    def prepare_inputs(self, inputs, **kwargs):
+        cum_sizes = [len(i) for i in inputs]
+        if 'window_size' in kwargs:
+            inputs = self.frame_inputs(inputs, kwargs.get('window_size'))
+        elif max(cum_sizes) != min(cum_sizes):
+            median = statistics.median(cum_sizes)
+            inputs = self.frame_inputs(inputs, int(median))
+        # inputs = self.scale_transform(inputs)
 
-        return inputs, targets
+        return inputs
 
 
 extract_options = {

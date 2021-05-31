@@ -108,9 +108,6 @@ class ChenAudiosetDataset(DataReader):
         # self.files = info['files']
         # self.np_objects = info['np_objects']
         # self.wav_files = info['wav_files']
-
-        self.taskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_base_path(),
-                                       index_mode=self.index_mode)
         self.taskDataset.load(self.get_base_path())
 
     def write_files(self):
