@@ -34,8 +34,8 @@ class FSDKaggle2018(DataReader):
         self.file_labels = pd.read_csv(os.path.join(self.root, 'train.csv'))
 
     def read_files(self):
-        info = joblib.load(self.get_path())
-        self.file_labels = info['file_labels']
+        # info = joblib.load(self.get_path())
+        # self.file_labels = info['file_labels']
         self.taskDataset.load(self.get_base_path())
 
     def write_files(self):

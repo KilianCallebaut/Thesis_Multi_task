@@ -20,69 +20,12 @@ from Training.Training import Training
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 drive = 'F'
-
-
-def run_datasets(dataset_list, extraction_params):
-    taskDatasets = []
-    testDatasets = []
-
-    if 0 in dataset_list:
-        asvspoof = ASVspoof2015(**extraction_params,
-                                object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\ASVspoof2015_{}')
-        taskDatasets.append(asvspoof.taskDataset)
-    if 1 in dataset_list:
-        chenaudio = ChenAudiosetDataset(**extraction_params,
-                                        object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\ChenAudiosetDataset')
-        taskDatasets.append(chenaudio.taskDataset)
-    if 2 in dataset_list:
-        dcaseScene = DCASE2017_SS(**extraction_params,
-                                  object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\DCASE2017_SS_{}')
-        taskDatasets.append(dcaseScene.taskDataset)
-        testDatasets.append(dcaseScene.valTaskDataset)
-    if 3 in dataset_list:
-        fsdkaggle = FSDKaggle2018(**extraction_params,
-                                  object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\FSDKaggle2018')
-        taskDatasets.append(fsdkaggle.taskDataset)
-    if 4 in dataset_list:
-        ravdess = Ravdess(**extraction_params,
-                          object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\Ravdess')
-        taskDatasets.append(ravdess.taskDataset)
-    if 5 in dataset_list:
-        speechcommands = SpeechCommands(**extraction_params,
-                                        object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\SpeechCommands_{}')
-        taskDatasets.append(speechcommands.taskDataset)
-        testDatasets.append(speechcommands.validTaskDataset)
-    if 6 in dataset_list:
-        dcaseEvents = DCASE2017_SE(**extraction_params,
-                                   object_path=r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\DCASE2017_SE_{}')
-        taskDatasets.append(dcaseEvents.taskDataset)
-    print('loaded all datasets')
-
-    return taskDatasets, testDatasets
-
-
-def sample_datasets(datasets):
-    sampled_datasets = []
-    for d in datasets:
-        sampled_datasets.append(d.sample_dataset(random_state=123))
-    return sampled_datasets
-
-
-def run_test(eval_dataset, meta_params, results):
-    task_list = eval_dataset.get_task_list()
-    blank_model = MultiTaskHardSharingConvolutional(1,
-                                                    **read_config('model_params_cnn'),
-                                                    task_list=task_list)
-    blank_model = blank_model.to(device)
-    Training.evaluate(blank_model=blank_model,
-                      concat_dataset=eval_dataset,
-                      training_results=results,
-                      batch_size=meta_params['batch_size'],
-                      num_epochs=meta_params['num_epochs'])
+# data_base = r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers'
+data_base = r'F:\Thesis_Results\Data_Readers'
 
 
 def run_five_fold(dataset_list, **kwargs):
-    extraction_params = read_config('extraction_params_cnn_MelSpectrogram')
+    extraction_params = read_config('extraction_params_cnn_LibMelSpectrogram')
     # extraction_params = read_config('extraction_params_cnn_mfcc')
     taskDatasets, testDatasets = run_datasets(dataset_list, extraction_params)
     print("Start iteration")
@@ -92,13 +35,51 @@ def run_five_fold(dataset_list, **kwargs):
                                                                'dic_of_labels_limits'] for t in taskDatasets],
                                     random_state=123,
                                     test_sets=testDatasets)
-    ctsc.prepare_scalers()
     for train, test in ctsc.generate_concats():
         if 'fold' in kwargs and kwargs.get('fold') > i:
             i += 1
             continue
         run_set(train, test, i)
         i += 1
+
+
+def run_datasets(dataset_list, extraction_params):
+    taskDatasets = []
+    testDatasets = []
+
+    if 0 in dataset_list:
+        asvspoof = ASVspoof2015(**extraction_params,
+                                object_path=os.path.join(data_base, 'ASVspoof2015_{}'))
+        taskDatasets.append(asvspoof.taskDataset)
+    if 1 in dataset_list:
+        chenaudio = ChenAudiosetDataset(**extraction_params,
+                                        object_path=os.path.join(data_base, 'ChenAudiosetDataset'))
+        taskDatasets.append(chenaudio.taskDataset)
+    if 2 in dataset_list:
+        dcaseScene = DCASE2017_SS(**extraction_params,
+                                  object_path=os.path.join(data_base, 'DCASE2017_SS_{}'))
+        taskDatasets.append(dcaseScene.taskDataset)
+        testDatasets.append(dcaseScene.valTaskDataset)
+    if 3 in dataset_list:
+        fsdkaggle = FSDKaggle2018(**extraction_params,
+                                  object_path=os.path.join(data_base, 'FSDKaggle2018'))
+        taskDatasets.append(fsdkaggle.taskDataset)
+    if 4 in dataset_list:
+        ravdess = Ravdess(**extraction_params,
+                          object_path=os.path.join(data_base, 'Ravdess'))
+        taskDatasets.append(ravdess.taskDataset)
+    if 5 in dataset_list:
+        speechcommands = SpeechCommands(**extraction_params,
+                                        object_path=os.path.join(data_base, 'SpeechCommands_{}'))
+        taskDatasets.append(speechcommands.taskDataset)
+        testDatasets.append(speechcommands.validTaskDataset)
+    if 6 in dataset_list:
+        dcaseEvents = DCASE2017_SE(**extraction_params,
+                                   object_path=os.path.join(data_base, 'DCASE2017_SE_{}'))
+        taskDatasets.append(dcaseEvents.taskDataset)
+    print('loaded all datasets')
+
+    return taskDatasets, testDatasets
 
 
 def run_set(concat_training, concat_test, fold):
@@ -110,7 +91,9 @@ def run_set(concat_training, concat_test, fold):
     model = MultiTaskHardSharingConvolutional(1,
                                               **read_config('model_params_cnn'),
                                               task_list=task_list)
-    # model = BaselineCnn(len(task_list[0].output_labels))
+    # model = BaselineCnn(n_hidden=4,
+    #                     task_list=task_list,
+    #                     drop_rate=0)
 
     model = model.to(device)
     print('Model Created')
@@ -140,79 +123,51 @@ def run_set(concat_training, concat_test, fold):
     results.close_writer()
 
 
-def check_distributions(dataset_list):
-    extraction_params = read_config('extraction_params_cnn_MelSpectrogram')
-    taskDatasets = run_datasets(dataset_list, extraction_params)
-    task_iterators = []
+def sample_datasets(datasets):
+    sampled_datasets = []
+    for d in datasets:
+        sampled_datasets.append(d.sample_dataset(random_state=123))
+    return sampled_datasets
 
-    print("Create iterators")
-    for t in taskDatasets:
-        task_iterators.append(t.k_folds(**read_config('dic_of_labels_limits_{}'.format(t.task.name)), random_state=123))
-    fold = 0
-    for train_index, test_index in task_iterators[0]:
-        print('fold {}'.format(fold))
-        training_tasks = []
-        test_tasks = []
-        train, test = taskDatasets[0].get_split_by_index(train_index, test_index)
-        tot = [0 for _ in train.targets[0]]
-        for tar in train.targets:
-            tot = [tot[i] + tar[i] for i in range(len(tot))]
 
-        print('task {}'.format(taskDatasets[0].task.name))
-        print(tot)
-        print([tot[i] / sum(tot) for i in range(len(tot))])
-
-        tot_t = [0 for _ in test.targets[0]]
-        for tar in test.targets:
-            tot_t = [tot_t[i] + tar[i] for i in range(len(tot_t))]
-
-        print(tot_t)
-        print([tot_t[i] / sum(tot_t) for i in range(len(tot_t))])
-        print([tot[i] / sum(tot) - tot_t[i] / sum(tot_t) for i in range(len(tot))])
-
-        if len(task_iterators) > 1:
-            for it_id in range(len(task_iterators[1:])):
-                it = task_iterators[it_id + 1]
-                train_nxt_id, test_nxt_id = next(it)
-                train, test = taskDatasets[it_id + 1].get_split_by_index(train_nxt_id, test_nxt_id)
-                training_tasks.append(train)
-                test_tasks.append(test)
-
-                tot = [0 for _ in train.targets[0]]
-                for tar in train.targets:
-                    tot = [tot[i] + tar[i] for i in range(len(tot))]
-
-                print('task {}'.format(taskDatasets[it_id + 1].task.name))
-                print(tot)
-                print([tot[i] / sum(tot) for i in range(len(tot))])
-
-                tot_t = [0 for _ in test.targets[0]]
-                for tar in test.targets:
-                    tot_t = [tot_t[i] + tar[i] for i in range(len(tot_t))]
-
-                print(tot_t)
-                print([tot_t[i] / sum(tot_t) for i in range(len(tot_t))])
-                print([tot[i] / sum(tot) - tot_t[i] / sum(tot_t) for i in range(len(tot))])
-        fold += 1
+def create_index_mode(dataset_list):
+    extraction_params = read_config('extraction_params_cnn_LibMelSpectrogram')
+    # extraction_params = read_config('extraction_params_cnn_mfcc')
+    taskDatasets, testDatasets = run_datasets(dataset_list, extraction_params)
+    print("Start iteration")
+    ctsc = ConcatTrainingSetCreator(training_sets=taskDatasets,
+                                    dics_of_labels_limits=[read_config('dic_of_labels_limits_{}'.format(t.task.name))[
+                                                               'dic_of_labels_limits'] for t in taskDatasets],
+                                    random_state=123,
+                                    test_sets=testDatasets)
+    ctsc.prepare_scalers()
+    print('writing to index mode')
+    ctsc.prepare_for_index_mode()
 
 
 def main(argv):
     # dataset_list = [2, 5, 4, 1, 0]
-    dataset_list_single = [2, 1]
+    dataset_list_single = [4, 1, 5, ]
     # dataset_list_double = [[0, 1], [0, 2], [0, 4], [0, 5], [1, 2], [1, 4], [1, 5], [2, 4], [2, 5], [4, 5]]
-    dataset_list_double = [[0, 1], [0, 2], [0, 4], [0, 5], [1, 2], [1, 4], [1, 5], [2, 4], [4, 5]]
+    dataset_list_double = [[0, 1], [0, 2], [0, 4], [0, 5], [1, 2], [1, 4], [1, 5], [2, 4], [2, 5], [4, 5]]
 
     print('--------------------------------------------------')
     print('test loop')
     print('--------------------------------------------------')
+
+    # for i in dataset_list_single:
+    #     create_index_mode([i])
+
     for i in range(len(dataset_list_single)):
-        run_five_fold([dataset_list_single[i]])
+        # create_index_mode([2])
+        run_five_fold([dataset_list_single[i]], fold=1 if i == 0 else 0)
         # for j in range(i + 1, len(dataset_list)):
         #     #     # check_distributions([dataset_list[i], dataset_list[j]])
         #     run_five_fold([dataset_list[i], dataset_list[j]], fold=4)
         # # # check_distributions([dataset_list[i]])
-    # for i in dataset_list_double:
-    #     run_five_fold(i)
+
+    for i in dataset_list_double:
+        run_five_fold(i)
 
     return 0
 
@@ -223,4 +178,3 @@ if __name__ == "__main__":
         sys.exit(main(sys.argv))
     except (ValueError, IOError) as e:
         sys.exit(e)
-# main(0)

@@ -94,7 +94,7 @@ class SpeechCommands(DataReader):
         inputs_t = self.calculate_input(test=True, **kwargs)
         targets_t = [[float(b == f) for b in range(len(self.ds_info.features['label'].names))] for f in targets_t]
 
-        self.taskDataset = TaskDataset(inputs=inputs, targets=targets, name="SpeechCommands",
+        self.taskDataset = TaskDataset(inputs=inputs, targets=targets, name="SpeechCommands_train",
                                        labels=self.ds_info.features['label'].names,
                                        extraction_method=self.extraction_method, base_path=self.get_base_path(),
                                        output_module='softmax',

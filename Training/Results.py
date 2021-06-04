@@ -179,6 +179,17 @@ class Results:
         joblib.dump(self.evaluation_curve_task,
                     os.path.join(path, self.run_name, "{}_losscurve_tasks.gz".format(phase)))
 
+    def early_stop(self, epoch):
+        if epoch == len(self.training_curve) - 1:
+            return True
+        if epoch == 0:
+            return False
+
+        if self.training_curve[epoch-1] - self.training_curve[epoch] < 0.01:
+            return True
+
+        return False
+
     def flush_writer(self):
         self.writer.flush()
 

@@ -32,7 +32,6 @@ class DCASE2017_SS(DataReader):
         super().__init__(extraction_method, **kwargs)
         print('done DCASE2017 SS')
 
-
     def get_path(self):
         return os.path.join(self.get_base_path(), 'DCASE2017_SS.obj')
 
@@ -87,7 +86,7 @@ class DCASE2017_SS(DataReader):
 
         # info = joblib.load(self.get_eval_path())
         # self.audio_files_eval = info['audio_files_eval']
-        self.valTaskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_base_path(),
+        self.valTaskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_eval_base_path(),
                                           index_mode=self.index_mode)
         self.valTaskDataset.load(self.get_eval_base_path())
         print('Reading SS done')
@@ -152,7 +151,6 @@ class DCASE2017_SS(DataReader):
 
         inputs, inputs_val = self.calculate_input(**kwargs)
 
-
         self.taskDataset = TaskDataset(inputs=inputs,
                                        targets=targets,
                                        name='DCASE2017_SS',
@@ -167,7 +165,7 @@ class DCASE2017_SS(DataReader):
                                           name='DCASE2017_SS_eval',
                                           labels=distinct_labels,
                                           extraction_method=self.extraction_method,
-                                          base_path=self.get_base_path(),
+                                          base_path=self.get_eval_base_path(),
                                           output_module='softmax',
                                           index_mode=self.index_mode
                                           )

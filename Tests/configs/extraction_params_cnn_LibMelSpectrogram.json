@@ -1,0 +1,9 @@
+{
+  "extraction_method": "LibMelSpectrogram",
+  "n_fft": 2048,
+  "hop_length": 512,
+  "n_mels": 128,
+  "window": "hann",
+  "resample_to": 32000,
+  "index_mode": false
+}

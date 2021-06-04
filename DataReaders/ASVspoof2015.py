@@ -71,9 +71,9 @@ class ASVspoof2015(DataReader):
 
         self.taskDataset.load(self.get_base_path())
 
-        self.valTaskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_eval_base_path(),
-                                          index_mode=self.index_mode)
-        self.valTaskDataset.load(self.get_eval_base_path())
+        # self.valTaskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_eval_base_path(),
+        #                                   index_mode=self.index_mode)
+        # self.valTaskDataset.load(self.get_eval_base_path())
 
     def write_files(self):
         dict = {'files': self.files,

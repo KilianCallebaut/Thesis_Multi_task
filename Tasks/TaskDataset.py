@@ -12,7 +12,9 @@ from skmultilearn.model_selection import IterativeStratification
 from torch.utils.data import Dataset
 
 from Tasks.Task import Task
-
+import matplotlib.pyplot as plt
+import librosa
+import librosa.display
 
 # In index mode:
 # before save -> full tensors in input list
@@ -56,6 +58,7 @@ class TaskDataset(Dataset):
         if not self.scaled:
             self.inputs = self.extraction_method.scale_transform(self.inputs)
             self.scaled = True
+
         return self.inputs[index].float(), \
                torch.from_numpy(np.array(self.pad_before + self.targets[index] + self.pad_after)), \
                self.task.name
@@ -249,18 +252,20 @@ class TaskDataset(Dataset):
     def to_index_mode(self):
         # save inputs in separate files (if not done so already)
         self.index_mode = True
+        # replace inputs with index lists
+        self.inputs = [i for i in range(len(self.inputs))]
+        self.switch_index_methods()
+
+    def write_index_files(self):
         separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
         if not os.path.exists(separated_dir):
             os.mkdir(separated_dir)
 
         if not os.listdir(separated_dir):
             for i in range(len(self.inputs)):
-                input_path = os.path.join(separated_dir, 'input_{}.pickle'.format(self.inputs[i]))
+                input_path = os.path.join(separated_dir, 'input_{}.pickle'.format(i))
                 torch.save(self.inputs[i], input_path)
 
-        # replace inputs with index lists
-        self.inputs = [i for i in range(len(self.inputs))]
-        self.switch_index_methods()
 
     def switch_index_methods(self):
         # replace getitem, get_split_by_index by index based functions
@@ -269,6 +274,11 @@ class TaskDataset(Dataset):
         self.save = types.MethodType(save_index_mode, self)
         self.load = types.MethodType(load_index_mode, self)
 
+    def has_index_mode(self):
+        separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
+        return os.path.isdir(separated_dir) and len(os.listdir(separated_dir)) == len(self.inputs)
+
+    # frame input
     def prepare_inputs(self, **kwargs):
         self.inputs = self.extraction_method.prepare_inputs(self.inputs, **kwargs)
 
@@ -280,7 +290,8 @@ class TaskDataset(Dataset):
 
 def get_item_index_mode(self, index):
     separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
-    x = self.extraction_method.scale_transform([torch.load(os.path.join(separated_dir, self.inputs[index])).float()])[0]
+    separated_file = os.path.join(separated_dir, 'input_{}.pickle'.format(self.inputs[index]))
+    x = self.extraction_method.scale_transform([torch.load(separated_file).float()])[0]
     y = self.targets[index]
     return x, \
            torch.from_numpy(np.array(self.pad_before + y + self.pad_after)), \
@@ -340,3 +351,4 @@ def load_index_mode(self, base_path):
     self.task = diction['task']
     self.pad_after = diction['pad_after']
     self.pad_before = diction['pad_before']
+

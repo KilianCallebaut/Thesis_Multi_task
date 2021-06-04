@@ -95,7 +95,7 @@ class Training:
                 if perc < (step / len(train_loader)) * 100:
                     while perc < (step / len(train_loader)) * 100:
                         perc += 1
-                    perc_s = 'I' * perc
+                    perc_s = 'I' * (perc - len(str(perc))) + str(perc) + '%'
                     perc_sp = ' ' * (100 - perc)
                     ex = datetime.datetime.now() - begin
                     begin = datetime.datetime.now()
@@ -178,6 +178,9 @@ class Training:
                                   num_epochs=epoch + 1,
                                   start_epoch=epoch,
                                   blank=False)
+
+            if results.early_stop(epoch=epoch):
+                break
         print('Training Done')
         results.flush_writer()
         print('Wrote Training Results')
@@ -250,7 +253,7 @@ class Training:
                     if perc < (step / len(eval_loader)) * 100:
                         while perc < (step / len(eval_loader)) * 100:
                             perc += 1
-                        perc_s = 'I' * perc
+                        perc_s = 'I' * (perc - len(str(perc))) + str(perc) + '%'
                         perc_sp = ' ' * (100 - perc)
                         ex = datetime.datetime.now() - begin
                         begin = datetime.datetime.now()

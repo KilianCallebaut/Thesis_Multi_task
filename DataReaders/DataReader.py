@@ -5,6 +5,8 @@ import librosa
 import numpy as np
 import soundfile
 import torch
+import matplotlib.pyplot as plt
+import librosa.display
 from scipy import signal
 from sklearn.model_selection import KFold
 
@@ -118,3 +120,6 @@ class DataReader(ABC):
             librosa.core.resample(sig, fs, resample_to)
 
         return sig, fs
+
+
+

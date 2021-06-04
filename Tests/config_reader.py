@@ -39,10 +39,10 @@ def read_config(name: str):
         if 'split' in data.keys():
             data['test_size'] = read_config('test_size_split') if data.pop('split') else read_config('test_size_val')
             data['test_size'] = data['test_size']['test_size']
-        if 'window' in data.keys():
-            window_feat = read_config('preparation_params_general_window') if data.pop('window') else read_config(
-                'preparation_params_general_no_window')
-            data = {**data, **window_feat}
+        # if 'window' in data.keys():
+        #     window_feat = read_config('preparation_params_general_window') if data.pop('window') else read_config(
+        #         'preparation_params_general_no_window')
+        #     data = {**data, **window_feat}
         return data
 
 

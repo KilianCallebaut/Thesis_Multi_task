@@ -1,12 +1,8 @@
-import types
 from typing import Optional
 
 from Tasks.ConcatTaskDataset import ConcatTaskDataset
 from Tasks.TaskDataset import TaskDataset
 
-
-# get the prepare inputs in here iso the datareaders
-# think how you will calculate, save and load the scalers
 
 class ConcatTrainingSetCreator:
     def __init__(self, training_sets: list, test_sets: Optional[list], dics_of_labels_limits: list,
@@ -15,7 +11,7 @@ class ConcatTrainingSetCreator:
         self.random_state = random_state
         training_with_tests = [tst.task.name.split('_')[0] for tst in test_sets]
         for t_id in range(len(training_sets)):
-            if not training_sets[t_id].task.name in training_with_tests:
+            if not training_sets[t_id].task.name.split('_')[0] in training_with_tests:
                 self.training_creators.append(TrainingSetCreator(dataset=training_sets[t_id],
                                                                  dic_of_labels_limits=dics_of_labels_limits[t_id],
                                                                  random_state=random_state,
@@ -24,7 +20,7 @@ class ConcatTrainingSetCreator:
             else:
                 self.training_creators.append(TrainingSetCreator(dataset=training_sets[t_id],
                                                                  test_dataset=test_sets[training_with_tests.index(
-                                                                     training_sets[t_id].task.name)],
+                                                                     training_sets[t_id].task.name.split('_')[0])],
                                                                  dic_of_labels_limits=dics_of_labels_limits[t_id],
                                                                  random_state=random_state,
                                                                  nr_runs=5 if len(training_with_tests) < len(
@@ -45,10 +41,12 @@ class ConcatTrainingSetCreator:
 
     def prepare_for_index_mode(self):
         for tc in self.training_creators:
-            tc.dataset.inputs = tc.dataset.prepare_inputs()
-            if tc.test_dataset:
-                tc.test_dataset.inputs = tc.test_dataset.prepare_inputs(window_size=tc.dataset.inputs[0].shape[0])
-            tc.dataset.to_index_mode()
+            if not tc.dataset.has_index_mode():
+                # tc.dataset.prepare_inputs()
+                tc.dataset.write_index_files()
+            if tc.test_dataset and not tc.test_dataset.has_index_mode():
+                # tc.test_dataset.prepare_inputs(window_size=tc.dataset.inputs[0].shape[0])
+                tc.test_dataset.write_index_files()
 
 
 class TrainingSetCreator:
@@ -59,21 +57,21 @@ class TrainingSetCreator:
         self.dic_of_labels_limits = dic_of_labels_limits
         self.random_state = random_state
         self.test_dataset = test_dataset
+        self.nr_runs = nr_runs
 
         if not self.dataset.index_mode:
             self.dataset.prepare_inputs()
-        self.dataset.sample_labels(self.dic_of_labels_limits, random_state)
 
-        if not test_dataset:
-            self.nr_runs = 5
-        else:
+        if test_dataset:
             if not isinstance(nr_runs, int):
                 self.nr_runs = 1
             if not self.test_dataset.index_mode:
                 self.test_dataset.prepare_inputs(window_size=self.dataset.inputs[0].shape[0])
-                self.test_dataset.sample_labels(self.dic_of_labels_limits, random_state)
+        elif not isinstance(nr_runs, int):
+            self.nr_runs = 5
 
     def generate_train_test(self):
+        self.dataset.sample_labels(self.dic_of_labels_limits, self.random_state)
         if not self.test_dataset:
             return self.generate_five_fold()
         else:

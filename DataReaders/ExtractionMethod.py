@@ -1,15 +1,14 @@
 import math
-import os
 import statistics
 from abc import abstractmethod, ABC
 
+import librosa
 import numpy as np
 import torch
-import joblib
-import pickle
 from python_speech_features import logfbank, mfcc, fbank
 from sklearn.preprocessing import StandardScaler
-
+import matplotlib.pyplot as plt
+import librosa.display
 
 class ExtractionMethod(ABC):
 
@@ -60,6 +59,7 @@ class ExtractionMethod(ABC):
 
     def scale_fit_2D(self, inputs):
         self.scalers[0] = StandardScaler()
+        # self.scalers[0] = MinMaxScaler()
         self.scalers[0].fit(inputs)
 
     # scale transformers
@@ -123,6 +123,7 @@ class ExtractionMethod(ABC):
             framed_inputs.append(frame)
         return framed_inputs
 
+
 class LogbankSummary(ExtractionMethod):
 
     def __init__(self):
@@ -177,7 +178,6 @@ class Mfcc(ExtractionMethod):
         self.scale_fit_2D(inputs)
 
     def scale_transform(self, inputs):
-        # ret = self.convert_list_of_tensors_to_nparray(inputs)
         ret = []
         for i in range(len(inputs)):
             ret.append(self.scale_transform_2D(inputs[i].numpy()))
@@ -191,8 +191,6 @@ class Mfcc(ExtractionMethod):
         elif max(cum_sizes) != min(cum_sizes):
             median = statistics.median(cum_sizes)
             inputs = self.frame_inputs(inputs, median)
-        # inputs = self.scale_transform(inputs)
-
         return inputs
 
 
@@ -218,7 +216,6 @@ class MelSpectrogram(ExtractionMethod):
         self.scale_fit_2D(inputs)
 
     def scale_transform(self, inputs):
-        # ret = self.convert_list_of_tensors_to_nparray(inputs)
         ret = []
         for i in range(len(inputs)):
             ret.append(self.scale_transform_2D(inputs[i].numpy()))
@@ -231,13 +228,54 @@ class MelSpectrogram(ExtractionMethod):
         elif max(cum_sizes) != min(cum_sizes):
             median = statistics.median(cum_sizes)
             inputs = self.frame_inputs(inputs, int(median))
-        # inputs = self.scale_transform(inputs)
+        return inputs
 
+
+class LibMelSpectrogram(ExtractionMethod):
+
+    def __init__(self):
+        super().__init__()
+        self.name = 'LibMelSpectrogram'
+
+    def extract_features(self, sig_samplerate, **kwargs):
+        feature = librosa.feature.melspectrogram(y=sig_samplerate[0], sr=sig_samplerate[1], **kwargs)
+        feature = librosa.power_to_db(feature, ref=np.max)
+        feature = librosa.util.normalize(feature)
+        # plot_feature(feature, 16000 )
+        return torch.tensor(feature).T
+
+    def scale_fit(self, inputs):
+        inputs = np.concatenate(inputs)
+        self.scale_fit_2D(inputs)
+
+    def scale_transform(self, inputs):
+        ret = []
+        for i in range(len(inputs)):
+            ret.append(self.scale_transform_2D(inputs[i].numpy()))
+        return self.convert_nparray_to_list_of_tensors(ret)
+
+    def prepare_inputs(self, inputs, **kwargs):
+        cum_sizes = [len(i) for i in inputs]
+        if 'window_size' in kwargs:
+            inputs = self.frame_inputs(inputs, kwargs.get('window_size'))
+        elif max(cum_sizes) != min(cum_sizes):
+            median = statistics.median(cum_sizes)
+            inputs = self.frame_inputs(inputs, int(median))
         return inputs
 
 
 extract_options = {
     MelSpectrogram().name: MelSpectrogram(),
     Mfcc().name: Mfcc(),
-    LogbankSummary().name: LogbankSummary()
+    LogbankSummary().name: LogbankSummary(),
+    LibMelSpectrogram().name: LibMelSpectrogram()
 }
+
+def plot_feature(S, sr):
+    fig, ax = plt.subplots()
+    # S_db = librosa.power_to_db(S, ref=np.max)
+    img = librosa.display.specshow(S, x_axis='time',
+                                   y_axis='mel', sr=sr, ax=ax)
+    fig.colorbar(img, ax=ax, format='%+2.0f dB')
+    ax.set(title='Spectrogram')
+    plt.show()
