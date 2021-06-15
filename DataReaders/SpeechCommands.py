@@ -27,7 +27,7 @@ class SpeechCommands(DataReader):
         return self.object_path.format('train')
 
     def get_eval_path(self):
-        return os.path.join(self.get_base_path(), 'SpeechCommands.obj')
+        return os.path.join(self.get_eval_base_path(), 'SpeechCommands.obj')
 
     def get_eval_base_path(self):
         return self.object_path.format('eval')
@@ -57,24 +57,20 @@ class SpeechCommands(DataReader):
         self.validTaskDataset.save(self.get_eval_base_path())
 
     def calculate_input(self, **kwargs):
-        inputs = []
-        ds_id = 0
-
+        inputs_tot = [[],[]]
         resample_to = None
         if 'resample_to' in kwargs:
             resample_to = kwargs.pop('resample_to')
 
-        if 'test' in kwargs and kwargs.pop('test'):
-            ds_id = 1
+        for ds_id in range(2):
+            for audio_label in self.ds[ds_id].as_numpy_iterator():
+                audio = audio_label["audio"]
+                fs = self.sample_rate
+                if resample_to is not None:
+                    audio, fs = self.resample(audio, self.sample_rate, resample_to)
+                inputs_tot[ds_id].append(self.extraction_method.extract_features((audio, fs), **kwargs))
 
-        for audio_label in self.ds[ds_id].as_numpy_iterator():
-            audio = audio_label["audio"]
-            fs = self.sample_rate
-            if resample_to is not None:
-                audio, fs = self.resample(audio, self.sample_rate, resample_to)
-            inputs.append(self.extraction_method.extract_features((audio, fs), **kwargs))
-
-        return inputs
+        return inputs_tot[0], inputs_tot[1]
 
     def calculate_taskDataset(self, **kwargs):
         # Training Set
@@ -83,7 +79,7 @@ class SpeechCommands(DataReader):
         for audio_label in self.ds[0].as_numpy_iterator():
             targets.append(audio_label["label"])
 
-        inputs = self.calculate_input(**kwargs)
+        inputs, inputs_t = self.calculate_input(**kwargs)
         targets = [[float(b == f) for b in range(len(self.ds_info.features['label'].names))] for f in targets]
 
         print("Calculate Test Set")
@@ -91,7 +87,6 @@ class SpeechCommands(DataReader):
         targets_t = []
         for audio_label in self.ds[1].as_numpy_iterator():
             targets_t.append(audio_label["label"])
-        inputs_t = self.calculate_input(test=True, **kwargs)
         targets_t = [[float(b == f) for b in range(len(self.ds_info.features['label'].names))] for f in targets_t]
 
         self.taskDataset = TaskDataset(inputs=inputs, targets=targets, name="SpeechCommands_train",

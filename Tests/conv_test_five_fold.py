@@ -62,7 +62,7 @@ def run_datasets(dataset_list, extraction_params):
         testDatasets.append(dcaseScene.valTaskDataset)
     if 3 in dataset_list:
         fsdkaggle = FSDKaggle2018(**extraction_params,
-                                  object_path=os.path.join(data_base, 'FSDKaggle2018'))
+                                  object_path=os.path.join(data_base, 'FSDKaggle2018_{}'))
         taskDatasets.append(fsdkaggle.taskDataset)
     if 4 in dataset_list:
         ravdess = Ravdess(**extraction_params,
@@ -134,7 +134,7 @@ def create_index_mode(dataset_list):
     extraction_params = read_config('extraction_params_cnn_LibMelSpectrogram')
     # extraction_params = read_config('extraction_params_cnn_mfcc')
     taskDatasets, testDatasets = run_datasets(dataset_list, extraction_params)
-    print("Start iteration")
+    print("Start create index mode")
     ctsc = ConcatTrainingSetCreator(training_sets=taskDatasets,
                                     dics_of_labels_limits=[read_config('dic_of_labels_limits_{}'.format(t.task.name))[
                                                                'dic_of_labels_limits'] for t in taskDatasets],
@@ -147,7 +147,8 @@ def create_index_mode(dataset_list):
 
 def main(argv):
     # dataset_list = [2, 5, 4, 1, 0]
-    dataset_list_single = [4, 1, 5, ]
+    dataset_list = [5]
+    dataset_list_single = [2, 5, 4, 1, 0]
     # dataset_list_double = [[0, 1], [0, 2], [0, 4], [0, 5], [1, 2], [1, 4], [1, 5], [2, 4], [2, 5], [4, 5]]
     dataset_list_double = [[0, 1], [0, 2], [0, 4], [0, 5], [1, 2], [1, 4], [1, 5], [2, 4], [2, 5], [4, 5]]
 
@@ -155,17 +156,18 @@ def main(argv):
     print('test loop')
     print('--------------------------------------------------')
 
-    # for i in dataset_list_single:
+    # for i in dataset_list:
     #     create_index_mode([i])
 
-    for i in range(len(dataset_list_single)):
+    for i in dataset_list_single:
         # create_index_mode([2])
-        run_five_fold([dataset_list_single[i]], fold=1 if i == 0 else 0)
-        # for j in range(i + 1, len(dataset_list)):
-        #     #     # check_distributions([dataset_list[i], dataset_list[j]])
-        #     run_five_fold([dataset_list[i], dataset_list[j]], fold=4)
-        # # # check_distributions([dataset_list[i]])
-
+        # create_index_mode([i])
+        run_five_fold([i])
+    #     # for j in range(i + 1, len(dataset_list)):
+    #     #     #     # check_distributions([dataset_list[i], dataset_list[j]])
+    #     #     run_five_fold([dataset_list[i], dataset_list[j]], fold=4)
+    #     # # # check_distributions([dataset_list[i]])
+    #
     for i in dataset_list_double:
         run_five_fold(i)
 

@@ -100,11 +100,7 @@ class DCASE2017_SS(DataReader):
         joblib.dump(dict, self.get_eval_path())
         self.valTaskDataset.save(self.get_eval_base_path())
 
-    def calculate_input(self, **kwargs):
-        resample_to = None
-        if 'resample_to' in kwargs:
-            resample_to = kwargs.pop('resample_to')
-
+    def calculate_input(self, resample_to=None, **kwargs):
         files = self.audio_files
         inputs = self.calculate_features(files, resample_to, **kwargs)
         print("Calculating input done")

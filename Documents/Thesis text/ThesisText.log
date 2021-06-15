@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  29 MAY 2021 14:24
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  15 JUN 2021 14:51
 entering extended mode
 **./ThesisText.tex
 (ThesisText.tex
@@ -115,7 +115,7 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 \tf@toc=\write3
 \openout3 = `ThesisText.toc'.
 
- (IntroductionV2.tex [1
+ (IntroductionV3.tex [1
 
 ]
 Chapter 1.
@@ -136,59 +136,53 @@ Underfull \hbox (badness 10000) in paragraph at lines 7--8
 
  []
 
-[3]
-Overfull \hbox (12.0pt too wide) in paragraph at lines 35--60
- [][] 
- []
-
-) (LiteratureStudyV2.tex [4] [5]
+) (LiteratureStudyV2.tex [3]
 Chapter 2.
-) (ExperimentDesign.tex [6
+) (ExperimentDesign.tex [4
 
-] [7]
+] [5]
 Chapter 3.
-) (Implementation.tex [8
+) (Implementation.tex [6
 
 ]
 Chapter 4.
-) (Evaluation.tex [9
+) (Evaluation.tex [7
 
 ]
 Chapter 5.
-) (Discussion.tex [10
+) (Discussion.tex [8
 
 ]
 Chapter 6.
-) (Conclusion.tex [11
+) (Conclusion.tex [9
 
 ]
 Chapter 7.
-) (Journal.tex [12
+) (Journal.tex [10
 
 ]
 Chapter 8.
-) (ThesisText.bbl [13
+) (ThesisText.bbl [11
 
-] [14
+] [12
 
-]) [15] (ThesisText.aux) ) 
+]) [13] (ThesisText.aux) ) 
 Here is how much of TeX's memory you used:
- 1597 strings out of 481212
- 23889 string characters out of 2905973
- 263254 words of memory out of 3000000
- 17191 multiletter control sequences out of 15000+200000
- 541239 words of font info for 49 fonts, out of 3000000 for 9000
+ 1594 strings out of 481212
+ 23853 string characters out of 2905973
+ 262254 words of memory out of 3000000
+ 17189 multiletter control sequences out of 15000+200000
+ 540902 words of font info for 48 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 36i,9n,33p,1378b,223s stack positions out of 5000i,500n,10000p,200000b,50000s
- <C:\Users\mrKC1\AppData\Local\MiKTeX\fonts/pk/ljfour
-/jknappen/ec/dpi600\tcrm1200.pk><C:/Users/mrKC1/AppData/Local/Programs/MiKTeX/f
-onts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/mrKC1/AppData/Local/Programs
-/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/mrKC1/AppData/Local/
-Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/mrKC1/AppDat
-a/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb>
-Output written on ThesisText.pdf (17 pages, 87193 bytes).
+ 36i,6n,33p,1378b,223s stack positions out of 5000i,500n,10000p,200000b,50000s
+<C:/Users/mrKC1/AppData/Local/Programs/MiKTeX/fonts/t
+ype1/public/amsfonts/cm/cmbx12.pfb><C:/Users/mrKC1/AppData/Local/Programs/MiKTe
+X/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/mrKC1/AppData/Local/Progra
+ms/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/mrKC1/AppData/Loca
+l/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb>
+Output written on ThesisText.pdf (15 pages, 82265 bytes).
 PDF statistics:
- 78 PDF objects out of 1000 (max. 8388607)
+ 67 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

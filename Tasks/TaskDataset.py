@@ -6,7 +6,7 @@ import types
 import joblib
 import numpy as np
 import torch
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import StratifiedKFold, GroupKFold
 from sklearn.preprocessing import LabelEncoder
 from skmultilearn.model_selection import IterativeStratification
 from torch.utils.data import Dataset
@@ -34,7 +34,8 @@ class TaskDataset(Dataset):
             extraction_method,
             base_path,
             output_module='softmax',  # 'sigmoid'
-            index_mode=False
+            index_mode=False,
+            grouping=None
     ):
         if index_mode:
             self.switch_index_methods()
@@ -50,6 +51,7 @@ class TaskDataset(Dataset):
         self.base_path = base_path
         self.pad_after = list()
         self.pad_before = list()
+        self.grouping = grouping
 
     def __getitem__(self, index):
         return self.get_item(index)
@@ -183,14 +185,19 @@ class TaskDataset(Dataset):
         inputs = self.inputs
         targets = self.targets
 
+        if self.grouping:
+            kf = GroupKFold(n_splits=5)
+            return kf.split(inputs, groups=self.grouping)
+
         if self.task.output_module == 'softmax':
             kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=random_state)
             targets = LabelEncoder().fit_transform([''.join(str(l)) for l in targets])
+            return kf.split(inputs, targets)
         else:
             kf = IterativeStratification(n_splits=5)
             targets = np.array(targets)
+            return kf.split(inputs, targets)
 
-        return kf.split(inputs, targets)
 
     def get_split_by_index(self, train_index, test_index, **kwargs):
         '''
@@ -221,7 +228,7 @@ class TaskDataset(Dataset):
     def save_split_scalers(self, random_state):
         i = 0
         for train, _ in self.k_folds(random_state):
-            x_train = [self.inputs[i] for i in range(len(self.inputs)) if i in train]
+            x_train = [self.inputs[ind] for ind in range(len(self.inputs)) if ind in train]
             self.extraction_method.scale_fit(x_train)
             scalers = self.extraction_method.scalers
             path = os.path.join(self.base_path,
@@ -236,6 +243,12 @@ class TaskDataset(Dataset):
                                                                               random_state, fold))
         self.extraction_method.scalers = joblib.load(path)
 
+    def check_split_scalers(self, fold, random_state):
+        path = os.path.join(self.base_path,
+                            'scaler_method_{}_state_{}_fold_{}.pickle'.format(self.extraction_method.name,
+                                                                              random_state, fold))
+        return os.path.isfile(path)
+
     def save_scalers(self):
         self.extraction_method.scale_fit(self.inputs)
         scalers = self.extraction_method.scalers
@@ -247,6 +260,11 @@ class TaskDataset(Dataset):
         path = os.path.join(self.base_path,
                             'scaler_method_{}.pickle'.format(self.extraction_method.name))
         self.extraction_method.scalers = joblib.load(path)
+
+    def check_scalers(self):
+        path = os.path.join(self.base_path,
+                            'scaler_method_{}.pickle'.format(self.extraction_method.name))
+        return os.path.isfile(path)
 
     # index mode transition
     def to_index_mode(self):

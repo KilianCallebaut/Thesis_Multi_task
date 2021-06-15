@@ -126,10 +126,10 @@ class Results:
     def add_loss_to_curve(self, epoch, step, loss, train):
         if train:
             phase = 'Train'
-            self.training_curve[epoch] = loss
+            self.training_curve[epoch] = loss /step
         else:
             phase = 'Evaluation'
-            self.evaluation_curve[epoch] = loss
+            self.evaluation_curve[epoch] = loss /step
         self.writer.add_scalar("{}/Loss".format(phase), loss / step, epoch)
 
     def load_loss_curve(self, train):
@@ -153,12 +153,12 @@ class Results:
             phase = 'Train'
             if task.name not in self.training_curve_task:
                 self.training_curve_task[task.name] = np.zeros(self.num_epochs)
-            self.training_curve_task[task.name][epoch] = loss
+            self.training_curve_task[task.name][epoch] = loss / step
         else:
             phase = 'Evaluation'
             if task.name not in self.evaluation_curve_task:
                 self.evaluation_curve_task[task.name] = np.zeros(self.num_epochs)
-            self.evaluation_curve_task[task.name][epoch] = loss
+            self.evaluation_curve_task[task.name][epoch] = loss / step
 
         self.writer.add_scalar("{}/Loss/{}".format(phase, task.name), loss / step, epoch)
 
@@ -185,7 +185,7 @@ class Results:
         if epoch == 0:
             return False
 
-        if self.training_curve[epoch-1] - self.training_curve[epoch] < 0.01:
+        if (self.training_curve[epoch-1] - self.training_curve[epoch]) < 0.1:
             return True
 
         return False

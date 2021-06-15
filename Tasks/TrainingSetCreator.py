@@ -38,6 +38,9 @@ class ConcatTrainingSetCreator:
         for tc in self.training_creators:
             tc.dataset.save_split_scalers(self.random_state)
             tc.dataset.save_scalers()
+            if tc.test_dataset:
+                tc.test_dataset.save_split_scalers(self.random_state)
+                tc.test_dataset.save_scalers()
 
     def prepare_for_index_mode(self):
         for tc in self.training_creators:
@@ -98,7 +101,7 @@ class TrainingSetCreator:
             yield self.dataset, self.test_dataset
 
     def load_scaler(self, **kwargs):
-        if 'fold' in kwargs:
+        if 'fold' in kwargs and self.dataset.check_split_scalers(kwargs.get('fold'), self.random_state):
             self.dataset.load_split_scalers(kwargs.get('fold'), self.random_state)
-        else:
+        elif self.dataset.check_scalers():
             self.dataset.load_scalers()

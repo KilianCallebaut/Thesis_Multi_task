@@ -5,8 +5,6 @@ from timeit import default_timer as timer
 import joblib
 import numpy as np
 
-from DataReaders.ExtractionMethod import extract_options
-
 try:
     import cPickle
 except BaseException:
@@ -127,14 +125,12 @@ class ChenAudiosetDataset(DataReader):
         name = "chen_audioset"
         self.taskDataset = TaskDataset(inputs=inputs, targets=targets, name=name, labels=distinct_targets,
                                        extraction_method=self.extraction_method, base_path=self.get_base_path(),
-                                       output_module='sigmoid', index_mode=self.index_mode)
+                                       output_module='sigmoid', index_mode=self.index_mode,
+                                       grouping=[fold for fold in range(len(self.wav_files)) for _ in
+                                                 self.wav_files[fold]])
 
-    def calculate_input(self,  **kwargs):
+    def calculate_input(self, resample_to=None, **kwargs):
         inputs = []
-
-        resample_to = None
-        if 'resample_to' in kwargs:
-            resample_to = kwargs.pop('resample_to')
 
         for folder in self.wav_files:
             for file in folder:

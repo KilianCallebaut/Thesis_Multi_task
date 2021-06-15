@@ -28,7 +28,7 @@ class Ravdess(DataReader):
         return TaskDataset.check(self.get_base_path(), extraction_method) and os.path.isfile(self.get_path())
 
     def load_files(self):
-        song_folder = 'Audio_song_actors_01-24'
+        song_folder = 'Audio_Song_actors_01-24'
         speech_folder = 'Audio_Speech_Actors_01-24'
         self.files = []
         for fold in [song_folder, speech_folder]:
@@ -88,7 +88,8 @@ class Ravdess(DataReader):
                                        extraction_method=self.extraction_method,
                                        base_path=self.get_base_path(),
                                        output_module='softmax',
-                                       index_mode=self.index_mode)
+                                       index_mode=self.index_mode,
+                                       grouping=[f['actor'] for f in self.files])
 
     def prepare_taskDatasets(self, test_size, dic_of_labels_limits, **kwargs):
 

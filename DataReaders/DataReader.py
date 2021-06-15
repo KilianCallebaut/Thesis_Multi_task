@@ -64,7 +64,7 @@ class DataReader(ABC):
         pass
 
     @abstractmethod
-    def calculate_input(self, **kwargs):
+    def calculate_input(self, resample_to=None, **kwargs):
         pass
 
     @abstractmethod
@@ -116,6 +116,8 @@ class DataReader(ABC):
         sig, fs = soundfile.read(loc)
         if len(sig.shape) > 1:
             sig = np.mean(sig, axis=1)
+        if sig.shape[0] == 0:
+            return None
         if resample_to is not None and resample_to != fs:
             librosa.core.resample(sig, fs, resample_to)
 
