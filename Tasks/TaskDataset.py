@@ -11,10 +11,9 @@ from sklearn.preprocessing import LabelEncoder
 from skmultilearn.model_selection import IterativeStratification
 from torch.utils.data import Dataset
 
+from DataReaders.ExtractionMethod import ExtractionMethod
 from Tasks.Task import Task
-import matplotlib.pyplot as plt
-import librosa
-import librosa.display
+
 
 # In index mode:
 # before save -> full tensors in input list
@@ -22,6 +21,14 @@ import librosa.display
 # when splitting into train and test -> filenames in inputs
 
 class TaskDataset(Dataset):
+    """
+    Unified object to store dataset and task information and perform transformations.
+
+    Has 2 modes: index and non-index mode.
+    In index mode, the object only stores indices pointing to input files. These should be created first using the
+    write_index_files method. When indexing, the inputs are live read from the corresponding file.
+    In non-index mode, the whole dataset is loaded into memory.
+    """
 
     # data_lists: lists of lists of instances per task
     # now requires sampling to be called beforehand, save scalers to be called beforehand
@@ -29,41 +36,63 @@ class TaskDataset(Dataset):
             self,
             inputs,
             targets,
-            name,
-            labels,
-            extraction_method,
-            base_path,
-            output_module='softmax',  # 'sigmoid'
+            task: Task,
+            extraction_method: ExtractionMethod,
+            base_path: str,
             index_mode=False,
-            grouping=None
+            grouping=None,
+            extra_tasks=None
     ):
+        """
+        Initializes the Taskdataset object
+
+        :param inputs: list of tensors of size (n_samples, n_features)
+        :param targets: list of binary representing the targets
+        :param task: Task object containing the name, list of distinct output labels and possible additional parameters
+        :param extraction_method: ExtractionMethod object, responsible for appropriate transformations and name of the data for saving and loading
+        :param base_path: The path to the folder where the data should be saved
+        :param index_mode: Boolean to switch on/off index mode
+        :param grouping: optional Grouping list for defining which data cannot be split up in k folds (see sklearn.model_selection.GroupKfold)
+        :param extra_tasks: List of Tuples (Task, targets) holding additional tasks on the same inputs
+        """
         if index_mode:
             self.switch_index_methods()
-        else:
-            self.scaled = False
         self.index_mode = index_mode
         self.inputs = inputs  # List of tensors
         self.targets = targets  # List of binary strings
         # self.name = name # String
         # self.labels = labels # List of strings
-        self.task = Task(name, labels, output_module)
+        # self.task = Task(name=name, output_labels=labels, classification_type=classification_type,
+        #                  loss_function=loss_function)
+        self.task = task
         self.extraction_method = extraction_method
         self.base_path = base_path
         self.pad_after = list()
         self.pad_before = list()
         self.grouping = grouping
+        self.extra_tasks = extra_tasks
 
     def __getitem__(self, index):
         return self.get_item(index)
 
     def get_item(self, index):
-        if not self.scaled:
-            self.inputs = self.extraction_method.scale_transform(self.inputs)
-            self.scaled = True
-
         return self.inputs[index].float(), \
-               torch.from_numpy(np.array(self.pad_before + self.targets[index] + self.pad_after)), \
+               torch.from_numpy(np.array(self.pad_before + self.get_all_targets(index) + self.pad_after)), \
                self.task.name
+
+    def get_all_targets(self, index):
+        if not self.extra_tasks:
+            return self.targets[index]
+        targets = self.targets[index]
+        for t in self.extra_tasks:
+            targets += t[1][index]
+        return targets
+
+    def get_all_tasks(self):
+        tasks = [self.task]
+        if self.extra_tasks:
+            tasks += [t[0] for t in self.extra_tasks]
+        return tasks
 
     def __len__(self):
         return len(self.inputs)
@@ -72,6 +101,12 @@ class TaskDataset(Dataset):
         self.pad_before = [0 for _ in range(before)]
         self.pad_after = [0 for _ in range(after)]
 
+    def declare_train_set(self):
+        self.task.name = "_train"
+
+    def declare_test_set(self):
+        self.task.name += "_test"
+
     def save(self, base_path):
         joblib.dump(self.inputs, os.path.join(base_path, '{}_inputs.gz'.format(self.extraction_method.name)))
         t_s = torch.Tensor(self.targets)
@@ -79,8 +114,7 @@ class TaskDataset(Dataset):
 
         diction = {
             'task': self.task,
-            'pad_after': self.pad_after,
-            'pad_before': self.pad_before
+            'grouping': self.grouping
         }
         joblib.dump(diction, os.path.join(base_path, 'other.obj'))
 
@@ -90,12 +124,17 @@ class TaskDataset(Dataset):
         self.targets = [[int(j) for j in i] for i in t_l]
         diction = joblib.load(os.path.join(base_path, 'other.obj'))
         self.task = diction['task']
-        self.pad_after = diction['pad_after']
-        self.pad_before = diction['pad_before']
+        self.grouping = diction['grouping']
 
     def sample_labels(self, dic_of_labels_limits, random_state=None):
+        """
+        Samples the instances according to predefined limits of number of instances per label
+        :param dic_of_labels_limits: Dictionary specifying the maximum amount of instances a label can have in the dataset
+        :param random_state: optional int for reproducability purposes
+        """
         sampled_targets = self.targets
         sampled_inputs = self.inputs
+        sampled_grouping = self.grouping
         if random_state is not None:
             random.seed(random_state)
 
@@ -103,14 +142,17 @@ class TaskDataset(Dataset):
             label_set = [i for i in range(len(sampled_targets))
                          if sampled_targets[i][self.task.output_labels.index(l)] == 1]
             if len(label_set) > dic_of_labels_limits[l]:
-
                 random_label_set = random.sample(label_set, dic_of_labels_limits[l])
                 sampled_targets = [sampled_targets[i] for i in range(len(sampled_targets)) if
                                    (i not in label_set or i in random_label_set)]
                 sampled_inputs = [sampled_inputs[i] for i in range(len(sampled_inputs)) if
                                   (i not in label_set or i in random_label_set)]
+                if self.grouping:
+                    sampled_grouping = [sampled_grouping[i] for i in range(len(sampled_grouping)) if
+                                        (i not in label_set or i in random_label_set)]
         self.inputs = sampled_inputs
         self.targets = sampled_targets
+        self.grouping = sampled_grouping
 
     def sample_dataset(self, random_state=None):
         """
@@ -122,14 +164,23 @@ class TaskDataset(Dataset):
         return TaskDataset(
             inputs=[self.inputs[i] for i in sample],
             targets=[self.targets[i] for i in sample],
-            name=self.task.name,
-            labels=self.task.output_labels,
+            task=self.task,
             extraction_method=self.extraction_method,
-            base_path=self.base_path, output_module=self.task.output_module
+            base_path=self.base_path,
+            index_mode=self.index_mode,
+            grouping=self.grouping,
+            extra_tasks=self.extra_tasks
         )
 
     # k_folds splitting
-    def k_folds(self, random_state=None):
+    def k_folds(self, random_state=None, n_splits=5):
+        """
+        Produces a k_fold training/test split generator, depending on the task type
+
+        :param n_splits: number of folds
+        :param random_state: optional int for reproducability purposes
+        :return: _BaseKFold object
+        """
         # Examples
         # --------
         # >> > import numpy as np
@@ -186,21 +237,21 @@ class TaskDataset(Dataset):
         targets = self.targets
 
         if self.grouping:
-            kf = GroupKFold(n_splits=5)
+            kf = GroupKFold(n_splits=n_splits)
             return kf.split(inputs, groups=self.grouping)
 
-        if self.task.output_module == 'softmax':
-            kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=random_state)
-            targets = LabelEncoder().fit_transform([''.join(str(l)) for l in targets])
-            return kf.split(inputs, targets)
-        else:
-            kf = IterativeStratification(n_splits=5)
+        if self.task.classification_type == 'multi-label':
+            kf = IterativeStratification(n_splits=n_splits)
             targets = np.array(targets)
             return kf.split(inputs, targets)
+        else:
+            kf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
+            targets = LabelEncoder().fit_transform([''.join(str(l)) for l in targets])
+            return kf.split(inputs, targets)
 
-
-    def get_split_by_index(self, train_index, test_index, **kwargs):
+    def get_split_by_index(self, train_index, test_index):
         '''
+        Returns the training and test set from the given lists of indexes
 
         :param train_index: indexes of the training set
         :param test_index: indexes of the test set
@@ -216,16 +267,28 @@ class TaskDataset(Dataset):
         if not self.extraction_method.scalers:
             self.extraction_method.scale_fit(x_train)
 
-        train_taskdataset = TaskDataset(inputs=x_train, targets=y_train, name=self.task.name + "_train",
-                                        labels=self.task.output_labels, extraction_method=self.extraction_method,
-                                        base_path=self.base_path, output_module=self.task.output_module)
-        test_taskdataset = TaskDataset(inputs=x_val, targets=y_val, name=self.task.name + "_test",
-                                       labels=self.task.output_labels, extraction_method=self.extraction_method,
-                                       base_path=self.base_path, output_module=self.task.output_module)
+        train_taskdataset = TaskDataset(inputs=x_train, targets=y_train,
+                                        task=self.task, extraction_method=self.extraction_method,
+                                        base_path=self.base_path, grouping=[self.grouping[i] for i in train_index],
+                                        extra_tasks=[(t[0], [t[1][targ_id] for targ_id in train_index]) for t in
+                                                     self.extra_tasks])
+        train_taskdataset.task.name = self.task.name + "_train"
+        test_taskdataset = TaskDataset(inputs=x_val, targets=y_val,
+                                       task=self.task,
+                                       extraction_method=self.extraction_method,
+                                       base_path=self.base_path, grouping=[self.grouping[i] for i in test_index],
+                                       extra_tasks=[(t[0], [t[1][targ_id] for targ_id in test_index]) for t in
+                                                    self.extra_tasks])
+        test_taskdataset.task.name = self.task.name + "_test"
         return train_taskdataset, test_taskdataset
 
     # normal_mode method
     def save_split_scalers(self, random_state):
+        """
+        Calculates and saves the scaler objects for normalization for each fold, given a random_state, in separate files
+        :param random_state: optional int for reproducability purposes
+        """
+
         i = 0
         for train, _ in self.k_folds(random_state):
             x_train = [self.inputs[ind] for ind in range(len(self.inputs)) if ind in train]
@@ -238,6 +301,11 @@ class TaskDataset(Dataset):
             i += 1
 
     def load_split_scalers(self, fold, random_state):
+        """
+        Loads the scaler objects for dataset normalization purposes for the specified fold and random state
+        :param fold: The fold to load
+        :param random_state: The random state the five fold datasets was created with
+        """
         path = os.path.join(self.base_path,
                             'scaler_method_{}_state_{}_fold_{}.pickle'.format(self.extraction_method.name,
                                                                               random_state, fold))
@@ -284,7 +352,6 @@ class TaskDataset(Dataset):
                 input_path = os.path.join(separated_dir, 'input_{}.pickle'.format(i))
                 torch.save(self.inputs[i], input_path)
 
-
     def switch_index_methods(self):
         # replace getitem, get_split_by_index by index based functions
         self.get_item = types.MethodType(get_item_index_mode, self)
@@ -299,6 +366,10 @@ class TaskDataset(Dataset):
     # frame input
     def prepare_inputs(self, **kwargs):
         self.inputs = self.extraction_method.prepare_inputs(self.inputs, **kwargs)
+        # self.inputs = np.array(self.inputs)
+
+    def normalize_inputs(self):
+        self.inputs = self.extraction_method.scale_transform(self.inputs)
 
     @staticmethod
     def check(base_path, extraction_method):
@@ -310,13 +381,13 @@ def get_item_index_mode(self, index):
     separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
     separated_file = os.path.join(separated_dir, 'input_{}.pickle'.format(self.inputs[index]))
     x = self.extraction_method.scale_transform([torch.load(separated_file).float()])[0]
-    y = self.targets[index]
+    y = self.get_all_targets(index)
     return x, \
            torch.from_numpy(np.array(self.pad_before + y + self.pad_after)), \
            self.task.name
 
 
-def get_split_by_index_index_mode(self, train_index, test_index, **kwargs):
+def get_split_by_index_index_mode(self, train_index, test_index):
     '''
         :param train_index: indexes of the training set
         :param test_index: indexes of the test set
@@ -337,12 +408,15 @@ def get_split_by_index_index_mode(self, train_index, test_index, **kwargs):
                    for ind in x_train_window]
         self.extraction_method.scale_fit(x_train)
 
-    train_taskdataset = TaskDataset(inputs=x_train_window, targets=y_train_window, name=self.task.name + "_train",
-                                    labels=self.task.output_labels, extraction_method=self.extraction_method,
-                                    base_path=self.base_path, output_module=self.task.output_module, index_mode=True)
-    test_taskdataset = TaskDataset(inputs=x_val_window, targets=y_val_window, name=self.task.name + "_test",
-                                   labels=self.task.output_labels, extraction_method=self.extraction_method,
-                                   base_path=self.base_path, output_module=self.task.output_module, index_mode=True)
+    train_taskdataset = TaskDataset(inputs=x_train_window, targets=y_train_window,
+                                    task=self.task,
+                                    extraction_method=self.extraction_method,
+                                    base_path=self.base_path, index_mode=True)
+    train_taskdataset.task.name = self.task.name + "_train"
+    test_taskdataset = TaskDataset(inputs=x_val_window, targets=y_val_window, task=self.task,
+                                   extraction_method=self.extraction_method,
+                                   base_path=self.base_path, index_mode=True)
+    test_taskdataset.task.name = self.task.name + "_test"
 
     return train_taskdataset, test_taskdataset
 
@@ -369,4 +443,3 @@ def load_index_mode(self, base_path):
     self.task = diction['task']
     self.pad_after = diction['pad_after']
     self.pad_before = diction['pad_before']
-

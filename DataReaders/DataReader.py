@@ -2,15 +2,13 @@ import random
 from abc import abstractmethod, ABC
 
 import librosa
+import librosa.display
 import numpy as np
 import soundfile
-import torch
-import matplotlib.pyplot as plt
-import librosa.display
 from scipy import signal
-from sklearn.model_selection import KFold
 
 from DataReaders.ExtractionMethod import extract_options
+from Tasks.Task import Task
 from Tasks.TaskDataset import TaskDataset
 
 
@@ -26,8 +24,9 @@ class DataReader(ABC):
             self.index_mode = False
 
         self.extraction_method = extract_options[extraction_method]
-        self.taskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_base_path(),
-                                       index_mode=self.index_mode)
+        self.taskDataset = TaskDataset(inputs=[], targets=[], task=Task(name='', output_labels=[]),
+                                       extraction_method=self.extraction_method,
+                                       base_path=self.get_base_path(), index_mode=self.index_mode)
 
         if self.check_files(extraction_method):
             print('reading')
@@ -37,7 +36,6 @@ class DataReader(ABC):
             self.load_files()
             self.calculate_taskDataset(**kwargs)
             self.write_files()
-
 
     @abstractmethod
     def get_path(self):
@@ -86,22 +84,6 @@ class DataReader(ABC):
                                   (i not in label_set or i in random_label_set)]
         return sampled_inputs, sampled_targets
 
-    @abstractmethod
-    def prepare_taskDatasets(self, test_size, dic_of_labels_limits, **kwargs):
-        pass
-
-    @abstractmethod
-    def toTrainTaskDataset(self):
-        pass
-
-    @abstractmethod
-    def toTestTaskDataset(self):
-        pass
-
-    @abstractmethod
-    def toValidTaskDataset(self):
-        pass
-
     def resample(self, sig, sample_rate, resample_to):
         secs = len(sig) / sample_rate
         return signal.resample(sig, int(secs * resample_to)), resample_to
@@ -122,6 +104,3 @@ class DataReader(ABC):
             librosa.core.resample(sig, fs, resample_to)
 
         return sig, fs
-
-
-

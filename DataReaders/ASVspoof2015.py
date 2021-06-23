@@ -4,9 +4,9 @@ import joblib
 import numpy as np
 import pandas as pd
 from numpy import long
-from sklearn.model_selection import train_test_split
 
 from DataReaders.DataReader import DataReader
+from Tasks.Task import MultiClassTask
 from Tasks.TaskDataset import TaskDataset
 
 try:
@@ -35,6 +35,12 @@ class ASVspoof2015(DataReader):
         return TaskDataset.check(self.get_base_path(), extraction_method) and os.path.isfile(self.get_path())
 
     def load_files(self):
+        if os.path.isfile(self.get_path()):
+            info = joblib.load(self.get_path())
+            self.files = info['files']
+            self.truths = info['truths']
+            return
+
         # self.truths = pd.read_csv(os.path.join(self.Label_folder, 'cm_develop.ndx'), sep=' ', header=None,
         #                           names=['folder', 'file', 'method', 'source'])
         # add = pd.read_csv(os.path.join(self.Label_folder, 'cm_evaluation.ndx'), sep=' ', header=None,
@@ -116,56 +122,14 @@ class ASVspoof2015(DataReader):
         inputs = self.calculate_input(**kwargs)
         for i in range(len(inputs)):
             target = [long(distinct_labels[label_id] == self.truths.loc[i].folder) if (
-                        self.truths.loc[i].method == 'genuine' or self.truths.loc[i].method == 'human') else long(
+                    self.truths.loc[i].method == 'genuine' or self.truths.loc[i].method == 'human') else long(
                 label_id == len(distinct_labels) - 1) for label_id in range(len(distinct_labels))]
             targets.append(target)
 
         self.taskDataset = TaskDataset(inputs=inputs,
                                        targets=targets,
-                                       name='ASVspoof2015',
-                                       labels=distinct_labels,
+                                       task=MultiClassTask(name='ASVspoof2015',
+                                                           output_labels=distinct_labels),
                                        extraction_method=self.extraction_method,
-                                       output_module='softmax',
                                        base_path=self.get_base_path(),
                                        index_mode=self.index_mode)
-
-    def prepare_taskDatasets(self, test_size, dic_of_labels_limits, **kwargs):
-        inputs = self.taskDataset.inputs
-        targets = self.taskDataset.targets
-        if dic_of_labels_limits:
-            inputs, targets = self.sample_labels(self.taskDataset, dic_of_labels_limits)
-
-        x_train, x_val, y_train, y_val = \
-            train_test_split(inputs, targets, test_size=test_size) \
-                if test_size > 0 else (inputs, [], targets, [])
-
-        self.extraction_method.scale_fit(x_train)
-        x_train, y_train = self.extraction_method.prepare_inputs_targets(x_train, y_train, **kwargs)
-        self.trainTaskDataset = TaskDataset(inputs=x_train, targets=y_train,
-                                            name=self.taskDataset.task.name + "_train",
-                                            labels=self.taskDataset.task.output_labels,
-                                            extraction_method=self.extraction_method,
-                                            output_module=self.taskDataset.task.output_module,
-                                            base_path=self.get_base_path(),
-                                            index_mode=self.index_mode)
-        if test_size > 0:
-            x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val, **kwargs)
-            self.testTaskDataset = TaskDataset(inputs=x_val, targets=y_val,
-                                               name=self.taskDataset.task.name + "_test",
-                                               labels=self.taskDataset.task.output_labels,
-                                               extraction_method=self.extraction_method,
-                                               output_module=self.taskDataset.task.output_module,
-                                               base_path=self.get_base_path(),
-                                               index_mode=self.index_mode)
-
-        self.valTaskDataset.inputs, self.valTaskDataset.targets = self.extraction_method.prepare_inputs_targets(
-            self.valTaskDataset.inputs, self.valTaskDataset.targets, **kwargs)
-
-    def toTrainTaskDataset(self):
-        return self.trainTaskDataset
-
-    def toTestTaskDataset(self):
-        return self.testTaskDataset
-
-    def toValidTaskDataset(self):
-        pass

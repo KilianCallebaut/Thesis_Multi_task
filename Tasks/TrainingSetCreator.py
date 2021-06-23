@@ -51,6 +51,29 @@ class ConcatTrainingSetCreator:
                 # tc.test_dataset.prepare_inputs(window_size=tc.dataset.inputs[0].shape[0])
                 tc.test_dataset.write_index_files()
 
+class IndexModeConcatTrainingSetCreator(ConcatTrainingSetCreator):
+    def __init__(self, training_sets: list, test_sets: Optional[list], dics_of_labels_limits: list,
+                 random_state: Optional[int]):
+
+
+        self.training_creators = []
+        self.random_state = random_state
+        training_with_tests = [tst.task.name.split('_')[0] for tst in test_sets]
+        for t_id in range(len(training_sets)):
+            if not training_sets[t_id].task.name.split('_')[0] in training_with_tests:
+                self.training_creators.append(TrainingSetCreator(dataset=training_sets[t_id],
+                                                                 dic_of_labels_limits=dics_of_labels_limits[t_id],
+                                                                 random_state=random_state,
+                                                                 nr_runs=None,
+                                                                 test_dataset=None))
+            else:
+                self.training_creators.append(TrainingSetCreator(dataset=training_sets[t_id],
+                                                                 test_dataset=test_sets[training_with_tests.index(
+                                                                     training_sets[t_id].task.name.split('_')[0])],
+                                                                 dic_of_labels_limits=dics_of_labels_limits[t_id],
+                                                                 random_state=random_state,
+                                                                 nr_runs=5 if len(training_with_tests) < len(
+                                                                     training_sets) else 1))
 
 class TrainingSetCreator:
 
@@ -75,10 +98,10 @@ class TrainingSetCreator:
 
     def generate_train_test(self):
         self.dataset.sample_labels(self.dic_of_labels_limits, self.random_state)
-        if not self.test_dataset:
-            return self.generate_five_fold()
-        else:
+        if self.test_dataset:
             return self.return_train_val_set()
+        else:
+            return self.generate_five_fold()
 
     def generate_five_fold(self):
 
@@ -88,8 +111,10 @@ class TrainingSetCreator:
                 print("fold: {}".format(fold))
                 self.load_scaler(fold=fold)
                 train_indices, test_indices = next(iterator)
-                yield self.dataset.get_split_by_index(train_indices, test_indices, fold=fold,
-                                                      random_state=self.random_state)
+                train, test = self.dataset.get_split_by_index(train_indices, test_indices)
+                train.normalize_inputs()
+                test.normalize_inputs()
+                yield train, test
             except StopIteration:
                 break
 
@@ -98,6 +123,8 @@ class TrainingSetCreator:
         self.test_dataset.extraction_method = self.dataset.extraction_method
         for i in range(self.nr_runs):
             print("fold: {}".format(i))
+            self.dataset.normalize_inputs()
+            self.test_dataset.normalize_inputs()
             yield self.dataset, self.test_dataset
 
     def load_scaler(self, **kwargs):

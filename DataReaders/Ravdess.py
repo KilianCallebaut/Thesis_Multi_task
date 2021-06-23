@@ -1,10 +1,9 @@
 import os
 
 import joblib
-from sklearn.model_selection import train_test_split
 
 from DataReaders.DataReader import DataReader
-from DataReaders.ExtractionMethod import extract_options
+from Tasks.Task import MultiClassTask
 from Tasks.TaskDataset import TaskDataset
 
 
@@ -28,6 +27,10 @@ class Ravdess(DataReader):
         return TaskDataset.check(self.get_base_path(), extraction_method) and os.path.isfile(self.get_path())
 
     def load_files(self):
+        if os.path.isfile(self.get_path()):
+            info = joblib.load(self.get_path())
+            self.files = info['files']
+            return
         song_folder = 'Audio_Song_actors_01-24'
         speech_folder = 'Audio_Speech_Actors_01-24'
         self.files = []
@@ -84,47 +87,9 @@ class Ravdess(DataReader):
         targets = [f['emotion'] for f in self.files]
         distinct_targets = list(set(targets))
         targets = [[float(b == f) for b in distinct_targets] for f in targets]
-        self.taskDataset = TaskDataset(inputs=inputs, targets=targets, name="Ravdess", labels=distinct_targets,
+        self.taskDataset = TaskDataset(inputs=inputs, targets=targets,
+                                       task=MultiClassTask(name="Ravdess", output_labels=distinct_targets),
                                        extraction_method=self.extraction_method,
                                        base_path=self.get_base_path(),
-                                       output_module='softmax',
                                        index_mode=self.index_mode,
                                        grouping=[f['actor'] for f in self.files])
-
-    def prepare_taskDatasets(self, test_size, dic_of_labels_limits, **kwargs):
-
-        inputs = self.taskDataset.inputs
-        targets = self.taskDataset.targets
-        if dic_of_labels_limits:
-            inputs, targets = self.sample_labels(self.taskDataset, dic_of_labels_limits)
-
-        x_train, x_val, y_train, y_val = \
-            train_test_split(inputs, targets, test_size=test_size) \
-                if test_size > 0 else (inputs, [], targets, [])
-        self.extraction_method.scale_fit(x_train)
-        x_train, y_train = self.extraction_method.prepare_inputs_targets(x_train, y_train, **kwargs)
-        self.trainTaskDataset = TaskDataset(inputs=x_train, targets=y_train,
-                                            name=self.taskDataset.task.name + "_train",
-                                            labels=self.taskDataset.task.output_labels,
-                                            extraction_method=self.extraction_method,
-                                            base_path=self.get_base_path(),
-                                            output_module=self.taskDataset.task.output_module,
-                                            index_mode=self.index_mode)
-        if test_size > 0:
-            x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val, **kwargs)
-            self.testTaskDataset = TaskDataset(inputs=x_val, targets=y_val,
-                                               name=self.taskDataset.task.name + "_test",
-                                               labels=self.taskDataset.task.output_labels,
-                                               extraction_method=self.extraction_method,
-                                               base_path=self.get_base_path(),
-                                               output_module=self.taskDataset.task.output_module,
-                                               index_mode=self.index_mode)
-
-    def toTrainTaskDataset(self):
-        return self.trainTaskDataset
-
-    def toTestTaskDataset(self):
-        return self.testTaskDataset
-
-    def toValidTaskDataset(self):
-        pass

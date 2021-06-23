@@ -20,27 +20,33 @@ class Results:
     audioset_file_base = r"Result"
     model_checkpoints_path = drive + r":\Thesis_Results\Model_Checkpoints"
 
-    def __init__(self, **kwargs):
+    def __init__(self,
+                 num_epochs: int,
+                 run_name=None,
+                 audioset_train_path=None,
+                 audioset_eval_path=None,
+                 model_checkpoints_path=None):
 
-        if 'run_name' in kwargs:
-            self.run_name = kwargs.get('run_name')
+        if run_name:
+            self.run_name = run_name
         else:
             self.run_name = self.audioset_file_base + "_" + str(
                 datetime.now().strftime("%d_%m_%Y_%H_%M_%S"))
-        if 'audioset_train_path' in kwargs:
-            self.audioset_train_path = kwargs.get('audioset_train_path')
-        if 'audioset_eval_path' in kwargs:
-            self.audioset_eval_path = kwargs.get('audioset_eval_path')
+        if audioset_train_path:
+            self.audioset_train_path = audioset_train_path
+        if audioset_eval_path:
+            self.audioset_eval_path = audioset_eval_path
 
         if not os.path.exists(os.path.join(self.audioset_train_path, self.run_name)):
             os.makedirs(os.path.join(self.audioset_train_path, self.run_name))
         if not os.path.exists(os.path.join(self.audioset_eval_path, self.run_name)):
             os.makedirs(os.path.join(self.audioset_eval_path, self.run_name))
-        if 'model_checkpoints_path' in kwargs:
-            self.model_checkpoints_path = kwargs.pop('model_checkpoints_path')
+
+        if model_checkpoints_path:
+            self.model_checkpoints_path = model_checkpoints_path
 
         self.writer = SummaryWriter(log_dir=os.path.join(self.audioset_train_path, 'experiments', self.run_name))
-        self.num_epochs = kwargs.get('num_epochs')
+        self.num_epochs = num_epochs
         self.training_curve = np.zeros(self.num_epochs)
         self.evaluation_curve = np.zeros(self.num_epochs)
         self.training_curve_task = {}
@@ -126,10 +132,10 @@ class Results:
     def add_loss_to_curve(self, epoch, step, loss, train):
         if train:
             phase = 'Train'
-            self.training_curve[epoch] = loss /step
+            self.training_curve[epoch] = loss / step
         else:
             phase = 'Evaluation'
-            self.evaluation_curve[epoch] = loss /step
+            self.evaluation_curve[epoch] = loss / step
         self.writer.add_scalar("{}/Loss".format(phase), loss / step, epoch)
 
     def load_loss_curve(self, train):
@@ -185,7 +191,7 @@ class Results:
         if epoch == 0:
             return False
 
-        if (self.training_curve[epoch-1] - self.training_curve[epoch]) < 0.1:
+        if (self.training_curve[epoch - 1] - self.training_curve[epoch]) < 0.1:
             return True
 
         return False

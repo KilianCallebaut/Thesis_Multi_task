@@ -2,15 +2,21 @@ import math
 import random
 
 import torch
-from torch.utils.data import RandomSampler, BatchSampler
+from torch.utils.data import RandomSampler, BatchSampler, ConcatDataset
 
 
 class MultiTaskSampler(torch.utils.data.sampler.BatchSampler):
+
     """
-    iterate over tasks and provide a balanced batch per task in each mini-batch
+    Iterate over datasets and provide a batch of a single random dataset interchangeably.
+    Each batch has a maximum length of the given batch size.
     """
 
-    def __init__(self, dataset, batch_size):
+    def __init__(self, dataset: ConcatDataset, batch_size: int):
+        """
+        :param dataset: ConcatDataset containing 1 or more Datasets
+        :param batch_size: Wanted size of each individual batch
+        """
         self.dataset = dataset
         self.batch_size = batch_size
         self.number_of_datasets = len(dataset.datasets)

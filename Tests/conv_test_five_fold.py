@@ -1,7 +1,6 @@
 from __future__ import print_function, division
 
 import sys
-from datetime import datetime
 
 import torch
 
@@ -15,7 +14,6 @@ from DataReaders.SpeechCommands import SpeechCommands
 from MultiTask.MultiTaskHardSharingConvolutional import MultiTaskHardSharingConvolutional
 from Tasks.TrainingSetCreator import ConcatTrainingSetCreator
 from Tests.config_reader import *
-from Training.Results import Results
 from Training.Training import Training
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -25,9 +23,9 @@ data_base = r'F:\Thesis_Results\Data_Readers'
 
 
 def run_five_fold(dataset_list, **kwargs):
-    extraction_params = read_config('extraction_params_cnn_LibMelSpectrogram')
     # extraction_params = read_config('extraction_params_cnn_mfcc')
-    taskDatasets, testDatasets = run_datasets(dataset_list, extraction_params)
+    taskDatasets, testDatasets = run_datasets(dataset_list)
+
     print("Start iteration")
     i = 0
     ctsc = ConcatTrainingSetCreator(training_sets=taskDatasets,
@@ -43,9 +41,10 @@ def run_five_fold(dataset_list, **kwargs):
         i += 1
 
 
-def run_datasets(dataset_list, extraction_params):
+def run_datasets(dataset_list):
     taskDatasets = []
     testDatasets = []
+    extraction_params = read_config('extraction_params_cnn_LibMelSpectrogram')
 
     if 0 in dataset_list:
         asvspoof = ASVspoof2015(**extraction_params,
@@ -83,9 +82,7 @@ def run_datasets(dataset_list, extraction_params):
 
 
 def run_set(concat_training, concat_test, fold):
-    model_checkpoints_path = drive + r":\Thesis_Results\Model_Checkpoints"
-    meta_params = read_config('meta_params_cnn_MelSpectrogram')
-
+    #################################################################################
     task_list = concat_training.get_task_list()
 
     model = MultiTaskHardSharingConvolutional(1,
@@ -98,15 +95,19 @@ def run_set(concat_training, concat_test, fold):
     model = model.to(device)
     print('Model Created')
 
-    # run_name creation
-    run_name = "Result_" + str(
-        datetime.now().strftime("%d_%m_%Y_%H_%M_%S")) + "_" + model.name
-    for n in task_list:
-        run_name += "_" + n.name
-    run_name += "_fold_{}".format(fold)
+    #################################################################################
+    meta_params = read_config('meta_params_cnn_MelSpectrogram')
 
-    results = Results(model_checkpoints_path=model_checkpoints_path,
-                      run_name=run_name, num_epochs=meta_params['num_epochs'])
+    #################################################################################
+
+    # run_name creation
+    results = Training.create_results(modelname=model.name,
+                                      task_list=task_list,
+                                      fold=fold,
+                                      model_checkpoints_path=drive + r":\Thesis_Results\Model_Checkpoints",
+                                      num_epochs=meta_params['num_epochs'])
+    #################################################################################
+
     model, results = Training.run_gradient_descent(model=model,
                                                    concat_dataset=concat_training,
                                                    results=results,
@@ -117,7 +118,6 @@ def run_set(concat_training, concat_test, fold):
 
     del model
     torch.cuda.empty_cache()
-    # run_test(concat_test, meta_params, results)
     results.write_loss_curve_tasks()
     results.write_loss_curves()
     results.close_writer()
@@ -133,7 +133,7 @@ def sample_datasets(datasets):
 def create_index_mode(dataset_list):
     extraction_params = read_config('extraction_params_cnn_LibMelSpectrogram')
     # extraction_params = read_config('extraction_params_cnn_mfcc')
-    taskDatasets, testDatasets = run_datasets(dataset_list, extraction_params)
+    taskDatasets, testDatasets = run_datasets(dataset_list)
     print("Start create index mode")
     ctsc = ConcatTrainingSetCreator(training_sets=taskDatasets,
                                     dics_of_labels_limits=[read_config('dic_of_labels_limits_{}'.format(t.task.name))[
@@ -147,10 +147,10 @@ def create_index_mode(dataset_list):
 
 def main(argv):
     # dataset_list = [2, 5, 4, 1, 0]
-    dataset_list = [5]
-    dataset_list_single = [2, 5, 4, 1, 0]
+    dataset_list = [0, 2, 5, 4, 1]
+    dataset_list_single = [1, 2, 4, 0, 5]
     # dataset_list_double = [[0, 1], [0, 2], [0, 4], [0, 5], [1, 2], [1, 4], [1, 5], [2, 4], [2, 5], [4, 5]]
-    dataset_list_double = [[0, 1], [0, 2], [0, 4], [0, 5], [1, 2], [1, 4], [1, 5], [2, 4], [2, 5], [4, 5]]
+    dataset_list_double = [[1, 5], [2, 4], [2, 5], [4, 5]]
 
     print('--------------------------------------------------')
     print('test loop')
@@ -158,11 +158,13 @@ def main(argv):
 
     # for i in dataset_list:
     #     create_index_mode([i])
+    # for i in dataset_list:
+    #     run_datasets([i])
 
-    for i in dataset_list_single:
-        # create_index_mode([2])
-        # create_index_mode([i])
-        run_five_fold([i])
+    # for i in dataset_list_single:
+    #     # create_index_mode([2])
+    #     # create_index_mode([i])
+    #     run_five_fold([i])
     #     # for j in range(i + 1, len(dataset_list)):
     #     #     #     # check_distributions([dataset_list[i], dataset_list[j]])
     #     #     run_five_fold([dataset_list[i], dataset_list[j]], fold=4)

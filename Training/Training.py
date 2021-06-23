@@ -19,6 +19,19 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class Training:
 
+    @staticmethod
+    def create_results(modelname, task_list, num_epochs, model_checkpoints_path=None, fold=None):
+        # run_name creation
+        run_name = "Result_" + str(
+            datetime.datetime.now().strftime("%d_%m_%Y_%H_%M_%S")) + "_" + modelname
+        for n in task_list:
+            run_name += "_" + n.name
+        if fold:
+            run_name += "_fold_{}".format(fold)
+        results = Results(model_checkpoints_path=model_checkpoints_path,
+                          run_name=run_name, num_epochs=num_epochs)
+        return results
+
     # Source: https://www.cs.toronto.edu/~lczhang/321/tut/tut04.pdf
     # Also helpful: https://github.com/sugi-chan/pytorch_multitask/blob/master/pytorch%20multi-task-Copy2.ipynb
     @staticmethod
@@ -30,26 +43,37 @@ class Training:
                              weight_decay=0,
                              num_epochs=50,
                              start_epoch=0,
-                             **kwargs):
+                             test_dataset=None,
+                             optimizer=None,
+                             train_loader=None):
         datasets = concat_dataset.datasets
         task_list = concat_dataset.get_task_list()
         n_tasks = len(task_list)
 
-        criteria = [nn.BCELoss().to(device) if t.output_module == 'sigmoid' else nn.CrossEntropyLoss().to(device)
-                    for t in task_list]
-        target_flags = [
-            [False for _ in x.pad_before] + [True for _ in x.targets[0]] + [False for _ in x.pad_after]
-            for x in datasets]
-        train_loader = torch.utils.data.DataLoader(
-            concat_dataset,
-            num_workers=0,
-            pin_memory=True,
-            batch_sampler=MultiTaskSampler(dataset=concat_dataset, batch_size=batch_size)
-        )
-        print(len(train_loader))
+        criteria = [t.loss_function for t in task_list]
 
-        # optimizer = optim.SGD(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
-        optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+        if not results:
+            results = Training.create_results(
+                modelname=model.name,
+                task_list=task_list,
+                num_epochs=num_epochs
+            )
+
+        if not train_loader:
+            train_loader = torch.utils.data.DataLoader(
+                concat_dataset,
+                num_workers=0,
+                pin_memory=True,
+                batch_sampler=MultiTaskSampler(dataset=concat_dataset, batch_size=batch_size)
+            )
+            print(len(train_loader))
+
+        if not optimizer:
+            # optimizer = optim.SGD(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+            optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+
+        #
+        target_flags = concat_dataset.get_target_flags()
 
         # Epoch
         for epoch in range(start_epoch, num_epochs):
@@ -117,10 +141,11 @@ class Training:
 
                         filtered_labels = filtered_labels[batch_flags[i], :]
                         filtered_labels = filtered_labels[:, target_flags[i]]
-
-                    losses_batch[i] = criteria[i](filtered_output,
-                                                  Training.calculate_labels(task_list[i].output_module,
-                                                                            filtered_labels))
+                    filtered_labels = task_list[i].translate_labels(filtered_labels)
+                    # losses_batch[i] = criteria[i](filtered_output,
+                    #                               Training.calculate_labels(task_list[i].classification_type,
+                    #                                                         filtered_labels))
+                    losses_batch[i] = criteria[i](filtered_output, filtered_labels)
                     output_batch[i] = filtered_output.detach()
                     labels_batch[i] = filtered_labels.detach()
 
@@ -133,14 +158,20 @@ class Training:
                 # Statistics
                 running_loss += loss.item() * inputs.size(0)
                 step += 1
-                task_labels = [
-                    task_labels[t] +
-                    [Training.get_actual_labels(l[None, :], task_list[t]).tolist() for l in labels_batch[t]] for
-                    t in range(len(labels_batch))]
-                task_predictions = [
-                    task_predictions[t] +
-                    [Training.get_actual_output(l[None, :], task_list[t]).tolist() for l in output_batch[t]] for
-                    t in range(len(output_batch))]
+
+                for t in range(len(task_list)):
+                    task_labels[t] += labels_batch[t].tolist()
+                    task_predictions[t] += task_list[t].decision_making(output_batch[t]).tolist()
+
+                # task_labels = [
+                #     task_labels[t] +
+                #     [Training.get_actual_labels(l[None, :], task_list[t]).tolist() for l in labels_batch[t]] for
+                #     t in range(len(labels_batch))]
+                # task_predictions = [
+                #     task_predictions[t] +
+                #     [Training.get_actual_output(l[None, :], task_list[t]).tolist() for l in output_batch[t]] for
+                #     # [task_list[t].decision_making(l).tolist() for l in output_batch[t]] for
+                #     t in range(len(output_batch))]
                 task_running_losses = [task_running_losses[t] + losses_batch[t].item()
                                        for t in range(len(losses_batch))]
 
@@ -158,10 +189,10 @@ class Training:
                 results.add_class_report(epoch, epoch_metrics[t], task_list[t], True)
                 results.add_loss_to_curve_task(epoch, step, task_running_losses[t], task_list[t], True)
                 mat = []
-                if task_list[t].output_module == "softmax":
+                if task_list[t].classification_type == "multi-class":
                     mat = metrics.confusion_matrix(task_labels[t], task_predictions[t])
                     results.add_confusion_matrix(epoch, mat, task_list[t], True)
-                elif task_list[t].output_module == "sigmoid":
+                elif task_list[t].classification_type == "multi-label":
                     mat = metrics.multilabel_confusion_matrix(task_labels[t], task_predictions[t])
                     results.add_multi_confusion_matrix(epoch, mat, task_list[t], True)
 
@@ -170,9 +201,9 @@ class Training:
 
             results.add_model_parameters(epoch, model)
 
-            if 'test_dataset' in kwargs:
+            if test_dataset:
                 Training.evaluate(model,
-                                  kwargs.get('test_dataset'),
+                                  test_dataset,
                                   results,
                                   batch_size,
                                   num_epochs=epoch + 1,
@@ -194,23 +225,23 @@ class Training:
                  batch_size=64,
                  num_epochs=50,
                  start_epoch=0,
-                 blank=True):
+                 blank=True,
+                 eval_loader=None):
 
         datasets = concat_dataset.datasets
         task_list = [x.task for x in datasets]
         n_tasks = len(task_list)
+        target_flags = concat_dataset.get_target_flags()
 
-        criteria = [nn.BCELoss().to(device) if d.task.output_module == 'sigmoid' else nn.CrossEntropyLoss().to(device)
-                    for d in datasets]
-        target_flags = [
-            [False for _ in x.pad_before] + [True for _ in x.targets[0]] + [False for _ in x.pad_after]
-            for x in datasets]
-        eval_loader = torch.utils.data.DataLoader(
-            concat_dataset,
-            num_workers=0,
-            pin_memory=True,
-            batch_sampler=MultiTaskSampler(dataset=concat_dataset, batch_size=batch_size)
-        )
+        criteria = [t.loss_function for t in task_list]
+
+        if not eval_loader:
+            eval_loader = torch.utils.data.DataLoader(
+                concat_dataset,
+                num_workers=0,
+                pin_memory=True,
+                batch_sampler=MultiTaskSampler(dataset=concat_dataset, batch_size=batch_size)
+            )
 
         blank_model.eval()
 
@@ -278,9 +309,11 @@ class Training:
                             filtered_labels = filtered_labels[batch_flags[i], :]
                             filtered_labels = filtered_labels[:, target_flags[i]]
 
-                        losses_batch[i] = criteria[i](filtered_output,
-                                                      Training.calculate_labels(task_list[i].output_module,
-                                                                                filtered_labels))
+                        filtered_labels = task_list[i].translate_labels(filtered_labels)
+                        # losses_batch[i] = criteria[i](filtered_output,
+                        #                               Training.calculate_labels(task_list[i].classification_type,
+                        #                                                         filtered_labels))
+                        losses_batch[i] = criteria[i](filtered_output, filtered_labels)
                         output_batch[i] = filtered_output.detach()
                         labels_batch[i] = filtered_labels.detach()
 
@@ -288,14 +321,19 @@ class Training:
 
                     running_loss += loss.item() * inputs.size(0)
                     step += 1
-                    task_labels = [
-                        task_labels[t] +
-                        [Training.get_actual_labels(l[None, :], task_list[t]).tolist() for l in labels_batch[t]] for
-                        t in range(len(labels_batch))]
-                    task_predictions = [
-                        task_predictions[t] +
-                        [Training.get_actual_output(l[None, :], task_list[t]).tolist() for l in output_batch[t]] for
-                        t in range(len(output_batch))]
+                    for t in range(len(task_list)):
+                        task_labels[t] += labels_batch[t].tolist()
+                        task_predictions[t] += task_list[t].decision_making(output_batch[t]).tolist()
+
+                    # task_labels = [
+                    #     task_labels[t] +
+                    #     [Training.get_actual_labels(l[None, :], task_list[t]).tolist() for l in labels_batch[t]] for
+                    #     t in range(len(labels_batch))]
+                    # task_predictions = [
+                    #     task_predictions[t] +
+                    #     # [Training.get_actual_output(l[None, :], task_list[t]).tolist() for l in output_batch[t]] for
+                    #     [task_list[t].decision_making(l).tolist() for l in output_batch[t]] for
+                    #     t in range(len(output_batch))]
                     task_running_losses = [task_running_losses[t] + losses_batch[t].item()
                                            for t in range(len(losses_batch))]
 
@@ -315,10 +353,10 @@ class Training:
 
                     mat = []
 
-                    if task_list[t].output_module == "softmax":
+                    if task_list[t].classification_type == "multi-class":
                         mat = metrics.confusion_matrix(task_labels[t], task_predictions[t])
                         training_results.add_confusion_matrix(epoch, mat, task_list[t], False)
-                    elif task_list[t].output_module == "sigmoid":
+                    elif task_list[t].classification_type == "multi-label":
                         mat = metrics.multilabel_confusion_matrix(task_labels[t], task_predictions[t])
                         training_results.add_multi_confusion_matrix(epoch, mat, task_list[t], False)
                     print(task_list[t].output_labels)
@@ -329,51 +367,24 @@ class Training:
         print('Wrote Evaluation Results')
 
     @staticmethod
-    def calculate_labels(output_module, output):
-        if output_module == 'softmax':
+    def calculate_labels(classification_type, output):
+        if classification_type == 'multi-class':
             return torch.max(output, 1)[1]
         return output.float()
 
     @staticmethod
     def get_actual_output(output, task):
-        if task.output_module == "softmax":
+        if task.classification_type == "multi-class":
             translated_out = torch.max(output, 1)[1]
             return translated_out
-        elif task.output_module == "sigmoid":
+        elif task.classification_type == "multi-label":
             translated_out = (output >= 0.5).float()
             return torch.squeeze(translated_out)
 
     @staticmethod
     def get_actual_labels(target, task):
-        if task.output_module == "softmax":
+        if task.classification_type == "multi-class":
             translated_target = torch.max(target, 1)[1]
             return translated_target
-        elif task.output_module == "sigmoid":
+        elif task.classification_type == "multi-label":
             return torch.squeeze(target)
-
-
-def plot_multilabel_confusion(conf_matrix, labels):
-    fig, ax = plt.subplots(4 * math.floor(len(labels) / 4), 4 - len(labels) % 4)
-
-    for axes, cfs_matrix, label in zip(ax.flatten(), conf_matrix, labels):
-        print_confusion_matrix(cfs_matrix, axes, label, ["N", "Y"])
-
-    # fig.tight_layout()
-    # plt.show()
-    return fig
-
-
-def print_confusion_matrix(confusion_matrix, axes, class_label, class_names, fontsize=14):
-    df_cm = pd.DataFrame(
-        confusion_matrix, index=class_names, columns=class_names,
-    )
-
-    try:
-        heatmap = sns.heatmap(df_cm, annot=True, fmt="d", cbar=False, ax=axes)
-    except ValueError:
-        raise ValueError("Confusion matrix values must be integers.")
-    heatmap.yaxis.set_ticklabels(heatmap.yaxis.get_ticklabels(), rotation=0, ha='right', fontsize=fontsize)
-    heatmap.xaxis.set_ticklabels(heatmap.xaxis.get_ticklabels(), rotation=45, ha='right', fontsize=fontsize)
-    axes.set_ylabel('True label')
-    axes.set_xlabel('Predicted label')
-    axes.set_title("Confusion Matrix for the class - " + class_label)

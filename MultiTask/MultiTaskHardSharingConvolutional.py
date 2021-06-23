@@ -11,11 +11,11 @@ class MultiTaskHardSharingConvolutional(nn.Module):
             hidden_size,  # 64
             n_hidden,
             task_list,
-            drop_rate
+            drop_rate=None
     ):
         super().__init__()
         self.name = 'cnn'
-        self.task_list = [t.output_module for t in task_list]
+        self.classification_types = [t.classification_type for t in task_list]
 
         self.hidden = nn.ModuleList()
         self.hidden_bn = nn.ModuleList()
@@ -53,10 +53,10 @@ class MultiTaskHardSharingConvolutional(nn.Module):
             nn.init.constant_(self.task_nets[t].bias, 0.0)
 
     def activate(self, x, activation):
-        if activation == 'softmax':
+        if activation == 'multi-class':
             x = F.log_softmax(x, dim=-1)
             return x
-        elif activation == 'sigmoid':
+        elif activation == 'multi-label':
             x = torch.sigmoid(x)
             return x
 
@@ -65,9 +65,11 @@ class MultiTaskHardSharingConvolutional(nn.Module):
         x = x[:, None, :, :]
         '''x: (batch_size, n_channels=1, time_steps, mel_bins)'''
         for layer_id in range(len(self.hidden)):
-            x = F.dropout(F.relu_(self.hidden_bn[layer_id](self.hidden[layer_id](x))),
-                          p=self.drop_rate,
-                          training=self.training)
+            x = F.relu_(self.hidden_bn[layer_id](self.hidden[layer_id](x)))
+            if self.drop_rate:
+                x = F.dropout(x,
+                              p=self.drop_rate,
+                              training=self.training)
             x = F.max_pool2d(x, kernel_size=(2, 2), stride=2)
 
         # Global max pooling
@@ -75,5 +77,5 @@ class MultiTaskHardSharingConvolutional(nn.Module):
         x = x.view(x.shape[0:2])
         '''x: (batch_size, feature_maps)'''
 
-        return tuple(self.activate(self.task_nets[task_model_id](x), self.task_list[task_model_id])
-                     for task_model_id in range(len(self.task_list)))
+        return tuple(self.activate(self.task_nets[task_model_id](x), self.classification_types[task_model_id])
+                     for task_model_id in range(len(self.classification_types)))

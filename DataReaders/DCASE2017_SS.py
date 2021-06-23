@@ -3,9 +3,8 @@ import os
 import joblib
 from dcase_util.datasets import TUTAcousticScenes_2017_DevelopmentSet, TUTAcousticScenes_2017_EvaluationSet
 from numpy import long
-from sklearn.model_selection import train_test_split
 
-from DataReaders.ExtractionMethod import extract_options
+from Tasks.Task import MultiClassTask
 
 try:
     import cPickle
@@ -86,8 +85,11 @@ class DCASE2017_SS(DataReader):
 
         # info = joblib.load(self.get_eval_path())
         # self.audio_files_eval = info['audio_files_eval']
-        self.valTaskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_eval_base_path(),
-                                          index_mode=self.index_mode)
+        self.valTaskDataset = TaskDataset(inputs=[],
+                                          targets=[],
+                                          task=MultiClassTask(name='', output_labels=[]),
+                                          extraction_method=self.extraction_method,
+                                          base_path=self.get_eval_base_path(), index_mode=self.index_mode)
         self.valTaskDataset.load(self.get_eval_base_path())
         print('Reading SS done')
 
@@ -149,61 +151,15 @@ class DCASE2017_SS(DataReader):
 
         self.taskDataset = TaskDataset(inputs=inputs,
                                        targets=targets,
-                                       name='DCASE2017_SS',
-                                       labels=distinct_labels,
+                                       task=MultiClassTask(name='DCASE2017_SS', output_labels=distinct_labels),
                                        extraction_method=self.extraction_method,
                                        base_path=self.get_base_path(),
-                                       output_module='softmax',
                                        index_mode=self.index_mode)
 
         self.valTaskDataset = TaskDataset(inputs=inputs_val,
                                           targets=targets_val,
-                                          name='DCASE2017_SS_eval',
-                                          labels=distinct_labels,
+                                          task=MultiClassTask(name='DCASE2017_SS_eval', output_labels=distinct_labels),
                                           extraction_method=self.extraction_method,
                                           base_path=self.get_eval_base_path(),
-                                          output_module='softmax',
                                           index_mode=self.index_mode
                                           )
-
-    def prepare_taskDatasets(self, test_size, dic_of_labels_limits, **kwargs):
-        inputs = self.taskDataset.inputs
-        targets = self.taskDataset.targets
-        if dic_of_labels_limits:
-            inputs, targets = self.sample_labels(self.taskDataset, dic_of_labels_limits)
-
-        x_train, x_val, y_train, y_val = \
-            train_test_split(inputs, targets,
-                             test_size=test_size) \
-                if test_size > 0 else (inputs, [], targets, [])
-        self.extraction_method.scale_fit(x_train)
-        x_train, y_train = self.extraction_method.prepare_inputs_targets(x_train, y_train, **kwargs)
-        self.trainTaskDataset = TaskDataset(inputs=x_train, targets=y_train,
-                                            name=self.taskDataset.task.name + "_train",
-                                            labels=self.taskDataset.task.output_labels,
-                                            extraction_method=self.extraction_method,
-                                            base_path=self.get_base_path(),
-                                            output_module=self.taskDataset.task.output_module,
-                                            index_mode=self.index_mode)
-        if test_size > 0:
-            x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val, **kwargs)
-            self.testTaskDataset = TaskDataset(inputs=x_val, targets=y_val,
-                                               name=self.taskDataset.task.name + "_test",
-                                               labels=self.taskDataset.task.output_labels,
-                                               extraction_method=self.extraction_method,
-                                               base_path=self.get_base_path(),
-                                               output_module=self.taskDataset.task.output_module,
-                                               index_mode=self.index_mode)
-
-        self.valTaskDataset.inputs, self.valTaskDataset.targets \
-            = self.extraction_method.prepare_inputs_targets(self.valTaskDataset.inputs, self.valTaskDataset.targets,
-                                                            **kwargs)
-
-    def toTrainTaskDataset(self):
-        return self.trainTaskDataset
-
-    def toTestTaskDataset(self):
-        return self.testTaskDataset
-
-    def toValidTaskDataset(self):
-        return self.valTaskDataset

@@ -2,10 +2,9 @@ import os
 
 import joblib
 import tensorflow_datasets as tfds
-from sklearn.model_selection import train_test_split
 
 from DataReaders.DataReader import DataReader
-from DataReaders.ExtractionMethod import extract_options
+from Tasks.Task import MultiClassTask
 from Tasks.TaskDataset import TaskDataset
 
 
@@ -45,7 +44,10 @@ class SpeechCommands(DataReader):
         # self.load_files()
         self.taskDataset.load(self.get_base_path())
 
-        self.validTaskDataset = TaskDataset([], [], '', [], self.extraction_method, base_path=self.get_eval_base_path(),
+        self.validTaskDataset = TaskDataset(inputs=[], targets=[],
+                                            task=MultiClassTask(name='', output_labels=[]),
+                                            extraction_method=self.extraction_method,
+                                            base_path=self.get_eval_base_path(),
                                             index_mode=self.index_mode)
         self.validTaskDataset.load(self.get_eval_base_path())
 
@@ -57,7 +59,7 @@ class SpeechCommands(DataReader):
         self.validTaskDataset.save(self.get_eval_base_path())
 
     def calculate_input(self, **kwargs):
-        inputs_tot = [[],[]]
+        inputs_tot = [[], []]
         resample_to = None
         if 'resample_to' in kwargs:
             resample_to = kwargs.pop('resample_to')
@@ -69,6 +71,7 @@ class SpeechCommands(DataReader):
                 if resample_to is not None:
                     audio, fs = self.resample(audio, self.sample_rate, resample_to)
                 inputs_tot[ds_id].append(self.extraction_method.extract_features((audio, fs), **kwargs))
+                print('input amount: {}'.format(len(inputs_tot[ds_id])), end='\r')
 
         return inputs_tot[0], inputs_tot[1]
 
@@ -89,55 +92,14 @@ class SpeechCommands(DataReader):
             targets_t.append(audio_label["label"])
         targets_t = [[float(b == f) for b in range(len(self.ds_info.features['label'].names))] for f in targets_t]
 
-        self.taskDataset = TaskDataset(inputs=inputs, targets=targets, name="SpeechCommands_train",
-                                       labels=self.ds_info.features['label'].names,
+        self.taskDataset = TaskDataset(inputs=inputs, targets=targets,
+                                       task=MultiClassTask(name="SpeechCommands_train",
+                                                           output_labels=self.ds_info.features['label'].names),
                                        extraction_method=self.extraction_method, base_path=self.get_base_path(),
-                                       output_module='softmax',
                                        index_mode=self.index_mode)
         self.validTaskDataset = TaskDataset(inputs=inputs_t, targets=targets_t,
-                                            name="SpeechCommands_eval",
-                                            extraction_method=self.extraction_method,
-                                            labels=self.ds_info.features['label'].names,
-                                            base_path=self.get_base_path(), output_module='softmax',
-                                            index_mode=self.index_mode)
-
-    def prepare_taskDatasets(self, test_size, dic_of_labels_limits, **kwargs):
-        inputs = self.taskDataset.inputs
-        targets = self.taskDataset.targets
-        if dic_of_labels_limits:
-            inputs, targets = self.sample_labels(self.taskDataset, dic_of_labels_limits)
-
-        x_train, x_val, y_train, y_val = \
-            train_test_split(inputs, targets, test_size=test_size) \
-                if test_size > 0 else (inputs, [], targets, [])
-        self.extraction_method.scale_fit(x_train)
-        x_train, y_train = self.extraction_method.prepare_inputs_targets(x_train, y_train, **kwargs)
-        self.trainTaskDataset = TaskDataset(inputs=x_train, targets=y_train,
-                                            name=self.taskDataset.task.name + "_train",
-                                            labels=self.taskDataset.task.output_labels,
+                                            task=MultiClassTask(name="SpeechCommands_eval",
+                                                                output_labels=self.ds_info.features['label'].names),
                                             extraction_method=self.extraction_method,
                                             base_path=self.get_base_path(),
-                                            output_module=self.taskDataset.task.output_module,
                                             index_mode=self.index_mode)
-        if test_size > 0:
-            x_val, y_val = self.extraction_method.prepare_inputs_targets(x_val, y_val, **kwargs)
-            self.testTaskDataset = TaskDataset(inputs=x_val, targets=y_val,
-                                               name=self.taskDataset.task.name + "_test",
-                                               labels=self.taskDataset.task.output_labels,
-                                               extraction_method=self.extraction_method,
-                                               base_path=self.get_base_path(),
-                                               output_module=self.taskDataset.task.output_module,
-                                               index_mode=self.index_mode)
-
-        self.validTaskDataset.inputs, self.validTaskDataset.targets = \
-            self.extraction_method.prepare_inputs_targets(self.validTaskDataset.inputs, self.validTaskDataset.targets,
-                                                          **kwargs)
-
-    def toTrainTaskDataset(self):
-        return self.trainTaskDataset
-
-    def toTestTaskDataset(self):
-        return self.testTaskDataset
-
-    def toValidTaskDataset(self):
-        return self.validTaskDataset
