@@ -50,13 +50,13 @@ class DCASE2017_SE(DataReader):
     def read_files(self):
         # info = joblib.load(self.get_path())
         # self.audio_files = info['audio_files']
-        self.taskDataset.load(self.get_base_path())
+        self.taskDataset.load()
         print('Reading SS done')
 
     def write_files(self):
         dict = {'audio_files': self.audio_files}
         joblib.dump(dict, self.get_path())
-        self.taskDataset.save(self.get_base_path())
+        self.taskDataset.save()
 
     def calculate_input(self, resample_to=None, **kwargs):
 

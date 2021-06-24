@@ -6,6 +6,7 @@ import tensorflow_datasets as tfds
 from DataReaders.DataReader import DataReader
 from Tasks.Task import MultiClassTask
 from Tasks.TaskDataset import TaskDataset
+from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 
 
 class SpeechCommands(DataReader):
@@ -18,6 +19,7 @@ class SpeechCommands(DataReader):
         print('start Speech commands')
         super().__init__(extraction_method, **kwargs)
         print('Done loading Speech Commands')
+        self.taskDataset.add_train_test_paths(self.get_base_path(), self.get_eval_base_path())
 
     def get_path(self):
         return os.path.join(self.get_base_path(), 'SpeechCommands.obj')
@@ -42,21 +44,13 @@ class SpeechCommands(DataReader):
 
     def read_files(self):
         # self.load_files()
-        self.taskDataset.load(self.get_base_path())
-
-        self.validTaskDataset = TaskDataset(inputs=[], targets=[],
-                                            task=MultiClassTask(name='', output_labels=[]),
-                                            extraction_method=self.extraction_method,
-                                            base_path=self.get_eval_base_path(),
-                                            index_mode=self.index_mode)
-        self.validTaskDataset.load(self.get_eval_base_path())
+        self.taskDataset.load()
 
     def write_files(self):
         dict = {}
         joblib.dump(dict, self.get_path())
         joblib.dump(dict, self.get_eval_path())
-        self.taskDataset.save(self.get_base_path())
-        self.validTaskDataset.save(self.get_eval_base_path())
+        self.taskDataset.save()
 
     def calculate_input(self, **kwargs):
         inputs_tot = [[], []]
@@ -92,14 +86,14 @@ class SpeechCommands(DataReader):
             targets_t.append(audio_label["label"])
         targets_t = [[float(b == f) for b in range(len(self.ds_info.features['label'].names))] for f in targets_t]
 
-        self.taskDataset = TaskDataset(inputs=inputs, targets=targets,
-                                       task=MultiClassTask(name="SpeechCommands_train",
-                                                           output_labels=self.ds_info.features['label'].names),
-                                       extraction_method=self.extraction_method, base_path=self.get_base_path(),
-                                       index_mode=self.index_mode)
-        self.validTaskDataset = TaskDataset(inputs=inputs_t, targets=targets_t,
-                                            task=MultiClassTask(name="SpeechCommands_eval",
-                                                                output_labels=self.ds_info.features['label'].names),
-                                            extraction_method=self.extraction_method,
-                                            base_path=self.get_base_path(),
-                                            index_mode=self.index_mode)
+        self.taskDataset = HoldTaskDataset(inputs=[], targets=[],
+                                           task=MultiClassTask(name="SpeechCommands",
+                                                               output_labels=self.ds_info.features['label'].names),
+                                           extraction_method=self.extraction_method,
+                                           index_mode=self.index_mode)
+        self.taskDataset.add_train_test_set(
+            training_inputs=inputs,
+            training_targets=targets,
+            testing_inputs=inputs_t,
+            testing_targets=targets_t
+        )

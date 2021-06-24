@@ -113,14 +113,14 @@ class ChenAudiosetDataset(DataReader):
         # self.files = info['files']
         # self.np_objects = info['np_objects']
         # self.wav_files = info['wav_files']
-        self.taskDataset.load(self.get_base_path())
+        self.taskDataset.load()
 
     def write_files(self):
         dict = {'files': self.files,
                 'np_objects': self.np_objects,
                 'wav_files': self.wav_files}
         joblib.dump(dict, self.get_path())
-        self.taskDataset.save(self.get_base_path())
+        self.taskDataset.save()
 
     def calculate_taskDataset(self, **kwargs):
         print('Calculating input')

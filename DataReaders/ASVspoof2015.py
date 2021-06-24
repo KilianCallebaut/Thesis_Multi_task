@@ -90,14 +90,14 @@ class ASVspoof2015(DataReader):
         # self.files_val = info['files_val']
         # self.truths_val = info['truths_val']
 
-        self.taskDataset.load(self.get_base_path())
+        self.taskDataset.load()
 
     def write_files(self):
         dict = {'files': self.files,
                 'truths': self.truths,
                 }
         joblib.dump(dict, self.get_path())
-        self.taskDataset.save(self.get_base_path())
+        self.taskDataset.save()
 
     # which = develop, evaluation
     def calculate_input(self, resample_to=None, **kwargs):

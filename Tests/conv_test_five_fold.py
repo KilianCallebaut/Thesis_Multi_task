@@ -24,15 +24,14 @@ data_base = r'F:\Thesis_Results\Data_Readers'
 
 def run_five_fold(dataset_list, **kwargs):
     # extraction_params = read_config('extraction_params_cnn_mfcc')
-    taskDatasets, testDatasets = run_datasets(dataset_list)
+    taskDatasets = run_datasets(dataset_list)
 
     print("Start iteration")
     i = 0
     ctsc = ConcatTrainingSetCreator(training_sets=taskDatasets,
                                     dics_of_labels_limits=[read_config('dic_of_labels_limits_{}'.format(t.task.name))[
                                                                'dic_of_labels_limits'] for t in taskDatasets],
-                                    random_state=123,
-                                    test_sets=testDatasets)
+                                    random_state=123)
     for train, test in ctsc.generate_concats():
         if 'fold' in kwargs and kwargs.get('fold') > i:
             i += 1
@@ -43,7 +42,6 @@ def run_five_fold(dataset_list, **kwargs):
 
 def run_datasets(dataset_list):
     taskDatasets = []
-    testDatasets = []
     extraction_params = read_config('extraction_params_cnn_LibMelSpectrogram')
 
     if 0 in dataset_list:
@@ -58,7 +56,6 @@ def run_datasets(dataset_list):
         dcaseScene = DCASE2017_SS(**extraction_params,
                                   object_path=os.path.join(data_base, 'DCASE2017_SS_{}'))
         taskDatasets.append(dcaseScene.taskDataset)
-        testDatasets.append(dcaseScene.valTaskDataset)
     if 3 in dataset_list:
         fsdkaggle = FSDKaggle2018(**extraction_params,
                                   object_path=os.path.join(data_base, 'FSDKaggle2018_{}'))
@@ -71,14 +68,13 @@ def run_datasets(dataset_list):
         speechcommands = SpeechCommands(**extraction_params,
                                         object_path=os.path.join(data_base, 'SpeechCommands_{}'))
         taskDatasets.append(speechcommands.taskDataset)
-        testDatasets.append(speechcommands.validTaskDataset)
     if 6 in dataset_list:
         dcaseEvents = DCASE2017_SE(**extraction_params,
                                    object_path=os.path.join(data_base, 'DCASE2017_SE_{}'))
         taskDatasets.append(dcaseEvents.taskDataset)
     print('loaded all datasets')
 
-    return taskDatasets, testDatasets
+    return taskDatasets
 
 
 def run_set(concat_training, concat_test, fold):
@@ -131,16 +127,12 @@ def sample_datasets(datasets):
 
 
 def create_index_mode(dataset_list):
-    extraction_params = read_config('extraction_params_cnn_LibMelSpectrogram')
-    # extraction_params = read_config('extraction_params_cnn_mfcc')
-    taskDatasets, testDatasets = run_datasets(dataset_list)
+    taskDatasets = run_datasets(dataset_list)
     print("Start create index mode")
     ctsc = ConcatTrainingSetCreator(training_sets=taskDatasets,
                                     dics_of_labels_limits=[read_config('dic_of_labels_limits_{}'.format(t.task.name))[
                                                                'dic_of_labels_limits'] for t in taskDatasets],
-                                    random_state=123,
-                                    test_sets=testDatasets)
-    ctsc.prepare_scalers()
+                                    random_state=123)
     print('writing to index mode')
     ctsc.prepare_for_index_mode()
 
@@ -150,7 +142,7 @@ def main(argv):
     dataset_list = [0, 2, 5, 4, 1]
     dataset_list_single = [1, 2, 4, 0, 5]
     # dataset_list_double = [[0, 1], [0, 2], [0, 4], [0, 5], [1, 2], [1, 4], [1, 5], [2, 4], [2, 5], [4, 5]]
-    dataset_list_double = [[1, 5], [2, 4], [2, 5], [4, 5]]
+    dataset_list_double = [[2, 4], [2, 5], [4, 5]]
 
     print('--------------------------------------------------')
     print('test loop')

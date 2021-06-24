@@ -2,6 +2,7 @@ import os
 import pickle
 import random
 import types
+from typing import List, Tuple
 
 import joblib
 import numpy as np
@@ -34,14 +35,14 @@ class TaskDataset(Dataset):
     # now requires sampling to be called beforehand, save scalers to be called beforehand
     def __init__(
             self,
-            inputs,
-            targets,
+            inputs: List[torch.tensor],
+            targets: List[List],
             task: Task,
             extraction_method: ExtractionMethod,
             base_path: str,
             index_mode=False,
-            grouping=None,
-            extra_tasks=None
+            grouping: List = None,
+            extra_tasks: List[Tuple] = None
     ):
         """
         Initializes the Taskdataset object
@@ -101,30 +102,27 @@ class TaskDataset(Dataset):
         self.pad_before = [0 for _ in range(before)]
         self.pad_after = [0 for _ in range(after)]
 
-    def declare_train_set(self):
-        self.task.name = "_train"
-
-    def declare_test_set(self):
-        self.task.name += "_test"
-
-    def save(self, base_path):
-        joblib.dump(self.inputs, os.path.join(base_path, '{}_inputs.gz'.format(self.extraction_method.name)))
+    def save(self):
+        joblib.dump(self.inputs, os.path.join(self.base_path, '{}_inputs.gz'.format(self.extraction_method.name)))
         t_s = torch.Tensor(self.targets)
-        torch.save(t_s, os.path.join(base_path, 'targets.pt'))
+        torch.save(t_s, os.path.join(self.base_path, 'targets.pt'))
 
         diction = {
             'task': self.task,
-            'grouping': self.grouping
+            'grouping': self.grouping,
+            'extra_tasks': self.extra_tasks
         }
-        joblib.dump(diction, os.path.join(base_path, 'other.obj'))
+        joblib.dump(diction, os.path.join(self.base_path, 'other.obj'))
 
-    def load(self, base_path):
-        self.inputs = joblib.load(os.path.join(base_path, '{}_inputs.gz'.format(self.extraction_method.name)))
-        t_l = torch.load(os.path.join(base_path, 'targets.pt'))
+    def load(self):
+        self.inputs = joblib.load(os.path.join(self.base_path, '{}_inputs.gz'.format(self.extraction_method.name)))
+        t_l = torch.load(os.path.join(self.base_path, 'targets.pt'))
         self.targets = [[int(j) for j in i] for i in t_l]
-        diction = joblib.load(os.path.join(base_path, 'other.obj'))
+        diction = joblib.load(os.path.join(self.base_path, 'other.obj'))
         self.task = diction['task']
         self.grouping = diction['grouping']
+        if diction.keys().__contains__('extra_tasks'):
+            self.extra_tasks = diction['extra_tasks']
 
     def sample_labels(self, dic_of_labels_limits, random_state=None):
         """
@@ -154,168 +152,150 @@ class TaskDataset(Dataset):
         self.targets = sampled_targets
         self.grouping = sampled_grouping
 
-    def sample_dataset(self, random_state=None):
-        """
-            Takes 1/5th of complete dataset
-            :return: sampled datasets
-        """
-        it = self.k_folds(random_state=random_state)
-        _, sample = next(it)
-        return TaskDataset(
-            inputs=[self.inputs[i] for i in sample],
-            targets=[self.targets[i] for i in sample],
-            task=self.task,
-            extraction_method=self.extraction_method,
-            base_path=self.base_path,
-            index_mode=self.index_mode,
-            grouping=self.grouping,
-            extra_tasks=self.extra_tasks
-        )
-
-    # k_folds splitting
-    def k_folds(self, random_state=None, n_splits=5):
-        """
-        Produces a k_fold training/test split generator, depending on the task type
-
-        :param n_splits: number of folds
-        :param random_state: optional int for reproducability purposes
-        :return: _BaseKFold object
-        """
-        # Examples
-        # --------
-        # >> > import numpy as np
-        # >> > from sklearn.model_selection import KFold
-        # >> > X = np.array([[1, 2], [3, 4], [1, 2], [3, 4]])
-        # >> > y = np.array([1, 2, 3, 4])
-        # >> > kf = KFold(n_splits=2)
-        # >> > kf.get_n_splits(X)
-        # 2
-        # >> > print(kf)
-        # KFold(n_splits=2, random_state=None, shuffle=False)
-        # >> > for train_index, test_index in kf.split(X):
-        #     ...
-        #     print("TRAIN:", train_index, "TEST:", test_index)
-        # ...
-        # X_train, X_test = X[train_index], X[test_index]
-        # ...
-        # y_train, y_test = y[train_index], y[test_index]
-        # TRAIN: [2 3]
-        # TEST: [0 1]
-        # TRAIN: [0 1]
-        # TEST: [2 3]
-
-        # Stratified KFold
-        # Examples
-        # --------
-        # >> > import numpy as np
-        # >> > from sklearn.model_selection import StratifiedKFold
-        # >> > X = np.array([[1, 2], [3, 4], [1, 2], [3, 4]])
-        # >> > y = np.array([0, 0, 1, 1])
-        # >> > skf = StratifiedKFold(n_splits=2)
-        # >> > skf.get_n_splits(X, y)
-        # 2
-        # >> > print(skf)
-        # StratifiedKFold(n_splits=2, random_state=None, shuffle=False)
-        # >> > for train_index, test_index in skf.split(X, y):
-        #     ...
-        #     print("TRAIN:", train_index, "TEST:", test_index)
-        # ...
-        # X_train, X_test = X[train_index], X[test_index]
-        # ...
-        # y_train, y_test = y[train_index], y[test_index]
-        # TRAIN: [1 3]
-        # TEST: [0 2]
-        # TRAIN: [0 2]
-        # TEST: [1 3]
-
-        # kf = KFold(n_splits=5, shuffle=True, random_state=random_state)
-        # if dic_of_labels_limits is None:
-        #     dic_of_labels_limits = {}
-        # if dic_of_labels_limits:
-        #     self.sample_labels(dic_of_labels_limits)
-        inputs = self.inputs
-        targets = self.targets
-
-        if self.grouping:
-            kf = GroupKFold(n_splits=n_splits)
-            return kf.split(inputs, groups=self.grouping)
-
-        if self.task.classification_type == 'multi-label':
-            kf = IterativeStratification(n_splits=n_splits)
-            targets = np.array(targets)
-            return kf.split(inputs, targets)
-        else:
-            kf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
-            targets = LabelEncoder().fit_transform([''.join(str(l)) for l in targets])
-            return kf.split(inputs, targets)
-
-    def get_split_by_index(self, train_index, test_index):
-        '''
-        Returns the training and test set from the given lists of indexes
-
-        :param train_index: indexes of the training set
-        :param test_index: indexes of the test set
-        :param kwargs: extra arguments for loading scalers
-        :return: the taskdataset for the training and test data
-        '''
-
-        x_train = [self.inputs[i] for i in train_index]
-        y_train = [self.targets[i] for i in train_index]
-        x_val = [self.inputs[i] for i in test_index]
-        y_val = [self.targets[i] for i in test_index]
-
-        if not self.extraction_method.scalers:
-            self.extraction_method.scale_fit(x_train)
-
-        train_taskdataset = TaskDataset(inputs=x_train, targets=y_train,
-                                        task=self.task, extraction_method=self.extraction_method,
-                                        base_path=self.base_path, grouping=[self.grouping[i] for i in train_index],
-                                        extra_tasks=[(t[0], [t[1][targ_id] for targ_id in train_index]) for t in
-                                                     self.extra_tasks])
-        train_taskdataset.task.name = self.task.name + "_train"
-        test_taskdataset = TaskDataset(inputs=x_val, targets=y_val,
-                                       task=self.task,
-                                       extraction_method=self.extraction_method,
-                                       base_path=self.base_path, grouping=[self.grouping[i] for i in test_index],
-                                       extra_tasks=[(t[0], [t[1][targ_id] for targ_id in test_index]) for t in
-                                                    self.extra_tasks])
-        test_taskdataset.task.name = self.task.name + "_test"
-        return train_taskdataset, test_taskdataset
+    # # k_folds splitting
+    # def k_folds(self, random_state=None, n_splits=5):
+    #     """
+    #     Produces a k_fold training/test split generator, depending on the task type
+    #
+    #     :param n_splits: number of folds
+    #     :param random_state: optional int for reproducability purposes
+    #     :return: _BaseKFold object
+    #     """
+    #     # Examples
+    #     # --------
+    #     # >> > import numpy as np
+    #     # >> > from sklearn.model_selection import KFold
+    #     # >> > X = np.array([[1, 2], [3, 4], [1, 2], [3, 4]])
+    #     # >> > y = np.array([1, 2, 3, 4])
+    #     # >> > kf = KFold(n_splits=2)
+    #     # >> > kf.get_n_splits(X)
+    #     # 2
+    #     # >> > print(kf)
+    #     # KFold(n_splits=2, random_state=None, shuffle=False)
+    #     # >> > for train_index, test_index in kf.split(X):
+    #     #     ...
+    #     #     print("TRAIN:", train_index, "TEST:", test_index)
+    #     # ...
+    #     # X_train, X_test = X[train_index], X[test_index]
+    #     # ...
+    #     # y_train, y_test = y[train_index], y[test_index]
+    #     # TRAIN: [2 3]
+    #     # TEST: [0 1]
+    #     # TRAIN: [0 1]
+    #     # TEST: [2 3]
+    #
+    #     # Stratified KFold
+    #     # Examples
+    #     # --------
+    #     # >> > import numpy as np
+    #     # >> > from sklearn.model_selection import StratifiedKFold
+    #     # >> > X = np.array([[1, 2], [3, 4], [1, 2], [3, 4]])
+    #     # >> > y = np.array([0, 0, 1, 1])
+    #     # >> > skf = StratifiedKFold(n_splits=2)
+    #     # >> > skf.get_n_splits(X, y)
+    #     # 2
+    #     # >> > print(skf)
+    #     # StratifiedKFold(n_splits=2, random_state=None, shuffle=False)
+    #     # >> > for train_index, test_index in skf.split(X, y):
+    #     #     ...
+    #     #     print("TRAIN:", train_index, "TEST:", test_index)
+    #     # ...
+    #     # X_train, X_test = X[train_index], X[test_index]
+    #     # ...
+    #     # y_train, y_test = y[train_index], y[test_index]
+    #     # TRAIN: [1 3]
+    #     # TEST: [0 2]
+    #     # TRAIN: [0 2]
+    #     # TEST: [1 3]
+    #
+    #     # kf = KFold(n_splits=5, shuffle=True, random_state=random_state)
+    #     # if dic_of_labels_limits is None:
+    #     #     dic_of_labels_limits = {}
+    #     # if dic_of_labels_limits:
+    #     #     self.sample_labels(dic_of_labels_limits)
+    #     inputs = self.inputs
+    #     targets = self.targets
+    #
+    #     if self.grouping:
+    #         kf = GroupKFold(n_splits=n_splits)
+    #         return kf.split(inputs, groups=self.grouping)
+    #
+    #     if self.task.classification_type == 'multi-label':
+    #         kf = IterativeStratification(n_splits=n_splits)
+    #         targets = np.array(targets)
+    #         return kf.split(inputs, targets)
+    #     else:
+    #         kf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
+    #         targets = LabelEncoder().fit_transform([''.join(str(l)) for l in targets])
+    #         return kf.split(inputs, targets)
+    #
+    # def get_split_by_index(self, train_index, test_index):
+    #     '''
+    #     Returns the training and test set from the given lists of indexes
+    #
+    #     :param train_index: indexes of the training set
+    #     :param test_index: indexes of the test set
+    #     :param kwargs: extra arguments for loading scalers
+    #     :return: the taskdataset for the training and test data
+    #     '''
+    #
+    #     x_train = [self.inputs[i] for i in train_index]
+    #     y_train = [self.targets[i] for i in train_index]
+    #     x_val = [self.inputs[i] for i in test_index]
+    #     y_val = [self.targets[i] for i in test_index]
+    #
+    #     if not self.extraction_method.scalers:
+    #         self.extraction_method.scale_fit(x_train)
+    #
+    #     train_taskdataset = TaskDataset(inputs=x_train, targets=y_train,
+    #                                     task=self.task, extraction_method=self.extraction_method,
+    #                                     base_path=self.base_path, grouping=[self.grouping[i] for i in train_index],
+    #                                     extra_tasks=[(t[0], [t[1][targ_id] for targ_id in train_index]) for t in
+    #                                                  self.extra_tasks])
+    #     train_taskdataset.task.name = self.task.name + "_train"
+    #     test_taskdataset = TaskDataset(inputs=x_val, targets=y_val,
+    #                                    task=self.task,
+    #                                    extraction_method=self.extraction_method,
+    #                                    base_path=self.base_path, grouping=[self.grouping[i] for i in test_index],
+    #                                    extra_tasks=[(t[0], [t[1][targ_id] for targ_id in test_index]) for t in
+    #                                                 self.extra_tasks])
+    #     test_taskdataset.task.name = self.task.name + "_test"
+    #     return train_taskdataset, test_taskdataset
 
     # normal_mode method
-    def save_split_scalers(self, random_state):
-        """
-        Calculates and saves the scaler objects for normalization for each fold, given a random_state, in separate files
-        :param random_state: optional int for reproducability purposes
-        """
-
-        i = 0
-        for train, _ in self.k_folds(random_state):
-            x_train = [self.inputs[ind] for ind in range(len(self.inputs)) if ind in train]
-            self.extraction_method.scale_fit(x_train)
-            scalers = self.extraction_method.scalers
-            path = os.path.join(self.base_path,
-                                'scaler_method_{}_state_{}_fold_{}.pickle'.format(self.extraction_method.name,
-                                                                                  random_state, i))
-            joblib.dump(value=scalers, filename=path, protocol=pickle.HIGHEST_PROTOCOL)
-            i += 1
-
-    def load_split_scalers(self, fold, random_state):
-        """
-        Loads the scaler objects for dataset normalization purposes for the specified fold and random state
-        :param fold: The fold to load
-        :param random_state: The random state the five fold datasets was created with
-        """
-        path = os.path.join(self.base_path,
-                            'scaler_method_{}_state_{}_fold_{}.pickle'.format(self.extraction_method.name,
-                                                                              random_state, fold))
-        self.extraction_method.scalers = joblib.load(path)
-
-    def check_split_scalers(self, fold, random_state):
-        path = os.path.join(self.base_path,
-                            'scaler_method_{}_state_{}_fold_{}.pickle'.format(self.extraction_method.name,
-                                                                              random_state, fold))
-        return os.path.isfile(path)
+    # def save_split_scalers(self, random_state):
+    #     """
+    #     Calculates and saves the scaler objects for normalization for each fold, given a random_state, in separate files
+    #     :param random_state: optional int for reproducability purposes
+    #     """
+    #
+    #     i = 0
+    #     for train, _ in self.k_folds(random_state):
+    #         x_train = [self.inputs[ind] for ind in range(len(self.inputs)) if ind in train]
+    #         self.extraction_method.scale_fit(x_train)
+    #         scalers = self.extraction_method.scalers
+    #         path = os.path.join(self.base_path,
+    #                             'scaler_method_{}_state_{}_fold_{}.pickle'.format(self.extraction_method.name,
+    #                                                                               random_state, i))
+    #         joblib.dump(value=scalers, filename=path, protocol=pickle.HIGHEST_PROTOCOL)
+    #         i += 1
+    #
+    # def load_split_scalers(self, fold, random_state):
+    #     """
+    #     Loads the scaler objects for dataset normalization purposes for the specified fold and random state
+    #     :param fold: The fold to load
+    #     :param random_state: The random state the five fold datasets was created with
+    #     """
+    #     path = os.path.join(self.base_path,
+    #                         'scaler_method_{}_state_{}_fold_{}.pickle'.format(self.extraction_method.name,
+    #                                                                           random_state, fold))
+    #     self.extraction_method.scalers = joblib.load(path)
+    #
+    # def check_split_scalers(self, fold, random_state):
+    #     path = os.path.join(self.base_path,
+    #                         'scaler_method_{}_state_{}_fold_{}.pickle'.format(self.extraction_method.name,
+    #                                                                           random_state, fold))
+    #     return os.path.isfile(path)
 
     def save_scalers(self):
         self.extraction_method.scale_fit(self.inputs)
@@ -355,7 +335,6 @@ class TaskDataset(Dataset):
     def switch_index_methods(self):
         # replace getitem, get_split_by_index by index based functions
         self.get_item = types.MethodType(get_item_index_mode, self)
-        self.get_split_by_index = types.MethodType(get_split_by_index_index_mode, self)
         self.save = types.MethodType(save_index_mode, self)
         self.load = types.MethodType(load_index_mode, self)
 
@@ -387,38 +366,38 @@ def get_item_index_mode(self, index):
            self.task.name
 
 
-def get_split_by_index_index_mode(self, train_index, test_index):
-    '''
-        :param train_index: indexes of the training set
-        :param test_index: indexes of the test set
-        :param kwargs: extra arguments for loading scalers
-        :return: the taskdataset for the training and test data
-    '''
-
-    separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
-    x_train_window = train_index
-    x_val_window = test_index
-
-    y_train_window = [self.targets[i] for i in train_index]
-    y_val_window = [self.targets[i] for i in test_index]
-
-    if not self.extraction_method.scalers:
-        print('calculating scalers')
-        x_train = [torch.load(os.path.join(separated_dir, 'input_{}.pickle'.format(ind))).float()
-                   for ind in x_train_window]
-        self.extraction_method.scale_fit(x_train)
-
-    train_taskdataset = TaskDataset(inputs=x_train_window, targets=y_train_window,
-                                    task=self.task,
-                                    extraction_method=self.extraction_method,
-                                    base_path=self.base_path, index_mode=True)
-    train_taskdataset.task.name = self.task.name + "_train"
-    test_taskdataset = TaskDataset(inputs=x_val_window, targets=y_val_window, task=self.task,
-                                   extraction_method=self.extraction_method,
-                                   base_path=self.base_path, index_mode=True)
-    test_taskdataset.task.name = self.task.name + "_test"
-
-    return train_taskdataset, test_taskdataset
+# def get_split_by_index_index_mode(self, train_index, test_index):
+#     '''
+#         :param train_index: indexes of the training set
+#         :param test_index: indexes of the test set
+#         :param kwargs: extra arguments for loading scalers
+#         :return: the taskdataset for the training and test data
+#     '''
+#
+#     separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
+#     x_train_window = train_index
+#     x_val_window = test_index
+#
+#     y_train_window = [self.targets[i] for i in train_index]
+#     y_val_window = [self.targets[i] for i in test_index]
+#
+#     if not self.extraction_method.scalers:
+#         print('calculating scalers')
+#         x_train = [torch.load(os.path.join(separated_dir, 'input_{}.pickle'.format(ind))).float()
+#                    for ind in x_train_window]
+#         self.extraction_method.scale_fit(x_train)
+#
+#     train_taskdataset = TaskDataset(inputs=x_train_window, targets=y_train_window,
+#                                     task=self.task,
+#                                     extraction_method=self.extraction_method,
+#                                     base_path=self.base_path, index_mode=True)
+#     train_taskdataset.task.name = self.task.name + "_train"
+#     test_taskdataset = TaskDataset(inputs=x_val_window, targets=y_val_window, task=self.task,
+#                                    extraction_method=self.extraction_method,
+#                                    base_path=self.base_path, index_mode=True)
+#     test_taskdataset.task.name = self.task.name + "_test"
+#
+#     return train_taskdataset, test_taskdataset
 
 
 def save_index_mode(self, base_path):
@@ -427,8 +406,8 @@ def save_index_mode(self, base_path):
 
     diction = {
         'task': self.task,
-        'pad_after': self.pad_after,
-        'pad_before': self.pad_before
+        'grouping': self.grouping,
+        'extra_tasks': self.extra_tasks
     }
     joblib.dump(diction, os.path.join(base_path, 'other.obj'))
 
@@ -441,5 +420,6 @@ def load_index_mode(self, base_path):
     self.targets = [[int(j) for j in i] for i in t_l]
     diction = joblib.load(os.path.join(base_path, 'other.obj'))
     self.task = diction['task']
-    self.pad_after = diction['pad_after']
-    self.pad_before = diction['pad_before']
+    self.grouping = diction['grouping']
+    if diction.keys().__contains__('extra_tasks'):
+        self.extra_tasks = diction['extra_tasks']

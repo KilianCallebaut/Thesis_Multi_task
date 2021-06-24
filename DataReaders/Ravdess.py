@@ -5,6 +5,7 @@ import joblib
 from DataReaders.DataReader import DataReader
 from Tasks.Task import MultiClassTask
 from Tasks.TaskDataset import TaskDataset
+from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 
 
 class Ravdess(DataReader):
@@ -56,12 +57,12 @@ class Ravdess(DataReader):
     def read_files(self):
         # info = joblib.load(self.get_path())
         # self.files = info['files']
-        self.taskDataset.load(self.get_base_path())
+        self.taskDataset.load()
 
     def write_files(self):
         dict = {'files': self.files}
         joblib.dump(dict, self.get_path())
-        self.taskDataset.save(self.get_base_path())
+        self.taskDataset.save()
 
     def calculate_input(self, **kwargs):
         inputs = []
@@ -87,9 +88,9 @@ class Ravdess(DataReader):
         targets = [f['emotion'] for f in self.files]
         distinct_targets = list(set(targets))
         targets = [[float(b == f) for b in distinct_targets] for f in targets]
-        self.taskDataset = TaskDataset(inputs=inputs, targets=targets,
-                                       task=MultiClassTask(name="Ravdess", output_labels=distinct_targets),
-                                       extraction_method=self.extraction_method,
-                                       base_path=self.get_base_path(),
-                                       index_mode=self.index_mode,
-                                       grouping=[f['actor'] for f in self.files])
+        self.taskDataset = HoldTaskDataset(inputs=inputs, targets=targets,
+                                           task=MultiClassTask(name="Ravdess", output_labels=distinct_targets),
+                                           extraction_method=self.extraction_method,
+                                           base_path=self.get_base_path(),
+                                           index_mode=self.index_mode,
+                                           grouping=[f['actor'] for f in self.files])

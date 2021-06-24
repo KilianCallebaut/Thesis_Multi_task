@@ -8,6 +8,7 @@ from numpy import long
 from DataReaders.DataReader import DataReader
 from Tasks.Task import MultiClassTask
 from Tasks.TaskDataset import TaskDataset
+from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 
 
 class FSDKaggle2018(DataReader):
@@ -20,6 +21,8 @@ class FSDKaggle2018(DataReader):
         print('start FSDKaggle 2018')
         super().__init__(extraction_method, **kwargs)
         print('done FSDKaggle 2018')
+        self.taskDataset.add_train_test_paths(self.get_base_path(), self.get_eval_base_path())
+
 
     def get_path(self):
         return os.path.join(self.get_base_path(), 'FSDKaggle2018.obj')
@@ -46,21 +49,14 @@ class FSDKaggle2018(DataReader):
     def read_files(self):
         # info = joblib.load(self.get_path())
         # self.file_labels = info['file_labels']
-        self.taskDataset.load(self.get_base_path())
-        self.validTaskDataset = TaskDataset(inputs=[], targets=[],
-                                            task=MultiClassTask(name='', output_labels=[]),
-                                            extraction_method=self.extraction_method,
-                                            base_path=self.get_eval_base_path(),
-                                            index_mode=self.index_mode)
-        self.validTaskDataset.load(self.get_eval_base_path())
+        self.taskDataset.load()
 
     def write_files(self):
         dict = {'file_labels': self.file_labels}
         joblib.dump(dict, self.get_path())
         dict = {'file_labels_val': self.file_labels_val}
         joblib.dump(dict, self.get_eval_path())
-        self.taskDataset.save(self.get_base_path())
-        self.validTaskDataset.save(self.get_eval_base_path())
+        self.taskDataset.save()
 
     def calculate_input(self, resample_to=None, **kwargs):
         inputs = []
@@ -106,19 +102,18 @@ class FSDKaggle2018(DataReader):
             if len(inputs_val[i_id]) == 0:
                 inputs_val.remove(inputs_val[i_id])
                 targets_val.remove(targets_val[i_id])
-        self.taskDataset = TaskDataset(inputs=inputs,
-                                       targets=targets,
-                                       task=MultiClassTask(
-                                           name='FSDKaggle2018_train',
-                                           output_labels=distinct_labels),
-                                       extraction_method=self.extraction_method,
-                                       base_path=self.get_base_path(),
-                                       index_mode=self.index_mode)
-        self.validTaskDataset = TaskDataset(inputs=inputs_val,
-                                            targets=targets_val,
-                                            task=MultiClassTask(
-                                                name='FSDKaggle2018_test',
-                                                output_labels=distinct_labels),
-                                            extraction_method=self.extraction_method,
-                                            base_path=self.get_eval_base_path(),
-                                            index_mode=self.index_mode)
+        self.taskDataset = HoldTaskDataset(inputs=[],
+                                           targets=[],
+                                           task=MultiClassTask(
+                                               name='FSDKaggle2018',
+                                               output_labels=distinct_labels),
+                                           extraction_method=self.extraction_method,
+                                           index_mode=self.index_mode,
+                                           training_base_path=self.get_base_path(),
+                                           testing_base_path=self.get_eval_base_path())
+        self.taskDataset.add_train_test_set(
+            training_inputs=inputs,
+            training_targets=targets,
+            testing_inputs=inputs_val,
+            testing_targets=targets_val
+        )

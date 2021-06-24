@@ -5,6 +5,8 @@ from dcase_util.datasets import TUTAcousticScenes_2017_DevelopmentSet, TUTAcoust
 from numpy import long
 
 from Tasks.Task import MultiClassTask
+from Tasks.TaskDataset import TaskDataset
+from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 
 try:
     import cPickle
@@ -12,7 +14,6 @@ except BaseException:
     import _pickle as cPickle
 
 from DataReaders.DataReader import DataReader
-from Tasks.TaskDataset import TaskDataset
 
 
 class DCASE2017_SS(DataReader):
@@ -30,6 +31,7 @@ class DCASE2017_SS(DataReader):
         print('start DCASE2017 SS')
         super().__init__(extraction_method, **kwargs)
         print('done DCASE2017 SS')
+        self.taskDataset.add_train_test_paths(self.get_base_path(), self.get_eval_base_path())
 
     def get_path(self):
         return os.path.join(self.get_base_path(), 'DCASE2017_SS.obj')
@@ -79,28 +81,16 @@ class DCASE2017_SS(DataReader):
         self.audio_files_eval = self.evaldataset.audio_files
 
     def read_files(self):
-        # info = joblib.load(self.get_path())
-        # self.audio_files = info['audio_files']
-        self.taskDataset.load(self.get_base_path())
-
-        # info = joblib.load(self.get_eval_path())
-        # self.audio_files_eval = info['audio_files_eval']
-        self.valTaskDataset = TaskDataset(inputs=[],
-                                          targets=[],
-                                          task=MultiClassTask(name='', output_labels=[]),
-                                          extraction_method=self.extraction_method,
-                                          base_path=self.get_eval_base_path(), index_mode=self.index_mode)
-        self.valTaskDataset.load(self.get_eval_base_path())
+        self.taskDataset.load()
         print('Reading SS done')
 
     def write_files(self):
         dict = {'audio_files': self.audio_files}
         joblib.dump(dict, self.get_path())
-        self.taskDataset.save(self.get_base_path())
+        self.taskDataset.save()
 
         dict = {'audio_files_eval': self.audio_files_eval}
         joblib.dump(dict, self.get_eval_path())
-        self.valTaskDataset.save(self.get_eval_base_path())
 
     def calculate_input(self, resample_to=None, **kwargs):
         files = self.audio_files
@@ -149,17 +139,17 @@ class DCASE2017_SS(DataReader):
 
         inputs, inputs_val = self.calculate_input(**kwargs)
 
-        self.taskDataset = TaskDataset(inputs=inputs,
-                                       targets=targets,
-                                       task=MultiClassTask(name='DCASE2017_SS', output_labels=distinct_labels),
-                                       extraction_method=self.extraction_method,
-                                       base_path=self.get_base_path(),
-                                       index_mode=self.index_mode)
+        self.taskDataset = HoldTaskDataset(inputs=[],
+                                           targets=[],
+                                           task=MultiClassTask(name='DCASE2017_SS', output_labels=distinct_labels),
+                                           extraction_method=self.extraction_method,
+                                           index_mode=self.index_mode,
+                                           training_base_path=self.get_base_path(),
+                                           testing_base_path=self.get_eval_base_path())
 
-        self.valTaskDataset = TaskDataset(inputs=inputs_val,
-                                          targets=targets_val,
-                                          task=MultiClassTask(name='DCASE2017_SS_eval', output_labels=distinct_labels),
-                                          extraction_method=self.extraction_method,
-                                          base_path=self.get_eval_base_path(),
-                                          index_mode=self.index_mode
-                                          )
+        self.taskDataset.add_train_test_set(
+            training_inputs=inputs,
+            training_targets=targets,
+            testing_inputs=inputs_val,
+            testing_targets=targets_val
+        )

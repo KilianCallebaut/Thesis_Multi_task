@@ -10,6 +10,7 @@ from scipy import signal
 from DataReaders.ExtractionMethod import extract_options
 from Tasks.Task import Task
 from Tasks.TaskDataset import TaskDataset
+from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 
 
 class DataReader(ABC):
@@ -24,9 +25,9 @@ class DataReader(ABC):
             self.index_mode = False
 
         self.extraction_method = extract_options[extraction_method]
-        self.taskDataset = TaskDataset(inputs=[], targets=[], task=Task(name='', output_labels=[]),
-                                       extraction_method=self.extraction_method,
-                                       base_path=self.get_base_path(), index_mode=self.index_mode)
+        self.taskDataset = HoldTaskDataset(inputs=[], targets=[], task=Task(name='', output_labels=[]),
+                                           extraction_method=self.extraction_method,
+                                           base_path=self.get_base_path(), index_mode=self.index_mode)
 
         if self.check_files(extraction_method):
             print('reading')

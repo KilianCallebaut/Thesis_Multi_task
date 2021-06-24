@@ -21,22 +21,20 @@ class ConcatTaskDataset(ConcatDataset):
             if d > 0:
                 for d_id in range(d):
                     all_tasks = datasets[d_id].get_all_tasks()
-                    for t_id in range(all_tasks):
+                    for t_id in range(len(all_tasks)):
                         before += len(all_tasks[t_id].output_labels)
             if d < len(datasets) - 1:
                 for d_id in range(d + 1, len(datasets)):
                     all_tasks = datasets[d_id].get_all_tasks()
-                    for t_id in range(all_tasks):
+                    for t_id in range(len(all_tasks)):
                         after += len(all_tasks[t_id].output_labels)
             datasets[d].pad_targets(before, after)
         super().__init__(datasets)
         self.datasets = datasets
 
-    @property
     def get_task_list(self):
         return [t for d in self.datasets for t in d.get_all_tasks()]
 
-    @property
     def get_target_flags(self):
         """
         Gets the targets flags, meaning the list of which columns belong to which task when two or more tasks

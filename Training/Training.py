@@ -63,7 +63,7 @@ class Training:
             train_loader = torch.utils.data.DataLoader(
                 concat_dataset,
                 num_workers=0,
-                pin_memory=True,
+                pin_memory=False,
                 batch_sampler=MultiTaskSampler(dataset=concat_dataset, batch_size=batch_size)
             )
             print(len(train_loader))
@@ -148,6 +148,8 @@ class Training:
                     losses_batch[i] = criteria[i](filtered_output, filtered_labels)
                     output_batch[i] = filtered_output.detach()
                     labels_batch[i] = filtered_labels.detach()
+                    del filtered_output
+                    del filtered_labels
 
                 # training step
                 loss = sum(losses_batch)
@@ -239,7 +241,7 @@ class Training:
             eval_loader = torch.utils.data.DataLoader(
                 concat_dataset,
                 num_workers=0,
-                pin_memory=True,
+                pin_memory=False,
                 batch_sampler=MultiTaskSampler(dataset=concat_dataset, batch_size=batch_size)
             )
 
