@@ -7,11 +7,9 @@ from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 
 class ConcatTrainingSetCreator:
     def __init__(self, training_sets: List[HoldTaskDataset], dics_of_labels_limits: list,
-                 random_state: Optional[int], nr_runs: Optional[int] = 5,
-                 prepare_args: Optional[dict] = dict()):
+                 random_state: Optional[int], nr_runs: Optional[int] = 5):
         self.training_creators = []
         self.random_state = random_state
-        self.prepare_args = prepare_args
         for t_id in range(len(training_sets)):
             set = training_sets[t_id]
             if set.index_mode:
@@ -26,25 +24,7 @@ class ConcatTrainingSetCreator:
                 self.training_creators.append(TrainingSetCreator(dataset=set,
                                                                  dic_of_labels_limits=dics_of_labels_limits[t_id],
                                                                  random_state=random_state,
-                                                                 nr_runs=nr_runs,
-                                                                 **prepare_args))
-
-        # training_with_tests = [tst.task.name.split('_')[0] for tst in test_sets]
-        # for t_id in range(len(training_sets)):
-        #     if not training_sets[t_id].task.name.split('_')[0] in training_with_tests:
-        #         self.training_creators.append(TrainingSetCreator(dataset=training_sets[t_id],
-        #                                                          dic_of_labels_limits=dics_of_labels_limits[t_id],
-        #                                                          random_state=random_state,
-        #                                                          nr_runs=None,
-        #                                                          test_dataset=None))
-        #     else:
-        #         self.training_creators.append(TrainingSetCreator(dataset=training_sets[t_id],
-        #                                                          test_dataset=test_sets[training_with_tests.index(
-        #                                                              training_sets[t_id].task.name.split('_')[0])],
-        #                                                          dic_of_labels_limits=dics_of_labels_limits[t_id],
-        #                                                          random_state=random_state,
-        #                                                          nr_runs=5 if len(training_with_tests) < len(
-        #                                                              training_sets) else 1))
+                                                                 nr_runs=nr_runs))
 
     def generate_concats(self):
         gens = [tc.generate_train_test() for tc in self.training_creators]
@@ -57,7 +37,7 @@ class ConcatTrainingSetCreator:
     def prepare_for_index_mode(self):
 
         for tc in self.training_creators:
-            tc.dataset.prepare_inputs(**self.prepare_args)
+            # tc.dataset.prepare_inputs(**self.prepare_args)
 
             if tc.dataset.check_train_test_present():
                 tc.dataset.training_set.save_scalers()
@@ -77,20 +57,17 @@ class ConcatTrainingSetCreator:
 class TrainingSetCreator:
 
     def __init__(self, dataset: HoldTaskDataset, dic_of_labels_limits: Optional[dict],
-                 random_state: Optional[int], nr_runs: Optional[int],
-                 **kwargs):
+                 random_state: Optional[int], nr_runs: Optional[int]):
         self.dataset = dataset
         self.dic_of_labels_limits = dic_of_labels_limits
         self.random_state = random_state
         self.nr_runs = nr_runs
 
-        self.dataset.prepare_inputs(**kwargs)
+        # self.dataset.prepare_inputs(**kwargs)
 
         if dataset.check_train_test_present():
             if not isinstance(nr_runs, int):
                 self.nr_runs = 1
-            # if not self.dataset.index_mode:
-            #     self.test_dataset.prepare_inputs(window_size=self.dataset.inputs[0].shape[0])
         elif not isinstance(nr_runs, int):
             self.nr_runs = 5
 
@@ -99,12 +76,6 @@ class TrainingSetCreator:
             return self.return_train_val_set()
         else:
             return self.generate_k_fold()
-
-        # self.dataset.sample_labels(self.dic_of_labels_limits, self.random_state)
-        # if self.test_dataset:
-        #     return self.return_train_val_set()
-        # else:
-        #     return self.generate_five_fold()
 
     def generate_k_fold(self):
         self.dataset.sample_labels(self.dic_of_labels_limits, self.random_state)
@@ -115,17 +86,15 @@ class TrainingSetCreator:
 
                 train_indices, test_indices = next(iterator)
                 self.dataset.get_split_by_index(train_indices, test_indices)
-                self.dataset.normalize_fit()
-                self.dataset.normalize_inputs()
+                self.dataset.training_set.normalize_fit()
+                # self.dataset.normalize_inputs()
                 yield self.dataset.training_set, self.dataset.test_set
             except StopIteration:
                 break
 
     def return_train_val_set(self):
         self.dataset.training_set.sample_labels(self.dic_of_labels_limits, self.random_state)
-        self.dataset.prepare_inputs()
-        self.dataset.normalize_fit()
-        self.dataset.normalize_inputs()
+        self.dataset.training_set.normalize_fit()
         for i in range(self.nr_runs):
             print("fold: {}".format(i))
             yield self.dataset.training_set, self.dataset.test_set

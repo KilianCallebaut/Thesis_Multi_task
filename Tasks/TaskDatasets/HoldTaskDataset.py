@@ -104,9 +104,10 @@ class HoldTaskDataset(TaskDataset):
         self.inputs = [None for i in range(len(self.training_set) + len(self.test_set))]
         self.targets = [None for i in range(len(self.training_set) + len(self.test_set))]
         self.grouping = [None for i in range(len(self.training_set) + len(self.test_set))]
-        self.extra_tasks = [(training_extra_tasks[t_id][0],
-                             [None for i in range(len(self.training_set) + len(self.test_set))])
-                            for t_id in range(len(training_extra_tasks))]
+        if training_extra_tasks:
+            self.extra_tasks = [(training_extra_tasks[t_id][0],
+                                 [None for i in range(len(self.training_set) + len(self.test_set))])
+                                for t_id in range(len(training_extra_tasks))]
 
     def add_train_test_paths(self, training_base_path: str, testing_base_path: str):
         self.training_set.base_path = training_base_path
@@ -197,37 +198,37 @@ class HoldTaskDataset(TaskDataset):
         :return: the taskdataset for the training and test data
         """
 
-        if self.check_train_test_present():
-            self.return_data()
+        # if self.check_train_test_present():
+        #     self.return_data()
 
-        x_train = []
-        y_train = []
-        grouping_train = []
-        extra_tasks_train = [(t[0], []) for t in self.extra_tasks] if self.extra_tasks else None
+        x_train = [self.inputs[i] for i in train_index]
+        y_train = [self.targets[i] for i in train_index]
+        grouping_train = [self.grouping[i] for i in train_index] if self.grouping else None
+        extra_tasks_train = [(t[0], [t[1][i] for i in train_index]) for t in self.extra_tasks] if self.extra_tasks else None
 
-        x_val = []
-        y_val = []
-        grouping_val = []
-        extra_tasks_val = [(t[0], []) for t in self.extra_tasks] if self.extra_tasks else None
+        x_val = [self.inputs[i] for i in test_index]
+        y_val = [self.targets[i] for i in test_index]
+        grouping_val = [self.grouping[i] for i in test_index] if self.grouping else None
+        extra_tasks_val = [(t[0], [t[1][i] for i in test_index]) for t in self.extra_tasks] if self.extra_tasks else None
 
-        for i in train_index:
-            x_train.append(soft_pop(self.inputs, i))
-            y_train.append(soft_pop(self.targets, i))
-            if self.grouping:
-                grouping_train.append(soft_pop(self.grouping, i))
-
-            extra_tasks_train = [(extra_tasks_train[t_id][0],
-                                  extra_tasks_train[t_id][1].append(soft_pop(self.extra_tasks[t_id][1], i)))
-                                 for t_id in range(len(extra_tasks_train))] if self.extra_tasks else None
-        for i in test_index:
-            x_val.append(soft_pop(self.inputs, i))
-            y_val.append(soft_pop(self.targets, i))
-            if self.grouping:
-                grouping_val.append(soft_pop(self.grouping, i))
-
-            extra_tasks_val = [(extra_tasks_val[t_id][0],
-                                extra_tasks_val[t_id][1].append(soft_pop(self.extra_tasks[t_id][1], i)))
-                               for t_id in range(len(extra_tasks_val))] if self.extra_tasks else None
+        # for i in train_index:
+        #     x_train.append(soft_pop(self.inputs, i))
+        #     y_train.append(soft_pop(self.targets, i))
+        #     if self.grouping:
+        #         grouping_train.append(soft_pop(self.grouping, i))
+        #
+        #     extra_tasks_train = [(extra_tasks_train[t_id][0],
+        #                           extra_tasks_train[t_id][1].append(soft_pop(self.extra_tasks[t_id][1], i)))
+        #                          for t_id in range(len(extra_tasks_train))] if self.extra_tasks else None
+        # for i in test_index:
+        #     x_val.append(soft_pop(self.inputs, i))
+        #     y_val.append(soft_pop(self.targets, i))
+        #     if self.grouping:
+        #         grouping_val.append(soft_pop(self.grouping, i))
+        #
+        #     extra_tasks_val = [(extra_tasks_val[t_id][0],
+        #                         extra_tasks_val[t_id][1].append(soft_pop(self.extra_tasks[t_id][1], i)))
+        #                        for t_id in range(len(extra_tasks_val))] if self.extra_tasks else None
 
         # if not self.extraction_method.scalers:
         #     self.extraction_method.scale_fit(x_train)
@@ -244,29 +245,29 @@ class HoldTaskDataset(TaskDataset):
                                         extra_tasks=extra_tasks_val, index_mode=self.index_mode)
         self.test_indexes = test_index
 
-    def return_data(self):
-        """
-        returns the data in the training and test sets to the holding dataset in order to prevent memory waste
-        :return:
-        """
-
-        for i in range(len(self.training_set)):
-            self.inputs[self.training_indexes[i]] = soft_pop(self.training_set.inputs, i)
-            self.targets[self.training_indexes[i]] = soft_pop(self.training_set.targets, i)
-            if self.grouping:
-                self.grouping[self.training_indexes[i]] = soft_pop(self.training_set.grouping, i)
-
-            if self.extra_tasks:
-                for t_id in range(len(self.extra_tasks)):
-                    self.extra_tasks[t_id][1][self.training_indexes[i]] = soft_pop(self.training_set.extra_tasks[t_id][1], i)
-        for i in range(len(self.test_set)):
-            self.inputs[self.test_indexes[i]] = soft_pop(self.test_set.inputs, i)
-            self.targets[self.test_indexes[i]] = soft_pop(self.test_set.targets, i)
-            if self.grouping:
-                self.grouping[self.test_indexes[i]] = soft_pop(self.test_set.grouping, i)
-            if self.extra_tasks:
-                for t_id in range(len(self.extra_tasks)):
-                    self.extra_tasks[t_id][1][self.test_indexes[i]] = soft_pop(self.test_set.extra_tasks[t_id][1], i)
+    # def return_data(self):
+    #     """
+    #     returns the data in the training and test sets to the holding dataset in order to prevent memory waste
+    #     :return:
+    #     """
+    #
+    #     for i in range(len(self.training_set)):
+    #         self.inputs[self.training_indexes[i]] = soft_pop(self.training_set.inputs, i)
+    #         self.targets[self.training_indexes[i]] = soft_pop(self.training_set.targets, i)
+    #         if self.grouping:
+    #             self.grouping[self.training_indexes[i]] = soft_pop(self.training_set.grouping, i)
+    #
+    #         if self.extra_tasks:
+    #             for t_id in range(len(self.extra_tasks)):
+    #                 self.extra_tasks[t_id][1][self.training_indexes[i]] = soft_pop(self.training_set.extra_tasks[t_id][1], i)
+    #     for i in range(len(self.test_set)):
+    #         self.inputs[self.test_indexes[i]] = soft_pop(self.test_set.inputs, i)
+    #         self.targets[self.test_indexes[i]] = soft_pop(self.test_set.targets, i)
+    #         if self.grouping:
+    #             self.grouping[self.test_indexes[i]] = soft_pop(self.test_set.grouping, i)
+    #         if self.extra_tasks:
+    #             for t_id in range(len(self.extra_tasks)):
+    #                 self.extra_tasks[t_id][1][self.test_indexes[i]] = soft_pop(self.test_set.extra_tasks[t_id][1], i)
 
     def save_split_scalers(self, random_state, n_splits=5):
         """
@@ -296,8 +297,6 @@ class HoldTaskDataset(TaskDataset):
                             'scaler_method_{}_state_{}_fold_{}.pickle'.format(self.extraction_method.name,
                                                                               random_state, fold))
         self.extraction_method.scalers = joblib.load(path)
-        self.training_set.extraction_method = self.extraction_method
-        self.test_set.extraction_method = self.extraction_method
 
     def check_split_scalers(self, fold, random_state):
         path = os.path.join(self.base_path,
@@ -305,20 +304,15 @@ class HoldTaskDataset(TaskDataset):
                                                                               random_state, fold))
         return os.path.isfile(path)
 
-    def normalize_fit(self):
-        self.training_set.normalize_fit()
-        self.test_set.extraction_method = self.training_set.extraction_method
+    # def normalize_fit(self):
+    #     self.training_set.normalize_fit()
 
-    def prepare_inputs(self, **kwargs):
+    def prepare_inputs(self):
         if self.check_train_test_present():
-            self.training_set.prepare_inputs(**kwargs)
-            if 'window_size' in kwargs:
-                self.test_set.prepare_inputs(**kwargs)
-            else:
-                self.test_set.prepare_inputs(window_size=self.training_set.inputs[0].shape[0], **kwargs)
-
+            self.training_set.prepare_inputs()
+            self.test_set.prepare_inputs()
         else:
-            super().prepare_inputs(**kwargs)
+            super().prepare_inputs()
 
     def normalize_inputs(self):
         self.training_set.normalize_inputs()

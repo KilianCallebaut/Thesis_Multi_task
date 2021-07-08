@@ -16,7 +16,7 @@ from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 class DataReader(ABC):
     extractor = None
 
-    def __init__(self, extraction_method, **kwargs):
+    def __init__(self, extraction_method, preparation_params=None, extraction_params=None, **kwargs):
         if 'object_path' in kwargs:
             self.object_path = kwargs.pop('object_path')
         if 'index_mode' in kwargs:
@@ -24,18 +24,23 @@ class DataReader(ABC):
         else:
             self.index_mode = False
 
-        self.extraction_method = extract_options[extraction_method]
+        if isinstance(extraction_method, str):
+            self.extraction_method = extract_options[extraction_method](preparation_params, extraction_params)
+        else:
+            self.extraction_method = extraction_method
+
         self.taskDataset = HoldTaskDataset(inputs=[], targets=[], task=Task(name='', output_labels=[]),
                                            extraction_method=self.extraction_method,
                                            base_path=self.get_base_path(), index_mode=self.index_mode)
 
-        if self.check_files(extraction_method):
+        if self.check_files(self.extraction_method.name):
             print('reading')
             self.read_files()
         else:
             print('calculating')
             self.load_files()
             self.calculate_taskDataset(**kwargs)
+            self.taskDataset.prepare_inputs()
             self.write_files()
 
     @abstractmethod
@@ -62,8 +67,12 @@ class DataReader(ABC):
     def write_files(self):
         pass
 
+    # Can add automatic iterator handler
+    # for x in iterat:
+    # handle if x are locations
+    # Handle if x are read objects
     @abstractmethod
-    def calculate_input(self, resample_to=None, **kwargs):
+    def calculate_input(self, resample_to=None):
         pass
 
     @abstractmethod
@@ -88,12 +97,6 @@ class DataReader(ABC):
     def resample(self, sig, sample_rate, resample_to):
         secs = len(sig) / sample_rate
         return signal.resample(sig, int(secs * resample_to)), resample_to
-
-    # def load_wav(self, loc, resample_to=None):
-    #     fs, sig = wav.read(open(loc, 'rb'))
-    #     if resample_to is not None:
-    #         return self.resample(sig, fs, resample_to)
-    #     return sig, fs
 
     def load_wav(self, loc, resample_to=None):
         sig, fs = soundfile.read(loc)

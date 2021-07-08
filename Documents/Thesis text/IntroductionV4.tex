@@ -1,0 +1,33 @@
+\chapter{Introduction}
+\todo{Introduce the context of multi-task deep learning audio frameworks}
+
+\section{Example: Variating audio task interaction in Multi-Task Research}
+\todo{Introduce original experiment set-ups as a basis for explaining what kind of multi-task development can be done, what the structure is and what it has to deal with}
+
+\section{Multi-Task Research}
+\todo{Go further in depth about the general state of audio multi-task research and why this system is needed in that. Why is a speed up in development needed in the field?}
+
+\section{Developing Deep Learning Multi-Task Set-ups}
+\todo{Outline the steps in developing deep learning Multi-Task Set ups and how shortcuts can be made to speed up/improve the process. I.e. which problems have to be answered in the system. What developmental problems are you addressing?}
+
+Issues to face:
+
+\textbf{Data Reading}
+\begin{itemize}
+	\item Developing valid input for loading and training for different datasets takes time and is error prone, while a lot of the processes are repetitive => DataReader to TaskDataset
+	\item While developing and testing different set ups, intermediate parts (e.g. the feature extraction method, file reading method, resampling method) as well as additional parts (e.g. resampling) often have to be varied and replaced, which might be a complex and time consuming process depending on the amount of rewrites and datasets required => Easily interchangeable pipeline pieces
+	\item Developing read/write functionalities per dataset is time consuming and potentially chaotic if done differently every time. Add to that the possibility of testing different set-ups for the same dataset which would require good file management. => Standardizing dataset read/write and automatic abstraction of reading when files are present
+%	\item While some datasets have predefined train/test sets, others do not, which would require different handling of both cases which might be time consuming and error prone (===> actually a consequence of standardizing in this way, i.e. engineering problem)
+	\item loading in multiple datasets might be too memory intensive for a lot of systems 
+	\item Running the code on a different system requires good datamanagement and changeable path locations
+%	\item Some Datasets can have multiple tasks on the same inputs (===> actually a consequence of standardizing in this way, i.e. engineering problem)
+\end{itemize}
+
+\section{Challenges}
+\todo{Define the technological challenges in answering those problems. What problems/challenges do you face or have to take in account in developing such a system?}
+
+\section{Contributions}
+\todo{Outline what new your thesis works contributes.}
+
+\section{Outline}
+\todo{Summarize the rest of the thesis' structure}

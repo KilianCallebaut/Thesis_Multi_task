@@ -58,19 +58,19 @@ class DCASE2017_SE(DataReader):
         joblib.dump(dict, self.get_path())
         self.taskDataset.save()
 
-    def calculate_input(self, resample_to=None, **kwargs):
+    def calculate_input(self, resample_to=None):
 
         files = self.audio_files
-        inputs = self.calculate_features(files, resample_to, **kwargs)
+        inputs = self.calculate_features(files, resample_to)
         print("Calculating input done")
         return inputs
 
-    def calculate_features(self, files, resample_to, **kwargs):
+    def calculate_features(self, files, resample_to):
         inputs = []
         perc = 0
         for audio_idx in range(len(files)):
             read_wav = self.load_wav(files[audio_idx], resample_to)
-            inputs.append(self.extraction_method.extract_features(read_wav, **kwargs))
+            inputs.append(self.extraction_method.extract_features(read_wav))
             if perc < (audio_idx / len(files)) * 100:
                 print("Percentage done: {}".format(perc))
                 perc += 1
@@ -99,3 +99,4 @@ class DCASE2017_SE(DataReader):
                                        extraction_method=self.extraction_method,
                                        base_path=self.get_base_path(),
                                        index_mode=self.index_mode)
+        self.taskDataset.prepare_inputs()

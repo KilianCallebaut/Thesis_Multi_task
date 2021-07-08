@@ -52,7 +52,6 @@ class DCASE2017_SS(DataReader):
     def load_files(self):
         # MetaDataContainer(filename=)
         self.devdataset = TUTAcousticScenes_2017_DevelopmentSet(
-            # data_path='C:\\Users\\mrKC1\\PycharmProjects\\Thesis\\ExternalClassifiers\\DCASE2017-baseline-system-master\\applications\\data\\',
             data_path='F:\\Thesis_Datasets\\DCASE2017\\',
             log_system_progress=False,
             show_progress_in_console=True,
@@ -65,8 +64,6 @@ class DCASE2017_SS(DataReader):
 
         ).initialize()
         self.evaldataset = TUTAcousticScenes_2017_EvaluationSet(
-            # data_path=r'C:\\Users\\mrKC1\\PycharmProjects\\Thesis\\ExternalClassifiers\\DCASE2017-baseline-system'
-            #           r'-master\\applications\\data\\',
             data_path='F:\\Thesis_Datasets\\DCASE2017\\',
             log_system_progress=False,
             show_progress_in_console=True,
@@ -92,21 +89,21 @@ class DCASE2017_SS(DataReader):
         dict = {'audio_files_eval': self.audio_files_eval}
         joblib.dump(dict, self.get_eval_path())
 
-    def calculate_input(self, resample_to=None, **kwargs):
+    def calculate_input(self, resample_to=None):
         files = self.audio_files
-        inputs = self.calculate_features(files, resample_to, **kwargs)
+        inputs = self.calculate_features(files, resample_to)
         print("Calculating input done")
         files = self.audio_files_eval
-        inputs_val = self.calculate_features(files, resample_to, **kwargs)
+        inputs_val = self.calculate_features(files, resample_to)
 
         return inputs, inputs_val
 
-    def calculate_features(self, files, resample_to, **kwargs):
+    def calculate_features(self, files, resample_to):
         inputs = []
         perc = 0
         for audio_idx in range(len(files)):
             read_wav = self.load_wav(files[audio_idx], resample_to)
-            inputs.append(self.extraction_method.extract_features(read_wav, **kwargs))
+            inputs.append(self.extraction_method.extract_features(read_wav))
             if perc < (audio_idx / len(files)) * 100:
                 print("Percentage done: {}".format(perc))
                 perc += 1
@@ -153,3 +150,4 @@ class DCASE2017_SS(DataReader):
             testing_inputs=inputs_val,
             testing_targets=targets_val
         )
+        self.taskDataset.prepare_inputs()

@@ -1,9 +1,5 @@
 import datetime
-import math
 
-import matplotlib.pyplot as plt
-import pandas as pd
-import seaborn as sns
 import torch
 import torch.optim as optim
 from sklearn import metrics
@@ -13,6 +9,7 @@ from torch.utils.data import ConcatDataset
 from Tasks.ConcatTaskDataset import ConcatTaskDataset
 from Tasks.Samplers.MultiTaskSampler import MultiTaskSampler
 from Training.Results import Results
+from Training.TrainingUtils import TrainingUtils
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -45,8 +42,8 @@ class Training:
                              start_epoch=0,
                              test_dataset=None,
                              optimizer=None,
-                             train_loader=None):
-        datasets = concat_dataset.datasets
+                             train_loader=None,
+                             training_utils=None):
         task_list = concat_dataset.get_task_list()
         n_tasks = len(task_list)
 
@@ -72,6 +69,9 @@ class Training:
             # optimizer = optim.SGD(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
             optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
 
+        if not training_utils:
+            training_utils = TrainingUtils()
+
         #
         target_flags = concat_dataset.get_target_flags()
 
@@ -93,13 +93,9 @@ class Training:
             ex_mx = datetime.timedelta(0)
             ex_t = datetime.timedelta(0)
             # iterate over data
-            for inputs, labels, names in train_loader:
-
-                # if len(labels) != batch_size:
-                #     continue
-
+            for inputs, labels, groups in train_loader:
                 # tensors for filtering instances in batch and targets that are not from the task
-                batch_flags = [[True if t.name == n else False for n in names] for t in
+                batch_flags = [[True if t.task_group == g else False for g in groups] for t in
                                task_list]
 
                 losses_batch = [torch.tensor([0]).to(device) for _ in task_list]
@@ -142,9 +138,7 @@ class Training:
                         filtered_labels = filtered_labels[batch_flags[i], :]
                         filtered_labels = filtered_labels[:, target_flags[i]]
                     filtered_labels = task_list[i].translate_labels(filtered_labels)
-                    # losses_batch[i] = criteria[i](filtered_output,
-                    #                               Training.calculate_labels(task_list[i].classification_type,
-                    #                                                         filtered_labels))
+
                     losses_batch[i] = criteria[i](filtered_output, filtered_labels)
                     output_batch[i] = filtered_output.detach()
                     labels_batch[i] = filtered_labels.detach()
@@ -152,28 +146,20 @@ class Training:
                     del filtered_labels
 
                 # training step
-                loss = sum(losses_batch)
+                loss = training_utils.combine_loss(losses_batch)
 
                 loss.backward()
                 optimizer.step()
 
                 # Statistics
-                running_loss += loss.item() * inputs.size(0)
+
                 step += 1
 
                 for t in range(len(task_list)):
                     task_labels[t] += labels_batch[t].tolist()
                     task_predictions[t] += task_list[t].decision_making(output_batch[t]).tolist()
 
-                # task_labels = [
-                #     task_labels[t] +
-                #     [Training.get_actual_labels(l[None, :], task_list[t]).tolist() for l in labels_batch[t]] for
-                #     t in range(len(labels_batch))]
-                # task_predictions = [
-                #     task_predictions[t] +
-                #     [Training.get_actual_output(l[None, :], task_list[t]).tolist() for l in output_batch[t]] for
-                #     # [task_list[t].decision_making(l).tolist() for l in output_batch[t]] for
-                #     t in range(len(output_batch))]
+                running_loss += loss.item() * inputs.size(0)
                 task_running_losses = [task_running_losses[t] + losses_batch[t].item()
                                        for t in range(len(losses_batch))]
 
@@ -212,7 +198,7 @@ class Training:
                                   start_epoch=epoch,
                                   blank=False)
 
-            if results.early_stop(epoch=epoch):
+            if training_utils.early_stop(results=results, epoch=epoch):
                 break
         print('Training Done')
         results.flush_writer()
@@ -228,10 +214,10 @@ class Training:
                  num_epochs=50,
                  start_epoch=0,
                  blank=True,
-                 eval_loader=None):
+                 eval_loader=None,
+                 training_utils=None):
 
-        datasets = concat_dataset.datasets
-        task_list = [x.task for x in datasets]
+        task_list = concat_dataset.get_task_list()
         n_tasks = len(task_list)
         target_flags = concat_dataset.get_target_flags()
 
@@ -244,6 +230,9 @@ class Training:
                 pin_memory=False,
                 batch_sampler=MultiTaskSampler(dataset=concat_dataset, batch_size=batch_size)
             )
+
+        if not training_utils:
+            training_utils = TrainingUtils()
 
         blank_model.eval()
 
@@ -267,12 +256,8 @@ class Training:
                 ex_mx = datetime.timedelta(0)
                 ex_t = datetime.timedelta(0)
 
-                for inputs, labels, names in eval_loader:
-
-                    # if len(labels) != batch_size:
-                    #     continue
-
-                    batch_flags = [[True if t.name == n else False for n in names] for t in
+                for inputs, labels, groups in eval_loader:
+                    batch_flags = [[True if t.task_group == g else False for g in groups] for t in
                                    task_list]
 
                     losses_batch = [torch.tensor([0]).to(device) for _ in task_list]
@@ -312,14 +297,11 @@ class Training:
                             filtered_labels = filtered_labels[:, target_flags[i]]
 
                         filtered_labels = task_list[i].translate_labels(filtered_labels)
-                        # losses_batch[i] = criteria[i](filtered_output,
-                        #                               Training.calculate_labels(task_list[i].classification_type,
-                        #                                                         filtered_labels))
                         losses_batch[i] = criteria[i](filtered_output, filtered_labels)
                         output_batch[i] = filtered_output.detach()
                         labels_batch[i] = filtered_labels.detach()
 
-                    loss = sum(losses_batch)
+                    loss = training_utils.combine_loss(losses_batch)
 
                     running_loss += loss.item() * inputs.size(0)
                     step += 1
@@ -327,15 +309,6 @@ class Training:
                         task_labels[t] += labels_batch[t].tolist()
                         task_predictions[t] += task_list[t].decision_making(output_batch[t]).tolist()
 
-                    # task_labels = [
-                    #     task_labels[t] +
-                    #     [Training.get_actual_labels(l[None, :], task_list[t]).tolist() for l in labels_batch[t]] for
-                    #     t in range(len(labels_batch))]
-                    # task_predictions = [
-                    #     task_predictions[t] +
-                    #     # [Training.get_actual_output(l[None, :], task_list[t]).tolist() for l in output_batch[t]] for
-                    #     [task_list[t].decision_making(l).tolist() for l in output_batch[t]] for
-                    #     t in range(len(output_batch))]
                     task_running_losses = [task_running_losses[t] + losses_batch[t].item()
                                            for t in range(len(losses_batch))]
 
@@ -365,28 +338,4 @@ class Training:
                     mats.append(mat)
 
         training_results.flush_writer()
-        # training_results.close_writer()
         print('Wrote Evaluation Results')
-
-    @staticmethod
-    def calculate_labels(classification_type, output):
-        if classification_type == 'multi-class':
-            return torch.max(output, 1)[1]
-        return output.float()
-
-    @staticmethod
-    def get_actual_output(output, task):
-        if task.classification_type == "multi-class":
-            translated_out = torch.max(output, 1)[1]
-            return translated_out
-        elif task.classification_type == "multi-label":
-            translated_out = (output >= 0.5).float()
-            return torch.squeeze(translated_out)
-
-    @staticmethod
-    def get_actual_labels(target, task):
-        if task.classification_type == "multi-class":
-            translated_target = torch.max(target, 1)[1]
-            return translated_target
-        elif task.classification_type == "multi-label":
-            return torch.squeeze(target)

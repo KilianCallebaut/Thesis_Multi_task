@@ -1,10 +1,12 @@
 {
-  "nfft": 2048,
-  "winlen": 0.03,
-  "winstep": 0.01,
-  "nfilt": 96,
-  "lowfreq": 0,
-  "highfreq": null,
-  "preemph": 0,
+  "extraction_params": {
+    "nfft": 2048,
+    "winlen": 0.03,
+    "winstep": 0.01,
+    "nfilt": 96,
+    "lowfreq": 0,
+    "highfreq": null,
+    "preemph": 0
+  },
   "extraction_method": "MelSpectrogram"
 }

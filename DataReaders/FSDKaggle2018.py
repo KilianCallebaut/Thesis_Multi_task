@@ -58,11 +58,11 @@ class FSDKaggle2018(DataReader):
         joblib.dump(dict, self.get_eval_path())
         self.taskDataset.save()
 
-    def calculate_input(self, resample_to=None, **kwargs):
+    def calculate_input(self, resample_to=None, test=False):
         inputs = []
         perc = 0
 
-        if 'test' in kwargs and kwargs.pop('test'):
+        if test:
             folder_path = os.path.join(self.root, 'audio_test')
             files = self.file_labels_val
         else:
@@ -75,7 +75,7 @@ class FSDKaggle2018(DataReader):
             if not read_wav:
                 inputs.append(torch.tensor([]))
                 continue
-            inputs.append(self.extraction_method.extract_features(read_wav, **kwargs))
+            inputs.append(self.extraction_method.extract_features(read_wav))
             if perc < (audio_idx / len(self.file_labels)) * 100:
                 print("Percentage done: {}".format(perc))
                 perc += 1
@@ -117,3 +117,4 @@ class FSDKaggle2018(DataReader):
             testing_inputs=inputs_val,
             testing_targets=targets_val
         )
+        self.taskDataset.prepare_inputs()

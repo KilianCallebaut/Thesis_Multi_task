@@ -64,18 +64,16 @@ class Ravdess(DataReader):
         joblib.dump(dict, self.get_path())
         self.taskDataset.save()
 
-    def calculate_input(self, **kwargs):
+    def calculate_input(self, resample_to=None):
         inputs = []
         perc = 0
 
         resample_to = None
-        if 'resample_to' in kwargs:
-            resample_to = kwargs.pop('resample_to')
 
         for file_idx in range(len(self.files)):
             file = self.files[file_idx]
             read_wav = self.load_wav(file['file'], resample_to)
-            inputs.append(self.extraction_method.extract_features(read_wav, **kwargs))
+            inputs.append(self.extraction_method.extract_features(read_wav))
             if perc < (file_idx / len(self.files)) * 100:
                 print("Percentage done: {}".format(perc))
                 perc += 1
@@ -94,3 +92,4 @@ class Ravdess(DataReader):
                                            base_path=self.get_base_path(),
                                            index_mode=self.index_mode,
                                            grouping=[f['actor'] for f in self.files])
+        self.taskDataset.prepare_inputs()

@@ -4,64 +4,47 @@ The top-level auxiliary file: ThesisText.aux
 Reallocating 'name_of_file' (item size: 1) to 9 items.
 The style file: plainnat.bst
 Reallocating 'name_of_file' (item size: 1) to 11 items.
+I found no \citation commands---while reading file ThesisText.aux
 Database file #1: references.bib
-Repeated entry---line 516 of file references.bib
- : @article{georgiev2017heterogeneous
- :                                   ,
-I'm skipping whatever remains of this entry
-Repeated entry---line 533 of file references.bib
- : @article{tagliasacchi2020multi
- :                               ,
-I'm skipping whatever remains of this entry
-Repeated entry---line 596 of file references.bib
- : @inproceedings{tonami2019joint
- :                               ,
-I'm skipping whatever remains of this entry
-Repeated entry---line 627 of file references.bib
- : @inproceedings{sakti2016deep
- :                             ,
-I'm skipping whatever remains of this entry
-Warning--empty journal in boregowda2018environmental
-Warning--empty journal in georgiev2017heterogeneous
-You've used 12 entries,
+You've used 0 entries,
             2773 wiz_defined-function locations,
-            657 strings with 7274 characters,
-and the built_in function-call counts, 6288 in all, are:
-= -- 557
-> -- 399
-< -- 9
-+ -- 135
-- -- 123
-* -- 495
-:= -- 955
-add.period$ -- 39
-call.type$ -- 12
-change.case$ -- 77
-chr.to.int$ -- 12
-cite$ -- 26
-duplicate$ -- 288
-empty$ -- 484
-format.name$ -- 139
-if$ -- 1330
+            592 strings with 4842 characters,
+and the built_in function-call counts, 33 in all, are:
+= -- 0
+> -- 0
+< -- 0
++ -- 0
+- -- 0
+* -- 2
+:= -- 10
+add.period$ -- 0
+call.type$ -- 0
+change.case$ -- 0
+chr.to.int$ -- 0
+cite$ -- 0
+duplicate$ -- 0
+empty$ -- 1
+format.name$ -- 0
+if$ -- 1
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 12
-newline$ -- 68
-num.names$ -- 48
-pop$ -- 167
+missing$ -- 0
+newline$ -- 8
+num.names$ -- 0
+pop$ -- 0
 preamble$ -- 1
-purify$ -- 65
+purify$ -- 0
 quote$ -- 0
-skip$ -- 233
+skip$ -- 1
 stack$ -- 0
-substring$ -- 213
-swap$ -- 48
-text.length$ -- 4
+substring$ -- 0
+swap$ -- 0
+text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 132
-warning$ -- 2
-while$ -- 54
+type$ -- 0
+warning$ -- 0
+while$ -- 0
 width$ -- 0
-write$ -- 159
-(There were 4 error messages)
+write$ -- 7
+(There was 1 error message)

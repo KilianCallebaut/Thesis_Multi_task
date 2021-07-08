@@ -84,12 +84,6 @@ class ASVspoof2015(DataReader):
         self.files = [os.path.join(self.Wav_folder, x[0], x[1]) for x in self.truths.to_numpy()]
 
     def read_files(self):
-        # info = joblib.load(self.get_path())
-        # self.files = info['files']
-        # self.truths = info['truths']
-        # self.files_val = info['files_val']
-        # self.truths_val = info['truths_val']
-
         self.taskDataset.load()
 
     def write_files(self):
@@ -99,14 +93,13 @@ class ASVspoof2015(DataReader):
         joblib.dump(dict, self.get_path())
         self.taskDataset.save()
 
-    # which = develop, evaluation
-    def calculate_input(self, resample_to=None, **kwargs):
+    def calculate_input(self, resample_to=None):
         print('training')
         perc = 0
         inputs = []
         for audio_idx in range(len(self.files)):
             read_wav = self.load_wav(self.files[audio_idx] + '.wav', resample_to)
-            inputs.append(self.extraction_method.extract_features(read_wav, **kwargs))
+            inputs.append(self.extraction_method.extract_features(read_wav))
             if perc < (audio_idx / len(self.files)) * 100:
                 print("Percentage done: {}".format(perc))
                 perc += 1
@@ -133,3 +126,4 @@ class ASVspoof2015(DataReader):
                                        extraction_method=self.extraction_method,
                                        base_path=self.get_base_path(),
                                        index_mode=self.index_mode)
+        self.taskDataset.prepare_inputs()

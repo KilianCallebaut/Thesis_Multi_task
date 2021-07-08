@@ -15,37 +15,44 @@ drive = 'F'
 # load/save matrices
 # load/save classification report
 class Results:
-    audioset_train_path = drive + r":\Thesis_Results\Training_Results"
-    audioset_eval_path = drive + r":\Thesis_Results\Evaluation_Results"
+    training_results_path = drive + r":\Thesis_Results\Training_Results"
+    evaluation_results_path = drive + r":\Thesis_Results\Evaluation_Results"
     audioset_file_base = r"Result"
     model_checkpoints_path = drive + r":\Thesis_Results\Model_Checkpoints"
 
     def __init__(self,
                  num_epochs: int,
                  run_name=None,
-                 audioset_train_path=None,
-                 audioset_eval_path=None,
-                 model_checkpoints_path=None):
+                 training_results_path=None,
+                 evaluation_results_path=None,
+                 model_checkpoints_path=None,
+                 tensorboard_folder=None):
 
         if run_name:
             self.run_name = run_name
         else:
             self.run_name = self.audioset_file_base + "_" + str(
                 datetime.now().strftime("%d_%m_%Y_%H_%M_%S"))
-        if audioset_train_path:
-            self.audioset_train_path = audioset_train_path
-        if audioset_eval_path:
-            self.audioset_eval_path = audioset_eval_path
+        if training_results_path:
+            self.training_results_path = training_results_path
+        if evaluation_results_path:
+            self.evaluation_results_path = evaluation_results_path
+        if not tensorboard_folder:
+            self.tensorboard_folder = 'TensorBoard'
+        else:
+            self.tensorboard_folder = tensorboard_folder
 
-        if not os.path.exists(os.path.join(self.audioset_train_path, self.run_name)):
-            os.makedirs(os.path.join(self.audioset_train_path, self.run_name))
-        if not os.path.exists(os.path.join(self.audioset_eval_path, self.run_name)):
-            os.makedirs(os.path.join(self.audioset_eval_path, self.run_name))
+        if not os.path.exists(os.path.join(self.training_results_path, self.run_name)):
+            os.makedirs(os.path.join(self.training_results_path, self.run_name))
+        if not os.path.exists(os.path.join(self.evaluation_results_path, self.run_name)):
+            os.makedirs(os.path.join(self.evaluation_results_path, self.run_name))
+        if not os.path.exists(os.path.join(self.training_results_path, self.tensorboard_folder)):
+            os.makedirs(os.path.join(self.training_results_path, self.tensorboard_folder))
 
         if model_checkpoints_path:
             self.model_checkpoints_path = model_checkpoints_path
 
-        self.writer = SummaryWriter(log_dir=os.path.join(self.audioset_train_path, 'experiments', self.run_name))
+        self.writer = SummaryWriter(log_dir=os.path.join(self.training_results_path, self.tensorboard_folder, self.run_name))
         self.num_epochs = num_epochs
         self.training_curve = np.zeros(self.num_epochs)
         self.evaluation_curve = np.zeros(self.num_epochs)
@@ -62,10 +69,10 @@ class Results:
         model.load_state_dict(checkpoint['model_state_dict'])
 
     def add_confusion_matrix(self, epoch, mat, task, train):
-        path = self.audioset_eval_path
+        path = self.evaluation_results_path
         phase = 'Evaluation'
         if train:
-            path = self.audioset_train_path
+            path = self.training_results_path
             phase = 'Train'
         joblib.dump(mat,
                     os.path.join(path, self.run_name, "{}_conf_mat_{}_epoch_{}.gz".format(phase, task.name, epoch)))
@@ -76,38 +83,38 @@ class Results:
         print(mat)
 
     def load_confusion_matrix(self, epoch, task, train):
-        path = self.audioset_eval_path
+        path = self.evaluation_results_path
         phase = 'Evaluation'
         if train:
-            path = self.audioset_train_path
+            path = self.training_results_path
             phase = 'Train'
         return joblib.load(
             os.path.join(path, self.run_name, "{}_conf_mat_{}_epoch_{}.gz".format(phase, task.name, epoch)))
 
     def add_multi_confusion_matrix(self, epoch, mat, task, train):
-        path = self.audioset_eval_path
+        path = self.evaluation_results_path
         phase = 'Evaluation'
         if train:
-            path = self.audioset_train_path
+            path = self.training_results_path
             phase = 'Train'
         joblib.dump(mat,
                     os.path.join(path, self.run_name, "{}_conf_mat_{}_epoch_{}.gz".format(phase, task.name, epoch)))
         print(mat)
 
     def load_multi_confusion_matrix(self, epoch, task, train):
-        path = self.audioset_eval_path
+        path = self.evaluation_results_path
         phase = 'Evaluation'
         if train:
-            path = self.audioset_train_path
+            path = self.training_results_path
             phase = 'Train'
         return joblib.load(
             os.path.join(path, self.run_name, "{}_conf_mat_{}_epoch_{}.gz".format(phase, task.name, epoch)))
 
     def add_class_report(self, epoch, report, task, train):
-        path = self.audioset_eval_path
+        path = self.evaluation_results_path
         phase = 'Evaluation'
         if train:
-            path = self.audioset_train_path
+            path = self.training_results_path
             phase = 'Train'
         joblib.dump(report,
                     os.path.join(path, self.run_name, "{}_class_report_{}_epoch_{}.gz".format(phase, task.name, epoch)))
@@ -121,10 +128,10 @@ class Results:
         print(report)
 
     def load_class_report(self, epoch, task, train):
-        path = self.audioset_eval_path
+        path = self.evaluation_results_path
         phase = 'Evaluation'
         if train:
-            path = self.audioset_train_path
+            path = self.training_results_path
             phase = 'Train'
         return joblib.load(
             os.path.join(path, self.run_name, "{}_class_report_{}_epoch_{}.gz".format(phase, task.name, epoch)))
@@ -139,19 +146,19 @@ class Results:
         self.writer.add_scalar("{}/Loss".format(phase), loss / step, epoch)
 
     def load_loss_curve(self, train):
-        path = self.audioset_eval_path
+        path = self.evaluation_results_path
         phase = 'Evaluation'
         if train:
-            path = self.audioset_train_path
+            path = self.training_results_path
             phase = 'Train'
         return joblib.load(os.path.join(path, self.run_name, "{}_losscurve.gz".format(phase)))
 
     def write_loss_curves(self):
         phase = 'Train'
-        path = self.audioset_train_path
+        path = self.training_results_path
         joblib.dump(self.training_curve, os.path.join(path, self.run_name, "{}_losscurve.gz".format(phase)))
         phase = 'Evaluation'
-        path = self.audioset_eval_path
+        path = self.evaluation_results_path
         joblib.dump(self.evaluation_curve, os.path.join(path, self.run_name, "{}_losscurve.gz".format(phase)))
 
     def add_loss_to_curve_task(self, epoch, step, loss, task, train):
@@ -169,32 +176,21 @@ class Results:
         self.writer.add_scalar("{}/Loss/{}".format(phase, task.name), loss / step, epoch)
 
     def load_loss_curve_task(self, task, train):
-        path = self.audioset_eval_path
+        path = self.evaluation_results_path
         phase = 'Evaluation'
         if train:
-            path = self.audioset_train_path
+            path = self.training_results_path
             phase = 'Train'
         return joblib.load(os.path.join(path, self.run_name, "{}_losscurve_tasks.gz".format(phase, task.name)))
 
     def write_loss_curve_tasks(self):
-        path = self.audioset_train_path
+        path = self.training_results_path
         phase = 'Train'
         joblib.dump(self.training_curve_task, os.path.join(path, self.run_name, "{}_losscurve_tasks.gz".format(phase)))
-        path = self.audioset_eval_path
+        path = self.evaluation_results_path
         phase = 'Evaluation'
         joblib.dump(self.evaluation_curve_task,
                     os.path.join(path, self.run_name, "{}_losscurve_tasks.gz".format(phase)))
-
-    def early_stop(self, epoch):
-        if epoch == len(self.training_curve) - 1:
-            return True
-        if epoch == 0:
-            return False
-
-        if (self.training_curve[epoch - 1] - self.training_curve[epoch]) < 0.1:
-            return True
-
-        return False
 
     def flush_writer(self):
         self.writer.flush()

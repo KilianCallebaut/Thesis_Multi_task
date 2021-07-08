@@ -29,6 +29,7 @@ class ConcatTaskDataset(ConcatDataset):
                     for t_id in range(len(all_tasks)):
                         after += len(all_tasks[t_id].output_labels)
             datasets[d].pad_targets(before, after)
+            datasets[d].task.set_task_group(d)
         super().__init__(datasets)
         self.datasets = datasets
 
@@ -58,21 +59,3 @@ class ConcatTaskDataset(ConcatDataset):
                 target_flags.append(task_padding)
         return target_flags
 
-    def split_inputs_targets(self):
-        inputs = torch.cat([torch.stack(d.inputs) for d in self.datasets]).float()
-        targets = torch.cat([torch.stack(
-            [torch.from_numpy(np.array(d.pad_before + t + d.pad_after)) for t in d.targets]
-        ) for d in self.datasets])
-        names = torch.tensor(
-            [d_id for d_id in range(len(self.datasets)) for _ in range(self.datasets[d_id].__len__())])
-        return inputs, targets, names
-
-    @staticmethod
-    def split_inputs_targets_static(datasets: List[TaskDataset]):
-        inputs = torch.cat([torch.stack(d.inputs) for d in datasets]).float()
-        targets = torch.cat([torch.stack(
-            [torch.from_numpy(np.array(d.pad_before + t + d.pad_after)) for t in d.targets]
-        ) for d in datasets])
-        names = torch.tensor(
-            [d_id for d_id in range(len(datasets)) for _ in range(datasets[d_id].__len__())])
-        return inputs, targets, names

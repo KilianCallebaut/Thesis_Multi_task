@@ -12,15 +12,15 @@ class Task:
             self,
             name: str,
             output_labels,
-            loss_function=None
-            # output_module='softmax' #'sigmoid'
-
+            loss_function=None,
+            task_group=0
     ):
         super().__init__()
         self.output_labels = output_labels
         self.name = name
         self.classification_type = ''
         self.loss_function = loss_function
+        self.task_group = task_group
 
     def decision_making(self, output):
         # if self.classification_type == 'multi-class':
@@ -36,6 +36,8 @@ class Task:
         #     return output
         pass
 
+    def set_task_group(self, group: int):
+        self.task_group = group
 
 class MultiClassTask(Task):
 

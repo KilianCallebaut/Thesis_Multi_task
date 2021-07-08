@@ -3,21 +3,28 @@ import statistics
 from abc import abstractmethod, ABC
 
 import librosa
+import librosa.display
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from python_speech_features import logfbank, mfcc, fbank
 from sklearn.preprocessing import StandardScaler
-import matplotlib.pyplot as plt
-import librosa.display
+
 
 class ExtractionMethod(ABC):
 
-    def __init__(self):
+    def __init__(self, preparation_params=None, extraction_params=None):
+        if extraction_params is None:
+            extraction_params = dict()
+        if preparation_params is None:
+            preparation_params = dict()
         self.scalers = {}
         self.name = ''
+        self.extraction_params = extraction_params
+        self.preparation_params = preparation_params
 
     @abstractmethod
-    def extract_features(self, sig_samplerate, **kwargs):
+    def extract_features(self, sig_samplerate):
         pass
 
     @abstractmethod
@@ -25,11 +32,11 @@ class ExtractionMethod(ABC):
         pass
 
     @abstractmethod
-    def scale_transform(self, inputs):
+    def scale_transform(self, input_tensor):
         pass
 
     @abstractmethod
-    def prepare_inputs(self, inputs, **kwargs):
+    def prepare_inputs(self, inputs):
         pass
 
     # EXTRACTION
@@ -59,7 +66,6 @@ class ExtractionMethod(ABC):
 
     def scale_fit_2D(self, inputs):
         self.scalers[0] = StandardScaler()
-        # self.scalers[0] = MinMaxScaler()
         self.scalers[0].fit(inputs)
 
     # scale transformers
@@ -126,12 +132,12 @@ class ExtractionMethod(ABC):
 
 class LogbankSummary(ExtractionMethod):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, preparation_params=None, extraction_params=None):
+        super().__init__(preparation_params, extraction_params)
         self.name = 'logbank_summary'
 
-    def extract_features(self, sig_samplerate, **kwargs):
-        lb = self.logbank(sig_samplerate, **kwargs)
+    def extract_features(self, sig_samplerate):
+        lb = self.logbank(sig_samplerate, **self.extraction_params)
         return self.logbank_summary(lb)
 
     def logbank_summary(self, lb):
@@ -143,24 +149,24 @@ class LogbankSummary(ExtractionMethod):
         inputs = self.convert_list_of_tensors_to_nparray(inputs)
         self.scale_fit_3D_2nddim(inputs)
 
-    def scale_transform(self, inputs):
-        inputs = self.convert_list_of_tensors_to_nparray(inputs)
-        ret = self.scale_transform_3D_2nddim(inputs)
-        return self.convert_nparray_to_list_of_tensors(ret)
+    def scale_transform(self, input_tensor: torch.tensor):
+        # inputs = self.convert_list_of_tensors_to_nparray(inputs)
+        # ret = self.scale_transform_3D_2nddim(inputs)
+        # return self.convert_nparray_to_list_of_tensors(ret)
+        return torch.from_numpy(self.scale_transform_2D(input_tensor.numpy()))
 
-    def prepare_inputs(self, inputs, **kwargs):
-        # inputs = self.scale_transform(inputs)
+    def prepare_inputs(self, inputs):
         return inputs
 
 
 class Mfcc(ExtractionMethod):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, preparation_params=None, extraction_params=None):
+        super().__init__(preparation_params, extraction_params)
         self.name = 'mfcc'
 
-    def extract_features(self, sig_samplerate, **kwargs):
-        return self.mfcc(sig_samplerate, **kwargs)
+    def extract_features(self, sig_samplerate):
+        return self.mfcc(sig_samplerate, **self.extraction_params)
 
     # winfunc = np.hamming
     # ceplifter = 22
@@ -177,30 +183,32 @@ class Mfcc(ExtractionMethod):
         inputs = np.concatenate(inputs)
         self.scale_fit_2D(inputs)
 
-    def scale_transform(self, inputs):
-        ret = []
-        for i in range(len(inputs)):
-            ret.append(self.scale_transform_2D(inputs[i].numpy()))
-        return self.convert_nparray_to_list_of_tensors(ret)
+    def scale_transform(self, input_tensor):
+        # ret = []
+        # for i in range(len(inputs)):
+        #     ret.append(self.scale_transform_2D(inputs[i].numpy()))
+        # return self.convert_nparray_to_list_of_tensors(ret)
+        return torch.from_numpy(self.scale_transform_2D(input_tensor.numpy()))
 
-    def prepare_inputs(self, inputs, **kwargs):
+    def prepare_inputs(self, inputs):
         cum_sizes = [len(i) for i in inputs]
 
-        if 'window_size' in kwargs:
-            inputs = self.frame_inputs(inputs, kwargs.get('window_size'))
-        elif max(cum_sizes) != min(cum_sizes):
-            median = statistics.median(cum_sizes)
-            inputs = self.frame_inputs(inputs, median)
+        if 'window_size' not in self.preparation_params and max(cum_sizes) != min(cum_sizes):
+            self.preparation_params['window_size'] = statistics.median(cum_sizes)
+
+        if 'window_size' in self.preparation_params:
+            return self.frame_inputs(inputs=inputs, window_size=self.preparation_params['window_size'])
+
         return inputs
 
 
 class MelSpectrogram(ExtractionMethod):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, preparation_params=None, extraction_params=None):
+        super().__init__(preparation_params, extraction_params)
         self.name = 'MelSpectrogram'
 
-    def extract_features(self, sig_samplerate, **kwargs):
+    def extract_features(self, sig_samplerate):
         """
         (numframes=1 + int(math.ceil((1.0*sig_len - frame_len=winlen*samplerate)/frame_step=winstep*samplerate)), nfilt)
         for winlen=0.03, winstep=0.01, sr=44100:
@@ -209,36 +217,39 @@ class MelSpectrogram(ExtractionMethod):
             numframes = 1 + math.ceil((44100 - 1323)/441)
         """
         return torch.tensor(fbank(sig_samplerate[0], sig_samplerate[1],
-                                  **kwargs)[0])
+                                  **self.extraction_params)[0])
 
     def scale_fit(self, inputs):
         inputs = np.concatenate(inputs)
         self.scale_fit_2D(inputs)
 
-    def scale_transform(self, inputs):
-        ret = []
-        for i in range(len(inputs)):
-            ret.append(self.scale_transform_2D(inputs[i].numpy()))
-        return self.convert_nparray_to_list_of_tensors(ret)
+    def scale_transform(self, input_tensor):
+        # ret = []
+        # for i in range(len(inputs)):
+        #     ret.append(self.scale_transform_2D(inputs[i].numpy()))
+        # return self.convert_nparray_to_list_of_tensors(ret)
+        return torch.from_numpy(self.scale_transform_2D(input_tensor.numpy()))
 
-    def prepare_inputs(self, inputs, **kwargs):
+    def prepare_inputs(self, inputs):
         cum_sizes = [len(i) for i in inputs]
-        if 'window_size' in kwargs:
-            inputs = self.frame_inputs(inputs, kwargs.get('window_size'))
-        elif max(cum_sizes) != min(cum_sizes):
-            median = statistics.median(cum_sizes)
-            inputs = self.frame_inputs(inputs, int(median))
+
+        if 'window_size' not in self.preparation_params and max(cum_sizes) != min(cum_sizes):
+            self.preparation_params['window_size'] = statistics.median(cum_sizes)
+
+        if 'window_size' in self.preparation_params:
+            return self.frame_inputs(inputs=inputs, window_size=self.preparation_params['window_size'])
+
         return inputs
 
 
 class LibMelSpectrogram(ExtractionMethod):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, preparation_params=None, extraction_params=None):
+        super().__init__(preparation_params, extraction_params)
         self.name = 'LibMelSpectrogram'
 
-    def extract_features(self, sig_samplerate, **kwargs):
-        feature = librosa.feature.melspectrogram(y=sig_samplerate[0], sr=sig_samplerate[1], **kwargs)
+    def extract_features(self, sig_samplerate):
+        feature = librosa.feature.melspectrogram(y=sig_samplerate[0], sr=sig_samplerate[1], **self.extraction_params)
         feature = librosa.power_to_db(feature, ref=np.max)
         feature = librosa.util.normalize(feature)
         # plot_feature(feature, 16000 )
@@ -248,28 +259,32 @@ class LibMelSpectrogram(ExtractionMethod):
         inputs = np.concatenate(inputs)
         self.scale_fit_2D(inputs)
 
-    def scale_transform(self, inputs):
-        ret = []
-        for i in range(len(inputs)):
-            ret.append(self.scale_transform_2D(inputs[i].numpy()))
-        return self.convert_nparray_to_list_of_tensors(ret)
+    def scale_transform(self, input_tensor):
+        # ret = []
+        # for i in range(len(inputs)):
+        #     ret.append(self.scale_transform_2D(inputs[i].numpy()))
+        # return self.convert_nparray_to_list_of_tensors(ret)
+        return torch.from_numpy(self.scale_transform_2D(input_tensor.numpy()))
 
-    def prepare_inputs(self, inputs, **kwargs):
+    def prepare_inputs(self, inputs):
         cum_sizes = [len(i) for i in inputs]
-        if 'window_size' in kwargs:
-            inputs = self.frame_inputs(inputs, kwargs.get('window_size'))
-        elif max(cum_sizes) != min(cum_sizes):
-            median = statistics.median(cum_sizes)
-            inputs = self.frame_inputs(inputs, int(median))
+
+        if 'window_size' not in self.preparation_params and max(cum_sizes) != min(cum_sizes):
+            self.preparation_params['window_size'] = int(statistics.median(cum_sizes))
+
+        if 'window_size' in self.preparation_params:
+            return self.frame_inputs(inputs=inputs, window_size=self.preparation_params['window_size'])
+
         return inputs
 
 
 extract_options = {
-    MelSpectrogram().name: MelSpectrogram(),
-    Mfcc().name: Mfcc(),
-    LogbankSummary().name: LogbankSummary(),
-    LibMelSpectrogram().name: LibMelSpectrogram()
+    MelSpectrogram().name: MelSpectrogram,
+    Mfcc().name: Mfcc,
+    LogbankSummary().name: LogbankSummary,
+    LibMelSpectrogram().name: LibMelSpectrogram
 }
+
 
 def plot_feature(S, sr):
     fig, ax = plt.subplots()

@@ -95,13 +95,13 @@ def run_set(concat_training, concat_test, fold):
     meta_params = read_config('meta_params_cnn_MelSpectrogram')
 
     #################################################################################
-
     # run_name creation
     results = Training.create_results(modelname=model.name,
                                       task_list=task_list,
                                       fold=fold,
                                       model_checkpoints_path=drive + r":\Thesis_Results\Model_Checkpoints",
                                       num_epochs=meta_params['num_epochs'])
+
     #################################################################################
 
     model, results = Training.run_gradient_descent(model=model,
@@ -142,7 +142,7 @@ def main(argv):
     dataset_list = [0, 2, 5, 4, 1]
     dataset_list_single = [1, 2, 4, 0, 5]
     # dataset_list_double = [[0, 1], [0, 2], [0, 4], [0, 5], [1, 2], [1, 4], [1, 5], [2, 4], [2, 5], [4, 5]]
-    dataset_list_double = [[2, 4], [2, 5], [4, 5]]
+    dataset_list_double = [[0, 1], [0, 2], [0, 4], [0, 5], [1, 2], [1, 4], [1, 5], [2, 4], [2, 5], [4, 5]]
 
     print('--------------------------------------------------')
     print('test loop')
@@ -153,10 +153,10 @@ def main(argv):
     # for i in dataset_list:
     #     run_datasets([i])
 
-    # for i in dataset_list_single:
-    #     # create_index_mode([2])
-    #     # create_index_mode([i])
-    #     run_five_fold([i])
+    for i in dataset_list_single:
+        # create_index_mode([2])
+        # create_index_mode([i])
+        run_five_fold([i])
     #     # for j in range(i + 1, len(dataset_list)):
     #     #     #     # check_distributions([dataset_list[i], dataset_list[j]])
     #     #     run_five_fold([dataset_list[i], dataset_list[j]], fold=4)
@@ -164,6 +164,7 @@ def main(argv):
     #
     for i in dataset_list_double:
         run_five_fold(i)
+    run_five_fold([1])
 
     return 0
 

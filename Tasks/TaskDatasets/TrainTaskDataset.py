@@ -20,7 +20,7 @@ class TrainTaskDataset(TaskDataset):
                  grouping: List = None,
                  extra_tasks: List[Tuple] = None):
         super().__init__(inputs, targets, task, extraction_method, base_path, index_mode, grouping, extra_tasks)
-        task.name += '_train'
+        # task.name += '_train'
 
     def normalize_fit(self):
         self.extraction_method.scale_fit(self.inputs)

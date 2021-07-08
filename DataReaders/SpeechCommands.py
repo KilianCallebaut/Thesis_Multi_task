@@ -52,11 +52,9 @@ class SpeechCommands(DataReader):
         joblib.dump(dict, self.get_eval_path())
         self.taskDataset.save()
 
-    def calculate_input(self, **kwargs):
+    def calculate_input(self, resample_to=None):
         inputs_tot = [[], []]
         resample_to = None
-        if 'resample_to' in kwargs:
-            resample_to = kwargs.pop('resample_to')
 
         for ds_id in range(2):
             for audio_label in self.ds[ds_id].as_numpy_iterator():
@@ -64,7 +62,7 @@ class SpeechCommands(DataReader):
                 fs = self.sample_rate
                 if resample_to is not None:
                     audio, fs = self.resample(audio, self.sample_rate, resample_to)
-                inputs_tot[ds_id].append(self.extraction_method.extract_features((audio, fs), **kwargs))
+                inputs_tot[ds_id].append(self.extraction_method.extract_features((audio, fs)))
                 print('input amount: {}'.format(len(inputs_tot[ds_id])), end='\r')
 
         return inputs_tot[0], inputs_tot[1]
@@ -97,3 +95,4 @@ class SpeechCommands(DataReader):
             testing_inputs=inputs_t,
             testing_targets=targets_t
         )
+        self.taskDataset.prepare_inputs()

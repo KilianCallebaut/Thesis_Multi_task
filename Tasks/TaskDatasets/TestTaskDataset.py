@@ -20,7 +20,7 @@ class TestTaskDataset(TaskDataset):
                  grouping: List = None,
                  extra_tasks: List[Tuple] = None):
         super().__init__(inputs, targets, task, extraction_method, base_path, index_mode, grouping, extra_tasks)
-        task.name += '_test'
+        # task.name += '_test'
 
     def default_base_path_extension(self):
         self.base_path = os.path.join(self.base_path, 'test_set')

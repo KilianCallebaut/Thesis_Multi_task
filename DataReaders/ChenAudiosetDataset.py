@@ -136,15 +136,16 @@ class ChenAudiosetDataset(DataReader):
                                        index_mode=self.index_mode,
                                        grouping=[fold for fold in range(len(self.wav_files)) for _ in
                                                  self.wav_files[fold]])
+        self.taskDataset.prepare_inputs()
 
-    def calculate_input(self, resample_to=None, **kwargs):
+    def calculate_input(self, resample_to=None):
         inputs = []
 
         i = 0
         for folder in self.wav_files:
             for file in folder:
                 read_wav = self.load_wav(file, resample_to)
-                inputs.append(self.extraction_method.extract_features(read_wav, **kwargs))
+                inputs.append(self.extraction_method.extract_features(read_wav))
             i += 1
             print('Percentage done: {}'.format(i/len(self.wav_files)), end='\r')
 
