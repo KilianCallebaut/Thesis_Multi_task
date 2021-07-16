@@ -67,7 +67,7 @@ class SpeechCommands(DataReader):
 
         return inputs_tot[0], inputs_tot[1]
 
-    def calculate_taskDataset(self, **kwargs):
+    def calculate_taskDataset(self, **kwargs) -> HoldTaskDataset:
         # Training Set
         print("Calculate Training Set")
         targets = []
@@ -84,15 +84,18 @@ class SpeechCommands(DataReader):
             targets_t.append(audio_label["label"])
         targets_t = [[float(b == f) for b in range(len(self.ds_info.features['label'].names))] for f in targets_t]
 
-        self.taskDataset = HoldTaskDataset(inputs=[], targets=[],
-                                           task=MultiClassTask(name="SpeechCommands",
-                                                               output_labels=self.ds_info.features['label'].names),
-                                           extraction_method=self.extraction_method,
-                                           index_mode=self.index_mode)
-        self.taskDataset.add_train_test_set(
+        taskDataset = HoldTaskDataset(inputs=[], targets=[],
+                                      task=MultiClassTask(name="SpeechCommands",
+                                                          output_labels=self.ds_info.features['label'].names),
+                                      extraction_method=self.extraction_method,
+                                      index_mode=self.index_mode,
+                                      training_base_path=self.get_base_path(),
+                                      testing_base_path=self.get_eval_base_path())
+        taskDataset.add_train_test_set(
             training_inputs=inputs,
             training_targets=targets,
             testing_inputs=inputs_t,
             testing_targets=targets_t
         )
-        self.taskDataset.prepare_inputs()
+        taskDataset.prepare_inputs()
+        return taskDataset

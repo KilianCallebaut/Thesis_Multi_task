@@ -1,14 +1,62 @@
 \chapter{Implementation}
 
+\section{Technology}
+
+The implementation is built in python and relies on pytorch for deep learning modeling and training. PyTorch is one of the biggest and most accessible frameworks for developing neural networks. This framework is designed to utilise its objects as to minimize an extra learning curve, as well as lighten any developmental work that it still requires. 
+
 \section{System Architecture}
 
-Reiterate the design principles and a description of what functionally has been built
+TODO: Reiterate the design principles and a description of what functionally has been built
 
 \section{High Level Description}
 
-Simplified overview of the pipeline
+TODO: Simplified overview of the pipeline
 
 \section{Data Reading}
+
+
+The first part of the pipeline is responsible for reading the audio data from datasets, extracting their features and storing it along their targets in valid objects. This also includes abstractions for reading and writing of files that store these objects for later use. As every dataset has their own structure and storage method, the implementation for every data reader has to be specified by the developer. The structure therefore is built around following the pattern layed out in the \textbf{DataReader} class and extending its functions with dataset specific ones. The pattern goes as follows. \\
+
+\subsection{Structure}
+
+First, a \textbf{DataReader} object is instantiated with an \textbf{ExtractionMethod} object and relevant parameters. The \textbf{ExtractionMethod} is the tool used to transform individual data instances. Since specific data transformations can often rely on the specific extraction method used (TODO: Give an example of this), it is opted to group multiple transformation functions this way, which will be explained further later. When the features still have to be extracted, the datareader will first read the structure (e.g. list of locations, list of read signals, tensorflow dataset, ...) in memory, through the \textit{load\_files} function. Then, the standardized object, called a \textbf{TaskDataset}, is made in the \textit{calculate\_taskDataset} function. This requires a list of input tensors, a list of targets, the \textbf{ExtractionMethod} object, a unique name and the list of target names. The idea is that using the \textbf{ExtractionMethod} object, the list of inputs is created by iterating over the structure, getting the read wav form and extracting the desired features per audio instance in a PyTorch tensor object. When the \textbf{TaskDataset} object is correctly created, the next step is then to write the extracted features to files in the \textit{write\_files} method. While this method can be extended if it is desired to write additional files, it is not necessary as the \textbf{TaskDataset} object already has its own file management functionalities. Because the created \textbf{TaskDataset}object also received the \textbf{ExtractionMethod} object, it handles its files depending on the specified extraction method, thus nullifying any need for further adaptations to be made if the developer wants to extract different features for the same dataset. If everything is written once already, the DataReader is able to detect this using its \textit{check\_files} method and will automatically read in the \textbf{TaskDataset} instead using the \textit{read\_files} method.\\
+	
+Having given the general overview of how to go from audio data to standardized objects through the framework, it's also important to note what it is designed to be invariant to. More specifically, the \textbf{TaskDataset} object has a number of functionalities which do not require any additional handling when utilized. The biggest one is the so called index mode, which automatically distributes the data over files that are read when needed. This only requires to be activated at the initialization of the TaskDataset, after which the necessary functionalities will be switched out for index based ones. \\
+
+Further factors the data structure can automatically deal with are datasets which have predefined train and test sets. This is possible through the hold - train - test set-up which allows for the train and test set to be defined and linked through the holding TaskDataset. If this is not the case, then the data is directly inserted in the holding TaskDataset and the splits can be made later. Separate Train and Test TaskDatasets can have their own storage locations, which the file management automatically handles as if it's the unseparated case.\\
+
+The last one are multiple tasks for the same dataset, which can simply be inserted without any limit into the same TaskDataset, after which the getter functions will automatically take all targets for all tasks at the specified index. \\
+
+\subsection{DataReader}
+
+TODO: insert Data Reader Model
+
+The \textbf{DataReader} class is meant as a parent class to be extended by specific implementations for each dataset. As previously mentioned, it has a number of abstract functions which require to be extended. Besides those, it also contains an automatic parser for ExtractionMethod objects from text, in case the input is directly read from files e.g. json. Alongside that, it also contains a function to read in wav files at a specific location, using the Librosa library and a separate resampling function, in case the signal is already read. The ability to resample signals is used often in multi-task learning, which makes it the extra parameter in the \textit{calculate\_input} function.
+
+\subsection{ExtractionMethod}
+
+TODO: insert ExtractionMethod Model
+
+If the DataReader is the workbench to transform audio datasets to TaskDatasets, then the \textbf{ExtractionMethod} class is the hammer. The functionality of this class is instance based, but groups together a number of transformations. The main one of course being feature extraction. This class works similarly to the DataReader class as it has a number of abstract methods to be extended if one wants to make their own implementation. However, a number of them are already available, like the MFCC, the Melspectrogram and the LogbankSummary (TODO: Refer to papers using and explaining these) features. At instantiation, this class should receive extraction parameters and preparation parameters. The extraction parameters should be a dictionary with parameters which can fit in the utilised extraction method. Since these are stored in the object, the same object can easily be reused on different datasets for consistency and easy scalability. 
+
+The other functionalities that were referred to, to possibly be dependent on the extraction method used are data transformations. One is the normalization of data. This requires scalers to be fit on the data to then transform each instance according to the scalers (typically infers calculating the mean and the variance of the whole dataset and then scaling these so that the mean of all instances is 0 and the variance is 1). Aside from scaling the data, the ExtractionMethod object also includes a function for other transformations. A typical use for this is cutting the matrices into same sized frames, as audio data can have varying lengths. This function is already included, along with a slight alternative, where the input matrices are not cut but windowed, meaning one input matrix result in multiple windows of the same size with overlap, so no data is lost. Standard methods for fitting, scaling, inverse scaling entire 2D inputs and 2D inputs per row are also already available and are implemented using the sklearn preprocessing toolbox.
+
+(TODO: Explain the example of the Logbank summary and the MelSpectrogram requiring different handling)
+
+\subsection{TaskDataset}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDataset Structure"}
+	\caption[TaskDataset Structure]{}
+	\label{fig:taskdataset-structure}
+\end{figure}
+
+The TaskDataset structure is how the framework manages to standardize inputs and targets in one valid object for training. It extends PyTorch's Dataset class to allow for integration with its dataloader objects. This class is responsible for containing the data with functionalities for getting data, storage and transformation. This class is however only a parent class to the Hold-train-test structure, which is set up to deal with functionalities related to generating and handling valid train and test sets. The entire TaskDataset structure is designed to be customizable, but invariant when handling from the outside. There are 5 parts to this that have their own strategies: File management, getting data, transforming data, splitting and the index mode. \\
+
+First the file management will be detailed. The idea is simple: the save function writes the Taskdataset to files and the load function reads the files to a valid TaskDataset object. Using the joblib library, which allows files to easily be written and read in a parallelised manner, the inputs are stored separately from the targets and the other information. In order to create inputs that used different extraction methods easily, the storage takes includes the name of the stored ExtractionMethod. \\
+
+Next is getting the data. 
 
 \section{Data Loading}
 
@@ -16,6 +64,6 @@ Simplified overview of the pipeline
 
 \section{Complementary tools}
 
-Describe things like the index mode, which answer additional needs outside of fast development.
+TODO: Describe things like the index mode, which answer additional needs outside of fast development.
 
 \section{Extendibility}

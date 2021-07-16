@@ -18,7 +18,6 @@ from Training.Training import Training
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 drive = 'F'
-# data_base = r'C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers'
 data_base = r'F:\Thesis_Results\Data_Readers'
 
 

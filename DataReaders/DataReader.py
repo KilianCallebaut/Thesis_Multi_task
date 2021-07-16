@@ -39,8 +39,8 @@ class DataReader(ABC):
         else:
             print('calculating')
             self.load_files()
-            self.calculate_taskDataset(**kwargs)
-            self.taskDataset.prepare_inputs()
+            self.taskDataset = self.calculate_taskDataset(**kwargs)
+            # self.taskDataset.prepare_inputs()
             self.write_files()
 
     @abstractmethod
@@ -59,14 +59,6 @@ class DataReader(ABC):
     def load_files(self):
         pass
 
-    @abstractmethod
-    def read_files(self):
-        pass
-
-    @abstractmethod
-    def write_files(self):
-        pass
-
     # Can add automatic iterator handler
     # for x in iterat:
     # handle if x are locations
@@ -76,23 +68,29 @@ class DataReader(ABC):
         pass
 
     @abstractmethod
-    def calculate_taskDataset(self, **kwargs):
+    def calculate_taskDataset(self, **kwargs) -> HoldTaskDataset:
         pass
 
-    def sample_labels(self, taskDataset, dic_of_labels_limits):
-        sampled_targets = taskDataset.targets
-        sampled_inputs = taskDataset.inputs
+    def read_files(self):
+        self.taskDataset.load()
 
-        for l in dic_of_labels_limits.keys():
-            label_set = [i for i in range(len(sampled_targets))
-                         if sampled_targets[i][taskDataset.task.output_labels.index(l)] == 1]
-            if len(label_set) > dic_of_labels_limits[l]:
-                random_label_set = random.sample(label_set, dic_of_labels_limits[l])
-                sampled_targets = [sampled_targets[i] for i in range(len(sampled_targets)) if
-                                   (i not in label_set or i in random_label_set)]
-                sampled_inputs = [sampled_inputs[i] for i in range(len(sampled_inputs)) if
-                                  (i not in label_set or i in random_label_set)]
-        return sampled_inputs, sampled_targets
+    def write_files(self):
+        self.taskDataset.save()
+
+    # def sample_labels(self, taskDataset, dic_of_labels_limits):
+    #     sampled_targets = taskDataset.targets
+    #     sampled_inputs = taskDataset.inputs
+    #
+    #     for l in dic_of_labels_limits.keys():
+    #         label_set = [i for i in range(len(sampled_targets))
+    #                      if sampled_targets[i][taskDataset.task.output_labels.index(l)] == 1]
+    #         if len(label_set) > dic_of_labels_limits[l]:
+    #             random_label_set = random.sample(label_set, dic_of_labels_limits[l])
+    #             sampled_targets = [sampled_targets[i] for i in range(len(sampled_targets)) if
+    #                                (i not in label_set or i in random_label_set)]
+    #             sampled_inputs = [sampled_inputs[i] for i in range(len(sampled_inputs)) if
+    #                               (i not in label_set or i in random_label_set)]
+    #     return sampled_inputs, sampled_targets
 
     def resample(self, sig, sample_rate, resample_to):
         secs = len(sig) / sample_rate

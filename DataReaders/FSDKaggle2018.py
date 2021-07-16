@@ -81,7 +81,7 @@ class FSDKaggle2018(DataReader):
                 perc += 1
         return inputs
 
-    def calculate_taskDataset(self, **kwargs):
+    def calculate_taskDataset(self, **kwargs) -> HoldTaskDataset:
         distinct_labels = self.file_labels.label.unique()
         distinct_labels.sort()
         targets = []
@@ -102,7 +102,7 @@ class FSDKaggle2018(DataReader):
             if len(inputs_val[i_id]) == 0:
                 inputs_val.remove(inputs_val[i_id])
                 targets_val.remove(targets_val[i_id])
-        self.taskDataset = HoldTaskDataset(inputs=[],
+        taskDataset = HoldTaskDataset(inputs=[],
                                            targets=[],
                                            task=MultiClassTask(
                                                name='FSDKaggle2018',
@@ -111,10 +111,11 @@ class FSDKaggle2018(DataReader):
                                            index_mode=self.index_mode,
                                            training_base_path=self.get_base_path(),
                                            testing_base_path=self.get_eval_base_path())
-        self.taskDataset.add_train_test_set(
+        taskDataset.add_train_test_set(
             training_inputs=inputs,
             training_targets=targets,
             testing_inputs=inputs_val,
             testing_targets=targets_val
         )
-        self.taskDataset.prepare_inputs()
+        taskDataset.prepare_inputs()
+        return taskDataset

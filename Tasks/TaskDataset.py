@@ -72,12 +72,13 @@ class TaskDataset(Dataset):
         self.extra_tasks = extra_tasks
 
     def __getitem__(self, index):
-        return self.get_item(index)
 
-    def get_item(self, index):
-        return self.extraction_method.scale_transform(self.inputs[index].float()), \
+        return self.get_input(index), \
                torch.from_numpy(np.array(self.pad_before + self.get_all_targets(index) + self.pad_after)), \
                self.task.task_group
+
+    def get_input(self, index):
+        return self.extraction_method.scale_transform(self.inputs[index].float())
 
     def get_all_targets(self, index):
         if not self.extra_tasks:
@@ -187,7 +188,7 @@ class TaskDataset(Dataset):
 
     def switch_index_methods(self):
         # replace getitem, get_split_by_index by index based functions
-        self.get_item = types.MethodType(get_item_index_mode, self)
+        self.get_input = types.MethodType(get_input_index_mode, self)
         self.save = types.MethodType(save_index_mode, self)
         self.load = types.MethodType(load_index_mode, self)
 
@@ -208,15 +209,10 @@ class TaskDataset(Dataset):
             os.path.join(base_path, 'targets.pt')) and os.path.isfile(os.path.join(base_path, 'other.obj'))
 
 
-def get_item_index_mode(self, index):
+def get_input_index_mode(self, index):
     separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
     separated_file = os.path.join(separated_dir, 'input_{}.pickle'.format(self.inputs[index]))
-    x = self.extraction_method.scale_transform(torch.load(separated_file).float())
-    y = self.get_all_targets(index)
-    return x, \
-           torch.from_numpy(np.array(self.pad_before + y + self.pad_after)), \
-           self.task.name
-
+    return self.extraction_method.scale_transform(torch.load(separated_file).float())
 
 def save_index_mode(self, base_path):
     t_s = torch.Tensor(self.targets)

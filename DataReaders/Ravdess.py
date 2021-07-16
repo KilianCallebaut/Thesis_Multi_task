@@ -79,17 +79,18 @@ class Ravdess(DataReader):
                 perc += 1
         return inputs
 
-    def calculate_taskDataset(self, **kwargs):
+    def calculate_taskDataset(self, **kwargs) -> HoldTaskDataset:
         print('Calculating input')
         inputs = self.calculate_input(**kwargs)
 
         targets = [f['emotion'] for f in self.files]
         distinct_targets = list(set(targets))
         targets = [[float(b == f) for b in distinct_targets] for f in targets]
-        self.taskDataset = HoldTaskDataset(inputs=inputs, targets=targets,
+        taskDataset = HoldTaskDataset(inputs=inputs, targets=targets,
                                            task=MultiClassTask(name="Ravdess", output_labels=distinct_targets),
                                            extraction_method=self.extraction_method,
                                            base_path=self.get_base_path(),
                                            index_mode=self.index_mode,
                                            grouping=[f['actor'] for f in self.files])
-        self.taskDataset.prepare_inputs()
+        taskDataset.prepare_inputs()
+        return  taskDataset

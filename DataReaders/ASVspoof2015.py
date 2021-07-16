@@ -8,6 +8,7 @@ from numpy import long
 from DataReaders.DataReader import DataReader
 from Tasks.Task import MultiClassTask
 from Tasks.TaskDataset import TaskDataset
+from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 
 try:
     import cPickle
@@ -106,7 +107,7 @@ class ASVspoof2015(DataReader):
 
         return inputs
 
-    def calculate_taskDataset(self, **kwargs):
+    def calculate_taskDataset(self, **kwargs) -> HoldTaskDataset:
         distinct_labels = self.truths.folder.unique()
         distinct_labels.sort()
         distinct_labels = np.append(distinct_labels, 'unknown')
@@ -119,11 +120,12 @@ class ASVspoof2015(DataReader):
                 label_id == len(distinct_labels) - 1) for label_id in range(len(distinct_labels))]
             targets.append(target)
 
-        self.taskDataset = TaskDataset(inputs=inputs,
-                                       targets=targets,
-                                       task=MultiClassTask(name='ASVspoof2015',
-                                                           output_labels=distinct_labels),
-                                       extraction_method=self.extraction_method,
-                                       base_path=self.get_base_path(),
-                                       index_mode=self.index_mode)
-        self.taskDataset.prepare_inputs()
+        taskDataset = HoldTaskDataset(inputs=inputs,
+                                      targets=targets,
+                                      task=MultiClassTask(name='ASVspoof2015',
+                                                          output_labels=distinct_labels),
+                                      extraction_method=self.extraction_method,
+                                      base_path=self.get_base_path(),
+                                      index_mode=self.index_mode)
+        taskDataset.prepare_inputs()
+        return taskDataset

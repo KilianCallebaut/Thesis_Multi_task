@@ -110,7 +110,7 @@ class DCASE2017_SS(DataReader):
         print("Calculating input done")
         return inputs
 
-    def calculate_taskDataset(self, **kwargs):
+    def calculate_taskDataset(self, **kwargs) -> HoldTaskDataset:
         distinct_labels = self.devdataset.scene_labels()
         targets = []
 
@@ -136,7 +136,7 @@ class DCASE2017_SS(DataReader):
 
         inputs, inputs_val = self.calculate_input(**kwargs)
 
-        self.taskDataset = HoldTaskDataset(inputs=[],
+        taskDataset = HoldTaskDataset(inputs=[],
                                            targets=[],
                                            task=MultiClassTask(name='DCASE2017_SS', output_labels=distinct_labels),
                                            extraction_method=self.extraction_method,
@@ -144,10 +144,11 @@ class DCASE2017_SS(DataReader):
                                            training_base_path=self.get_base_path(),
                                            testing_base_path=self.get_eval_base_path())
 
-        self.taskDataset.add_train_test_set(
+        taskDataset.add_train_test_set(
             training_inputs=inputs,
             training_targets=targets,
             testing_inputs=inputs_val,
             testing_targets=targets_val
         )
-        self.taskDataset.prepare_inputs()
+        taskDataset.prepare_inputs()
+        return taskDataset

@@ -28,11 +28,15 @@ class ExtractionMethod(ABC):
         pass
 
     @abstractmethod
-    def scale_fit(self, inputs):
+    def partial_scale_fit(self, input):
         pass
 
     @abstractmethod
     def scale_transform(self, input_tensor):
+        pass
+
+    @abstractmethod
+    def inverse_scale_transform(self, input_tensor):
         pass
 
     @abstractmethod
@@ -55,39 +59,67 @@ class ExtractionMethod(ABC):
         return [torch.from_numpy(el) for el in arr]
 
     # scale fitters
-    def scale_fit_3D_2nddim(self, inputs):
+    def partial_scale_fit_1st_dim(self, input_tensor):
         """
-        Sets the scalers based on the input per the second dimension in a 3D matrix
+        Sets the scalers based on the input per row
         :param inputs: ndarray
         """
-        for i in range(inputs.shape[1]):
-            self.scalers[i] = StandardScaler()
-            self.scalers[i].fit(inputs[:, i, :])
+        if not self.scalers:
+            for i in range(input_tensor.shape[0]):
+                self.scalers[i] = StandardScaler()
+        for i in range(input_tensor.shape[0]):
+            self.scalers[i].partial_fit(input_tensor[i, :].reshape(1, -1))
 
-    def scale_fit_2D(self, inputs):
-        self.scalers[0] = StandardScaler()
-        self.scalers[0].fit(inputs)
+    def partial_scale_fit_2D(self, input_tensor):
+        """
+        Adds the current input to the scaling calculation
+        :param input_tensor:
+        :return:
+        """
+        if not self.scalers[0]:
+            self.scalers[0] = StandardScaler()
+        self.scalers[0].partial_fit(input_tensor)
 
     # scale transformers
-    def scale_transform_3D_2nddim(self, inputs):
+    def scale_transform_1st_dim(self, input_tensor):
         """
-        Scales an input for both feature dimensions in a 3D matrix
+        Scales an input for the first axis in a tensor
         :param inputs: ndarray
         :return: transformed input
         """
-        ret = inputs
-        for i in range(inputs.shape[1]):
-            ret[:, i, :] = self.scalers[i].transform(inputs[:, i, :])
-        return ret
+        for i in range(input_tensor.shape[0]):
+            input_tensor[i, :] = self.scalers[i].transform(input_tensor[i, :].reshape(1, -1))
+        return input_tensor
 
-    def scale_transform_2D(self, inputs):
+    def inverse_scale_transform_1st_dim(self, input_tensor):
+        """
+        Undoes a performed scaling
+        :param input: ndarray
+        :return: original input
+        """
+        for i in range(input_tensor.shape[0]):
+            input_tensor[i, :] = self.scalers[i].inverse_transform(input_tensor[i, :].reshape(1, -1))
+        return input_tensor
+
+    def scale_transform_2D(self, input_tensor):
         """
         Scales an input for 2D matrix
         :param inputs: ndarray
         :return: transformed input
         """
-        ret = self.scalers[0].transform(inputs)
-        return ret
+        return self.scalers[0].transform(input_tensor)
+
+    def inverse_scale_transform_2D(self, input):
+        """
+        Undoes a performed scaling
+        :param input: ndarray
+        :return: original input
+        """
+        return self.scalers[0].inverse_transform(input)
+
+    def scale_reset(self):
+        for s in self.scalers:
+            s._reset()
 
     # WINDOWING
 
@@ -145,15 +177,17 @@ class LogbankSummary(ExtractionMethod):
                             torch.median(lb, 1).values, torch.tensor(np.percentile(lb, 25, axis=1)),
                             torch.tensor(np.percentile(lb, 75, axis=1))])
 
-    def scale_fit(self, inputs):
-        inputs = self.convert_list_of_tensors_to_nparray(inputs)
-        self.scale_fit_3D_2nddim(inputs)
+    def partial_scale_fit(self, input_tensor):
+        self.partial_scale_fit_1st_dim(input_tensor)
 
     def scale_transform(self, input_tensor: torch.tensor):
         # inputs = self.convert_list_of_tensors_to_nparray(inputs)
         # ret = self.scale_transform_3D_2nddim(inputs)
         # return self.convert_nparray_to_list_of_tensors(ret)
-        return torch.from_numpy(self.scale_transform_2D(input_tensor.numpy()))
+        return torch.from_numpy(self.scale_transform_1st_dim(input_tensor))
+
+    def inverse_scale_transform(self, input_tensor):
+        return torch.from_numpy(self.inverse_scale_transform_1st_dim(input_tensor))
 
     def prepare_inputs(self, inputs):
         return inputs
@@ -179,9 +213,10 @@ class Mfcc(ExtractionMethod):
                  lowfreq=lowfreq, highfreq=highfreq, preemph=preemph, numcep=numcep, ceplifter=ceplifter,
                  appendEnergy=appendEnergy, winfunc=winfunc))
 
-    def scale_fit(self, inputs):
-        inputs = np.concatenate(inputs)
-        self.scale_fit_2D(inputs)
+    def partial_scale_fit(self, input_tensor):
+        # inputs = np.concatenate(inputs)
+        # self.scale_fit_2D(inputs)
+        self.partial_scale_fit_2D(input_tensor)
 
     def scale_transform(self, input_tensor):
         # ret = []
@@ -189,6 +224,9 @@ class Mfcc(ExtractionMethod):
         #     ret.append(self.scale_transform_2D(inputs[i].numpy()))
         # return self.convert_nparray_to_list_of_tensors(ret)
         return torch.from_numpy(self.scale_transform_2D(input_tensor.numpy()))
+
+    def inverse_scale_transform(self, input_tensor):
+        return torch.from_numpy(self.inverse_scale_transform_2D(input_tensor))
 
     def prepare_inputs(self, inputs):
         cum_sizes = [len(i) for i in inputs]
@@ -219,9 +257,10 @@ class MelSpectrogram(ExtractionMethod):
         return torch.tensor(fbank(sig_samplerate[0], sig_samplerate[1],
                                   **self.extraction_params)[0])
 
-    def scale_fit(self, inputs):
-        inputs = np.concatenate(inputs)
-        self.scale_fit_2D(inputs)
+    def partial_scale_fit(self, input_tensor):
+        # inputs = np.concatenate(inputs)
+        # self.scale_fit_2D(inputs)
+        self.partial_scale_fit_2D(input_tensor)
 
     def scale_transform(self, input_tensor):
         # ret = []
@@ -229,6 +268,9 @@ class MelSpectrogram(ExtractionMethod):
         #     ret.append(self.scale_transform_2D(inputs[i].numpy()))
         # return self.convert_nparray_to_list_of_tensors(ret)
         return torch.from_numpy(self.scale_transform_2D(input_tensor.numpy()))
+
+    def inverse_scale_transform(self, input_tensor):
+        return torch.from_numpy(self.inverse_scale_transform_2D(input_tensor.numpy()))
 
     def prepare_inputs(self, inputs):
         cum_sizes = [len(i) for i in inputs]
@@ -255,9 +297,10 @@ class LibMelSpectrogram(ExtractionMethod):
         # plot_feature(feature, 16000 )
         return torch.tensor(feature).T
 
-    def scale_fit(self, inputs):
-        inputs = np.concatenate(inputs)
-        self.scale_fit_2D(inputs)
+    def partial_scale_fit(self, input_tensor):
+        # inputs = np.concatenate(inputs)
+        # self.scale_fit_2D(inputs)
+        self.partial_scale_fit_2D(input_tensor)
 
     def scale_transform(self, input_tensor):
         # ret = []
@@ -265,6 +308,9 @@ class LibMelSpectrogram(ExtractionMethod):
         #     ret.append(self.scale_transform_2D(inputs[i].numpy()))
         # return self.convert_nparray_to_list_of_tensors(ret)
         return torch.from_numpy(self.scale_transform_2D(input_tensor.numpy()))
+
+    def inverse_scale_transform(self, input_tensor):
+        return torch.from_numpy(self.inverse_scale_transform_2D(input_tensor.numpy()))
 
     def prepare_inputs(self, inputs):
         cum_sizes = [len(i) for i in inputs]

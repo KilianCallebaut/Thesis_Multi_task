@@ -8,6 +8,7 @@ from DataReaders.DataReader import DataReader
 from DataReaders.ExtractionMethod import extract_options
 from Tasks.Task import MultiClassTask, MultiLabelTask
 from Tasks.TaskDataset import TaskDataset
+from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 
 
 class DCASE2017_SE(DataReader):
@@ -77,7 +78,7 @@ class DCASE2017_SE(DataReader):
         print("Calculating input done")
         return inputs
 
-    def calculate_taskDataset(self, **kwargs):
+    def calculate_taskDataset(self, **kwargs) -> HoldTaskDataset:
         distinct_labels = self.devdataset.scene_labels()
         targets = []
 
@@ -93,10 +94,11 @@ class DCASE2017_SE(DataReader):
 
         inputs = self.calculate_input(**kwargs)
 
-        self.taskDataset = TaskDataset(inputs=inputs,
-                                       targets=targets,
-                                       task=MultiLabelTask(name='DCASE2017_SE', output_labels=distinct_labels),
-                                       extraction_method=self.extraction_method,
-                                       base_path=self.get_base_path(),
-                                       index_mode=self.index_mode)
-        self.taskDataset.prepare_inputs()
+        taskDataset = HoldTaskDataset(inputs=inputs,
+                                      targets=targets,
+                                      task=MultiLabelTask(name='DCASE2017_SE', output_labels=distinct_labels),
+                                      extraction_method=self.extraction_method,
+                                      base_path=self.get_base_path(),
+                                      index_mode=self.index_mode)
+        taskDataset.prepare_inputs()
+        return taskDataset

@@ -33,8 +33,8 @@ class HoldTaskDataset(TaskDataset):
                  training_base_path: str = None,
                  testing_base_path: str = None):
         super().__init__(inputs, targets, task, extraction_method, base_path, index_mode, grouping, extra_tasks)
-        self.training_indexes = []
-        self.test_indexes = []
+        # self.training_indexes = []
+        # self.test_indexes = []
         self.training_set = None
         self.test_set = None
         self.training_set = TrainTaskDataset(
@@ -93,13 +93,13 @@ class HoldTaskDataset(TaskDataset):
         self.training_set.targets = training_targets
         self.training_set.grouping = training_grouping
         self.training_set.extra_tasks = training_extra_tasks
-        self.training_indexes = [i for i in range(len(self.training_set))]
+        # self.training_indexes = [i for i in range(len(self.training_set))]
 
         self.test_set.inputs = testing_inputs
         self.test_set.targets = testing_targets
         self.test_set.grouping = testing_grouping
         self.test_set.extra_tasks = testing_extra_tasks
-        self.test_indexes = [i + len(self.training_set) for i in range(len(self.test_set))]
+        # self.test_indexes = [i + len(self.training_set) for i in range(len(self.test_set))]
 
         self.inputs = [None for i in range(len(self.training_set) + len(self.test_set))]
         self.targets = [None for i in range(len(self.training_set) + len(self.test_set))]
@@ -237,13 +237,13 @@ class HoldTaskDataset(TaskDataset):
                                              task=self.task, extraction_method=self.extraction_method,
                                              base_path=self.base_path, grouping=grouping_train,
                                              extra_tasks=extra_tasks_train, index_mode=self.index_mode)
-        self.training_indexes = train_index
+        # self.training_indexes = train_index
         self.test_set = TestTaskDataset(inputs=x_val, targets=y_val,
                                         task=self.task,
                                         extraction_method=self.extraction_method,
                                         base_path=self.base_path, grouping=grouping_val,
                                         extra_tasks=extra_tasks_val, index_mode=self.index_mode)
-        self.test_indexes = test_index
+        # self.test_indexes = test_index
 
     # def return_data(self):
     #     """
@@ -319,7 +319,3 @@ class HoldTaskDataset(TaskDataset):
         self.test_set.normalize_inputs()
 
 
-def soft_pop(l, index):
-    ret = l[index]
-    l[index] = None
-    return ret

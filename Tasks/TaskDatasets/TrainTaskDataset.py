@@ -23,7 +23,8 @@ class TrainTaskDataset(TaskDataset):
         # task.name += '_train'
 
     def normalize_fit(self):
-        self.extraction_method.scale_fit(self.inputs)
+        for i in range(len(self.inputs)):
+            self.extraction_method.partial_scale_fit(self.get_input(i))
 
     def default_base_path_extension(self):
         self.base_path = os.path.join(self.base_path, 'train_set')

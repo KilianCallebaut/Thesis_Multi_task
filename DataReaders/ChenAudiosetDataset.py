@@ -6,6 +6,7 @@ import joblib
 import numpy as np
 
 from Tasks.Task import MultiLabelTask
+from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 
 try:
     import cPickle
@@ -122,7 +123,7 @@ class ChenAudiosetDataset(DataReader):
         joblib.dump(dict, self.get_path())
         self.taskDataset.save()
 
-    def calculate_taskDataset(self, **kwargs):
+    def calculate_taskDataset(self, **kwargs) -> HoldTaskDataset:
         print('Calculating input')
         inputs = self.calculate_input(**kwargs)
         print('Input calculated')
@@ -130,13 +131,14 @@ class ChenAudiosetDataset(DataReader):
         targets, distinct_targets = self.calculate_targets()
 
         name = "chen_audioset"
-        self.taskDataset = TaskDataset(inputs=inputs, targets=targets,
-                                       task=MultiLabelTask(name=name, output_labels=distinct_targets),
-                                       extraction_method=self.extraction_method, base_path=self.get_base_path(),
-                                       index_mode=self.index_mode,
-                                       grouping=[fold for fold in range(len(self.wav_files)) for _ in
-                                                 self.wav_files[fold]])
-        self.taskDataset.prepare_inputs()
+        taskDataset = HoldTaskDataset(inputs=inputs, targets=targets,
+                                           task=MultiLabelTask(name=name, output_labels=distinct_targets),
+                                           extraction_method=self.extraction_method, base_path=self.get_base_path(),
+                                           index_mode=self.index_mode,
+                                           grouping=[fold for fold in range(len(self.wav_files)) for _ in
+                                                     self.wav_files[fold]])
+        taskDataset.prepare_inputs()
+        return taskDataset
 
     def calculate_input(self, resample_to=None):
         inputs = []
@@ -147,7 +149,7 @@ class ChenAudiosetDataset(DataReader):
                 read_wav = self.load_wav(file, resample_to)
                 inputs.append(self.extraction_method.extract_features(read_wav))
             i += 1
-            print('Percentage done: {}'.format(i/len(self.wav_files)), end='\r')
+            print('Percentage done: {}'.format(i / len(self.wav_files)), end='\r')
 
         return inputs
 
