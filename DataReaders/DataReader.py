@@ -33,6 +33,7 @@ class DataReader(ABC):
                                            extraction_method=self.extraction_method,
                                            base_path=self.get_base_path(), index_mode=self.index_mode)
 
+    def return_taskDataset(self):
         if self.check_files(self.extraction_method.name):
             print('reading')
             self.read_files()
@@ -42,6 +43,7 @@ class DataReader(ABC):
             self.taskDataset = self.calculate_taskDataset(**kwargs)
             # self.taskDataset.prepare_inputs()
             self.write_files()
+        return self.taskDataset
 
     @abstractmethod
     def get_path(self):

@@ -21,7 +21,6 @@ drive = 'F'
 data_base = r'F:\Thesis_Results\Data_Readers'
 
 
-
 # def create_index_mode(dataset_list):
 #     taskDatasets = run_datasets(dataset_list)
 #     print("Start create index mode")
@@ -37,43 +36,60 @@ def main(argv):
     print('--------------------------------------------------')
     print('test loop')
     print('--------------------------------------------------')
-    taskDatasets = []
     extraction_params = read_config('extraction_params_cnn_LibMelSpectrogram')
     meta_params = read_config('meta_params_cnn_MelSpectrogram')
 
     ## Data Reading
     asvspoof = ASVspoof2015(**extraction_params,
                             object_path=os.path.join(data_base, 'ASVspoof2015_{}'))
-    taskDatasets.append(asvspoof.taskDataset)
-
     chenaudio = ChenAudiosetDataset(**extraction_params,
                                     object_path=os.path.join(data_base, 'ChenAudiosetDataset'))
-    taskDatasets.append(chenaudio.taskDataset)
-
     dcaseScene = DCASE2017_SS(**extraction_params,
                               object_path=os.path.join(data_base, 'DCASE2017_SS_{}'))
-    taskDatasets.append(dcaseScene.taskDataset)
     fsdkaggle = FSDKaggle2018(**extraction_params,
                               object_path=os.path.join(data_base, 'FSDKaggle2018_{}'))
-    taskDatasets.append(fsdkaggle.taskDataset)
     ravdess = Ravdess(**extraction_params,
                       object_path=os.path.join(data_base, 'Ravdess'))
-    taskDatasets.append(ravdess.taskDataset)
     speechcommands = SpeechCommands(**extraction_params,
                                     object_path=os.path.join(data_base, 'SpeechCommands_{}'))
-    taskDatasets.append(speechcommands.taskDataset)
     dcaseEvents = DCASE2017_SE(**extraction_params,
                                object_path=os.path.join(data_base, 'DCASE2017_SE_{}'))
-    taskDatasets.append(dcaseEvents.taskDataset)
     print('loaded all datasets')
 
     #### Data Loading
     print("Start iteration")
     i = 0
-    ctsc = ConcatTrainingSetCreator(training_sets=taskDatasets,
-                                    dics_of_labels_limits=[read_config('dic_of_labels_limits_{}'.format(t.task.name))[
-                                                               'dic_of_labels_limits'] for t in taskDatasets],
-                                    random_state=123)
+    ctsc = ConcatTrainingSetCreator(random_state=123)
+    asvspoof_task = asvspoof.return_taskDataset()
+    ctsc.add_dataset(dataset=asvspoof_task,
+                     dic_of_labels_limits=read_config('dic_of_labels_limits_{}'.format(asvspoof_task.task.name))[
+                         'dic_of_labels_limits'])
+    chen_task = chenaudio.return_taskDataset()
+    ctsc.add_dataset(dataset=chen_task,
+                     dic_of_labels_limits=read_config('dic_of_labels_limits_{}'.format(chen_task.task.name))[
+                         'dic_of_labels_limits'])
+    dcaseScene_task = dcaseScene.return_taskDataset()
+    ctsc.add_dataset(dataset=dcaseScene_task,
+                     dic_of_labels_limits=read_config('dic_of_labels_limits_{}'.format(dcaseScene_task.task.name))[
+                         'dic_of_labels_limits'])
+    fsdkaggle_task = fsdkaggle.return_taskDataset()
+    ctsc.add_dataset(dataset=fsdkaggle_task,
+                     dic_of_labels_limits=read_config('dic_of_labels_limits_{}'.format(fsdkaggle_task.task.name))[
+                         'dic_of_labels_limits'])
+    ravdess_task = ravdess.return_taskDataset()
+    ctsc.add_dataset(dataset=ravdess_task,
+                     dic_of_labels_limits=read_config('dic_of_labels_limits_{}'.format(ravdess_task.task.name))[
+                         'dic_of_labels_limits'])
+    speechcommands_task = speechcommands.return_taskDataset()
+    ctsc.add_dataset(dataset=speechcommands_task,
+                     dic_of_labels_limits=read_config('dic_of_labels_limits_{}'.format(speechcommands_task.task.name))[
+                         'dic_of_labels_limits'])
+    dcaseEvents_task = dcaseEvents.return_taskDataset()
+    ctsc.add_dataset(dataset=dcaseEvents_task,
+                     dic_of_labels_limits=read_config('dic_of_labels_limits_{}'.format(dcaseEvents_task.task.name))[
+                         'dic_of_labels_limits']
+                     )
+
     for train, test in ctsc.generate_concats():
         if 'fold' in kwargs and kwargs.get('fold') > i:
             i += 1

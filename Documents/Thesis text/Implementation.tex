@@ -47,18 +47,55 @@ The other functionalities that were referred to, to possibly be dependent on the
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.7\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDataset Structure"}
-	\caption[TaskDataset Structure]{}
+	\includegraphics[width=\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDataset Structure"}
+	\caption[TaskDataset Structure]{TaskDataset Structure}
 	\label{fig:taskdataset-structure}
 \end{figure}
 
-The TaskDataset structure is how the framework manages to standardize inputs and targets in one valid object for training. It extends PyTorch's Dataset class to allow for integration with its dataloader objects. This class is responsible for containing the data with functionalities for getting data, storage and transformation. This class is however only a parent class to the Hold-train-test structure, which is set up to deal with functionalities related to generating and handling valid train and test sets. The entire TaskDataset structure is designed to be customizable, but invariant when handling from the outside. There are 5 parts to this that have their own strategies: File management, getting data, transforming data, splitting and the index mode. \\
+The TaskDataset structure is how the framework manages to standardize inputs and targets in one valid object for training. It extends PyTorch's Dataset class to allow for integration with its dataloader objects. This class is responsible for containing the data with functionalities for getting data, storage and transformation. This class is however only a parent class to the Hold-train-test structure, which is set up to deal with functionalities related to generating and handling valid train and test sets. The entire TaskDataset structure is designed to be customizable, but invariant when handling from the outside. There are 3 parts to this that have their own strategies: File management, structure of data, the index mode and combining separate train and test sets. \\
 
 First the file management will be detailed. The idea is simple: the save function writes the Taskdataset to files and the load function reads the files to a valid TaskDataset object. Using the joblib library, which allows files to easily be written and read in a parallelised manner, the inputs are stored separately from the targets and the other information. In order to create inputs that used different extraction methods easily, the storage takes includes the name of the stored ExtractionMethod. \\
 
-Next is getting the data. 
+Next is structure of the data. The input features are stored as PyTorch tensors in a python list. The targets are stored as lists of binary numbers. These two lists should have the same length. One data instance thus has a feature tensor at index i in the inputs list and a target list at index i in the targets list, where the number is 1 if the instance has the label at that position. The named labels and their order are stored in the \textbf{Task} object, which is also stored in the TaskDataset object. The \textbf{Task} object holds all information related to the Task as well as functionalities which depend on the type of task used. If more than one task should be available for the same dataset - without having to put multiple copies of the same data in the combined dataset - then these can be inserted and stored in the list of extra tasks, which consist of tuples of \textbf{Task} and list of targets pairs. The indexes in these lists of targets should still refer to the same data instance as the other indexes. \\
+
+Now, the index mode is discussed. The index mode basically writes the feature matrices to individual files which are loaded when the getter function is called. This prevents that the whole dataset has to be loaded into memory. A TaskDataset object should not be handled differently from the outside when it is running in index mode or not. This is achieved by switching out the getter method for feature matrices, the save function and the load function to one specified for index mode. The list of input tensors is switched out for a list of integers that represent the indexes of the inputs. A input feature matrix is loaded and saved with this index in its file name. All other information is kept as usual. \\
+
+Lastly, the case is examined where a dataset has a predefined train and test set, possibly stored at different locations. As seen in figure \ref{fig:taskdataset-structure}, a dataset is not simply stored as a TaskDataset, but in the hold-train-test structure. Every HoldTaskDataset has a Train- and TestTaskdataset, for which it is the administrating object. Separated Train and Test datasets can be made through the HoldTaskDataset and only require unique paths to save their data. At that point, they can just utilize the same functions for loading and saving defined in TaskDataset. \\
+
+% I Think this should be in data loading
+Getting a data instance - i.e. the feature matrix and targets - requires more than just plucking the corresponding elements from the list. While the data loading is discussed later, getting an item at an index from a TaskDataset infers getting three things: the feature matrix as input, the target list as correct output and the task\_group. Getting the feature matrix is a simple indexing operation, after which the scaling transformation is applied. This transformation is applied every time in the get function, as the same data likely has to be rescaled multiple times - e.g. in a five fold cross validation training set-up - so there is no need to revert the transformation every time. \\
+
+
+
+Getting the target data has to take in account more factors though. First of all, it is required for creating batches that all returned items have the same shape, meaning that every returned input and target list must have the same dimensions. Correctly shaping the input matrices can be done using the prepare inputs functionalities beforehand, but the targets are different. \\
+
+
+% Note for explaining faster data structures like ndarry: Audio data lengths can vary so it's not always possible to create a matrix with predefined shape to store the inputs
+
+\subsection{Examples To Get List}
+Example of creating a DataReader
+
+Example of creating a TaskDataset in index mode
+
+Example of creating a HoldTaskDataset with predefined train and test set
 
 \section{Data Loading}
+
+After the DataReaders created their individual \textbf{HoldTaskDatasets}, the data should be prepared for training, split in train and test sets, concatenated into 1 dataset and loaded in batches. 
+
+\subsection{Combining TaskDatasets}
+
+\subsection{Generating Train and Test Sets}
+
+\subsection{Normalizing Inputs}
+
+\subsection{Filtering Inputs}
+
+\subsection{Preparing Inputs to same size}
+
+\subsection{Loading Data}
+
+Generating batched inputs requires that every input in the batch has the same shape. Specifically each feature matrix and each target matrix within a batch must have the same shape. 
 
 \section{Training}
 
@@ -67,3 +104,5 @@ Next is getting the data.
 TODO: Describe things like the index mode, which answer additional needs outside of fast development.
 
 \section{Extendibility}
+
+

@@ -23,6 +23,7 @@ class TrainTaskDataset(TaskDataset):
         # task.name += '_train'
 
     def normalize_fit(self):
+        self.extraction_method.scale_reset()
         for i in range(len(self.inputs)):
             self.extraction_method.partial_scale_fit(self.get_input(i))
 
