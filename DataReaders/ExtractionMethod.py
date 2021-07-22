@@ -62,7 +62,7 @@ class ExtractionMethod(ABC):
     def partial_scale_fit_1st_dim(self, input_tensor):
         """
         Sets the scalers based on the input per row
-        :param inputs: ndarray
+        :param input_tensor: ndarray
         """
         if not self.scalers:
             for i in range(input_tensor.shape[0]):

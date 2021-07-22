@@ -122,8 +122,6 @@ def main(argv):
                                                        learning_rate=meta_params['learning_rate'],
                                                        test_dataset=test)
 
-        results.write_loss_curve_tasks()
-        results.write_loss_curves()
         results.close_writer()
 
         #################################################################################

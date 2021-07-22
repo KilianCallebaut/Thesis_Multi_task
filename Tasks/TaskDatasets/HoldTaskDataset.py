@@ -6,6 +6,7 @@ import joblib
 import numpy as np
 import torch
 from sklearn.model_selection import GroupKFold, StratifiedKFold
+from sklearn.model_selection._split import _BaseKFold
 from sklearn.preprocessing import LabelEncoder
 from skmultilearn.model_selection import IterativeStratification
 
@@ -113,10 +114,11 @@ class HoldTaskDataset(TaskDataset):
         self.training_set.base_path = training_base_path
         self.test_set.base_path = testing_base_path
 
-    def k_folds(self, random_state=None, n_splits=5):
+    def k_folds(self, random_state=None, n_splits=5, kf: _BaseKFold = None):
         """
         Produces a k_fold training/test split generator, depending on the task type
 
+        :param kf: optional input for inserting own sklearn kfold splitter
         :param n_splits: number of folds
         :param random_state: optional int for reproducability purposes
         :return: _BaseKFold object
@@ -176,6 +178,9 @@ class HoldTaskDataset(TaskDataset):
         inputs = self.inputs
         targets = self.targets
 
+        if kf:
+            return kf.split(inputs, np.array(targets), groups=self.grouping)
+
         if self.grouping:
             kf = GroupKFold(n_splits=n_splits)
             return kf.split(inputs, groups=self.grouping)
@@ -204,12 +209,14 @@ class HoldTaskDataset(TaskDataset):
         x_train = [self.inputs[i] for i in train_index]
         y_train = [self.targets[i] for i in train_index]
         grouping_train = [self.grouping[i] for i in train_index] if self.grouping else None
-        extra_tasks_train = [(t[0], [t[1][i] for i in train_index]) for t in self.extra_tasks] if self.extra_tasks else None
+        extra_tasks_train = [(t[0], [t[1][i] for i in train_index]) for t in
+                             self.extra_tasks] if self.extra_tasks else None
 
         x_val = [self.inputs[i] for i in test_index]
         y_val = [self.targets[i] for i in test_index]
         grouping_val = [self.grouping[i] for i in test_index] if self.grouping else None
-        extra_tasks_val = [(t[0], [t[1][i] for i in test_index]) for t in self.extra_tasks] if self.extra_tasks else None
+        extra_tasks_val = [(t[0], [t[1][i] for i in test_index]) for t in
+                           self.extra_tasks] if self.extra_tasks else None
 
         # for i in train_index:
         #     x_train.append(soft_pop(self.inputs, i))
@@ -269,40 +276,40 @@ class HoldTaskDataset(TaskDataset):
     #             for t_id in range(len(self.extra_tasks)):
     #                 self.extra_tasks[t_id][1][self.test_indexes[i]] = soft_pop(self.test_set.extra_tasks[t_id][1], i)
 
-    def save_split_scalers(self, random_state, n_splits=5):
-        """
-        Calculates and saves the scaler objects for normalization for each fold, given a random_state, in separate files
-        :param n_splits: number of folds
-        :param random_state: optional int for reproducability purposes
-        """
-
-        i = 0
-        for train, _ in self.k_folds(random_state, n_splits):
-            x_train = [self.inputs[ind] for ind in range(len(self.inputs)) if ind in train]
-            self.extraction_method.scale_fit(x_train)
-            scalers = self.extraction_method.scalers
-            path = os.path.join(self.base_path,
-                                'scaler_method_{}_state_{}_fold_{}.pickle'.format(self.extraction_method.name,
-                                                                                  random_state, i))
-            joblib.dump(value=scalers, filename=path, protocol=pickle.HIGHEST_PROTOCOL)
-            i += 1
-
-    def load_split_scalers(self, fold, random_state):
-        """
-        Loads the scaler objects for dataset normalization purposes for the specified fold and random state
-        :param fold: The fold to load
-        :param random_state: The random state the five fold datasets was created with
-        """
-        path = os.path.join(self.base_path,
-                            'scaler_method_{}_state_{}_fold_{}.pickle'.format(self.extraction_method.name,
-                                                                              random_state, fold))
-        self.extraction_method.scalers = joblib.load(path)
-
-    def check_split_scalers(self, fold, random_state):
-        path = os.path.join(self.base_path,
-                            'scaler_method_{}_state_{}_fold_{}.pickle'.format(self.extraction_method.name,
-                                                                              random_state, fold))
-        return os.path.isfile(path)
+    # def save_split_scalers(self, random_state, n_splits=5):
+    #     """
+    #     Calculates and saves the scaler objects for normalization for each fold, given a random_state, in separate files
+    #     :param n_splits: number of folds
+    #     :param random_state: optional int for reproducability purposes
+    #     """
+    #
+    #     i = 0
+    #     for train, _ in self.k_folds(random_state, n_splits):
+    #         x_train = [self.inputs[ind] for ind in range(len(self.inputs)) if ind in train]
+    #         self.extraction_method.scale_fit(x_train)
+    #         scalers = self.extraction_method.scalers
+    #         path = os.path.join(self.base_path,
+    #                             'scaler_method_{}_state_{}_fold_{}.pickle'.format(self.extraction_method.name,
+    #                                                                               random_state, i))
+    #         joblib.dump(value=scalers, filename=path, protocol=pickle.HIGHEST_PROTOCOL)
+    #         i += 1
+    #
+    # def load_split_scalers(self, fold, random_state):
+    #     """
+    #     Loads the scaler objects for dataset normalization purposes for the specified fold and random state
+    #     :param fold: The fold to load
+    #     :param random_state: The random state the five fold datasets was created with
+    #     """
+    #     path = os.path.join(self.base_path,
+    #                         'scaler_method_{}_state_{}_fold_{}.pickle'.format(self.extraction_method.name,
+    #                                                                           random_state, fold))
+    #     self.extraction_method.scalers = joblib.load(path)
+    #
+    # def check_split_scalers(self, fold, random_state):
+    #     path = os.path.join(self.base_path,
+    #                         'scaler_method_{}_state_{}_fold_{}.pickle'.format(self.extraction_method.name,
+    #                                                                           random_state, fold))
+    #     return os.path.isfile(path)
 
     # def normalize_fit(self):
     #     self.training_set.normalize_fit()
@@ -317,5 +324,3 @@ class HoldTaskDataset(TaskDataset):
     def normalize_inputs(self):
         self.training_set.normalize_inputs()
         self.test_set.normalize_inputs()
-
-

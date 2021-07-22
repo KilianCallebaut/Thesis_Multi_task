@@ -63,13 +63,23 @@
 \contentsline {subsection}{\numberline {5.4.4}TaskDataset}{18}%
 \contentsline {subsection}{\numberline {5.4.5}Examples To Get List}{21}%
 \contentsline {section}{\numberline {5.5}Data Loading}{21}%
-\contentsline {section}{\numberline {5.6}Training}{21}%
-\contentsline {section}{\numberline {5.7}Complementary tools}{21}%
-\contentsline {section}{\numberline {5.8}Extendibility}{21}%
-\contentsline {chapter}{\numberline {6}Evaluation}{22}%
-\contentsline {section}{\numberline {6.1}Goals and Results}{22}%
-\contentsline {section}{\numberline {6.2}Discussion on the implementation}{22}%
-\contentsline {section}{\numberline {6.3}Memory Saving (and such)}{22}%
-\contentsline {section}{\numberline {6.4}Requirements}{22}%
-\contentsline {chapter}{\numberline {7}Conclusion}{23}%
-\contentsline {section}{\numberline {7.1}Future Work}{23}%
+\contentsline {subsection}{\numberline {5.5.1}Combining TaskDatasets}{22}%
+\contentsline {subsection}{\numberline {5.5.2}Generating Train and Test Sets}{23}%
+\contentsline {subsection}{\numberline {5.5.3}Preparing Inputs to same size}{24}%
+\contentsline {subsection}{\numberline {5.5.4}Scaling Inputs}{25}%
+\contentsline {subsection}{\numberline {5.5.5}Filtering Inputs}{26}%
+\contentsline {subsection}{\numberline {5.5.6}Loading Data}{26}%
+\contentsline {section}{\numberline {5.6}Training}{27}%
+\contentsline {subsection}{\numberline {5.6.1}Model Creation}{27}%
+\contentsline {subsection}{\numberline {5.6.2}Results Handling}{27}%
+\contentsline {subsection}{\numberline {5.6.3}Training Updating}{27}%
+\contentsline {subsection}{\numberline {5.6.4}Evaluation}{27}%
+\contentsline {section}{\numberline {5.7}Complementary tools}{27}%
+\contentsline {section}{\numberline {5.8}Extendibility}{27}%
+\contentsline {chapter}{\numberline {6}Evaluation}{28}%
+\contentsline {section}{\numberline {6.1}Goals and Results}{28}%
+\contentsline {section}{\numberline {6.2}Discussion on the implementation}{28}%
+\contentsline {section}{\numberline {6.3}Memory Saving (and such)}{28}%
+\contentsline {section}{\numberline {6.4}Requirements}{28}%
+\contentsline {chapter}{\numberline {7}Conclusion}{29}%
+\contentsline {section}{\numberline {7.1}Future Work}{29}%

@@ -201,6 +201,9 @@ class Training:
             if training_utils.early_stop(results=results, epoch=epoch):
                 break
         print('Training Done')
+
+        results.write_loss_curve_tasks()
+        results.write_loss_curves()
         results.flush_writer()
         print('Wrote Training Results')
 
@@ -337,5 +340,7 @@ class Training:
                     print(task_list[t].output_labels)
                     mats.append(mat)
 
+        training_results.write_loss_curve_tasks()
+        training_results.write_loss_curves()
         training_results.flush_writer()
         print('Wrote Evaluation Results')

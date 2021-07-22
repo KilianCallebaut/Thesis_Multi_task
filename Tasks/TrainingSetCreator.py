@@ -87,7 +87,6 @@ class TrainingSetCreator:
             return self.generate_k_fold()
 
     def generate_k_fold(self):
-        # self.dataset.sample_labels(self.dic_of_labels_limits, self.random_state)
         iterator = self.dataset.k_folds(random_state=self.random_state, n_splits=self.nr_runs)
         for fold in range(self.nr_runs):
             try:
@@ -96,51 +95,15 @@ class TrainingSetCreator:
                 train_indices, test_indices = next(iterator)
                 self.dataset.get_split_by_index(train_indices, test_indices)
                 self.dataset.training_set.normalize_fit()
+
                 yield self.dataset.training_set, self.dataset.test_set
             except StopIteration:
                 break
 
     def return_train_val_set(self):
-        # self.dataset.training_set.sample_labels(self.dic_of_labels_limits, self.random_state)
         self.dataset.training_set.normalize_fit()
         for i in range(self.nr_runs):
             print("fold: {}".format(i))
             yield self.dataset.training_set, self.dataset.test_set
 
 
-# class IndexModeTrainingSetCreator(TrainingSetCreator):
-#
-#     def generate_train_test(self):
-#         if self.dataset.check_train_test_present():
-#             return self.return_train_val_set()
-#         else:
-#             return self.generate_k_fold()
-#
-#     def generate_k_fold(self):
-#         self.dataset.sample_labels(self.dic_of_labels_limits, self.random_state)
-#         iterator = self.dataset.k_folds(random_state=self.random_state, n_splits=self.nr_runs)
-#         for fold in range(self.nr_runs):
-#             try:
-#                 print("fold: {}".format(fold))
-#                 train_indices, test_indices = next(iterator)
-#                 self.dataset.get_split_by_index(train_indices, test_indices)
-#                 self.load_scaler(fold)
-#                 yield self.dataset.training_set, self.dataset.test_set
-#             except StopIteration:
-#                 break
-#
-#     def return_train_val_set(self):
-#         self.dataset.training_set.sample_labels(self.dic_of_labels_limits, self.random_state)
-#         self.load_scaler()
-#         for i in range(self.nr_runs):
-#             print("fold: {}".format(i))
-#             yield self.dataset.training_set, self.dataset.test_set
-#
-#     def load_scaler(self, fold=None):
-#         if isinstance(fold, int) and self.dataset.check_split_scalers(fold, self.random_state):
-#             self.dataset.load_split_scalers(fold, self.random_state)
-#         elif self.dataset.check_scalers():
-#             self.dataset.training_set.load_scalers()
-#             self.dataset.test_set.extraction_method = self.dataset.training_set.extraction_method
-#         else:
-#             raise Exception('Scalers must be calculated and saved beforehand when using index mode')

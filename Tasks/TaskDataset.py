@@ -136,6 +136,7 @@ class TaskDataset(Dataset):
             random.seed(random_state)
 
         for l in dic_of_labels_limits.keys():
+
             label_set = [i for i in range(len(sampled_targets))
                          if sampled_targets[i][self.task.output_labels.index(l)] == 1]
             if len(label_set) > dic_of_labels_limits[l]:
@@ -150,23 +151,6 @@ class TaskDataset(Dataset):
         self.inputs = sampled_inputs
         self.targets = sampled_targets
         self.grouping = sampled_grouping
-
-    def save_scalers(self):
-        self.extraction_method.scale_fit(self.inputs)
-        scalers = self.extraction_method.scalers
-        path = os.path.join(self.base_path,
-                            'scaler_method_{}.pickle'.format(self.extraction_method.name))
-        joblib.dump(value=scalers, filename=path, protocol=pickle.HIGHEST_PROTOCOL)
-
-    def load_scalers(self):
-        path = os.path.join(self.base_path,
-                            'scaler_method_{}.pickle'.format(self.extraction_method.name))
-        self.extraction_method.scalers = joblib.load(path)
-
-    def check_scalers(self):
-        path = os.path.join(self.base_path,
-                            'scaler_method_{}.pickle'.format(self.extraction_method.name))
-        return os.path.isfile(path)
 
     # index mode transition
     def to_index_mode(self):

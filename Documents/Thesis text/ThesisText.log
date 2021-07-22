@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  19 JUL 2021 18:03
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  22 JUL 2021 17:58
 entering extended mode
 **./ThesisText.tex
 (ThesisText.tex
@@ -604,26 +604,121 @@ Underfull \hbox (badness 10000) in paragraph at lines 61--62
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 64--65
+Underfull \hbox (badness 10000) in paragraph at lines 63--64
 
  []
 
 [20]
-Underfull \hbox (badness 10000) in paragraph at lines 68--69
+Underfull \hbox (badness 10000) in paragraph at lines 66--67
 
  []
 
-) (Evaluation.tex [21]
+
+Underfull \hbox (badness 10000) in paragraph at lines 70--71
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 84--85
+
+ []
+
+[21]
+Underfull \hbox (badness 10000) in paragraph at lines 88--89
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 90--91
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 92--93
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 94--95
+
+ []
+
+[22]
+Underfull \hbox (badness 10000) in paragraph at lines 96--97
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 103--104
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 105--107
+
+ []
+
+[23]
+Underfull \hbox (badness 10000) in paragraph at lines 110--111
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 112--113
+
+ []
+
+[24]
+Underfull \hbox (badness 10000) in paragraph at lines 116--117
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 118--119
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 120--121
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 122--123
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 126--127
+
+ []
+
+[25]
+Underfull \hbox (badness 10000) in paragraph at lines 131--132
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 133--134
+
+ []
+
+[26]
+Underfull \hbox (badness 10000) in paragraph at lines 135--136
+
+ []
+
+) (Evaluation.tex [27]
 Chapter 6.
-) (Conclusion.tex [22
+) (Conclusion.tex [28
 
 ]
 Chapter 7.
-) (ThesisText.bbl [23
+) (ThesisText.bbl [29
 
-] [24
+] [30
 
-]) [25] (ThesisText.aux) ) 
+]) [31] (ThesisText.aux) ) 
 Here is how much of TeX's memory you used:
  12444 strings out of 481212
  257311 string characters out of 2905973
@@ -638,9 +733,9 @@ onts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/mrKC1/AppData/Local/Programs
 /MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/mrKC1/AppData/Local/
 Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/mrKC1/AppDat
 a/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb>
-Output written on ThesisText.pdf (27 pages, 162944 bytes).
+Output written on ThesisText.pdf (33 pages, 178091 bytes).
 PDF statistics:
- 118 PDF objects out of 1000 (max. 8388607)
+ 137 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  23 words of extra memory for PDF output out of 10000 (max. 10000000)
 
