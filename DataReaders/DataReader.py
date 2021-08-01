@@ -1,98 +1,91 @@
-import random
 from abc import abstractmethod, ABC
+from typing import List
 
 import librosa
 import librosa.display
 import numpy as np
 import soundfile
+import torch
 from scipy import signal
 
-from DataReaders.ExtractionMethod import extract_options
-from Tasks.Task import Task
-from Tasks.TaskDataset import TaskDataset
+from DataReaders.ExtractionMethod import extract_options, ExtractionMethod
 from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 
 
 class DataReader(ABC):
     extractor = None
 
-    def __init__(self, extraction_method, preparation_params=None, extraction_params=None, **kwargs):
-        if 'object_path' in kwargs:
-            self.object_path = kwargs.pop('object_path')
-        if 'index_mode' in kwargs:
-            self.index_mode = kwargs.pop('index_mode')
-        else:
-            self.index_mode = False
+    def __init__(self, extraction_method: ExtractionMethod, preparation_params: dict = None,
+                 extraction_params: dict = None, object_path: str = None,
+                 index_mode: bool = False, **kwargs):
+        if object_path:
+            self.object_path = object_path
+
+        self.index_mode = index_mode
 
         if isinstance(extraction_method, str):
             self.extraction_method = extract_options[extraction_method](preparation_params, extraction_params)
         else:
             self.extraction_method = extraction_method
 
-        self.taskDataset = HoldTaskDataset(inputs=[], targets=[], task=Task(name='', output_labels=[]),
-                                           extraction_method=self.extraction_method,
-                                           base_path=self.get_base_path(), index_mode=self.index_mode)
-
-    def return_taskDataset(self):
-        if self.check_files(self.extraction_method.name):
+    def return_taskDataset(self) -> HoldTaskDataset:
+        """
+        Either reads or calculates the HoldTaskDataset object from the dataset
+        :return: HoldTaskDataset: The standardized object
+        """
+        if self.check_files():
             print('reading')
-            self.read_files()
+            taskDataset = self.read_files()
         else:
             print('calculating')
             self.load_files()
-            self.taskDataset = self.calculate_taskDataset(**kwargs)
-            # self.taskDataset.prepare_inputs()
-            self.write_files()
-        return self.taskDataset
+            taskDataset = self.calculate_taskDataset(**kwargs)
+            self.write_files(taskDataset)
+        return taskDataset
+
+    # @abstractmethod
+    # def get_path(self) -> str:
+    #     pass
 
     @abstractmethod
-    def get_path(self):
-        pass
-
-    @abstractmethod
-    def get_base_path(self):
-        pass
-
-    @abstractmethod
-    def check_files(self, extraction_method):
+    def get_base_path(self) -> dict:
+        """"
+        Returns a dictionary with the path to the folder containing the extracted files.
+        Has to have training_base_path and testing_base_path as keys if the dataset has predefined train/test sets,
+        base_path as a key if not.
+        See HoldTaskDataset
+        """
         pass
 
     @abstractmethod
     def load_files(self):
         pass
 
-    # Can add automatic iterator handler
-    # for x in iterat:
-    # handle if x are locations
-    # Handle if x are read objects
     @abstractmethod
-    def calculate_input(self, resample_to=None):
+    def calculate_input(self, files, resample_to=None) -> List[torch.tensor]:
         pass
 
     @abstractmethod
     def calculate_taskDataset(self, **kwargs) -> HoldTaskDataset:
         pass
 
-    def read_files(self):
-        self.taskDataset.load()
+    def __create_taskDataset__(self) -> HoldTaskDataset:
+        assert 'base_path' in self.get_base_path() or (
+                'training_base_path' in self.get_base_path() and 'testing_base_path' in self.get_base_path()), 'base_path or training_base_path and testing_base_path keys required'
+        return HoldTaskDataset(extraction_method=self.extraction_method,
+                               index_mode=self.index_mode,
+                               **self.get_base_path())
 
-    def write_files(self):
-        self.taskDataset.save()
+    def check_files(self):
+        HoldTaskDataset.check(extraction_method=self.extraction_method, **self.get_base_path())
 
-    # def sample_labels(self, taskDataset, dic_of_labels_limits):
-    #     sampled_targets = taskDataset.targets
-    #     sampled_inputs = taskDataset.inputs
-    #
-    #     for l in dic_of_labels_limits.keys():
-    #         label_set = [i for i in range(len(sampled_targets))
-    #                      if sampled_targets[i][taskDataset.task.output_labels.index(l)] == 1]
-    #         if len(label_set) > dic_of_labels_limits[l]:
-    #             random_label_set = random.sample(label_set, dic_of_labels_limits[l])
-    #             sampled_targets = [sampled_targets[i] for i in range(len(sampled_targets)) if
-    #                                (i not in label_set or i in random_label_set)]
-    #             sampled_inputs = [sampled_inputs[i] for i in range(len(sampled_inputs)) if
-    #                               (i not in label_set or i in random_label_set)]
-    #     return sampled_inputs, sampled_targets
+    def read_files(self) -> HoldTaskDataset:
+        taskDataset = self.__create_taskDataset__()
+        taskDataset.load()
+        return taskDataset
+
+    def write_files(self, taskDataset: HoldTaskDataset):
+        taskDataset.save()
 
     def resample(self, sig, sample_rate, resample_to):
         secs = len(sig) / sample_rate

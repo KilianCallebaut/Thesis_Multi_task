@@ -1,9 +1,11 @@
 import os
 from datetime import timedelta
 from timeit import default_timer as timer
+from typing import List
 
 import joblib
 import numpy as np
+import torch
 
 from Tasks.Task import MultiLabelTask
 from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
@@ -52,10 +54,14 @@ class ChenAudiosetDataset(DataReader):
         return os.path.join(self.object_path, "ChenAudiosetDataset.obj")
 
     def get_base_path(self):
-        return self.object_path
+        return dict(base_path=self.object_path)
 
-    def check_files(self, extraction_method):
-        return TaskDataset.check(self.get_base_path(), extraction_method) and os.path.isfile(self.get_path())
+    def check_files(self):
+        return super().check_files() and \
+               os.path.isfile(self.get_path())
+
+    def read_files(self) -> HoldTaskDataset:
+        return super().read_files()
 
     def load_files(self):
         if os.path.isfile(self.get_path()):
@@ -109,42 +115,27 @@ class ChenAudiosetDataset(DataReader):
         self.np_objects = np_objects
         self.wav_files = wav_files
 
-    def read_files(self):
-        # info = joblib.load(self.get_path())
-        # self.files = info['files']
-        # self.np_objects = info['np_objects']
-        # self.wav_files = info['wav_files']
-        self.taskDataset.load()
-
-    def write_files(self):
-        dict = {'files': self.files,
-                'np_objects': self.np_objects,
-                'wav_files': self.wav_files}
-        joblib.dump(dict, self.get_path())
-        self.taskDataset.save()
-
     def calculate_taskDataset(self, **kwargs) -> HoldTaskDataset:
         print('Calculating input')
-        inputs = self.calculate_input(**kwargs)
+        inputs = self.calculate_input(self.wav_files, **kwargs)
         print('Input calculated')
 
         targets, distinct_targets = self.calculate_targets()
 
         name = "chen_audioset"
-        taskDataset = HoldTaskDataset(inputs=inputs, targets=targets,
-                                           task=MultiLabelTask(name=name, output_labels=distinct_targets),
-                                           extraction_method=self.extraction_method, base_path=self.get_base_path(),
-                                           index_mode=self.index_mode,
-                                           grouping=[fold for fold in range(len(self.wav_files)) for _ in
-                                                     self.wav_files[fold]])
+        taskDataset = self.__create_taskDataset__()
+        taskDataset.initialize(inputs=inputs, targets=targets,
+                               task=MultiLabelTask(name=name, output_labels=distinct_targets),
+                               grouping=[fold for fold in range(len(self.wav_files)) for _ in
+                                         self.wav_files[fold]])
         taskDataset.prepare_inputs()
         return taskDataset
 
-    def calculate_input(self, resample_to=None):
+    def calculate_input(self, files, resample_to=None) -> List[torch.tensor]:
         inputs = []
 
         i = 0
-        for folder in self.wav_files:
+        for folder in files:
             for file in folder:
                 read_wav = self.load_wav(file, resample_to)
                 inputs.append(self.extraction_method.extract_features(read_wav))
@@ -161,33 +152,8 @@ class ChenAudiosetDataset(DataReader):
 
         # Targets are translated as binary strings with 1 for each target
         # at the index where it is in distinct_targets order
-        targets = [[float(b in f) for b in distinct_targets] for f in targets]
+        targets = [[int(b in f) for b in distinct_targets] for f in targets]
         return targets, distinct_targets
-
-    # def sample_label(self):
-    #     limit = 500
-    #     sampled_targets = self.taskDataset.targets
-    #     sampled_inputs = self.taskDataset.inputs
-    #
-    #     if self.limit_speech:
-    #         speech_set = [i for i in range(len(sampled_targets))
-    #                       if self.contains_label(sampled_targets[i], 'Speech')]
-    #         random_speech_set = random.sample(speech_set, limit)
-    #         non_speech_set = [i for i in range(len(sampled_targets))
-    #                           if not self.contains_label(sampled_targets[i], 'Speech')]
-    #         sampled_targets = [sampled_targets[i] for i in random_speech_set + non_speech_set]
-    #         sampled_inputs = [sampled_inputs[i] for i in random_speech_set + non_speech_set]
-    #
-    #     if self.limit_other:
-    #         other_set = [i for i in range(len(sampled_targets))
-    #                      if self.contains_label(sampled_targets[i], 'None of the above')]
-    #         random_other_set = random.sample(other_set, limit)
-    #         non_other_set = [i for i in range(len(sampled_targets))
-    #                          if not self.contains_label(sampled_targets[i], 'None of the above')]
-    #         sampled_targets = [sampled_targets[i] for i in random_other_set + non_other_set]
-    #         sampled_inputs = [sampled_inputs[i] for i in random_other_set + non_other_set]
-    #
-    #     return sampled_inputs, sampled_targets
 
     # def contains_label(self, folder, label):
     #     for f in folder:

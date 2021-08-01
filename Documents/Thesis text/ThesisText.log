@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  22 JUL 2021 17:58
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  1 AUG 2021 15:27
 entering extended mode
 **./ThesisText.tex
 (ThesisText.tex
@@ -532,7 +532,7 @@ view.png Graphic file (type png)
 <use ../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOverv
 iew.png>
 Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
-tion/SimplifiedOverview.png  used on input line 7.
+tion/SimplifiedOverview.png  used on input line 15.
 (pdftex.def)             Requested size: 195.0pt x 72.61858pt.
 [12
 
@@ -708,22 +708,127 @@ Underfull \hbox (badness 10000) in paragraph at lines 135--136
 
  []
 
-) (Evaluation.tex [27]
+
+Underfull \hbox (badness 10000) in paragraph at lines 140--141
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 144--145
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 146--147
+
+ []
+
+[27]
+Underfull \hbox (badness 10000) in paragraph at lines 150--151
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 152--153
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 154--155
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 156--157
+
+ []
+
+[28]
+Underfull \hbox (badness 10000) in paragraph at lines 158--159
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 160--161
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 164--165
+
+ []
+
+[29]
+Underfull \hbox (badness 10000) in paragraph at lines 168--169
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 170--171
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 172--173
+
+ []
+
+[30]
+Underfull \hbox (badness 10000) in paragraph at lines 180--181
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 182--183
+
+ []
+
+[31]
+Underfull \hbox (badness 10000) in paragraph at lines 186--187
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 188--189
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 192--193
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 194--195
+
+ []
+
+[32]
+Underfull \hbox (badness 10000) in paragraph at lines 196--197
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 233--234
+
+ []
+
+[33]) (Evaluation.tex [34]
 Chapter 6.
-) (Conclusion.tex [28
+) (Conclusion.tex [35
 
 ]
 Chapter 7.
-) (ThesisText.bbl [29
+) (ThesisText.bbl [36
 
-] [30
+] [37
 
-]) [31] (ThesisText.aux) ) 
+]) [38] (ThesisText.aux) ) 
 Here is how much of TeX's memory you used:
- 12444 strings out of 481212
- 257311 string characters out of 2905973
- 474107 words of memory out of 3000000
- 27795 multiletter control sequences out of 15000+200000
+ 12461 strings out of 481212
+ 257701 string characters out of 2905973
+ 474322 words of memory out of 3000000
+ 27812 multiletter control sequences out of 15000+200000
  541546 words of font info for 50 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  68i,6n,64p,2083b,294s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -733,9 +838,9 @@ onts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/mrKC1/AppData/Local/Programs
 /MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/mrKC1/AppData/Local/
 Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/mrKC1/AppDat
 a/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb>
-Output written on ThesisText.pdf (33 pages, 178091 bytes).
+Output written on ThesisText.pdf (40 pages, 196278 bytes).
 PDF statistics:
- 137 PDF objects out of 1000 (max. 8388607)
+ 161 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  23 words of extra memory for PDF output out of 10000 (max. 10000000)
 

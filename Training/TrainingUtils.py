@@ -3,7 +3,6 @@ from Training.Results import Results
 
 class TrainingUtils:
 
-
     def combine_loss(self, list_of_losses):
         return sum(list_of_losses)
 

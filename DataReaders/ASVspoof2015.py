@@ -1,8 +1,10 @@
 import os
+from typing import List
 
 import joblib
 import numpy as np
 import pandas as pd
+import torch
 from numpy import long
 
 from DataReaders.DataReader import DataReader
@@ -27,13 +29,14 @@ class ASVspoof2015(DataReader):
         print('done asvspoof2015')
 
     def get_path(self):
-        return os.path.join(self.get_base_path(), 'ASVspoof2015.obj')
+        return os.path.join(self.get_base_path()['base_path'], 'ASVspoof2015.obj')
 
     def get_base_path(self):
-        return self.object_path.format('train')
+        return dict(base_path=self.object_path.format('train'))
 
-    def check_files(self, extraction_method):
-        return TaskDataset.check(self.get_base_path(), extraction_method) and os.path.isfile(self.get_path())
+    def check_files(self):
+        return super().check_files() and \
+               os.path.isfile(self.get_path())
 
     def load_files(self):
         if os.path.isfile(self.get_path()):
@@ -42,11 +45,6 @@ class ASVspoof2015(DataReader):
             self.truths = info['truths']
             return
 
-        # self.truths = pd.read_csv(os.path.join(self.Label_folder, 'cm_develop.ndx'), sep=' ', header=None,
-        #                           names=['folder', 'file', 'method', 'source'])
-        # add = pd.read_csv(os.path.join(self.Label_folder, 'cm_evaluation.ndx'), sep=' ', header=None,
-        #                   names=['folder', 'file', 'method', 'source'])
-        # self.truths = self.truths.append(add)
         self.truths = pd.read_csv(os.path.join(self.Label_folder, 'CM_protocol', 'cm_train.trn'), sep=' ', header=None,
                                   names=['folder', 'file', 'method', 'source'])
         # self.truths = self.truths.append(add)
@@ -84,24 +82,27 @@ class ASVspoof2015(DataReader):
 
         self.files = [os.path.join(self.Wav_folder, x[0], x[1]) for x in self.truths.to_numpy()]
 
-    def read_files(self):
-        self.taskDataset.load()
+    def read_files(self) -> HoldTaskDataset:
+        info = joblib.load(self.get_path())
+        self.files = info['files']
+        self.truths = info['truths']
+        return super().read_files()
 
-    def write_files(self):
+    def write_files(self, taskDataset: HoldTaskDataset):
+        super().write_files(taskDataset)
         dict = {'files': self.files,
                 'truths': self.truths,
                 }
         joblib.dump(dict, self.get_path())
-        self.taskDataset.save()
 
-    def calculate_input(self, resample_to=None):
+    def calculate_input(self, files, resample_to=None) -> List[torch.tensor]:
         print('training')
         perc = 0
         inputs = []
-        for audio_idx in range(len(self.files)):
-            read_wav = self.load_wav(self.files[audio_idx] + '.wav', resample_to)
+        for audio_idx in range(len(files)):
+            read_wav = self.load_wav(files[audio_idx] + '.wav', resample_to)
             inputs.append(self.extraction_method.extract_features(read_wav))
-            if perc < (audio_idx / len(self.files)) * 100:
+            if perc < (audio_idx / len(files)) * 100:
                 print("Percentage done: {}".format(perc))
                 perc += 1
 
@@ -113,19 +114,20 @@ class ASVspoof2015(DataReader):
         distinct_labels = np.append(distinct_labels, 'unknown')
 
         targets = []
-        inputs = self.calculate_input(**kwargs)
+        inputs = self.calculate_input(self.files, **kwargs)
         for i in range(len(inputs)):
             target = [long(distinct_labels[label_id] == self.truths.loc[i].folder) if (
                     self.truths.loc[i].method == 'genuine' or self.truths.loc[i].method == 'human') else long(
                 label_id == len(distinct_labels) - 1) for label_id in range(len(distinct_labels))]
             targets.append(target)
 
-        taskDataset = HoldTaskDataset(inputs=inputs,
-                                      targets=targets,
-                                      task=MultiClassTask(name='ASVspoof2015',
-                                                          output_labels=distinct_labels),
-                                      extraction_method=self.extraction_method,
-                                      base_path=self.get_base_path(),
-                                      index_mode=self.index_mode)
-        taskDataset.prepare_inputs()
+        taskDataset = HoldTaskDataset(extraction_method=self.extraction_method,
+                                      index_mode=self.index_mode,
+                                      **self.get_base_path())
+        taskDataset.initialize(inputs=inputs,
+                               targets=targets,
+                               task=MultiClassTask(name='ASVspoof2015',
+                                                   output_labels=distinct_labels),
+                               )
+        # taskDataset.prepare_inputs()
         return taskDataset

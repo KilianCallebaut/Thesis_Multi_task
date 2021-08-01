@@ -19,13 +19,14 @@ class Ravdess(DataReader):
         print('Done loading Ravdess')
 
     def get_path(self):
-        return os.path.join(self.get_base_path(), 'Ravdess.obj')
+        return os.path.join(self.get_base_path()['base_path'], 'Ravdess.obj')
 
     def get_base_path(self):
-        return self.object_path
+        return dict(base_path=self.object_path)
 
-    def check_files(self, extraction_method):
-        return TaskDataset.check(self.get_base_path(), extraction_method) and os.path.isfile(self.get_path())
+    def check_files(self):
+        return super().check_files() and \
+               os.path.isfile(self.get_path())
 
     def load_files(self):
         if os.path.isfile(self.get_path()):
@@ -55,23 +56,23 @@ class Ravdess(DataReader):
                         )
 
     def read_files(self):
-        # info = joblib.load(self.get_path())
-        # self.files = info['files']
-        self.taskDataset.load()
+        info = joblib.load(self.get_path())
+        self.files = info['files']
+        return super().read_files()
 
-    def write_files(self):
+    def write_files(self, taskDataset):
         dict = {'files': self.files}
         joblib.dump(dict, self.get_path())
-        self.taskDataset.save()
+        super().write_files(taskDataset=taskDataset)
 
-    def calculate_input(self, resample_to=None):
+    def calculate_input(self, files, resample_to=None):
         inputs = []
         perc = 0
 
         resample_to = None
 
-        for file_idx in range(len(self.files)):
-            file = self.files[file_idx]
+        for file_idx in range(len(files)):
+            file = files[file_idx]
             read_wav = self.load_wav(file['file'], resample_to)
             inputs.append(self.extraction_method.extract_features(read_wav))
             if perc < (file_idx / len(self.files)) * 100:
@@ -81,16 +82,15 @@ class Ravdess(DataReader):
 
     def calculate_taskDataset(self, **kwargs) -> HoldTaskDataset:
         print('Calculating input')
-        inputs = self.calculate_input(**kwargs)
+        inputs = self.calculate_input(self.files, **kwargs)
 
         targets = [f['emotion'] for f in self.files]
         distinct_targets = list(set(targets))
-        targets = [[float(b == f) for b in distinct_targets] for f in targets]
-        taskDataset = HoldTaskDataset(inputs=inputs, targets=targets,
-                                           task=MultiClassTask(name="Ravdess", output_labels=distinct_targets),
-                                           extraction_method=self.extraction_method,
-                                           base_path=self.get_base_path(),
-                                           index_mode=self.index_mode,
-                                           grouping=[f['actor'] for f in self.files])
-        taskDataset.prepare_inputs()
-        return  taskDataset
+        targets = [[int(b == f) for b in distinct_targets] for f in targets]
+        taskDataset = super().__create_taskDataset__()
+        taskDataset.initialize(inputs=inputs,
+                               targets=targets,
+                               task=MultiClassTask(name="Ravdess", output_labels=distinct_targets),
+                               grouping=[f['actor'] for f in self.files])
+        # taskDataset.prepare_inputs()
+        return taskDataset

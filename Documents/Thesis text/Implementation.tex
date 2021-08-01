@@ -12,12 +12,12 @@ TODO: Reiterate the design principles and a description of what functionally has
 
 TODO: Simplified overview of the pipeline
 
-\section{Data Reading}
+\section{Data Reading} \label{Impl:DataRead}
 
 
 The first part of the pipeline is responsible for reading the audio data from datasets, extracting their features and storing it along their targets in valid objects. This also includes abstractions for reading and writing of files that store these objects for later use. As every dataset has their own structure and storage method, the implementation for every data reader has to be specified by the developer. The structure therefore is built around following the pattern layed out in the \textbf{DataReader} class and extending its functions with dataset specific ones. The pattern goes as follows. \\
 
-\subsection{Structure}
+\subsection{Structure} \label{Impl:DataRead:Structure}
 
 First, a \textbf{DataReader} object is instantiated with an \textbf{ExtractionMethod} object and relevant parameters. The \textbf{ExtractionMethod} is the tool used to transform individual data instances. Since specific data transformations can often rely on the specific extraction method used (TODO: Give an example of this), it is opted to group multiple transformation functions this way, which will be explained further later. When the features still have to be extracted, the datareader will first read the structure (e.g. list of locations, list of read signals, tensorflow dataset, ...) in memory, through the \textit{load\_files} function. Then, the standardized object, called a \textbf{TaskDataset}, is made in the \textit{calculate\_taskDataset} function. This requires a list of input tensors, a list of targets, the \textbf{ExtractionMethod} object, a unique name and the list of target names. The idea is that using the \textbf{ExtractionMethod} object, the list of inputs is created by iterating over the structure, getting the read wav form and extracting the desired features per audio instance in a PyTorch tensor object. When the \textbf{TaskDataset} object is correctly created, the next step is then to write the extracted features to files in the \textit{write\_files} method. While this method can be extended if it is desired to write additional files, it is not necessary as the \textbf{TaskDataset} object already has its own file management functionalities. Because the created \textbf{TaskDataset}object also received the \textbf{ExtractionMethod} object, it handles its files depending on the specified extraction method, thus nullifying any need for further adaptations to be made if the developer wants to extract different features for the same dataset. If everything is written once already, the DataReader is able to detect this using its \textit{check\_files} method and will automatically read in the \textbf{TaskDataset} instead using the \textit{read\_files} method.\\
 	
@@ -27,13 +27,16 @@ Further factors the data structure can automatically deal with are datasets whic
 
 The last one are multiple tasks for the same dataset, which can simply be inserted without any limit into the same TaskDataset, after which the getter functions will automatically take all targets for all tasks at the specified index. \\
 
-\subsection{DataReader}
+\subsection{DataReader} \label{Impl:DataRead:DataReader}
 
 TODO: insert Data Reader Model
+TODO: Mention the return taskdataset structure
+TODO: Mention the __create_taskdataset__ structure
+TODO: Mention that check, read and write files are now non abstract
 
 The \textbf{DataReader} class is meant as a parent class to be extended by specific implementations for each dataset. As previously mentioned, it has a number of abstract functions which require to be extended. Besides those, it also contains an automatic parser for ExtractionMethod objects from text, in case the input is directly read from files e.g. json. Alongside that, it also contains a function to read in wav files at a specific location, using the Librosa library and a separate resampling function, in case the signal is already read. The ability to resample signals is used often in multi-task learning, which makes it the extra parameter in the \textit{calculate\_input} function.
 
-\subsection{ExtractionMethod}
+\subsection{ExtractionMethod} \label{Impl:DataRead:ExtractionMethod}
 
 TODO: insert ExtractionMethod Model
 
@@ -43,7 +46,9 @@ The other functionalities that were referred to, to possibly be dependent on the
 
 (TODO: Explain the example of the Logbank summary and the MelSpectrogram requiring different handling)
 
-\subsection{TaskDataset}
+\subsection{TaskDataset} \label{Impl:DataRead:TaskDataset}
+
+TODO: Revisit this, the initialization is now different and splits inserting the data from the rest of initialization
 
 \begin{figure}
 	\centering
@@ -79,11 +84,11 @@ Example of creating a TaskDataset in index mode
 
 Example of creating a HoldTaskDataset with predefined train and test set
 
-\section{Data Loading}
+\section{Data Loading} \label{Impl:DataLoad}
 
 After the DataReaders created their individual \textbf{HoldTaskDatasets}, the data should be prepared for training, split in train and test sets, concatenated into 1 dataset and loaded in batches.  This section will detail how the system turns the TaskDatasets into train and test sets and then loads them in batches for training. \\
 
-\subsection{Combining TaskDatasets}
+\subsection{Combining TaskDatasets} \label{Impl:DataLoad:Combining}
 
 In order to combine multiple datasets into a structure which combines them all as one, while still preserving necessary task information and functions, PyTorch has a class called ConcatDataset which does exactly that. ConcatDatasets can be used as inputs for PyTorch's DataLoader classes, which creates batched inputs for training. This class is extended in the framework's \textbf{ConcatTaskDataset}. Intuitively, this class accumulates \textbf{TaskDataset}s, but also provides necessary functionalities for combining different datasets. \\
 
@@ -95,7 +100,7 @@ Another addition is required in the \textbf{ConcatTaskDataset} for this scenario
 
 This is the structure how \textbf{TaskDatasets} are combined, but before that, they have to be split into train and test sets and have their data processed for training. Now that the end goal is clarified, the road leading up to it is detailed. \\
 
-\subsection{Generating Train and Test Sets}
+\subsection{Generating Train and Test Sets} \label{Impl:DataLoad:GenerateTrainTest}
 
 To simplify the process of generating concatenated train and test sets combined from various datasets, the system has an abstraction to this process, named the ConcatTrainingSetCreator. This class can take the different datasets and generate training sets according to k-fold validation, with a variable amount of folds. In the process, it also applies further preparations for the data to be training ready. \\
 TODO: show a code example
@@ -105,13 +110,13 @@ For every TaskDataset that gets added in the \textbf{ConcatTrainingSetCreator} a
 So back in the \textbf{TrainingSetCreator}, there is a generation function that automatically processes the data and returns a training and test set from the assigned \textbf{HoldTaskDataset}. When this TaskDataset has a predefined training and testing set, it will simply return this. If one has to be created, then it will automatically generate the kfold splits and return the next \textbf{TrainTaskDataset} and \textbf{TestTaskDataset} every time the function gets called. The number of k can be defined beforehand. However, if one TaskDataset that does have predefined train and test sets is combined with one that does not, 
 it will automatically generate its train and test set k times. Calling the generate\_concats method in the \textbf{ConcatTrainingSetCreator} then calls each individual \textbf{TrainingSetCreator}'s generate train test method and combines each train test and each test set in \textbf{ConcatTaskDataset}s. From the outside, one could just input all the TaskDatasets from the DataReaders and then iterate through the generate\_concats method, which results in valid datasets for Training and Evaluation. \\
 
-\subsection{Preparing Inputs to same size}
+\subsection{Preparing Inputs to same size} \label{Impl:DataLoad:Prep}
 
 While the system can automatically make the target vectors the same size, for all the datasets, the developer should be in charge on how this happens for input feature matrices. Audio data can come in largely varying lengths and feature extraction methods who's output dimensions depend on the time domain, will have to either cut or pad their input matrices to the same size as the rest of the batch. The TaskDataset class has a function that transforms the feature matrices like this, which in turn calls the prepare\_input method from its ExtractionMethod object for each matrix. Because of this reliance on the used feature extraction method, the preparation is also in this class. \\
 
-The framework provides two preparation methods out of the box. The first simply cuts the matrix down or pads the matrix to the desired feature length. This also can be used alongside a window size calculation, which takes the median window length of all the feature matrices. The second one transforms each instance to possibly multiple windows of the desired length, with a given hop length. This way, no information is lost, but it can greatly increase the amount of data. If the developer wants to write their own function for this, they can just extend the \textbf{ExtractionMethod} class and insert that into the TaskDataset. The preparation is automatically called in the \textbf{TrainingSetCreator}.\\
+The framework provides two preparation methods out of the box. The first simply cuts the matrix down or pads the matrix to the desired feature length. It only requires the desired window length as input. This also can be used alongside a window size calculation, which takes the median window length of all the feature matrices. The second one transforms each instance to possibly multiple windows of the desired length, with a given hop length. This way, no information is lost, but it can greatly increase the amount of data. If the developer wants to write their own function for this, they can just extend the \textbf{ExtractionMethod} class and insert that into the TaskDataset. The preparation is automatically called in the \textbf{TrainingSetCreator}. The preparation parameters are stored beforehand in the \textbf{ExtractionMethod} object.\\
 
-\subsection{Scaling Inputs}
+\subsection{Scaling Inputs} \label{Impl:DataLoad:Scale}
 
 In order to produce successful results in deep learning, the numerical inputs often need to be scaled. This happens because input variables may have different scales, which in turn can make training unstable. Scaling normally happens based on statistics calculated from the dataset, which are then used to change the distribution of the data. One example is Standardization, for which the data's mean and variance are taken and the data transformed so that the new mean and variance are 0 and 1 respectively. \\
 
@@ -121,12 +126,12 @@ The default scaling uses sklearn's StandardScaler, which performs standardizatio
 
 When the feature statistics are calculated, which happens in the \textbf{TrainingSetCreator}, the transformation only happens at the getter level of the TaskDataset. This way, the transformed data is not stored every time and shouldn't be reversed every new train/test set gets generated. It also allows the system to run in index mode in largely the same way as normal mode. \\
 
-\subsection{Filtering Inputs}
+\subsection{Filtering Inputs} \label{Impl:DataLoad:Filter}
 
 In order to examine the effect of the distribution of data samples with specific labels, the framework adds an easy way to filter/limit the amount of samples per label. The \textbf{TaskDataset} class includes a sample\_labels function, for which a dictionary can be inserted where the key is the label and the value its maximum amount of samples. This operation does remove samples from the TaskDataset object, so in case the filtering needs to change, the object has to be reread from memory. This filtering happens before the train/test sets are created in the \textbf{TrainingSetCreator}. \\
 
 
-\subsection{Loading Data}
+\subsection{Loading Data} \label{Impl:DataLoad:Load}
 
 When everything is prepared and the cumulative train and test sets are created, the datasets can finally be loaded for training. The train and test generation, including every preparation step leading up to it can simply be done by inserting all the created TaskDatasets into a \textbf{ConcatTrainingSetCreator} and iterating over its generate\_concats function. At that point, the train and test set can be inserted into the training and evaluation functions, which will be detailed later. \\
 
@@ -135,17 +140,65 @@ However, what is still explained here, is the data loader and what it returns, a
 In \textbf{TaskDatasets}, this function returns three things: the feature matrix at the specified index, the (cummulative) target vector at the specified index and an identifier for which dataset the item belongs to. The difference between index\_mode and without, is solely how it returns the feature matrix. When iterating over the DataLoader, these will thus be returned in 3 separate matrices of the specified batch size. \\
 
 
-\section{Training}
+\section{Training} \label{Impl:Training}
 
-When the train and test sets are created, it is time for the training loop. Training and evaluation are designed to not require any modification, as they include hooks for multiple possible extensions. At this point, the only inputs that are necessary for training are the PyTorch model, a \textbf{Results} object, the training set and any additional training parameters. This simplicity yet extendibility for training tries to allow developers to easily change variables anywhere in the process, as quickly as possible, without having to adjust other parts of the pipeline. There are four components to this stage: Model creation, results handling, training updating and evaluation.
+When the train and test sets are created, it is time for the training loop. Training and evaluation are designed to not require any modification, as they include hooks for multiple possible extensions. At this point, the only inputs that are necessary for training are the PyTorch model, a \textbf{Results} object, the training set and any additional training parameters. This simplicity yet extendibility for training tries to allow developers to easily change variables anywhere in the process, as quickly as possible, without having to adjust other parts of the pipeline. There are four components to this stage: Model creation, results handling, training updating and evaluation. \\
 
-\subsection{Model Creation}
+\subsection{Model Creation} \label{Impl:Training:Model}
 
-\subsection{Results Handling}
+Model creation does not have any additional functionalities and simply requires PyTorch Modules. It is up to the developer to create models using PyTorch that can handle their Multi-task requirements. This also allows external models to be plugged into the framework and easily tested. The standard assumption the system does make in training however is that the different classification results are returned in tuples. \\
 
-\subsection{Training Updating}
+In order to provide a helpful basis, the framework already has two simple, adjustable models available: A DNN and a CNN. Both consist of an adjustable number of shared layers, with an adjustable number of nodes that branch into different output layers per task that have an activation function, depending on the type of task. Multi-class tasks have a log softmax activation function, while multi-label tasks get a sigmoid activation function. \\ 
 
-\subsection{Evaluation}
+\subsection{Results Handling} \label{Impl:Training:Results}
+
+To evaluate the system's performance efficiently as well as creating an abstraction layer for reading/writing intermediate results, the framework utilizes the \textbf{Results} class. This object is responsible for storing and recalling calculated data during training and evaluation. Furthermore, it also provides an easy way to visualize data through TensorBoard. \\
+
+The results object has to be created beforehand with a unique name for the training run. This gets used for the file locations, as well as identifiers to compare runs in TensorBoard. Developers can create their own Results object or use the \textit{create\_results} method in the Training class, which handles the unique name creation. After it is created, the training function and evaluation function require this object and automatically write their results after every batch and after every epoch. After every batch, the overall loss gets saved as well as the true labels, the predicted labels and the loss of each individual task. After every epoch, this information is used to calculate the learning curve, the evaluation metrics and the confusion matrix. Each of these then both gets written to files using the Joblib library, as well as visualized using the TensorBoard Library. Developers can see the metrics develop during training, which can also help them anticipate problems in their models. \\
+
+The evaluation metrics are calculated using the sklearn's metrics library. These return the precision, recall, f1-score and support metrics for all individual labels as well as for different aggregation forms. For multi-class and binary class tasks, these aggregation forms are macro average and weighted average, along with the aggregate score for accuracy. For multi-label tasks, these are micro average, macro average and weighted average aggregations. These reports get written in full to files for every epoch. The visualization of evolutions of these numbers can be seen and downloaded through TensorBoard's UI. \\
+
+Also the confusion matrix in every epoch gets calculated and written to TensorBoard, so one can follow the evolution of how samples are classified. Same goes for the learning curve or the loss curve which is calculated from the overall combined loss of all tasks. \\
+
+Not only do the metrics get written every epoch through the Results object, a copy of the model that is being trained its parameters get written as well. This thus creates a checkpoint for the model at every epoch that can be used later. Every writing function of the previously mentioned data comes with a straight forward loading function as well. Every path and name used is set during initialization. Therefore, one would only need to initialize a \textbf{Results} object in the same way as it was done previously, in order to load up all written data related, using the same additional information (e.g. epoch number, the task, ...) that was used to write. The Results object can easily be recreated through a static method in the class called the \textit{create\_model\_loader} which takes the run name and any custom paths that are needed to recreate the same results object. This simplifies the data loading process when a developer would need it, but in combination with saving the model parameters also allows for something more. \\
+
+Being able to easily load every model state in training, means that each of these states can be reintroduced into the training or evaluation function. This allows for what is called interrupted training, meaning the training loop can simply continue from a certain epoch's model state if the loop was somehow stopped. To facilitate this, both the training and evaluation functions include a start epoch parameter, from which the loops can then continue until the end. The evaluation function goes even further and includes an automatic model parameter function if the inserted model is blank. This way, evaluation of the different states can happen at any time, as long as the \textbf{Results} object it received is correctly initialised. If the object was created using the default settings before, this only requires the correct name of the run. \\
+
+\subsection{Training Updating} \label{Impl:Training:Updating}
+
+Training a Neural Network happens by multiple times iterating through the data, each time inserting a batch of feature matrices, predicting their labels, calculating a loss function from the predictions and the correct labels and then updating the model's parameters based on the loss function using a - usually gradient descent based - optimizer. In a multi-task setting, this can get trickier as one has to calculate each task's loss separately, possibly with different loss functions, based on only the inputs from that task's dataset and then combine the losses to a single result, with which to update the model. A platform that is able to handle all sorts of task and set-up variations has to thus dynamically deal with various scenarios as well as open the opportunity for the developer to customize for possible other variations. The training function \textit{run\_gradient\_descent} is designed to not require any code adaptations, meaning most of its functionalities have a default way of working which can be overwritten. Each step of the training loop will be explained and discussed what scenarios it can take on. \\
+
+\textbf{Initializing}
+
+From the start, the developer can submit their own optimizer, data loader, device and \textbf{TrainingUtils}. The optimizer just needs to be one of the PyTorch optim objects, or extends it, with the default being the ADAM optimizer. The data loader also should either come from or extend PyTorch's DataLoader. This is by default the standard PyTorch DataLoader, but with the previously mentioned \textbf{MultiTaskSampler}, which alternates for each batch between tasks. The device is also an element from the PyTorch library, which is responsible for defining where the deep learning calculations are made. By default this gets set to the system's GPU if available, else the CPU. \\
+
+The \textbf{TrainingUtils} object is a collection of different functions which a developer possibly wants to alter in the training loop. This includes the \textit{combine\_loss} function - responsible for defining how the losses from different tasks are added - and the method for defining early stopping. By extending this class, a developer can define their own definitions for these functions without problem. \\
+
+After this, the training starts looping over the epochs wherein it loops over all the data in the dataloader. \\
+
+\textbf{Prediction}
+
+Inside an epoch, the training loop goes over every batch of data in the DataLoader - which holds the \textbf{ConcatTaskDataset} from earlier. Every batch includes a batch of feature matrices, a batch of correct target labels and a list of identifiers to which dataset each sample in a batch belongs. The input feature matrices are then sent to the specified device and inserted into the PyTorch model to acquire predictions. While this can be adjusted if the corresponding functions are changed in the \textbf{TrainingUtils} object, the system's only requirement from the PyTorch model is that the prediction for each task is a separate tensor, combined in a tuple. This part requires no further adjustments for the multi-task setting.
+
+\textbf{loss calculation}
+
+After the prediction is made, the loss has to be calculated for each task and combined. The list of identifiers from the data loader is there to take in account the scenario where multiple tasks from different datasets are present within the same batch. A list of booleans is created for each task that indicates for each sample in the batch whether it belongs to that task. A similar list, indicating which target columns belong to which task, is received from the \textbf{ConcatTaskDataset}. To reiterate, every target vector has a column for every label in its own dataset, as well as zero padding for all the labels in the other datasets, which allows samples from different tasks to be present in the same batch. In order to calculate the loss for each task, the matrix of predicted labels and the matrix of ground truth labels, are filtered so that only the samples and columns for the task at hand remain, when its loss is calculated. When only one task is present per batch, this doesn't do anything and nothing is filtered out. When multiple tasks are present in one batch, but only one dataset, then no samples are filtered out, but the other target columns still are for calculating the loss. \\
+
+After the unnecessary data is filtered, the predictions and ground truths can go through the loss calculation. The loss calculation functions again rely on PyTorch loss modules. These are different for different types of tasks, and the loss function, as well as the handling of the predictions and ground truths matrices are defined within the \textbf{Task} object. For example, CrossEntropyLoss cannot be used for Multi-Label classification tasks, as it requires a singular class as its target. Therefore, the system calls on a function to translate the ground truths beforehand, which in the case where CrossEntropyLoss is used for a Multi-Class classification task, would mean that the ground truths, which are encoded as binary sequences, first are converted to the class number to then be put through the loss function. The loss function itself is also stored in the \textbf{Task} object and can thus be easily be replaced by a different function through implementing one's own \textbf{Task} class extension and giving it to the \textbf{TaskDataset}. Also the final class choice of the prediction can be adjusted in the \textbf{Task} object, but this is only used for statistics, as the PyTorch loss functions can perform their own decision functions for predicted chances. \\
+
+\textbf{model updating}
+
+Combining the different losses then normally happens through a simple summation of all the losses. As mentioned before, this can easily be changed in the \textbf{TrainingUtils} object. This cumulative loss is then used to update the model's gradients and the model is updated using the optimizer performing gradient descent. All individual losses and the combined loss are saved through the \textbf{Results} object, and the next batch is loaded. After the batches, the training metrics are then calculated and saved, as well as the model's current parameters.\\
+
+At the end of each epoch then, the system will call the \textbf{TrainingUtils}' \textit{early\_stop} function to assess whether it should quit training early or not. After training stops, everything is written to files and the function returns the trained model and the results object.\\
+
+\subsection{Evaluation} \label{Impl:Training:Evaluation}
+
+Finally, the evaluation is examined. The evaluation loop is in large parts the same as the training loop, just without updating the model's parameters. The same functionalities to deal with different multi-task scenarios are present in the evaluation function, so the same inputs can be used for both. The system thus loads a batch of data, predicts the labels, calculates a loss function and then writes the evaluation metrics to files. The same Results object should be used in training as well as testing. The metrics and their files are automatically differentiated into train and test results, but both can then be viewed and distinguished in the TensorBoard UI. \\
+
+One notable thing about the evaluation function however is when it is used. This is open for two different cases: one where the evaluation happens during training and one where it happens after. If the developer wants this to happen during training, then all they need to do is include the test set in the training function as a variable. The training loop then automatically pushes the current model into the evaluation function for one epoch, with all the same variables as in training. This then just iterates through the whole test set once and writes the resulting metrics to files. \\
+
+To allow for separate evaluation - e.g. if the developer wants to test a previously trained model - the evaluation function solely needs a Results object with the same data as during training and an indication that it is a blank model. When this happens, the evaluation loop automatically uses the \textbf{Results} object's function to load in a model's parameters from file, which it does for each epoch. \\
 
 \section{Complementary tools}
 
@@ -154,3 +207,43 @@ TODO: Describe things like the index mode, which answer additional needs outside
 \section{Extendibility}
 
 
+Things that are meant to be subclassed
+
+DataReader
+ExtractionMethod
+Task
+TrainingUtils
+
+Things that can be subclassed
+
+Results
+TaskDataset
+
+Things that should be subclassed from outside libraries
+Model
+Sampler
+Any PyTorch object that needs specific functions not available
+
+Things that can vary functionality based on input but should not be changed
+Training \& Evaluation
+-> TrainingUtils
+-> Task
+TrainingSetCreator
+-> ExtractionMethod
+
+In this section, there will be a deeper look at where the framework is open for customization and how the developer is meant to implement this. The framework aims to simplify development, but provide hooks for features that likely need to be modified. In this line of thinking, the framework has different categories to extend the base functionalities depending on the likeliness of change. Each will be examined based on their structure, what is required to introduce the extension and what it should take in account. 
+
+\subsection{Classes that are meant to be extended}
+
+In this category are the classes that are basically abstract, for which the developer should build their own extension, unless it is already covered by the provided implementations. These contain the functionalities most likely to change depending on the specific case, but provide the required method definitions along with some basic functions to help the developer along. If the developer extends the abstract functions and follows its required output, the rest of the pipeline will not require any further adaptation. \\
+
+The first one is the \textbf{DataReader} class. The structure and use of this class has already been discussed in section \ref{Impl:DataRead:DataReader}. In terms of extendibility, the parent DataReader class includes a basic structure for returning a TaskDataset, calling on a few abstract functions which should be implemented in the child class. These methods include output type hints, which if followed always lead to correct execution of the creation of a TaskDataset from the Reader, but Python cannot enforce these, so the developer should be aware of this. Aside from the abstract methods, the \textit{return\_taskDataset} method also calls on functions that do already have implementations to respectively check, read and write files to disk. These implementations simply call on the ones defined in the \textbf{TaskDataset} class and only deal with the file handling of TaskDataset objects. If a developer wants to check, read or write files other than that, they should write their own implementations for these as well. One example scenario would be to write read-in audio files to one file, so that the code doesn't have to read in all individual files every time a new feature set is needed from the same data.\\
+TODO: Show the return\_taskDataset code
+
+
+Next is the \textbf{ExtractionMethod} class. As explained in \ref{Impl:DataRead:ExtractionMethod}, this is an object used in the \textbf{DataReader}, \textbf{TaskDataset} and the \textbf{TrainingSetCreator} classes to transform individual data instances. In effect, this has three forms of transformation: feature extraction, feature scaling and preparation. The methods for all of these have to be overwritten in a child class, but there are a few predefined methods for them already available in the parent class. Also available are a few implementing child classes which the developer can use or take as an example. Even if no scaling or further preparation of the data is necessary, the methods for these will still be called in the \textbf{TrainingSetCreator}, so the developer should either not utilise this class or return the same objects in that case. Aside from the methods, it is important that each implementing class gives itself a unique name, for file storing purposes.\\
+TODO: Show the abstract methods in ExtractionMethod
+
+Following that is the \textbf{Task} class. This class, explained in sections \ref{Impl:DataRead:TaskDataset} and \ref{Impl:Training:Updating}, has two methods \textit{decision\_making} and \textit{translate\_labels} that a child class has to implement. Respectively, these are responsible for deciding how labels get assigned from probability based inputs and translating binary sequences to class numbers. These are used for loss calculation and metric calculation, which have to change depending on the classification type. It is not really expected that this class is overwritten if the developer is dealing with Multi-Class or Multi-Label type classification tasks as they already contain implementations. This object also holds the loss function for the task at hand, but is given at instantiation, making extending this class only necessary if the decision making and translation functions need to change.\\
+
+Finally there is the \textbf{TrainingUtils} class. This class, discussed in section \ref{Impl:Training:Updating}, is a collection of different functionalities used in the training function \textit{run\_gradient\_descent}. This class is extended if the developer needs a different way to combine losses or criteria for early stopping, without having to adjust the code in the training and evaluation functions. The early stopping receives the current epoch and more importantly the \textbf{Results} object, from which it can take any previously written data in the training run. \\

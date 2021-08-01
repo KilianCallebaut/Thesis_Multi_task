@@ -1,11 +1,12 @@
 import os
+from typing import List
 
 import joblib
+import torch
 from dcase_util.datasets import TUTAcousticScenes_2017_DevelopmentSet, TUTAcousticScenes_2017_EvaluationSet
 from numpy import long
 
 from Tasks.Task import MultiClassTask
-from Tasks.TaskDataset import TaskDataset
 from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 
 try:
@@ -31,23 +32,22 @@ class DCASE2017_SS(DataReader):
         print('start DCASE2017 SS')
         super().__init__(extraction_method, **kwargs)
         print('done DCASE2017 SS')
-        self.taskDataset.add_train_test_paths(self.get_base_path(), self.get_eval_base_path())
-
-    def get_path(self):
-        return os.path.join(self.get_base_path(), 'DCASE2017_SS.obj')
 
     def get_base_path(self):
-        return self.object_path.format('train')
+        return dict(training_base_path=self.object_path.format('train'),
+                    testing_base_path=self.object_path.format('eval'))
+
+    def get_path(self):
+        return os.path.join(self.get_base_path()['training_base_path'],
+                            'DCASE2017_SS.obj')
 
     def get_eval_path(self):
-        return os.path.join(self.get_eval_base_path(), 'DCASE2017_SS.obj')
+        return os.path.join(self.get_base_path()['testing_base_path'],
+                            'DCASE2017_SS.obj')
 
-    def get_eval_base_path(self):
-        return self.object_path.format('eval')
-
-    def check_files(self, extraction_method):
-        return TaskDataset.check(self.get_base_path(), extraction_method) and \
-               TaskDataset.check(self.get_eval_base_path(), extraction_method) and os.path.isfile(self.get_path())
+    def check_files(self):
+        return super().check_files() and \
+               os.path.isfile(self.get_path()) and os.path.isfile(self.get_eval_path())
 
     def load_files(self):
         # MetaDataContainer(filename=)
@@ -77,26 +77,21 @@ class DCASE2017_SS(DataReader):
         self.audio_files = self.devdataset.audio_files
         self.audio_files_eval = self.evaldataset.audio_files
 
-    def read_files(self):
-        self.taskDataset.load()
-        print('Reading SS done')
+    def read_files(self) -> HoldTaskDataset:
+        self.audio_files = joblib.load(self.get_path())
+        self.audio_files_eval = joblib.load(self.get_eval_path())
+        return super().read_files()
 
-    def write_files(self):
+    def write_files(self, taskDataset: HoldTaskDataset):
+        super().write_files(taskDataset=taskDataset)
         dict = {'audio_files': self.audio_files}
         joblib.dump(dict, self.get_path())
-        self.taskDataset.save()
 
         dict = {'audio_files_eval': self.audio_files_eval}
         joblib.dump(dict, self.get_eval_path())
 
-    def calculate_input(self, resample_to=None):
-        files = self.audio_files
-        inputs = self.calculate_features(files, resample_to)
-        print("Calculating input done")
-        files = self.audio_files_eval
-        inputs_val = self.calculate_features(files, resample_to)
-
-        return inputs, inputs_val
+    def calculate_input(self, files, resample_to=None) -> List[torch.tensor]:
+        return self.calculate_features(files, resample_to)
 
     def calculate_features(self, files, resample_to):
         inputs = []
@@ -134,21 +129,15 @@ class DCASE2017_SS(DataReader):
             targets_val.append(target)
             print(file_id / len(self.audio_files_eval))
 
-        inputs, inputs_val = self.calculate_input(**kwargs)
+        inputs = self.calculate_input(files=self.audio_files, **kwargs)
+        inputs_val = self.calculate_input(files=self.audio_files_eval, **kwargs)
 
-        taskDataset = HoldTaskDataset(inputs=[],
-                                           targets=[],
-                                           task=MultiClassTask(name='DCASE2017_SS', output_labels=distinct_labels),
-                                           extraction_method=self.extraction_method,
-                                           index_mode=self.index_mode,
-                                           training_base_path=self.get_base_path(),
-                                           testing_base_path=self.get_eval_base_path())
+        taskDataset = self.__create_taskDataset__()
+        taskDataset.initialize_train_test(task=MultiClassTask(name='DCASE2017_SS', output_labels=distinct_labels),
+                                          training_inputs=inputs,
+                                          training_targets=targets,
+                                          testing_inputs=inputs_val,
+                                          testing_targets=targets_val)
 
-        taskDataset.add_train_test_set(
-            training_inputs=inputs,
-            training_targets=targets,
-            testing_inputs=inputs_val,
-            testing_targets=targets_val
-        )
-        taskDataset.prepare_inputs()
+        # taskDataset.prepare_inputs()
         return taskDataset

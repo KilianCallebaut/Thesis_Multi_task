@@ -1,13 +1,12 @@
 import os
+from typing import List
 
-import joblib
 import pandas as pd
 import torch
 from numpy import long
 
 from DataReaders.DataReader import DataReader
 from Tasks.Task import MultiClassTask
-from Tasks.TaskDataset import TaskDataset
 from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 
 
@@ -21,56 +20,34 @@ class FSDKaggle2018(DataReader):
         print('start FSDKaggle 2018')
         super().__init__(extraction_method, **kwargs)
         print('done FSDKaggle 2018')
-        self.taskDataset.add_train_test_paths(self.get_base_path(), self.get_eval_base_path())
-
 
     def get_path(self):
-        return os.path.join(self.get_base_path(), 'FSDKaggle2018.obj')
-
-    def get_base_path(self):
-        return self.object_path.format('train')
+        return os.path.join(self.get_base_path()['training_base_path'], 'FSDKaggle2018.obj')
 
     def get_eval_path(self):
-        return os.path.join(self.get_eval_base_path(), 'FSDKaggle2018.obj')
+        return os.path.join(self.get_base_path()['testing_base_path'], 'FSDKaggle2018.obj')
 
-    def get_eval_base_path(self):
-        return self.object_path.format('eval')
-
-    def check_files(self, extraction_method):
-        return TaskDataset.check(self.get_base_path(), extraction_method) and \
-               TaskDataset.check(self.get_eval_base_path(), extraction_method) and \
-               os.path.isfile(self.get_path()) and \
-               os.path.isfile(self.get_eval_path())
+    def get_base_path(self):
+        return dict(training_base_path=self.object_path.format('train'),
+                    testing_base_path=self.object_path.format('eval'))
 
     def load_files(self):
         self.file_labels = pd.read_csv(os.path.join(self.root, 'train.csv'))
         self.file_labels_val = pd.read_csv(os.path.join(self.root, 'test_post_competition.csv'))
 
-    def read_files(self):
-        # info = joblib.load(self.get_path())
-        # self.file_labels = info['file_labels']
-        self.taskDataset.load()
-
-    def write_files(self):
-        dict = {'file_labels': self.file_labels}
-        joblib.dump(dict, self.get_path())
-        dict = {'file_labels_val': self.file_labels_val}
-        joblib.dump(dict, self.get_eval_path())
-        self.taskDataset.save()
-
-    def calculate_input(self, resample_to=None, test=False):
+    def calculate_input(self, files, resample_to=None) -> List[torch.tensor]:
         inputs = []
         perc = 0
 
-        if test:
-            folder_path = os.path.join(self.root, 'audio_test')
-            files = self.file_labels_val
-        else:
-            folder_path = os.path.join(self.root, self.audio_folder)
-            files = self.file_labels
+        # if test:
+        #     folder_path = os.path.join(self.root, 'audio_test')
+        #     files = self.file_labels_val
+        # else:
+        #     folder_path = os.path.join(self.root, self.audio_folder)
+        #     files = self.file_labels
 
         for audio_idx in range(len(files)):
-            path = os.path.join(folder_path, files.loc[audio_idx].fname)
+            path = files[audio_idx]
             read_wav = self.load_wav(path, resample_to)
             if not read_wav:
                 inputs.append(torch.tensor([]))
@@ -92,8 +69,12 @@ class FSDKaggle2018(DataReader):
         for f in self.file_labels_val.label.to_numpy():
             target = [long(distinct_labels[label_id] == f) for label_id in range(len(distinct_labels))]
             targets_val.append(target)
-        inputs = self.calculate_input(**kwargs)
-        inputs_val = self.calculate_input(**kwargs, test=True)
+
+        inputs = self.calculate_input(
+            files=[os.path.join(self.root, self.audio_folder, name) for name in self.file_labels['fname']], **kwargs)
+        inputs_val = self.calculate_input(
+            files=[os.path.join(self.root, 'audio_test', name) for name in self.file_labels_val['fname']], **kwargs)
+
         for i_id in range(len(inputs)):
             if len(inputs[i_id]) == 0:
                 inputs.remove(inputs[i_id])
@@ -102,20 +83,15 @@ class FSDKaggle2018(DataReader):
             if len(inputs_val[i_id]) == 0:
                 inputs_val.remove(inputs_val[i_id])
                 targets_val.remove(targets_val[i_id])
-        taskDataset = HoldTaskDataset(inputs=[],
-                                           targets=[],
-                                           task=MultiClassTask(
-                                               name='FSDKaggle2018',
-                                               output_labels=distinct_labels),
-                                           extraction_method=self.extraction_method,
-                                           index_mode=self.index_mode,
-                                           training_base_path=self.get_base_path(),
-                                           testing_base_path=self.get_eval_base_path())
-        taskDataset.add_train_test_set(
+        taskDataset = self.__create_taskDataset__()
+        taskDataset.initialize_train_test(
+            task=MultiClassTask(
+                name='FSDKaggle2018',
+                output_labels=distinct_labels),
             training_inputs=inputs,
             training_targets=targets,
             testing_inputs=inputs_val,
             testing_targets=targets_val
         )
-        taskDataset.prepare_inputs()
+        # taskDataset.prepare_inputs()
         return taskDataset

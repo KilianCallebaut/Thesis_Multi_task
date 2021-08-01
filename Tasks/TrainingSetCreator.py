@@ -42,25 +42,6 @@ class ConcatTrainingSetCreator:
             concat_tests = ConcatTaskDataset([tt[1] for tt in train_tests])
             yield concat_training, concat_tests
 
-    # def prepare_for_index_mode(self):
-    #
-    #     for tc in self.training_creators:
-    #         # tc.dataset.prepare_inputs(**self.prepare_args)
-    #
-    #         if tc.dataset.check_train_test_present():
-    #             tc.dataset.training_set.save_scalers()
-    #         else:
-    #             tc.dataset.save_split_scalers(self.random_state)
-    #
-    #         if tc.dataset.check_train_test_present():
-    #             if not tc.dataset.training_set.has_index_mode():
-    #                 tc.dataset.training_set.write_index_files()
-    #             if not tc.dataset.test_set.has_index_mode():
-    #                 tc.dataset.test_set.write_index_files()
-    #         else:
-    #             if not tc.dataset.has_index_mode():
-    #                 tc.dataset.write_index_files()
-
 
 class TrainingSetCreator:
 
@@ -105,5 +86,3 @@ class TrainingSetCreator:
         for i in range(self.nr_runs):
             print("fold: {}".format(i))
             yield self.dataset.training_set, self.dataset.test_set
-
-

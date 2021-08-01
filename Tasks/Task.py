@@ -1,4 +1,5 @@
 import types
+from abc import abstractmethod, ABC
 
 import torch
 from torch import nn
@@ -6,7 +7,7 @@ from torch import nn
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
-class Task:
+class Task(ABC):
 
     def __init__(
             self,
@@ -22,6 +23,7 @@ class Task:
         self.loss_function = loss_function
         self.task_group = task_group
 
+    @abstractmethod
     def decision_making(self, output):
         # if self.classification_type == 'multi-class':
         #     return default_max_multi_class(output)
@@ -29,6 +31,7 @@ class Task:
         #     return default_max_multi_label(output)
         pass
 
+    @abstractmethod
     def translate_labels(self, output):
         # if self.classification_type == 'multi-class':
         #     return torch.max(output, 1)[1]
@@ -38,6 +41,7 @@ class Task:
 
     def set_task_group(self, group: int):
         self.task_group = group
+
 
 class MultiClassTask(Task):
 

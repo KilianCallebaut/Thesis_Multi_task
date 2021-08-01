@@ -21,13 +21,14 @@ class DCASE2017_SE(DataReader):
         print('done DCASE2017 SE')
 
     def get_path(self):
-        return os.path.join(self.get_base_path(), 'DCASE2017_SE.obj')
+        return os.path.join(self.get_base_path()['base_path'], 'DCASE2017_SE.obj')
 
     def get_base_path(self):
-        return self.object_path.format('train')
+        return dict(base_path=self.object_path.format('train'))
 
-    def check_files(self, extraction_method):
-        return TaskDataset.check(self.get_base_path(), extraction_method) and os.path.isfile(self.get_path())
+    def check_files(self):
+        return super().check_files() and \
+               os.path.isfile(self.get_path())
 
     def load_files(self):
         self.devdataset = TUTSoundEvents_2017_DevelopmentSet(
@@ -48,20 +49,17 @@ class DCASE2017_SE(DataReader):
 
         self.audio_files = self.devdataset.audio_files
 
-    def read_files(self):
-        # info = joblib.load(self.get_path())
-        # self.audio_files = info['audio_files']
-        self.taskDataset.load()
-        print('Reading SS done')
+    def read_files(self) -> HoldTaskDataset:
+        info = joblib.load(self.get_path())
+        self.audio_files = info['audio_files']
+        return super().read_files()
 
-    def write_files(self):
+    def write_files(self, taskDataset):
+        super().write_files(taskDataset)
         dict = {'audio_files': self.audio_files}
         joblib.dump(dict, self.get_path())
-        self.taskDataset.save()
 
-    def calculate_input(self, resample_to=None):
-
-        files = self.audio_files
+    def calculate_input(self, files, resample_to=None):
         inputs = self.calculate_features(files, resample_to)
         print("Calculating input done")
         return inputs
@@ -94,11 +92,10 @@ class DCASE2017_SE(DataReader):
 
         inputs = self.calculate_input(**kwargs)
 
-        taskDataset = HoldTaskDataset(inputs=inputs,
-                                      targets=targets,
-                                      task=MultiLabelTask(name='DCASE2017_SE', output_labels=distinct_labels),
-                                      extraction_method=self.extraction_method,
-                                      base_path=self.get_base_path(),
-                                      index_mode=self.index_mode)
+        taskDataset = self.__create_taskDataset__()
+        taskDataset.initialize(inputs=inputs,
+                               targets=targets,
+                               task=MultiLabelTask(name='DCASE2017_SE', output_labels=distinct_labels),
+                               )
         taskDataset.prepare_inputs()
         return taskDataset
