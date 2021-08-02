@@ -87,7 +87,7 @@ class TaskDataset(Dataset):
     def __getitem__(self, index):
         return self.extraction_method.scale_transform(self.get_input(index)), \
                torch.from_numpy(self.get_all_targets(index)), \
-               self.task.task_group
+               torch.tensor([t.task_group for t in self.get_all_tasks()])
 
     def get_input(self, index):
         return self.inputs[index].float()

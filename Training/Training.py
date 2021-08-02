@@ -98,7 +98,7 @@ class Training:
             # iterate over data
             for inputs, labels, groups in train_loader:
                 # tensors for filtering instances in batch and targets that are not from the task
-                batch_flags = [[True if t.task_group == g else False for g in groups] for t in
+                batch_flags = [[True if t.task_group in g else False for g in groups] for t in
                                task_list]
 
                 losses_batch = [torch.tensor([0]).to(device) for _ in task_list]
@@ -272,7 +272,7 @@ class Training:
                 ex_t = datetime.timedelta(0)
 
                 for inputs, labels, groups in eval_loader:
-                    batch_flags = [[True if t.task_group == g else False for g in groups] for t in
+                    batch_flags = [[True if t.task_group in g else False for g in groups] for t in
                                    task_list]
 
                     losses_batch = [torch.tensor([0]).to(device) for _ in task_list]

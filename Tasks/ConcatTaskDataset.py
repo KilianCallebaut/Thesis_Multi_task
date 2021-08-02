@@ -17,7 +17,6 @@ class ConcatTaskDataset(ConcatDataset):
         distinct_tasks = self.__get_distinct_tasks__(datasets)
         total_size = sum([len(t.output_labels) for t in distinct_tasks])
         start_indexes = [0]
-        stop_indexes = []
         for t_id in range(len(distinct_tasks)):
             start_indexes += [start_indexes[t_id] + len(distinct_tasks[t_id].output_labels)]
 
@@ -40,7 +39,9 @@ class ConcatTaskDataset(ConcatDataset):
                                 t in datasets[d].get_all_tasks()]
             stop_index_list = [start_indexes[distinct_tasks.index(t)+1] for t in datasets[d].get_all_tasks()]
             datasets[d].pad_targets(start_index_list, stop_index_list, total_size)
-            datasets[d].task.set_task_group(d)
+            datasets[d].task.set_task_group(distinct_tasks.index(datasets[d].task))
+            for t in datasets[d].extra_tasks:
+                t[0].set_task_group(distinct_tasks.index(t))
         super().__init__(datasets)
         self.datasets = datasets
 
