@@ -62,6 +62,8 @@ class TrainingSetCreator:
             self.nr_runs = 5
 
     def generate_train_test(self, **kwargs):
+        self.dataset.prepare_fit()
+        self.dataset.prepare_inputs()
         if self.dataset.check_train_test_present():
             return self.return_train_val_set()
         else:

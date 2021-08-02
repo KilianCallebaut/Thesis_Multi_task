@@ -50,8 +50,9 @@ class TaskDataset(Dataset):
         self.index_mode = index_mode
         self.extraction_method = extraction_method
         self.base_path = base_path
-        self.pad_after = list()
-        self.pad_before = list()
+        self.start_index_list = []
+        self.stop_index_list = []
+        self.total_target_size = 0
         self.prepared = False
 
         self.inputs = []
@@ -73,24 +74,35 @@ class TaskDataset(Dataset):
         self.task = task
         self.grouping = grouping
         self.extra_tasks = extra_tasks
+
+        for t in self.get_all_tasks():
+            self.start_index_list += [self.total_target_size]
+            self.total_target_size += len(t.output_labels)
+            self.stop_index_list += [self.total_target_size]
+
         if self.index_mode:
             self.write_index_files()
             self.to_index_mode()
 
     def __getitem__(self, index):
         return self.extraction_method.scale_transform(self.get_input(index)), \
-               torch.from_numpy(np.array(self.pad_before + self.get_all_targets(index) + self.pad_after)), \
+               torch.from_numpy(self.get_all_targets(index)), \
                self.task.task_group
 
     def get_input(self, index):
         return self.inputs[index].float()
 
     def get_all_targets(self, index):
-        if not self.extra_tasks:
-            return self.targets[index]
-        targets = self.targets[index]
-        for t in self.extra_tasks:
-            targets += t[1][index]
+        targets = np.zeros(self.total_target_size, dtype=int)
+        targets[self.start_index_list[0]:self.stop_index_list[0]] = self.targets[index]
+        for i in range(len(self.extra_tasks)):
+            targets[self.start_index_list[i+1]:self.stop_index_list[i+1]] = self.extra_tasks[i][1][index]
+
+        # if not self.extra_tasks:
+        #     return self.targets[index]
+        # targets = self.targets[index]
+        # for t in self.extra_tasks:
+        #     targets += t[1][index]
         return targets
 
     def get_all_tasks(self):
@@ -102,9 +114,10 @@ class TaskDataset(Dataset):
     def __len__(self):
         return len(self.inputs)
 
-    def pad_targets(self, before: int, after: int):
-        self.pad_before = [0 for _ in range(before)]
-        self.pad_after = [0 for _ in range(after)]
+    def pad_targets(self, start_index_list: List[int], stop_index_list: List[int], total_size: int):
+        self.start_index_list = start_index_list
+        self.stop_index_list = stop_index_list
+        self.total_target_size = total_size
 
     def save(self):
         joblib.dump(self.inputs, os.path.join(self.base_path, '{}_inputs.gz'.format(self.extraction_method.name)))

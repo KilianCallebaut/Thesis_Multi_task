@@ -23,6 +23,13 @@ class Task(ABC):
         self.loss_function = loss_function
         self.task_group = task_group
 
+    def __eq__(self, other):
+        if isinstance(other, Task):
+            return self.output_labels == other.output_labels and self.name == other.name and \
+                   self.classification_type == other.classification_type and \
+                   type(self.loss_function) == type(other.loss_function)
+        return False
+
     @abstractmethod
     def decision_making(self, output):
         # if self.classification_type == 'multi-class':
