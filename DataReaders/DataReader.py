@@ -43,10 +43,6 @@ class DataReader(ABC):
             self.write_files(taskDataset)
         return taskDataset
 
-    # @abstractmethod
-    # def get_path(self) -> str:
-    #     pass
-
     @abstractmethod
     def get_base_path(self) -> dict:
         """"

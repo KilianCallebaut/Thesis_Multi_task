@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  2 AUG 2021 18:16
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  5 AUG 2021 17:44
 entering extended mode
 **./ThesisText.tex
 (ThesisText.tex
@@ -521,12 +521,98 @@ Chapter 2.
 
 ]
 Chapter 3.
+
+Underfull \hbox (badness 10000) in paragraph at lines 12--13
+
+ []
+
 [10
 
-]) (Model.tex [11]
+]
+Underfull \hbox (badness 10000) in paragraph at lines 14--15
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 16--17
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 21--22
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 23--24
+
+ []
+
+[11]
+Underfull \hbox (badness 10000) in paragraph at lines 33--34
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 35--36
+
+ []
+
+[12] [13]
+Underfull \hbox (badness 10000) in paragraph at lines 64--65
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 66--67
+
+ []
+
+[14]
+Underfull \hbox (badness 10000) in paragraph at lines 68--69
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 70--71
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 72--73
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 74--75
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 76--77
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 78--79
+
+ []
+
+[15] [16]
+Overfull \hbox (4.46951pt too wide) in paragraph at lines 100--101
+[]\OT1/cmr/m/n/12 The func-tional re-quire-ments will be grouped along the step
+s in the pipeline,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 100--101
+
+ []
+
+) (Model.tex [17]
 Chapter 4.
 <../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOverview.
-png, id=50, 1215.54124pt x 452.69125pt>
+png, id=70, 1215.54124pt x 452.69125pt>
 File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOver
 view.png Graphic file (type png)
 <use ../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOverv
@@ -534,17 +620,17 @@ iew.png>
 Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
 tion/SimplifiedOverview.png  used on input line 20.
 (pdftex.def)             Requested size: 390.0pt x 145.24406pt.
-[12
+[18
 
  <../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOverview
-.png>]) (Implementation.tex [13] [14]
+.png>]) (Implementation.tex [19] [20]
 Chapter 5.
 
 Underfull \hbox (badness 10000) in paragraph at lines 18--19
 
  []
 
-[15
+[21
 
 ]
 Underfull \hbox (badness 10000) in paragraph at lines 22--23
@@ -556,7 +642,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 24--25
 
  []
 
-[16]
+[22]
 Overfull \hbox (1.43205pt too wide) in paragraph at lines 26--27
 []\OT1/cmr/m/n/12 Further fac-tors the data struc-ture can au-to-mat-i-cally de
 al with are datasets
@@ -572,9 +658,9 @@ Underfull \hbox (badness 10000) in paragraph at lines 28--29
 
  []
 
-[17]
+[23]
 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDataset Structu
-re.png, id=73, 779.91376pt x 897.3525pt>
+re.png, id=92, 779.91376pt x 897.3525pt>
 File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDataset St
 ructure.png Graphic file (type png)
 <use ../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDataset Str
@@ -587,7 +673,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 60--61
 
  []
 
-[18] [19 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatase
+[24] [25 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatase
 t Structure.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 62--63
 
@@ -603,7 +689,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 66--67
 
  []
 
-[20]
+[26]
 Underfull \hbox (badness 10000) in paragraph at lines 68--69
 
  []
@@ -623,7 +709,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 89--90
 
  []
 
-[21]
+[27]
 Underfull \hbox (badness 10000) in paragraph at lines 93--94
 
  []
@@ -638,7 +724,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 97--98
 
  []
 
-[22]
+[28]
 Underfull \hbox (badness 10000) in paragraph at lines 99--100
 
  []
@@ -653,7 +739,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 108--109
 
  []
 
-[23]
+[29]
 Underfull \hbox (badness 10000) in paragraph at lines 110--112
 
  []
@@ -668,7 +754,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 117--118
 
  []
 
-[24]
+[30]
 Underfull \hbox (badness 10000) in paragraph at lines 121--122
 
  []
@@ -688,7 +774,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 127--128
 
  []
 
-[25]
+[31]
 Underfull \hbox (badness 10000) in paragraph at lines 131--132
 
  []
@@ -703,7 +789,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 138--139
 
  []
 
-[26]
+[32]
 Underfull \hbox (badness 10000) in paragraph at lines 140--141
 
  []
@@ -723,7 +809,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 151--152
 
  []
 
-[27]
+[33]
 Underfull \hbox (badness 10000) in paragraph at lines 155--156
 
  []
@@ -738,7 +824,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 159--160
 
  []
 
-[28]
+[34]
 Underfull \hbox (badness 10000) in paragraph at lines 161--162
 
  []
@@ -758,7 +844,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 169--170
 
  []
 
-[29]
+[35]
 Underfull \hbox (badness 10000) in paragraph at lines 173--174
 
  []
@@ -773,7 +859,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 177--178
 
  []
 
-[30]
+[36]
 Underfull \hbox (badness 10000) in paragraph at lines 185--186
 
  []
@@ -783,7 +869,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 187--188
 
  []
 
-[31]
+[37]
 Underfull \hbox (badness 10000) in paragraph at lines 191--192
 
  []
@@ -803,17 +889,17 @@ Underfull \hbox (badness 10000) in paragraph at lines 199--200
 
  []
 
-[32]
+[38]
 Underfull \hbox (badness 10000) in paragraph at lines 201--202
 
  []
 
-[33]
+[39]
 Underfull \hbox (badness 10000) in paragraph at lines 238--239
 
  []
 
-[34]
+[40]
 Underfull \hbox (badness 10000) in paragraph at lines 247--248
 
  []
@@ -840,7 +926,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 255--256
 
  []
 
-[35]
+[41]
 Underfull \hbox (badness 10000) in paragraph at lines 257--258
 
  []
@@ -850,7 +936,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 259--260
 
  []
 
-[36]
+[42]
 Underfull \hbox (badness 10000) in paragraph at lines 263--264
 
  []
@@ -871,27 +957,35 @@ Underfull \hbox (badness 10000) in paragraph at lines 269--270
 
  []
 
-[37]
+[43]
 Underfull \hbox (badness 10000) in paragraph at lines 271--272
 
  []
 
-[38]) (Evaluation.tex [39]
+[44]) (Evaluation.tex [45]
 Chapter 6.
-) (Conclusion.tex [40
+! You can't use `macro parameter character #' in vertical mode.
+l.3 #
+      IDEA: get paper examples and discuss how to implement them
+Sorry, but I'm not programmed to handle this case;
+I'll just pretend that you didn't ask for it.
+If you're in the wrong mode, you might be able to
+return to the right one by typing `I}' or `I$' or `I\par'.
+
+) (Conclusion.tex [46
 
 ]
 Chapter 7.
-) (ThesisText.bbl [41
+) (ThesisText.bbl [47
 
-] [42
+] [48
 
-]) [43] (ThesisText.aux) ) 
+]) [49] (ThesisText.aux) ) 
 Here is how much of TeX's memory you used:
- 12461 strings out of 481212
- 257701 string characters out of 2905973
- 474322 words of memory out of 3000000
- 27812 multiletter control sequences out of 15000+200000
+ 12468 strings out of 481212
+ 257844 string characters out of 2905973
+ 474472 words of memory out of 3000000
+ 27819 multiletter control sequences out of 15000+200000
  541546 words of font info for 50 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  68i,6n,64p,2083b,292s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -901,9 +995,9 @@ onts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/mrKC1/AppData/Local/Programs
 /MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/mrKC1/AppData/Local/
 Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/mrKC1/AppDat
 a/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb>
-Output written on ThesisText.pdf (45 pages, 209450 bytes).
+Output written on ThesisText.pdf (51 pages, 227296 bytes).
 PDF statistics:
- 177 PDF objects out of 1000 (max. 8388607)
+ 196 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  23 words of extra memory for PDF output out of 10000 (max. 10000000)
 

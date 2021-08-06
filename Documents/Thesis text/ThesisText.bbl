@@ -1,4 +1,4 @@
-\begin{thebibliography}{9}
+\begin{thebibliography}{11}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -14,6 +14,14 @@ HB~BoreGowda.
 Rich Caruana.
 \newblock Multitask learning.
 \newblock \emph{Machine learning}, 28\penalty0 (1):\penalty0 41--75, 1997.
+
+\bibitem[De~Rainville et~al.(2012)De~Rainville, Fortin, Gardner, Parizeau, and
+  Gagn{\'e}]{de2012deap}
+Fran{\c{c}}ois-Michel De~Rainville, F{\'e}lix-Antoine Fortin, Marc-Andr{\'e}
+  Gardner, Marc Parizeau, and Christian Gagn{\'e}.
+\newblock Deap: A python framework for evolutionary algorithms.
+\newblock In \emph{Proceedings of the 14th annual conference companion on
+  Genetic and evolutionary computation}, pages 85--92, 2012.
 
 \bibitem[Duan et~al.(2014)Duan, Zhang, Roe, and Towsey]{duan2014survey}
 Shufei Duan, Jinglan Zhang, Paul Roe, and Michael Towsey.
@@ -42,6 +50,13 @@ Luca Oneto, Michele Doninini, Amon Elders, and Massimiliano Pontil.
 \newblock Taking advantage of multitask learning for fair classification.
 \newblock In \emph{Proceedings of the 2019 AAAI/ACM Conference on AI, Ethics,
   and Society}, pages 227--237, 2019.
+
+\bibitem[Roberts et~al.(1996)Roberts, Johnson, et~al.]{roberts1996evolving}
+Don Roberts, Ralph Johnson, et~al.
+\newblock Evolving frameworks: A pattern language for developing
+  object-oriented frameworks.
+\newblock \emph{Pattern languages of program design}, 3:\penalty0 471--486,
+  1996.
 
 \bibitem[Sakti et~al.(2016)Sakti, Kawanishi, Neubig, Yoshino, and
   Nakamura]{sakti2016deep}

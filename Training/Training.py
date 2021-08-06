@@ -49,13 +49,6 @@ class Training:
 
         criteria = [t.loss_function for t in task_list]
 
-        # if not results:
-        #     results = Training.create_results(
-        #         modelname=model.name,
-        #         task_list=task_list,
-        #         num_epochs=num_epochs
-        #     )
-
         if not train_loader:
             train_loader = torch.utils.data.DataLoader(
                 concat_dataset,
@@ -85,12 +78,7 @@ class Training:
             print('Epoch {}'.format(epoch))
             print('===========================================================')
 
-            # running_loss = 0.0
             step = 0
-            # task_predictions = [[] for _ in task_list]
-            # task_labels = [[] for _ in task_list]
-            # task_running_losses = [0 for _ in task_list]
-
             perc = 0
             begin = datetime.datetime.now()
             ex_mx = datetime.timedelta(0)
@@ -160,38 +148,10 @@ class Training:
                                           output_batch,
                                           losses_batch,
                                           loss)
-                # for t in range(len(task_list)):
-                #     task_labels[t] += labels_batch[t].tolist()
-                #     task_predictions[t] += task_list[t].decision_making(output_batch[t]).tolist()
-                #
-                # running_loss += loss.item() * inputs.size(0)
-                # task_running_losses = [task_running_losses[t] + (losses_batch[t].item() * sum(batch_flags[t]))
-                #                        for t in range(len(losses_batch))]
 
                 step += 1
                 torch.cuda.empty_cache()
 
-            # Statistics
-            # results.add_loss_to_curve(epoch, step, running_loss, True)
-            # epoch_metrics = [metrics.classification_report(task_labels[t], task_predictions[t], output_dict=True) for t
-            #                  in range(len(task_predictions))]
-
-            # mats = []
-            # for t in range(n_tasks):
-            #     task_name = task_list[t].name
-            #     print('TASK {}: '.format(task_name), end='')
-            #     results.add_class_report(epoch, epoch_metrics[t], task_list[t], True)
-            #     results.add_loss_to_curve_task(epoch, step, task_running_losses[t], task_list[t], True)
-            #     mat = []
-            #     if task_list[t].classification_type == "multi-class":
-            #         mat = metrics.confusion_matrix(task_labels[t], task_predictions[t])
-            #         results.add_confusion_matrix(epoch, mat, task_list[t], True)
-            #     elif task_list[t].classification_type == "multi-label":
-            #         mat = metrics.multilabel_confusion_matrix(task_labels[t], task_predictions[t])
-            #         results.add_multi_confusion_matrix(epoch, mat, task_list[t], True)
-            #
-            #     print(task_list[t].output_labels)
-            #     mats.append(mat)
             results.add_epoch_metrics(epoch, step, True)
             results.add_model_parameters(epoch, model)
 
@@ -326,39 +286,9 @@ class Training:
                                                        losses_batch,
                                                        loss)
 
-                    # running_loss += loss.item() * inputs.size(0)
-                    # for t in range(len(task_list)):
-                    #     task_labels[t] += labels_batch[t].tolist()
-                    #     task_predictions[t] += task_list[t].decision_making(output_batch[t]).tolist()
-                    #
-                    # task_running_losses = [task_running_losses[t] + losses_batch[t].item()
-                    #                        for t in range(len(losses_batch))]
-
                     step += 1
                     torch.cuda.empty_cache()
 
-                # Statistics
-                # training_results.add_loss_to_curve(epoch, step, running_loss, False)
-                # epoch_metrics = [metrics.classification_report(task_labels[t], task_predictions[t], output_dict=True)
-                #                  for t in range(len(task_predictions))]
-                #
-                # mats = []
-                # for t in range(n_tasks):
-                #     task_name = task_list[t].name
-                #     print('TASK {}: '.format(task_name), end='')
-                #     training_results.add_class_report(epoch, epoch_metrics[t], task_list[t], False)
-                #     training_results.add_loss_to_curve_task(epoch, step, task_running_losses[t], task_list[t], False)
-                #
-                #     mat = []
-                #
-                #     if task_list[t].classification_type == "multi-class":
-                #         mat = metrics.confusion_matrix(task_labels[t], task_predictions[t])
-                #         training_results.add_confusion_matrix(epoch, mat, task_list[t], False)
-                #     elif task_list[t].classification_type == "multi-label":
-                #         mat = metrics.multilabel_confusion_matrix(task_labels[t], task_predictions[t])
-                #         training_results.add_multi_confusion_matrix(epoch, mat, task_list[t], False)
-                #     print(task_list[t].output_labels)
-                #     mats.append(mat)
                 training_results.add_epoch_metrics(epoch, step, False)
 
         training_results.write_loss_curve_tasks()

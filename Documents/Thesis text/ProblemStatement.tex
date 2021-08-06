@@ -6,53 +6,140 @@ TODO: Explain the need for requirements by clarifying examples
 
 This section will examine some hypothetical use cases to serve as a basis for drawing up requirements for the framework. Each case examines a situation where a multi-task pipeline - from the raw datasets to the trained and evaluated models - needs to be created. 
 
-\subsection{Researching Multi-Task Set-ups}
 
 \subsection{Developing General Purpose Classifiers}
 
-\subsection{Testing classifiers}
+A lifelogging system that tracks and annotates its user's day through audio can be really useful for purposes like memory augmentation [citation needed] or safety [citation needed]. Imagine for example an on-person security system that can detect the environment its in as well as automatically alert when a noisy threat is present. In order to provide multiple, robust annotations for a piece of audio which provide possibilities for comprehensively browsing through the events in a day or statistical analysis, one has to build a classification system capable of this. While the usual approach for this is to build separate classifiers per task. A big implication of this, is that the raw audio is sent to a server, able to house and execute the classifiers, but this can cause several issues in this case. For one, there is the privacy and security issue of continuously recording audio and sending it to a remote system. One has no assurance that this data is safe and not being misused for other purposes. Another one is that this centralization of data possibly causes issues for scalability both in terms of time and devices. Lastly, it requires sending a lot of data continuously which might be subject to network outages and traffic bottlenecks. A different approach to sending all that data to the server is performing the classification on the device and only sending the resulting output.\\
+
+It is however rather unlikely that the device which records the lifelogging audio is able to fit and execute multiple trained neural network models at the same time. This is where the multi-task set-up comes in, which shares its network layers over multiple tasks and thus reduces the resources required for general purpose classification. Not only that, but multi-task classification has proven that it can achieve more robust representations of audio data which can be of serious benefit for the noisy, continuous real life data. \\
+
+Developing such a system thus inquires a trained singular model which can perform multiple varied tasks reliably. It is unlikely that one dataset can be found suitable to train all tasks, but each task is likely to have at least one dataset. The trained model needs to be evaluated on real life audio using the same preprocessing as the training data. \\
+
+
+\subsection{Researching Multi-Task Set-ups}
+
+The Multi-Task learning paradigm has successfully been implemented to improve accuracy and robustness [citation needed]. Research into utilising multi-task learning can have great benefits for developing optimal audio recognition systems. For example, there is a yearly competition for developing audio classification systems with numerous objectives, called DCASE [citation needed]. Multi-task systems have seen more success [citation needed] here recently, both for tasks that have multiple objectives [citation needed] as well as for improving performance in singular tasks [citation needed].\\
+
+In order for a researcher to find and compare working solutions to the posed challenge, they need to be able to vary multiple elements in the deep learning pipeline easily as well as compare their results to the baseline easily. However, compared to singular tasks, changing elements - e.g. the feature extraction method, data transformations, loss calculation - for multiple tasks can lead to repetitive and error prone code modifications. Multi-task set-ups also bring more elements in the process, as the data from different tasks can require different handling, have to be combined and the shared system has to be updated. This makes researching multi-task set-ups more time consuming, which puts a strain on new developments in the field.\\
+
+
+
+\subsection{New Datasets}
 
 % Research by comparing different set-ups
 % Developing a general purpose classifier that can run on constrained devices and has to be able to do multiple things => lifelogging
 % Adding new datasets
 
+New datasets continuously become available, with different purposes in mind and different sources. These might suddenly make it possible to develop different kind of systems, but also improve existing ones, even if the data is of comparatively lower quality for the task at hand. Research has been done proving that weakly labeled data can be used to improve the performance of a system trained on strongly labeled data [citation needed]. Access to a new dataset opens up all sorts of opportunities for new goals or improving old systems. \\
 
-\section{Developers}
+Take for example the case where a dataset from google was extended with more fine grained labels in order to develop a recognition system that needed mere seconds for inference [citation needed, park]. In this case, older classifiers need to be tested for performance. Another thing is that this dataset was a subset of the larger dataset, with more fine grained annotations, but its parent set still contains valuable information for training the system. While this is essentially the same task set-up, the developer would still likely have to spend time making adjustments to how the original dataset is handled, the training loop functions and/or the results are calculated. A system which would take the combination of tasks in account beforehand and only require the correct handling of the new dataset would go a long way on cutting development time. This goes as well for being able to bring in older classifiers in a modular way and testing the difference in performance without any adjustments. The need is not only for the ability to develop working systems statically, but open the development up for additions, which do not require reworking the rest of the pipeline.\\
+
+
+\section{Stakeholders}
 
 % New folks
 % Researchers
 % Developers
 
+The developmental framework needs to take in account different stakeholders that are concerned with building and training a multi-task Neural Network. These have different objectives which leads to different necessities the framework has to provide.
+
 \subsection{Researchers}
 TODO: Who need to vary different parts of the pipeline and report on their effect
 
-\subsection{Optimizers}
+Researchers are the people that, in this intended use of the word, would use the framework to figure out cause and effect relationships concerning multi-task neural networks. What this means in practice is that these people need to be able to vary the changeable variables in the system and evaluate the results. This framework should make this easier to vary one parameter modularly and provide quick and easy ways to visualize the results. Another thing is that the framework should provide opportunity for reproducibility of results.  
+
+\subsection{Developers}
 TODO: Who need to be able to build and train the best performing model
+
+Developers are the group of people that need to be able to build solutions for a given task as quick and easy as possible, but with opportunity to extend the framework in the places that likely can change. This necessitates that often used features - which take up needless time to develop - in a deep learning pipeline are already available and easy to use. This group likely models a system like this with the intension of deploying or executing on a different device, while their working device might be resource constrained. This both means that the framework needs to take usual resource bottlenecks in account as well as facilitate transitioning the execution environment to a different system.
+
+\subsection{Newcomers}
+
+The final group is the crowd for whom the framework and possibly the multi-task learning paradigm are new. For them, the framework structure needs to be comprehensible as well as offer some developmental railings to help them avoid problems. The framework should have a clear workflow and provide enough guiding for implementing new pipelines correctly through providing type checks and examples. While  this framework's intended purpose is not to educate the user on how multi-task learning works, it should provide assistance to lessen or track potential issues.
 
 \section{Design Principles}
 
 TODO: Outline the assumptions you make that the system is built on and the objectives the framework has to achieve to offer better developmental support
 
-\subsection{Fast Prototyping}
+Previous work done by \cite{roberts1996evolving} informally describes the requirement for frameworks being "simple enough to be learned, yet must provide enough features that it can be used quickly and hooks for the features that are likely to change". The goal of this platform is to facilitate research and development of deep learning multi-task algorithms for audio recognition purposes. This frameworks is built on top of the PyTorch library that already offers comprehensible and easy to use tools for developing deep learning models. However, this extension looks to alleviate the pain points the multi-task paradigm brings with it: extracting multiple datasets and tasks and combining them to train and test a single model. \\
 
-Deliver a framework which users can use to quickly build, train and test a deep learning multi-task pipeline without compromise. 
+The truth of the matter is that performing research requires changing a lot of variables in the process of deep learning and reporting on the outcomes. For multi-task learning however, the work required for implementing the changes can quickly scale with the amount of datasets, the amount of tasks and the amount of elements that need to be varied. Not only does the extra amount of input cause a lot of unnecessary double work, but each difference in the individual tasks and datasets can cause problems further down the line when combining. Thus the main idea is to offer a pipeline pattern where each individual step can be filled in and tinkered with, without having to worry about previous or next parts in the pipeline breaking. For this purpose, it builds on the groundworks from Pytorch to provide the deep learning tools, while focusing on standardizing input data, anticipated handling of possible variations and offer often used features in acoustic deep learning. \\ 
 
-\subsection{Dynamic Handling Of Deviating Cases}
+As a basis for developing the framework, following the example set in a different framework \cite{de2012deap}, a number of hypotheses were made about the usage of the system. These are as follows: \\
 
-The framework should be capable of handling a wide range of variations in datasets and task structures, without requiring adjustments to be made to the overall structure.
+\textbf{Hypothesis 1.} \textit{The user will need to vary parts of the pipeline. These parts should be easily interchangeable and cause little to no problems in the rest of the system when changed. Furthermore, the framework should be ready for quick iteration on top of previous results, as well as the need to compare these iterations.}\\
 
-\subsection{Easy Extendibility}
+\textbf{Hypothesis 2.} \textit{Every dataset is different, while every model needs similar inputs. No assumptions should be made about the structure of the datasets, but the user should be able to store the data in a structure that is guaranteed to be valid. The structure should be robust enough to deal with variations in the dataset, without having to alter its behaviour. The user knows best how to navigate the dataset's structure in order to extract the necessary information.}\\
 
-Every part of the pipeline that has variations, should be variable in a modular way.
+\textbf{Hypothesis 3.} \textit{Speed of developing pipelines is more important than speed of execution of the result. Clarity and simplicity are important for designing the framework. This tool is meant to help developers create the best model. The creation can be reimplemented in another language for optimal resource efficiency.}\\
 
-\subsection{Abstracted File Management}
+\textbf{Hypothesis 4.} \textit{Not every possible feature can be covered beforehand. If the user is in need of a different functionality in a certain part, they should be able to implement their own solution and plug it in easily.}\\
 
-Functionalities that require a system to write or read files on the system, should be abstracted to the point that users should not be forced to input more than the desired location of the files.
+\textbf{Hypothesis 5.} \textit{Optimal resource usage is not required, but the system should be executable. Concatenating multiple datasets means more space is required and more time will be needed to execute. The framework should assume the entire concatenated dataset possibly can not fit in memory and device failures can happen while executing, which should not automatically require a restart of the entire process.}\\
 
-\subsection{Guided Development}
-
-Developers getting familiar with the system should both be in possession of working examples, as well as guiding functions they have to implement in order to build a functioning pipeline.
 
 \section{Non-functional Requirements}
 
+From the observations made in the previous sections, a number of non-functional requirements have been drawn up. These requirements are goals for the design of the software framework. The requirements are as follows:
+
+\begin{itemize}
+	\item \textbf{Modular:} The framework aims to provide a helpful tool to build deep learning multi-task pipelines, for which the individual parts of the pipeline are likely to be tinkered with in order to develop optimal solutions.. The different components should be modifiable and be interchangeable independently from the rest of the components. 
+	\item \textbf{Extendible:} The framework should provide open hooks for features and functionalities that likely require change. 
+	\item \textbf{Fast prototyping:} Developers using the framework should be met with an environment that provides them with the tools necessary to develop their own multi task pipelines fast.
+	\item \textbf{Comprehensible:} New developers using the framework should get a clear development structure and guiding through examples, warnings and hints.
+	\item \textbf{Robust:} The framework should be able to dynamically handle possible differences in input and desired pipeline functionalities.
+	\item \textbf{Portable:} The developed code should be transferable to different devices with possibly more constrained resources.
+\end{itemize}
+
 \section{Functional Requirements}
+
+The framework is a tool for building Deep Learning Multi-task pipelines, which this work distributes in three steps. The first step is the data reading. In this step, the raw datasets are read, features extracted from the instances and the results stored in objects which will serve as the input for the rest of the system. Then, the data loading happens, in which the multiple separate objects are prepared for the specific training set-up, combined and then served to train and evaluate the model. In the last step, training, the model is created, the data instances go through the model, the loss for each task gets calculated and combined which is used to optimize the model and the optimized model gets evaluated. 
+
+Further note should be made of the difference between datasets and tasks. A dataset can have multiple tasks and a task can have multiple datasets. A task is in essence the learning objective for the input and comes in different forms for the target labels. A data instance can belong to only one of two classes (binary tasks), only one of multiple classes (multi-class tasks), multiple classes at once (multi-label tasks) or have a continuous value for a class (regression tasks). The dataset is the collection of data instances that can be linked to the targets. The framework must deal with the fact that there can be multiple datasets and multiple tasks in a many to many relationship and that each can require different handling. 
+
+The functional requirements will be grouped along the steps in the pipeline, keeping the non-functional requirements in mind and determining what is necessary to allow multiple different datasets and tasks. \\
+
+
+\subsection{Data Reading}
+
+The functional requirements for reading the data to standardized objects are as follows:
+
+
+\begin{itemize}
+	\item Standardizing input: The developer must be able to read the data from the datasets to standardized objects which will always be valid and function in the rest of the process, so that they only need to worry about extracting the data. These objects must be versatile enough to deal with any dataset and be able to be combined with other standardized inputs. Furthermore, the standardized object must be able to contain multiple tasks and those tasks must be able to be contained in multiple dataset objects. Finally methods must be available for aid in the extraction of features and creation of valid objects.
+	\item Handling dataset differences: Datasets can come in various structures and storage forms. The developer must have the power to navigate the dataset structure and extract the data to the required form on their own, but the system must have the capability of dealing with different ways the data is stringed together. Datasets can have predefined train and test sets, which have to be combinable with datasets that have to be split later. The system thus must get these two cases in a unified form to achieve modularity where other parts handling the standardized objects don't have to differentiate between the two cases once the standardized object is made. Same goes for datasets that have pre-split audio segments. These belong together and should not be separated later on.
+	\item Scalable preprocessing: It is often the case that input data must enter the system as if they are the same input. This means having the same preproccesing as well as sample rate for audio. To cut on useless double work, the system must provide with easy possibility to replicate the same preprocessing for each dataset.
+	\item File storage abstraction: Saving, reading and checking files require repetitive work for multiple datsets, especially if it's the case that datasets must be extracted multiple times to vary for research, which requires saving to different files. The system can take workload this off the developer's hands for the standardized objects as well as further files that need to be written and read.
+	\item Quick Reading: In order to vary quickly and not have to either extract the entire dataset each time or have to enter the location of the desired stored dataset, the framework must provide a function that reads the correct file automatically when the data is read. 
+\end{itemize}
+
+
+\subsection{Data Loading}
+
+Combining and loading the data for training has the following functional requirements:
+
+\begin{itemize}
+	\item Combining datasets: The framework must provide a way to combine different datasets in standardized objects that the training function can take instances from and derive predictions for the multiple tasks.
+	\item Not requiring the combined datasets in memory: Computer memory on numerous devices is likely not large enough to hold multiple datasets at the same time. In this case, the framework must provide away around this in order to make multi-task learning possible, without having to treat the standardized object differently.
+	\item Train and test set generation: Train and test sets most likely have to be created from the original dataset. The framework must provide an easy way to generate these for the combined datasets for datasets that both have and don't have predefined sets.
+	\item Transforming data: Scaling and windowing functions for the input matrices must be available so the developer should only have to deal with the specifics of what methods to use for these and the parameters. 
+	\item Filtering data: Research in deep learning often deals with adjusting the distribution of instances with certain labels in a dataset, for which the framework should be able to provide a filtering method.
+	\item Reusing data: Data is likely to be reused and reiterated over with different transformations and such applied. The system must be prepared for this and only store the base extracted feature matrices without any of the subsequent adjustments.
+	\item Batching multiple tasks: Batches of input are done matrices that append inputs from different datasets and targets from different tasks together. These inputs and targets must have the same shape in order to be able to fit together in a matrix. The framework must provide for this instance automatic functions that make this possible, for the task targets. For inputs however, they either have to be cut or padded to the same shape, so the developer must have the tools available to achieve this.
+	\item Replicability: An important part in research is the ability to replicate the results. Any randomness based operations the system adds must come with pseudo random number generators that make it possible to receive the same output every time.
+\end{itemize}
+
+\subsection{Training}
+
+Training and evaluation based on the batches of input data deal with predicting results from the model and using those predictions to calculate the error margin, optimizing the model parameters and outputting metrics. The training part of the pipeline has these functional requirements:
+
+\begin{itemize}
+
+	\item Predicting multiple tasks: The framework must be able to predict the targets of multiple tasks for each data instance. 
+	\item Task specific output handling: The developer must have the ability to define the handling of the prediction output for each task. This should be easily integrated and extendible for the desired handling. This includes the loss calculation but also any other task-specific metric calculations.
+	\item Loss combination specifiable: The way the different losses are then combined to one single loss by which to update the system should be definable by the developer.
+	\item Metric calculation, storage and visualization: Metrics are different evaluation criteria based on the predicted output labels compared to the true output labels. Calculating and inspecting these are a crucial of research, so the framework must provide an easy way of doing so in which it is also possible to compare the results to previous ones. Furthermore, the developer must also be able to extend these with their own implementation and additions.
+	\item Interrupted Learning: Sometimes a training run can fail or be stopped in the middle of its execution. This is more likely when the running time is longer due to the increase in inputs from combining multiple datasets. To deal with this the framework must provide a feature called interrupted learning, in which a training run can restart where it left last time around.
+	\item Separate evaluation: To follow the line of modularity, the system must not assume that training and evaluation will always happen together, but a developer can use the system to simply evaluate a model or a previous training run. Therefore it must be able to evaluate models and historical runs without much hassle.
+\end{itemize}
+

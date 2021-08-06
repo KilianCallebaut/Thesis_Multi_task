@@ -23,45 +23,45 @@ Repeated entry---line 627 of file references.bib
 I'm skipping whatever remains of this entry
 Warning--empty journal in boregowda2018environmental
 Warning--empty journal in georgiev2017heterogeneous
-You've used 9 entries,
+You've used 11 entries,
             2773 wiz_defined-function locations,
-            645 strings with 6681 characters,
-and the built_in function-call counts, 5049 in all, are:
-= -- 453
-> -- 309
-< -- 7
-+ -- 105
-- -- 96
-* -- 403
-:= -- 754
-add.period$ -- 30
-call.type$ -- 9
-change.case$ -- 59
-chr.to.int$ -- 9
-cite$ -- 20
-duplicate$ -- 230
-empty$ -- 393
-format.name$ -- 105
-if$ -- 1076
+            657 strings with 7170 characters,
+and the built_in function-call counts, 6224 in all, are:
+= -- 557
+> -- 386
+< -- 8
++ -- 131
+- -- 120
+* -- 502
+:= -- 929
+add.period$ -- 36
+call.type$ -- 11
+change.case$ -- 72
+chr.to.int$ -- 11
+cite$ -- 24
+duplicate$ -- 282
+empty$ -- 484
+format.name$ -- 131
+if$ -- 1326
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 9
-newline$ -- 53
-num.names$ -- 36
-pop$ -- 131
+missing$ -- 11
+newline$ -- 63
+num.names$ -- 44
+pop$ -- 158
 preamble$ -- 1
-purify$ -- 50
+purify$ -- 61
 quote$ -- 0
-skip$ -- 184
+skip$ -- 226
 stack$ -- 0
-substring$ -- 207
-swap$ -- 45
-text.length$ -- 4
+substring$ -- 260
+swap$ -- 55
+text.length$ -- 5
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 99
+type$ -- 121
 warning$ -- 2
-while$ -- 45
+while$ -- 56
 width$ -- 0
-write$ -- 123
+write$ -- 149
 (There were 4 error messages)
