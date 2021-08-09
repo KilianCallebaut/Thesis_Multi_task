@@ -53,13 +53,18 @@ class TaskDataset(Dataset):
         self.start_index_list = []
         self.stop_index_list = []
         self.total_target_size = 0
+
         self.prepared = False
+        self.flag_scaled = False
 
         self.inputs = []
         self.targets = []
         self.grouping = []
         self.extra_tasks = []
 
+    ########################################################################################################
+    # Setters
+    ########################################################################################################
     def initialize(self, inputs: List[torch.tensor], targets: List[List[int]], task: Task, grouping: List[int] = None,
                    extra_tasks: List[Tuple[Task, List[List[int]]]] = None):
         assert len(inputs) == len(targets), 'There must be as many inputs as there are targets'
@@ -84,6 +89,10 @@ class TaskDataset(Dataset):
             self.write_index_files()
             self.to_index_mode()
 
+    ########################################################################################################
+    # Getters
+    ########################################################################################################
+
     def __getitem__(self, index):
         return self.extraction_method.scale_transform(self.get_input(index)), \
                torch.from_numpy(self.get_all_targets(index)), \
@@ -97,12 +106,6 @@ class TaskDataset(Dataset):
         targets[self.start_index_list[0]:self.stop_index_list[0]] = self.targets[index]
         for i in range(len(self.extra_tasks)):
             targets[self.start_index_list[i+1]:self.stop_index_list[i+1]] = self.extra_tasks[i][1][index]
-
-        # if not self.extra_tasks:
-        #     return self.targets[index]
-        # targets = self.targets[index]
-        # for t in self.extra_tasks:
-        #     targets += t[1][index]
         return targets
 
     def get_all_tasks(self):
@@ -114,32 +117,17 @@ class TaskDataset(Dataset):
     def __len__(self):
         return len(self.inputs)
 
+    ########################################################################################################
+    # Combining
+    ########################################################################################################
     def pad_targets(self, start_index_list: List[int], stop_index_list: List[int], total_size: int):
         self.start_index_list = start_index_list
         self.stop_index_list = stop_index_list
         self.total_target_size = total_size
 
-    def save(self):
-        joblib.dump(self.inputs, os.path.join(self.base_path, '{}_inputs.gz'.format(self.extraction_method.name)))
-        t_s = torch.Tensor(self.targets)
-        torch.save(t_s, os.path.join(self.base_path, 'targets.pt'))
-
-        diction = {
-            'task': self.task,
-            'grouping': self.grouping,
-            'extra_tasks': self.extra_tasks
-        }
-        joblib.dump(diction, os.path.join(self.base_path, 'other.obj'))
-
-    def load(self):
-        inputs = joblib.load(os.path.join(self.base_path, '{}_inputs.gz'.format(self.extraction_method.name)))
-        t_l = torch.load(os.path.join(self.base_path, 'targets.pt'))
-        t_l = [[int(j) for j in i] for i in t_l]
-        diction = joblib.load(os.path.join(self.base_path, 'other.obj'))
-        task = diction['task']
-        grouping = diction['grouping']
-        extra_tasks = diction['extra_tasks']
-        self.initialize(inputs=inputs, targets=t_l, task=task, grouping=grouping, extra_tasks=extra_tasks)
+    ########################################################################################################
+    # Filtering
+    ########################################################################################################
 
     def sample_labels(self, dic_of_labels_limits, random_state=None):
         """
@@ -170,7 +158,33 @@ class TaskDataset(Dataset):
         self.targets = sampled_targets
         self.grouping = sampled_grouping
 
-    # index mode transition
+    ########################################################################################################
+    # Transformation
+    ########################################################################################################
+
+    def prepare_fit(self):
+        for i in range(len(self.inputs)):
+            self.extraction_method.prepare_fit(self.get_input(i))
+
+    def prepare_inputs(self):
+        if not self.grouping:
+            self.grouping = [i for i in range(len(self.inputs))]
+        for i in range(len(self.inputs)):
+            prepared_inputs = self.extraction_method.prepare_input(self.get_input(i))
+            self.inputs[i] = prepared_inputs[0]
+            for inp_id in range(1, len(prepared_inputs)):
+                self.inputs.append(prepared_inputs[inp_id])
+                self.targets.append(self.targets[i])
+                self.grouping.append(self.grouping[i])
+                for t in self.extra_tasks:
+                    t[1].append(t[1][i])
+
+        self.prepared = True
+
+    ########################################################################################################
+    # Index mode
+    ########################################################################################################
+
     def to_index_mode(self):
         # save inputs in separate files (if not done so already)
         self.index_mode = True
@@ -199,25 +213,30 @@ class TaskDataset(Dataset):
         separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
         return os.path.isdir(separated_dir) and len(os.listdir(separated_dir)) == len(self.inputs)
 
-    # frame input
-    def prepare_fit(self):
-        for i in range(len(self.inputs)):
-            self.extraction_method.prepare_fit(self.get_input(i))
+    ########################################################################################################
+    # I/O
+    ########################################################################################################
+    def save(self):
+        joblib.dump(self.inputs, os.path.join(self.base_path, '{}_inputs.gz'.format(self.extraction_method.name)))
+        t_s = torch.Tensor(self.targets)
+        torch.save(t_s, os.path.join(self.base_path, 'targets.pt'))
 
-    def prepare_inputs(self):
-        if not self.grouping:
-            self.grouping = [i for i in range(len(self.inputs))]
-        for i in range(len(self.inputs)):
-            prepared_inputs = self.extraction_method.prepare_input(self.get_input(i))
-            self.inputs[i] = prepared_inputs[0]
-            for inp_id in range(1, len(prepared_inputs)):
-                self.inputs.append(prepared_inputs[inp_id])
-                self.targets.append(self.targets[i])
-                self.grouping.append(self.grouping[i])
-                for t in self.extra_tasks:
-                    t[1].append(t[1][i])
+        diction = {
+            'task': self.task,
+            'grouping': self.grouping,
+            'extra_tasks': self.extra_tasks
+        }
+        joblib.dump(diction, os.path.join(self.base_path, 'other.obj'))
 
-        self.prepared = True
+    def load(self):
+        inputs = joblib.load(os.path.join(self.base_path, '{}_inputs.gz'.format(self.extraction_method.name)))
+        t_l = torch.load(os.path.join(self.base_path, 'targets.pt'))
+        t_l = [[int(j) for j in i] for i in t_l]
+        diction = joblib.load(os.path.join(self.base_path, 'other.obj'))
+        task = diction['task']
+        grouping = diction['grouping']
+        extra_tasks = diction['extra_tasks']
+        self.initialize(inputs=inputs, targets=t_l, task=task, grouping=grouping, extra_tasks=extra_tasks)
 
     @staticmethod
     def check(base_path: str, extraction_method: ExtractionMethod):

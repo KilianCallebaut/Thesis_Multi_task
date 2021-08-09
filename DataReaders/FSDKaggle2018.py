@@ -39,13 +39,6 @@ class FSDKaggle2018(DataReader):
         inputs = []
         perc = 0
 
-        # if test:
-        #     folder_path = os.path.join(self.root, 'audio_test')
-        #     files = self.file_labels_val
-        # else:
-        #     folder_path = os.path.join(self.root, self.audio_folder)
-        #     files = self.file_labels
-
         for audio_idx in range(len(files)):
             path = files[audio_idx]
             read_wav = self.load_wav(path, resample_to)

@@ -40,27 +40,35 @@ class HoldTaskDataset(TaskDataset):
             index_mode=self.index_mode
         )
 
-    def save(self):
-        if self.check_train_test_present():
-            self.training_set.save()
-            self.test_set.save()
-        else:
-            super().save()
-
-    def load(self):
-        if os.path.isdir(self.training_set.base_path):
-            self.training_set.load()
-            self.test_set.load()
-        else:
-            super().load()
 
     def check_train_test_present(self):
+        """
+        Checks if this HoldTaskDataset has predefined train/test split
+        :return: Bool
+        """
         return len(self.training_set.inputs) > 0 and len(self.test_set.inputs) > 0
+
+    ########################################################################################################
+    # Setters
+    ########################################################################################################
 
     def initialize_train_test(self, task: Task, training_inputs: List[torch.tensor], training_targets: List[List],
                               testing_inputs: List[torch.tensor], testing_targets: List[List],
-                              training_grouping: List[int] = None, training_extra_tasks: List[Tuple] = None,
-                              testing_grouping: List[int] = None, testing_extra_tasks: List[Tuple] = None):
+                              training_grouping: List[int] = None, training_extra_tasks: List[Tuple[Task, List]] = None,
+                              testing_grouping: List[int] = None, testing_extra_tasks: List[Tuple[Task, List]] = None):
+        """
+        Inserts the data for a dataset with predefined train/test splits
+        :param task: The task object for the dataset
+        :param training_inputs:  The list of input tensors for training
+        :param training_targets: The list of targets for training
+        :param testing_inputs: The list of input tensors for testing
+        :param testing_targets: The list of targets for testing
+        :param training_grouping: The grouping list defining which instances belong together for training
+        :param training_extra_tasks: The list of extra task/target tuples for training
+        :param testing_grouping: The grouping list defining which instances belong together for testing
+        :param testing_extra_tasks: The list of extra task/target tuples for testing
+        :return:
+        """
         self.training_set.initialize(inputs=training_inputs, targets=training_targets, task=task,
                                      grouping=training_grouping, extra_tasks=training_extra_tasks)
         self.test_set.initialize(inputs=testing_inputs, targets=testing_targets, task=task,
@@ -72,7 +80,10 @@ class HoldTaskDataset(TaskDataset):
                         grouping=[],
                         extra_tasks=[])
 
-    def k_folds(self, random_state=None, n_splits=5, kf: _BaseKFold = None):
+    ########################################################################################################
+    # Splitters
+    ########################################################################################################
+    def k_folds(self, random_state: int =None, n_splits: int =5, kf: _BaseKFold = None):
         """
         Produces a k_fold training/test split generator, depending on the task type
 
@@ -183,8 +194,25 @@ class HoldTaskDataset(TaskDataset):
                                  task=self.task, grouping=grouping_val,
                                  extra_tasks=extra_tasks_val)
 
-    def normalize_fit(self):
-        self.training_set.normalize_fit()
+    def generate_train_test_set(self, random_state: int = None, n_splits=5, kf: _BaseKFold = None):
+        """
+        Generates and returns the train and test split
+        :param random_state:
+        :param n_splits:
+        :param kf:
+        :return:
+        """
+        if self.check_train_test_present():
+            for i in range(n_splits):
+                yield self.training_set, self.test_set
+        else:
+            for train, test in self.k_folds(random_state=random_state, n_splits=n_splits, kf=kf):
+                self.get_split_by_index(train_index=train, test_index=test)
+                yield self.training_set, self.test_set
+
+    ########################################################################################################
+    # Filtering
+    ########################################################################################################
 
     def sample_labels(self, dic_of_labels_limits, random_state=None):
         if self.check_train_test_present():
@@ -193,12 +221,35 @@ class HoldTaskDataset(TaskDataset):
         else:
             super().sample_labels(dic_of_labels_limits=dic_of_labels_limits, random_state=random_state)
 
+    ########################################################################################################
+    # Transformation
+    ########################################################################################################
+    def normalize_fit(self):
+        self.training_set.normalize_fit()
+
     def prepare_inputs(self):
         if self.check_train_test_present():
             self.training_set.prepare_inputs()
             self.test_set.prepare_inputs()
         else:
             super().prepare_inputs()
+
+    ########################################################################################################
+    # I/O
+    ########################################################################################################
+    def save(self):
+        if self.check_train_test_present():
+            self.training_set.save()
+            self.test_set.save()
+        else:
+            super().save()
+
+    def load(self):
+        if os.path.isdir(self.training_set.base_path):
+            self.training_set.load()
+            self.test_set.load()
+        else:
+            super().load()
 
     @staticmethod
     def check(extraction_method: ExtractionMethod, base_path: str = None,

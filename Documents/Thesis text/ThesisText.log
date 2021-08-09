@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  5 AUG 2021 17:44
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  9 AUG 2021 12:50
 entering extended mode
 **./ThesisText.tex
 (ThesisText.tex
@@ -609,10 +609,10 @@ Underfull \hbox (badness 10000) in paragraph at lines 100--101
 
  []
 
-) (Model.tex [17]
+[17] [18] [19]) (Model.tex [20]
 Chapter 4.
 <../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOverview.
-png, id=70, 1215.54124pt x 452.69125pt>
+png, id=79, 1215.54124pt x 452.69125pt>
 File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOver
 view.png Graphic file (type png)
 <use ../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOverv
@@ -620,17 +620,17 @@ iew.png>
 Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
 tion/SimplifiedOverview.png  used on input line 20.
 (pdftex.def)             Requested size: 390.0pt x 145.24406pt.
-[18
+[21
 
  <../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOverview
-.png>]) (Implementation.tex [19] [20]
+.png>]) (Implementation.tex [22] [23]
 Chapter 5.
 
 Underfull \hbox (badness 10000) in paragraph at lines 18--19
 
  []
 
-[21
+[24
 
 ]
 Underfull \hbox (badness 10000) in paragraph at lines 22--23
@@ -642,7 +642,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 24--25
 
  []
 
-[22]
+[25]
 Overfull \hbox (1.43205pt too wide) in paragraph at lines 26--27
 []\OT1/cmr/m/n/12 Further fac-tors the data struc-ture can au-to-mat-i-cally de
 al with are datasets
@@ -658,9 +658,9 @@ Underfull \hbox (badness 10000) in paragraph at lines 28--29
 
  []
 
-[23]
+[26]
 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDataset Structu
-re.png, id=92, 779.91376pt x 897.3525pt>
+re.png, id=101, 779.91376pt x 897.3525pt>
 File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDataset St
 ructure.png Graphic file (type png)
 <use ../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDataset Str
@@ -673,7 +673,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 60--61
 
  []
 
-[24] [25 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatase
+[27] [28 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatase
 t Structure.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 62--63
 
@@ -689,7 +689,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 66--67
 
  []
 
-[26]
+[29]
 Underfull \hbox (badness 10000) in paragraph at lines 68--69
 
  []
@@ -709,7 +709,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 89--90
 
  []
 
-[27]
+[30]
 Underfull \hbox (badness 10000) in paragraph at lines 93--94
 
  []
@@ -724,7 +724,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 97--98
 
  []
 
-[28]
+[31]
 Underfull \hbox (badness 10000) in paragraph at lines 99--100
 
  []
@@ -739,7 +739,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 108--109
 
  []
 
-[29]
+[32]
 Underfull \hbox (badness 10000) in paragraph at lines 110--112
 
  []
@@ -754,7 +754,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 117--118
 
  []
 
-[30]
+[33]
 Underfull \hbox (badness 10000) in paragraph at lines 121--122
 
  []
@@ -774,7 +774,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 127--128
 
  []
 
-[31]
+[34]
 Underfull \hbox (badness 10000) in paragraph at lines 131--132
 
  []
@@ -789,7 +789,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 138--139
 
  []
 
-[32]
+[35]
 Underfull \hbox (badness 10000) in paragraph at lines 140--141
 
  []
@@ -809,7 +809,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 151--152
 
  []
 
-[33]
+[36]
 Underfull \hbox (badness 10000) in paragraph at lines 155--156
 
  []
@@ -824,7 +824,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 159--160
 
  []
 
-[34]
+[37]
 Underfull \hbox (badness 10000) in paragraph at lines 161--162
 
  []
@@ -844,7 +844,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 169--170
 
  []
 
-[35]
+[38]
 Underfull \hbox (badness 10000) in paragraph at lines 173--174
 
  []
@@ -859,7 +859,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 177--178
 
  []
 
-[36]
+[39]
 Underfull \hbox (badness 10000) in paragraph at lines 185--186
 
  []
@@ -869,7 +869,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 187--188
 
  []
 
-[37]
+[40]
 Underfull \hbox (badness 10000) in paragraph at lines 191--192
 
  []
@@ -889,17 +889,17 @@ Underfull \hbox (badness 10000) in paragraph at lines 199--200
 
  []
 
-[38]
+[41]
 Underfull \hbox (badness 10000) in paragraph at lines 201--202
 
  []
 
-[39]
+[42]
 Underfull \hbox (badness 10000) in paragraph at lines 238--239
 
  []
 
-[40]
+[43]
 Underfull \hbox (badness 10000) in paragraph at lines 247--248
 
  []
@@ -926,7 +926,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 255--256
 
  []
 
-[41]
+[44]
 Underfull \hbox (badness 10000) in paragraph at lines 257--258
 
  []
@@ -936,7 +936,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 259--260
 
  []
 
-[42]
+[45]
 Underfull \hbox (badness 10000) in paragraph at lines 263--264
 
  []
@@ -957,12 +957,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 269--270
 
  []
 
-[43]
+[46]
 Underfull \hbox (badness 10000) in paragraph at lines 271--272
 
  []
 
-[44]) (Evaluation.tex [45]
+[47]) (Evaluation.tex [48]
 Chapter 6.
 ! You can't use `macro parameter character #' in vertical mode.
 l.3 #
@@ -972,19 +972,19 @@ I'll just pretend that you didn't ask for it.
 If you're in the wrong mode, you might be able to
 return to the right one by typing `I}' or `I$' or `I\par'.
 
-) (Conclusion.tex [46
+) (Conclusion.tex [49
 
 ]
 Chapter 7.
-) (ThesisText.bbl [47
+) (ThesisText.bbl [50
 
-] [48
+] [51
 
-]) [49] (ThesisText.aux) ) 
+]) [52] (ThesisText.aux) ) 
 Here is how much of TeX's memory you used:
  12468 strings out of 481212
  257844 string characters out of 2905973
- 474472 words of memory out of 3000000
+ 473472 words of memory out of 3000000
  27819 multiletter control sequences out of 15000+200000
  541546 words of font info for 50 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -995,9 +995,9 @@ onts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/mrKC1/AppData/Local/Programs
 /MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/mrKC1/AppData/Local/
 Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/mrKC1/AppDat
 a/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb>
-Output written on ThesisText.pdf (51 pages, 227296 bytes).
+Output written on ThesisText.pdf (54 pages, 234722 bytes).
 PDF statistics:
- 196 PDF objects out of 1000 (max. 8388607)
+ 205 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  23 words of extra memory for PDF output out of 10000 (max. 10000000)
 

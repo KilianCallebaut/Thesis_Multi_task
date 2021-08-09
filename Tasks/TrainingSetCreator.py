@@ -10,21 +10,6 @@ class ConcatTrainingSetCreator:
         self.training_creators = []
         self.random_state = random_state
         self.nr_runs = nr_runs
-        # for t_id in range(len(training_sets)):
-        #     set = training_sets[t_id]
-        #     if set.index_mode:
-        #         if not set.has_index_mode():
-        #             raise Exception('Index files must be created first')
-        #         self.training_creators.append(IndexModeTrainingSetCreator(dataset=set,
-        #                                                                   dic_of_labels_limits=dics_of_labels_limits[
-        #                                                                       t_id],
-        #                                                                   random_state=random_state,
-        #                                                                   nr_runs=nr_runs))
-        #     else:
-        #         self.training_creators.append(TrainingSetCreator(dataset=set,
-        #                                                          dic_of_labels_limits=dics_of_labels_limits[t_id],
-        #                                                          random_state=random_state,
-        #                                                          nr_runs=nr_runs))
 
     def add_dataset(self, dataset: HoldTaskDataset, dic_of_labels_limits: dict):
         self.training_creators.append(TrainingSetCreator(
@@ -52,8 +37,6 @@ class TrainingSetCreator:
         self.random_state = random_state
         self.nr_runs = nr_runs
         self.dataset.sample_labels(self.dic_of_labels_limits, self.random_state)
-
-        # self.dataset.prepare_inputs(**kwargs)
 
         if dataset.check_train_test_present():
             if not isinstance(nr_runs, int):
