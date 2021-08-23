@@ -1,20 +1,12 @@
 import os
-from typing import List
 
 import joblib
-import torch
 from dcase_util.datasets import TUTAcousticScenes_2017_DevelopmentSet, TUTAcousticScenes_2017_EvaluationSet
 from numpy import long
 
+from DataReaders.DataReader import DataReader
 from Tasks.Task import MultiClassTask
 from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
-
-try:
-    import cPickle
-except BaseException:
-    import _pickle as cPickle
-
-from DataReaders.DataReader import DataReader
 
 
 class DCASE2017_SS(DataReader):
@@ -28,13 +20,13 @@ class DCASE2017_SS(DataReader):
     # wav_folder_eval = 'C:\\Users\\mrKC1\\PycharmProjects\\Thesis\\ExternalClassifiers\\DCASE2017-baseline-system-master' \
     #                   '\\applications\\data\\TUT-acoustic-scenes-2017-evaluation\\audio\\'
 
-    def __init__(self, extraction_method, **kwargs):
+    def __init__(self, **kwargs):
         print('start DCASE2017 SS')
-        super().__init__(extraction_method, **kwargs)
+        super().__init__(**kwargs)
         print('done DCASE2017 SS')
 
     def get_base_path(self):
-        return dict(training_base_path=self.object_path.format('train'),
+        return dict(base_path=self.object_path.format('train'),
                     testing_base_path=self.object_path.format('eval'))
 
     def get_path(self):
@@ -45,9 +37,10 @@ class DCASE2017_SS(DataReader):
         return os.path.join(self.get_base_path()['testing_base_path'],
                             'DCASE2017_SS.obj')
 
-    def check_files(self):
-        return super().check_files() and \
-               os.path.isfile(self.get_path()) and os.path.isfile(self.get_eval_path())
+    def check_files(self, extraction_method):
+        return super().check_files(extraction_method) and \
+               os.path.isfile(self.get_path()) and \
+               os.path.isfile(self.get_eval_path())
 
     def load_files(self):
         # MetaDataContainer(filename=)
@@ -77,10 +70,10 @@ class DCASE2017_SS(DataReader):
         self.audio_files = self.devdataset.audio_files
         self.audio_files_eval = self.evaldataset.audio_files
 
-    def read_files(self) -> HoldTaskDataset:
+    def read_files(self, taskDataset: HoldTaskDataset):
         self.audio_files = joblib.load(self.get_path())
         self.audio_files_eval = joblib.load(self.get_eval_path())
-        return super().read_files()
+        return super().read_files(taskDataset)
 
     def write_files(self, taskDataset: HoldTaskDataset):
         super().write_files(taskDataset=taskDataset)
@@ -90,22 +83,27 @@ class DCASE2017_SS(DataReader):
         dict = {'audio_files_eval': self.audio_files_eval}
         joblib.dump(dict, self.get_eval_path())
 
-    def calculate_input(self, files, resample_to=None) -> List[torch.tensor]:
-        return self.calculate_features(files, resample_to)
-
-    def calculate_features(self, files, resample_to):
-        inputs = []
+    def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict):
         perc = 0
-        for audio_idx in range(len(files)):
-            read_wav = self.load_wav(files[audio_idx], resample_to)
-            inputs.append(self.extraction_method.extract_features(read_wav))
-            if perc < (audio_idx / len(files)) * 100:
+        for audio_idx in range(len(self.audio_files)):
+            read_wav = self.preprocess_signal(self.load_wav(self.audio_files[audio_idx]), **preprocess_parameters)
+            taskDataset.extract_and_add_input(read_wav)
+            if perc < (audio_idx / len(self.audio_files)) * 100:
+                print("Percentage done: {}".format(perc))
+                perc += 1
+
+        perc = 0
+        for audio_idx in range(len(self.audio_files_eval)):
+            read_wav = self.preprocess_signal(self.load_wav(self.audio_files_eval[audio_idx]), **preprocess_parameters)
+            taskDataset.test_set.extract_and_add_input(read_wav)
+            if perc < (audio_idx / len(self.audio_files_eval)) * 100:
                 print("Percentage done: {}".format(perc))
                 perc += 1
         print("Calculating input done")
-        return inputs
 
-    def calculate_taskDataset(self, **kwargs) -> HoldTaskDataset:
+    def calculate_taskDataset(self,
+                              taskDataset: HoldTaskDataset,
+                              **kwargs):
         distinct_labels = self.devdataset.scene_labels()
         targets = []
 
@@ -129,15 +127,12 @@ class DCASE2017_SS(DataReader):
             targets_val.append(target)
             print(file_id / len(self.audio_files_eval))
 
-        inputs = self.calculate_input(files=self.audio_files, **kwargs)
-        inputs_val = self.calculate_input(files=self.audio_files_eval, **kwargs)
-
-        taskDataset = self.__create_taskDataset__()
-        taskDataset.initialize_train_test(task=MultiClassTask(name='DCASE2017_SS', output_labels=distinct_labels),
-                                          training_inputs=inputs,
-                                          training_targets=targets,
-                                          testing_inputs=inputs_val,
-                                          testing_targets=targets_val)
-
-        # taskDataset.prepare_inputs()
-        return taskDataset
+        task = MultiClassTask(name='DCASE2017_SS', output_labels=distinct_labels)
+        taskDataset.add_task_and_targets(
+            task=task,
+            targets=targets
+        )
+        taskDataset.test_set.add_task_and_targets(
+            task=task,
+            targets=targets_val
+        )

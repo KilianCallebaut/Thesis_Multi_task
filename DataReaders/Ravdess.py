@@ -4,7 +4,6 @@ import joblib
 
 from DataReaders.DataReader import DataReader
 from Tasks.Task import MultiClassTask
-from Tasks.TaskDataset import TaskDataset
 from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 
 
@@ -13,9 +12,9 @@ class Ravdess(DataReader):
     # object_path = r"E:\Thesis_Results\Data_Readers\Ravdess"
     root = r"F:\Thesis_Datasets\Ravdess"
 
-    def __init__(self, extraction_method, **kwargs):
+    def __init__(self, **kwargs):
         print('start ravdess')
-        super().__init__(extraction_method, **kwargs)
+        super().__init__(**kwargs)
         print('Done loading Ravdess')
 
     def get_path(self):
@@ -24,8 +23,8 @@ class Ravdess(DataReader):
     def get_base_path(self):
         return dict(base_path=self.object_path)
 
-    def check_files(self):
-        return super().check_files() and \
+    def check_files(self, extraction_method):
+        return super().check_files(extraction_method) and \
                os.path.isfile(self.get_path())
 
     def load_files(self):
@@ -55,42 +54,37 @@ class Ravdess(DataReader):
                              }
                         )
 
-    def read_files(self):
+    def read_files(self, taskDataset):
         info = joblib.load(self.get_path())
         self.files = info['files']
-        return super().read_files()
+        return super().read_files(taskDataset)
 
     def write_files(self, taskDataset):
         dict = {'files': self.files}
         joblib.dump(dict, self.get_path())
         super().write_files(taskDataset=taskDataset)
 
-    def calculate_input(self, files, resample_to=None):
+    def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict):
         inputs = []
         perc = 0
 
-        resample_to = None
-
-        for file_idx in range(len(files)):
-            file = files[file_idx]
-            read_wav = self.load_wav(file['file'], resample_to)
-            inputs.append(self.extraction_method.extract_features(read_wav))
+        for file_idx in range(len(self.files)):
+            file = self.files[file_idx]
+            read_wav = self.preprocess_signal(self.load_wav(file['file']), **preprocess_parameters)
+            taskDataset.extract_and_add_input(read_wav)
             if perc < (file_idx / len(self.files)) * 100:
                 print("Percentage done: {}".format(perc))
                 perc += 1
         return inputs
 
-    def calculate_taskDataset(self, **kwargs) -> HoldTaskDataset:
+    def calculate_taskDataset(self,
+                              taskDataset: HoldTaskDataset,
+                              **kwargs):
         print('Calculating input')
-        inputs = self.calculate_input(self.files, **kwargs)
-
         targets = [f['emotion'] for f in self.files]
         distinct_targets = list(set(targets))
         targets = [[int(b == f) for b in distinct_targets] for f in targets]
-        taskDataset = super().__create_taskDataset__()
-        taskDataset.initialize(inputs=inputs,
-                               targets=targets,
-                               task=MultiClassTask(name="Ravdess", output_labels=distinct_targets),
-                               grouping=[f['actor'] for f in self.files])
-        # taskDataset.prepare_inputs()
-        return taskDataset
+        taskDataset.add_task_and_targets(
+            targets=targets,
+            task=MultiClassTask(name="Ravdess", output_labels=distinct_targets))
+        taskDataset.add_grouping(grouping=[f['actor'] for f in self.files])

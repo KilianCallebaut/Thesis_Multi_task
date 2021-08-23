@@ -9,6 +9,8 @@
 
 \begin{itemize}
 	\item For feature extraction, the device can hold each entire extracted dataset separately in memory, but no 
+	\item the model creation is central
+	\item training loop and evaluation loop should not change
 \end{itemize}
 
 
@@ -20,6 +22,139 @@ TODO: Explain how the system was modeled based on the design requirements
 	\caption{Simplified System overview}
 \end{figure}
 
+\section{Creating standardized objects}
+
+One of the most important aspects of this framework is the addition of standardized objects to encapsulate the input. These allow for easy manipulation and combination of different datasets. The objective is that once created, the developer should not have to worry about them further down the pipeline. \\
+
+TODO: Give in the model for the TaskDataset
+
+The standardized object is called the TaskDataset. This contains the feature matrices extracted from the audio files in the dataset, their target labels which form the ground truths and their corresponding task information. Creating these objects from the raw datasets is a complex task which requires the navigation of their storage structure, that is specific for each dataset. Developers should thus be responsible for getting the correct data out of the dataset but should get proper assurance the object was created correctly. \\
+
+The design choice was thus made to create an abstract factory the developer has to extend, loaded with the necessary tools to insert the data correctly. In order to provide the necessary assurances the object is created correctly as well as facilitate the process, the TaskDataset is loaded with builder functions. Through these the TaskDataset can be filled step-by-step. This further achieves two things. One, because the functions are in the TaskDataset itself, \textit{no outside classes have to make any assumptions about internal data structure or workings of the TaskDataset}. This ensures modularity and extendibility of the TaskDataset and will be a constraint held for the rest of the design. Two, because datasets can be too large to be loaded in the system's working memory, this way each instance can be inserted one by one in the data object. \\
+
+Back to the abstract factory - the DataReader - where the abstract methods are called in a predefined pattern, so the developer only has to extend the required methods and adhere to their required responsibilities. To aid with extraction and processing the sound files from different datasets in the same way, this class also has a processing function for the numerical time series representing the audio. Included here are abilities like resample audio to the same rate and converting multi-channel audio to a single channel. The developer themselves can choose to use this or not. Along with creating the standardized object, the factory also includes quick saving and reading of the created object for the specific method of extraction. This makes it more feasible to quickly reload the dataset without having to redo the extraction. \\
+
+The structure for storing data in the TaskDataset itself then is as follows. Since in audio every instance likely has a different size due to varying audio lengths, the collection of input matrices are stored as tensors in a Python list. Each target then is stored as a list of integers. Usually they are encoded as binary strings with a 1 in each column number that an instance has a corresponding label for. The target labels in the order which relates to the column numbers and the rest of the task information is recorded in a Task object which is stored in the TaskDataset as well. \\
+
+\subsection{Variations}
+
+
+The default assumption is that a dataset has a single list of unrelated inputs with a target label for each instance. This section will explain how variations on this can also be contained in the TaskDataset. First variation are datasets which have separated predefined training and test sets. These will have to be combined with datasets that have to be split afterwards. Both training and test dataset have to receive the same preprocessing, so to enforce this their objects have to be somehow linked. This is done through making the a composite object that is a TaskDataset which contains a test TaskDataset. The test data can then be stored in this test object inside the composite object, while sharing the same preprocessing functions as well as appropriately handling called functions on it to allow it to be treated uniformly to a dataset without presplit data. \\
+
+Next variation are datasets that have target data for multiple tasks. While one task with according targets is required, the rest can be added in a list of tuples of task objects and a list of targets same as for the 'main' task. \\
+
+The last one are datasets that have "groupings". What is meant here are datasets consisting of audio files that are already split, with each part having their own ground truth, but cannot be divided later (e.g. parts of the same split going to the training set and the test set). For this instance, the same formality is used as in sklearn's splitting functions and a grouping list can be stored where the index corresponding to each instance belonging together contains the same number. \\
+
+The objective is to treat the resulting TaskDataset uniformly regardless of variation. The strategy for handling each of these cases will be discussed in the appropriate sections later.
+
+
+\section{Manipulating datasets}
+
+As mentioned before the created standardized objects are also responsible for providing easy manipulation abilities for datasets. The choice was made to include dataset changing handles on the object itself, which can be called by other classes, without having them know the underlying representation of the object itself. These handles fall into two categories: functions that transform data instances and functions that change the collection itself. \\
+
+The functions that transform instances are the most likely to change, as these have to be tweaked based on their effect on performance of the resulting recognition system. What we understand under these are data scaling methods, windowing functions, but also feature extraction as this transforms the original time series representation to one fit for the required learning task. The data scaling and other possibly required preparation functions will depend on the feature extraction method used. For example, a feature extraction method which outputs a time dependent representation will require a windowing function that cuts the feature matrices to the same shape in order to fit them in the same batches, while one that outputs matrices of the same shape will not. To adress this along with the likelihood of change, the instance transformation functions are encapsulated in an object called the Extraction\_Method. \\
+
+This is an abstract template that developers have to extend in order to define their required implementation. Parameters for these implementations can be given on the fly as input to instantiate these objects. The whole object is then stored in return as input in the TaskDataset which will then use it when the call is made to transform the data. \\
+
+Functions that change the collection itself then are ones that filter and split the data. For these ones it does not matter what is contained in the actual instances, but simply how the collection is composed. Filtering the data instances - based on their associated labels - is present to offer the ability of adjusting the label distribution. This happens through taking a (pseudo)random sample of data instances with the associated label of the defined size the developer wants the (maximum) amount of labels to be. The rest then gets filtered out of the current dataset object. \\
+
+Splitting the dataset then in a train and test set requires a more sophisticated strategy. Because both require that the same transformations are performed, with some additional constraints (see further), it is opted for creating a composite object which both is a TaskDataset and contains a TaskDataset that is the test set. Splitting the dataset into a train and test set is performed then by filling this test set with data split from the original, while both share the same object - with the same parameters - for performing transformations. As mentioned before, there are datasets which have test sets defined beforehand. The difference between these two situations is thus that the developer fills this test dataset beforehand. At the point where a dataset has a filled test set, both of these situations thus become the same again for the rest of the process. \\
+
+Creating training and test sets themselves do not simply happen at random either. The default case is that these get a stratified collection, meaning that the resulting folds will try to stick as close to the original label distribution as possible. Mentioning folds gives away that the splitting is not simply meant for one time use. The splitting into train and test sets actually contains three operations. First is splitting the data into k equally sized folds based on their indices. Second takes indices and transforms them into a train and test TaskDataset, while returning previous data to the original set. Third simply handles the difference between predefined sets and sets where the splits still needs to happen, calling the previous functions in the latter case. \\
+
+
+
+\section{Combining Datasets}
+
+When the datasets are created and prepared for training, they need to be combined as a single dataset, but from which the instances can be processed differently per task in training and evaluation. The solution for this is another composite object called the ConcatTaskDataset. Built on the groundwork from PyTorch's ConcatDataset, this class contains a list of TaskDatasets and builds a front for the data loading in training making it seem like one big dataset. Alongside this, the class contains methods for differentiating the different tasks afterwards. At instantiation every individual dataset gets loaded with information to combine the target vectors into one. More detailed information on the exact problems that need to be addressed and how it achieves this are given in TODO: refer to section.
+
+\section{Creating Model}
+
+This framework is aimed at providing a facilitating extension to PyTorch for training and testing multi-head hard parameter sharing models. Model creation thus puts as little requirements on designing the actual models as possible. The rest of the system builds on Pytorch's classes as to ensure that the input would be valid for any PyTorch module. The only presumption the system has to make is that the output is a tuple with each entry being the predicted results for each task in the order of the task list from the input dataset. While no class was made that ensures the developer does this correctly - with the model creation being central, the developer should have the freedom to create whatever they want, adjusting the functionalities around it if necessary - there are two base multi-head networks, a CNN and a DNN, available which has variable layers based on the input. These also already include adaptations based on the type of task. In this area the mantra is that the developer knows best. \\
+
+
+\section{Training and Evaluating Model}
+
+When the model is designed and the input dataset is created, they will be inserted into the method which trains and/or evaluates a model. These two are similar, with the only exception that the training function updates the model parameters every loop. Training (and evaluating) a model happens through a method which should remain static, but can vary its functionalities based on input. The reason for this is that the framework can only ensure the validity of the created pipeline if it controls how inputs are received and outputs are processed. In other words if it knows what it is going to do with the received data. \\
+
+The handling of objects and data which the rest of the system does not rely on however, can be overwritten in numerous ways, depending on the required change. These are all discussed in TODO: REFERENCE. Every batch statistics are calculated from comparing the model's results to the ground truths. This happens through an adapter class that takes the predicted results and is responsible for writing them to the correct files. This class, the Results object, is wired to write results already to TensorBoard. This library provides easy visualization for deep learning metrics. This happens live, both in the training and evaluation loop, so that developer can follow the progress and intervene during the loop if necessary. The developer can easily extend this class and define their own desired metric calculations, as the results only receive the ground truths, predictions and the loss. \\
+
+Alongside metric calculation and storage, the Results object also provides checkpointing function for the model's parameters. This makes it possible to retrieve a model's previous states. The Results object thus acts as a unique adapter for each training run, managing and distributing files resulting from training and evaluation. Because of this design choice, it is possible to continue or restart previous runs by instantiating the same Results object and giving it to the "blind" training and evaluation functions. \\
+
+Especially the evaluation function dynamically uses this, as it can either take a model object or load up the model from each epoch if none was given. This simple aspect allows a developer to use the system as a testing framework for trained created models if they need to. \\
+
+Changing non-metric related functions - like early stopping - can be done by another extra object which can be given as input, namely the Training\_Utils object. This simply contains functions, for which the developer can write an extending object and give as input. \\ 
+
+\section{Three Implementations}
+
+With the base strategies in the pipeline designed, it might seem complex without a clear reason why its abstractions were built. This section will give insight to how the framework was developed alongside giving clear examples of how the previous designs are instantiated. \\
+
+The designing process for a framework is broken down by \cite{roberts1996evolving} as follows. Frameworks are reusable software patterns that facilitate the development of applications. Determining the correct abstractions must come from concrete examples, as it is nearly impossible to have to foresight to address the required functionalities from simply the domain. A number of abstractions do not become apparent until the framework has been reused. Generalizable solutions can only come from actually building the applications. \\
+
+What \citep{roberts1996evolving} propose as a simple step by step plan is to build three applications in the same problem domain which differ from each other each time. While the more applications get developed lead to a more generalizable framework, there has to be a cut off point as too many applications can make it impossible to actually finish the work. That being said, a framework is likely to continue to evolve after the three applications are made. What follows now is an explanation of the three applications that shaped the design of the framework, ending with conclusions drawn from them and further extensions. \\
+
+{\large \textbf{Choice}} \\
+
+First however, the choice of projects must be decided. Each of them will be acoustic multi-task classifiers with different requirements for the system. The focus for this platform is research and iteratively designing the best performing multi-task system. Therefore, the first two implementations are following two research papers. This choice also adds an opportunity to evaluate the system by comparing to the reported results. Generalizing for multi-task purposes means that the choices must cover enough datasets, tasks and data processing features. Implementing existing research can be helpful here for discovering possible set-ups, one must take in account that this is completed work. The process of discovery and improvement of systems is not usually covered in the resulting paper. Therefore, the last implementation actually went into trying to develop new functioning set-up for multi-task research . \\
+
+
+%Explain Georgiev
+
+{\large \textbf{Low-resource Multi-task Audio Sensing for Mobile and Embedded Devices via Shared Deep Neural Network Representations}} \\
+
+In the work done by \citep{georgiev2017low}, a Deep Neural Network is developed which tries to create a general purpose audio task model that addresses computational limitations of mobile, embedded and IOT devices. The approach is to bring 4 separate audio tasks together in one deep learning framework, for which they try out different configurations. Every task is tested combined in a multi-head network as well as separated after which they evaluate the effect on performance for each of them. The model that combined each in a single multi-head model was not significantly worse than the best performing one, making the multi-task set-up  a viable way to reduce resource requirements. \\
+
+The chosen tasks here were Speaker Identification, Emotion Recognition, Stress Detection and Acoustic Scene Recognition. These are three background identification tasks, meaning they don't actually require to know what happens in an audio fragment and can take a longer time frame for labeling. To rebuild the actual set-up this work utilised the ASVSpoof database TODO: REFERENCE for the Speaker Identification task, the Ravdess database TODO: REFERENCE for emotional speech recognition task and the DCASE 2017 Acoustic Scene dataset TODO: Reference for the Acoustic Scene Recognition task. However, the authors used a self made dataset for the stress detection for which no suitable replacement was found. \\
+
+For extracting features they utilised both MFCC TODO: REFERENCE and their own created summary of filter banks. This summary consists of creating different statistical aggregation metrics (e.g. the mean, the standard deviation, the median, ...) per coefficient from extracted log filter banks TODO: Reference. This creates a representation from an audio sample independent of time and requiring less space.\\
+
+TODO: Include their model 
+
+For design purposes, the multi-task pipeline is examined. The system is built for low quality audio with a sample rate of 8 kHZ. From the audio MFCC or the logbank summaries are extracted. Each task has a different dataset but all the inputs require the same extraction. The resulting matrices are then normalized using the mean and the standard deviation from the numerical data. This is then used as input for training the model, which is done using gradient descent. The data is fed to the training module in stratified batches. In this context, it means that a batch contains samples from every dataset, with the amount of samples from every dataset matching internal size ratios of the datasets. \\
+
+A few lessons have been made from recreating this exact set-up. 
+
+\begin{itemize}
+	\item Every audio sample should be able to be resampled which will likely happen at all the datasets at once
+	\item Feature extraction as well as any other preprocessing will have to be easily replicable for every dataset at once
+	\item Features can be time related or not. If the dataset has varying time lengths then the resulting feature matrices will be of varying lengths. These can not be batched together for data loading. The solution for this is to include an operation that can transform feature matrices to the same size in a windowing function. 
+	\item Depending on the desired batching method, it is possible that data instances from all datasets and tasks have to go in the same batch. This does not only require that input instances have to have the same size, but also that target vectors can go in a unified matrix structure.
+	\item Normalization using the mean and the standard deviation happens differently for these two feature extraction methods. In MFCC, the mean and standard deviation is calculated per one dimension in the feature matrix: the coefficients. This makes sense as the second dimension are time steps, so the numerical distribution will be from the same domain. However for the statistical summary matrices, every value in the second dimension is a different metric. Mean and standard deviation calculation must happen in this instance per cell basis. In essence for the system, this means that both these scaling methods need to be covered, but also that normalization (and possibly any other transformation operation like windowing) depend on the extraction method used.
+	\item The DCASE dataset has a predefined train and test set. The other two do not. The system has to be able to store both of these instances in the same standardized object as well as combine them easily and take them in account when generating test sets for the other case.
+\end{itemize}
+
+
+TODO: Model instantiation and explain \\
+
+
+{\large \textbf{A Multi-task Learning Approach Based on Convolutional Neural Network for Acoustic Scene Classification}} \\
+
+In this paper, by \citet{xu2019multi}, an Acoustic Event Detection (AED) task and a Acoustic Scene Recognition (ASR) task are put together in the same multi task framework. Here a Convolutional Neural Network is used for classification with AED being an auxiliary task for improving the ASR task. The training data for the ASR task comes from the DCASE 2017 acoustic scene dataset while for the AED task it comes from the DCASE 2017 sound event dataset. The evaluation data comes from their respective predefined evaluation datasets. The evaluation metric is not simply accuracy which was the case in the previous work but Unweighted Average Recall TODO: Reference.\\
+
+Again, a number of lessons have been made from recreating this set-up:
+
+\begin{itemize}
+	\item This work has two predefined test sets, yet only one is used for evaluation as the focus is only one of the two tasks. Developers need to simply be able to control what goes in the training set and the test set separately, so training and evaluation can happen independently. On the same note, the framework should not only be made for combined datasets but be as receptive for single datasets.
+	\item ASR and AED function differently. ASR is a task where one singular label is predicted for a whole sound file. AED detects whether or not a sound event is present at every time frame within a sound file. Multiple sound events - and thus multiple labels - can be given to a single feature matrix. These are respectively called multi-class tasks and multi-label tasks and the system thus needs the ability to combine both. They (often) require different loss calculation methods (in this case categorical cross entropy and binary cross entropy respectively), which thus should be decided in the system depending on the type of task. Following that the developer only should focus on one part of the pipeline at a time, the developer should be able to define the handling of the task when the task is defined (in other words in the Task object).
+	\item Alongside handling the model output depending on the task definition, the model output head for each task itself should be adaptable on its definition. Multi-class tasks need only one output, which in this case is achieved by a SoftMax layer. Multi-label  tasks need multiple output labels which happens here through a sigmoid layer defining the activation value for each label. The dynamic output of models is important when different task combinations are made for the same system.
+	\item There are numerous ways to evaluate the output of the system. Standard evaluation metrics should automatically be readily available, but the developer needs to be able to define their own required implementations easily. 
+	\item The DCASE audio files are not mono audio files but stereo. This means that there are two time series in parallel for which individual feature matrices have to be made and appended. It's also possibly desired that the audio files are converted to mono files.
+\end{itemize}
+
+TODO: Model instantiation and explain \\
+
+{\large \textbf{Finding the best }}\\
+
+
+
+
+
+
+
+Explain further extensions
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Easy changeable variables}
 

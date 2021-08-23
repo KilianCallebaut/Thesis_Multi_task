@@ -21,20 +21,6 @@ class ConcatTaskDataset(ConcatDataset):
             start_indexes += [start_indexes[t_id] + len(distinct_tasks[t_id].output_labels)]
 
         for d in range(len(datasets)):
-            # before = 0
-            # after = 0
-            # if d > 0:
-            #     for d_id in range(d):
-            #         all_tasks = datasets[d_id].get_all_tasks()
-            #         for t_id in range(len(all_tasks)):
-            #             before += len(all_tasks[t_id].output_labels)
-            # if d < len(datasets) - 1:
-            #     for d_id in range(d + 1, len(datasets)):
-            #         all_tasks = datasets[d_id].get_all_tasks()
-            #         for t_id in range(len(all_tasks)):
-            #             after += len(all_tasks[t_id].output_labels)
-            # datasets[d].pad_targets(before, after)
-
             start_index_list = [start_indexes[distinct_tasks.index(t)] for
                                 t in datasets[d].get_all_tasks()]
             stop_index_list = [start_indexes[distinct_tasks.index(t)+1] for t in datasets[d].get_all_tasks()]
@@ -43,7 +29,6 @@ class ConcatTaskDataset(ConcatDataset):
             for t in datasets[d].extra_tasks:
                 t[0].set_task_group(distinct_tasks.index(t))
         super().__init__(datasets)
-        self.datasets = datasets
 
     def get_task_list(self) -> List[Task]:
         return self.__get_distinct_tasks__(self.datasets)
@@ -75,18 +60,4 @@ class ConcatTaskDataset(ConcatDataset):
             task_padding = [False for _ in range(before)] + [True for _ in all_tasks[t_id].output_labels] + \
                            [False for _ in range(after)]
             target_flags.append(task_padding)
-
-        # for d in self.datasets:
-        #     all_tasks = d.get_all_tasks()
-        #     for t_id in range(len(all_tasks)):
-        #         before = 0
-        #         after = 0
-        #         if t_id > 0:
-        #             before = sum([len(all_tasks[i].output_labels) for i in range(t_id)])
-        #         if t_id < len(all_tasks) - 1:
-        #             after = sum([len(all_tasks[i].output_labels) for i in range(t_id + 1, len(all_tasks))])
-        #         task_padding = [False for _ in d.pad_before] + [False for _ in range(before)] + \
-        #                        [True for _ in all_tasks[t_id].output_labels] + [False for _ in range(after)] + \
-        #                        [False for _ in d.pad_after]
-        #         target_flags.append(task_padding)
         return target_flags

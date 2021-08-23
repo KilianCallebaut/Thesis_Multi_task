@@ -15,7 +15,12 @@ from Training.TrainingUtils import TrainingUtils
 class Training:
 
     @staticmethod
-    def create_results(modelname, task_list, num_epochs, model_checkpoints_path=None, fold=None, **kwargs):
+    def create_results(modelname,
+                       task_list,
+                       num_epochs,
+                       results_path=None,
+                       fold=None,
+                       **kwargs):
         # run_name creation
         run_name = "Result_" + str(
             datetime.datetime.now().strftime("%d_%m_%Y_%H_%M_%S")) + "_" + modelname
@@ -23,10 +28,13 @@ class Training:
             run_name += "_" + n.name
         if fold:
             run_name += "_fold_{}".format(fold)
-        results = Results(model_checkpoints_path=model_checkpoints_path,
-                          run_name=run_name, num_epochs=num_epochs,
-                          task_list=task_list, **kwargs)
+        results = Results(results_path=results_path,
+                          run_name=run_name,
+                          num_epochs=num_epochs,
+                          task_list=task_list,
+                          **kwargs)
         return results
+
 
     # Source: https://www.cs.toronto.edu/~lczhang/321/tut/tut04.pdf
     # Also helpful: https://github.com/sugi-chan/pytorch_multitask/blob/master/pytorch%20multi-task-Copy2.ipynb
@@ -43,7 +51,8 @@ class Training:
                              optimizer=None,
                              train_loader=None,
                              device=None,
-                             training_utils=None):
+                             training_utils=None,
+                             **kwargs):
         task_list = concat_dataset.get_task_list()
         n_tasks = len(task_list)
 
@@ -139,6 +148,7 @@ class Training:
                 # training step
                 loss = training_utils.combine_loss(losses_batch)
 
+                # update
                 loss.backward()
                 optimizer.step()
 
@@ -152,6 +162,7 @@ class Training:
                 step += 1
                 torch.cuda.empty_cache()
 
+            training_utils.extra_operation(**kwargs)
             results.add_epoch_metrics(epoch, step, True)
             results.add_model_parameters(epoch, model)
 
@@ -170,8 +181,6 @@ class Training:
                 break
         print('Training Done')
 
-        results.write_loss_curve_tasks()
-        results.write_loss_curves()
         results.flush_writer()
         print('Wrote Training Results')
 
@@ -291,7 +300,7 @@ class Training:
 
                 training_results.add_epoch_metrics(epoch, step, False)
 
-        training_results.write_loss_curve_tasks()
-        training_results.write_loss_curves()
         training_results.flush_writer()
         print('Wrote Evaluation Results')
+
+        return training_results

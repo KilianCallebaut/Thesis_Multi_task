@@ -1,45 +1,50 @@
 from abc import abstractmethod, ABC
-from typing import List
+from typing import Tuple
 
 import librosa
 import librosa.display
 import numpy as np
 import soundfile
-import torch
 from scipy import signal
 
-from DataReaders.ExtractionMethod import extract_options, ExtractionMethod
+from DataReaders.ExtractionMethod import ExtractionMethod
 from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 
 
 class DataReader(ABC):
     extractor = None
 
-    def __init__(self, extraction_method: ExtractionMethod, preparation_params: dict = None,
-                 extraction_params: dict = None, object_path: str = None,
-                 index_mode: bool = False, **kwargs):
+    def __init__(self,
+                 object_path: str = None,
+                 index_mode: bool = False,
+                 **kwargs):
         if object_path:
             self.object_path = object_path
 
         self.index_mode = index_mode
 
-        if isinstance(extraction_method, str):
-            self.extraction_method = extract_options[extraction_method](preparation_params, extraction_params)
-        else:
-            self.extraction_method = extraction_method
-
-    def return_taskDataset(self) -> HoldTaskDataset:
+    def return_taskDataset(self,
+                           extraction_method: ExtractionMethod,
+                           **preprocess_parameters) -> HoldTaskDataset:
         """
         Either reads or calculates the HoldTaskDataset object from the dataset
+        :param extraction_method: The extraction method object to extract the inputs with
+        :param preprocess_parameters: The preprocessing parameters see preprocess_signal
         :return: HoldTaskDataset: The standardized object
         """
-        if self.check_files():
+
+        taskDataset = self.__create_taskDataset__(extraction_method)
+        if self.check_files(extraction_method):
             print('reading')
-            taskDataset = self.read_files()
+            self.read_files(taskDataset)
         else:
             print('calculating')
             self.load_files()
-            taskDataset = self.calculate_taskDataset(**kwargs)
+            self.calculate_input(taskDataset=taskDataset,
+                                 preprocess_parameters=preprocess_parameters)
+
+            self.calculate_taskDataset(taskDataset)
+            taskDataset.validate()
             self.write_files(taskDataset)
         return taskDataset
 
@@ -55,30 +60,51 @@ class DataReader(ABC):
 
     @abstractmethod
     def load_files(self):
+        """
+        Load in the required files from the dataset to later extract the input and targets from
+        """
         pass
 
     @abstractmethod
-    def calculate_input(self, files, resample_to=None) -> List[torch.tensor]:
+    def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict):
+        """
+        Extract and add the input tensors to the taskDataset object using add_input for complete tensors,
+        extract_and_add_input for extracting and adding feature matrices using the extraction_method object.
+
+        If a predefined test set needs to be added, utilize the same methods on the taskDataset.test_set
+        to fill the dataset with inputs
+
+        :param taskDataset: The standardized HoldTaskDataset object to fill
+        :param preprocess_parameters:
+        Preprocessing parameters if utilising the preprocess_signal method on the time series, see preprocess_signal
+        """
         pass
 
     @abstractmethod
-    def calculate_taskDataset(self, **kwargs) -> HoldTaskDataset:
+    def calculate_taskDataset(self,
+                              taskDataset: HoldTaskDataset,
+                              **kwargs):
+        """
+        Fill the rest of the TaskDataset inputs with targets, tasks and possible groupings.
+        :param taskDataset: The standardized HoldTaskDataset object to fill
+        :param kwargs: Any additional parameters that the function needs
+        """
         pass
 
-    def __create_taskDataset__(self) -> HoldTaskDataset:
+    def __create_taskDataset__(self, extraction_method: ExtractionMethod) -> HoldTaskDataset:
         assert 'base_path' in self.get_base_path() or (
                 'training_base_path' in self.get_base_path() and 'testing_base_path' in self.get_base_path()), 'base_path or training_base_path and testing_base_path keys required'
-        return HoldTaskDataset(extraction_method=self.extraction_method,
+        return HoldTaskDataset(extraction_method=extraction_method,
                                index_mode=self.index_mode,
                                **self.get_base_path())
 
-    def check_files(self):
-        HoldTaskDataset.check(extraction_method=self.extraction_method, **self.get_base_path())
+    def check_files(self, extraction_method):
+        HoldTaskDataset.check(extraction_method=extraction_method,
+                              index_mode=self.index_mode,
+                              **self.get_base_path())
 
-    def read_files(self) -> HoldTaskDataset:
-        taskDataset = self.__create_taskDataset__()
+    def read_files(self, taskDataset: HoldTaskDataset):
         taskDataset.load()
-        return taskDataset
 
     def write_files(self, taskDataset: HoldTaskDataset):
         taskDataset.save()
@@ -87,13 +113,23 @@ class DataReader(ABC):
         secs = len(sig) / sample_rate
         return signal.resample(sig, int(secs * resample_to)), resample_to
 
-    def load_wav(self, loc, resample_to=None):
+    def preprocess_signal(self,
+                          sig_samplerate: Tuple[np.ndarray, int],
+                          resample_to: int = None,
+                          mono: bool = False) -> Tuple[np.ndarray, int]:
+        if sig_samplerate[0].dtype != np.dtype('float32'):
+            sig_samplerate = (sig_samplerate[0].astype('float32'), sig_samplerate[1])
+
+        if len(sig_samplerate[0].shape) > 1 and mono:
+            sig_samplerate = (np.mean(sig_samplerate[0], axis=1), sig_samplerate[1])
+
+        if resample_to is not None:
+            sig_samplerate = (librosa.core.resample(sig_samplerate[0], sig_samplerate[1], resample_to), resample_to)
+        return sig_samplerate
+
+    def load_wav(self, loc) -> Tuple[np.ndarray, int]:
         sig, fs = soundfile.read(loc)
-        if len(sig.shape) > 1:
-            sig = np.mean(sig, axis=1)
+
         if sig.shape[0] == 0:
             return None
-        if resample_to is not None and resample_to != fs:
-            librosa.core.resample(sig, fs, resample_to)
-
         return sig, fs

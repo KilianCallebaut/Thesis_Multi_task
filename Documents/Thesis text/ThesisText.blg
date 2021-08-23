@@ -21,47 +21,51 @@ Repeated entry---line 627 of file references.bib
  : @inproceedings{sakti2016deep
  :                             ,
 I'm skipping whatever remains of this entry
+Repeated entry---line 766 of file references.bib
+ : @article{roberts1996evolving
+ :                             ,
+I'm skipping whatever remains of this entry
 Warning--empty journal in boregowda2018environmental
 Warning--empty journal in georgiev2017heterogeneous
-You've used 11 entries,
+You've used 13 entries,
             2773 wiz_defined-function locations,
-            657 strings with 7170 characters,
-and the built_in function-call counts, 6224 in all, are:
-= -- 557
-> -- 386
-< -- 8
-+ -- 131
-- -- 120
-* -- 502
-:= -- 929
-add.period$ -- 36
-call.type$ -- 11
-change.case$ -- 72
-chr.to.int$ -- 11
-cite$ -- 24
-duplicate$ -- 282
-empty$ -- 484
-format.name$ -- 131
-if$ -- 1326
+            668 strings with 7776 characters,
+and the built_in function-call counts, 7387 in all, are:
+= -- 659
+> -- 464
+< -- 9
++ -- 157
+- -- 144
+* -- 603
+:= -- 1101
+add.period$ -- 42
+call.type$ -- 13
+change.case$ -- 86
+chr.to.int$ -- 13
+cite$ -- 28
+duplicate$ -- 334
+empty$ -- 573
+format.name$ -- 157
+if$ -- 1573
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 11
-newline$ -- 63
-num.names$ -- 44
-pop$ -- 158
+missing$ -- 13
+newline$ -- 73
+num.names$ -- 52
+pop$ -- 187
 preamble$ -- 1
-purify$ -- 61
+purify$ -- 73
 quote$ -- 0
-skip$ -- 226
+skip$ -- 268
 stack$ -- 0
-substring$ -- 260
-swap$ -- 55
-text.length$ -- 5
+substring$ -- 304
+swap$ -- 65
+text.length$ -- 6
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 121
+type$ -- 143
 warning$ -- 2
-while$ -- 56
+while$ -- 67
 width$ -- 0
-write$ -- 149
-(There were 4 error messages)
+write$ -- 175
+(There were 5 error messages)

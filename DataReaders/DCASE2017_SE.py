@@ -2,12 +2,9 @@ import os
 
 import joblib
 from dcase_util.datasets import TUTSoundEvents_2017_DevelopmentSet
-from sklearn.model_selection import train_test_split
 
 from DataReaders.DataReader import DataReader
-from DataReaders.ExtractionMethod import extract_options
-from Tasks.Task import MultiClassTask, MultiLabelTask
-from Tasks.TaskDataset import TaskDataset
+from Tasks.Task import MultiLabelTask
 from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 
 
@@ -15,9 +12,9 @@ class DCASE2017_SE(DataReader):
     object_path = r"C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\DCASE2017_SE_{}"
     wav_folder = 'F:\\Thesis_Datasets\\DCASE2017\\TUT-sound-events-2017-development\\audio\\'
 
-    def __init__(self, extraction_method, **kwargs):
+    def __init__(self, **kwargs):
         print('start DCASE2017 SE')
-        super().__init__(extraction_method, **kwargs)
+        super().__init__(**kwargs)
         print('done DCASE2017 SE')
 
     def get_path(self):
@@ -26,9 +23,19 @@ class DCASE2017_SE(DataReader):
     def get_base_path(self):
         return dict(base_path=self.object_path.format('train'))
 
-    def check_files(self):
-        return super().check_files() and \
+    def check_files(self, extraction_method):
+        return super().check_files(extraction_method) and \
                os.path.isfile(self.get_path())
+
+    def read_files(self, taskDataset: HoldTaskDataset):
+        info = joblib.load(self.get_path())
+        self.audio_files = info['audio_files']
+        super().read_files(taskDataset)
+
+    def write_files(self, taskDataset):
+        super().write_files(taskDataset)
+        dict = {'audio_files': self.audio_files}
+        joblib.dump(dict, self.get_path())
 
     def load_files(self):
         self.devdataset = TUTSoundEvents_2017_DevelopmentSet(
@@ -49,34 +56,20 @@ class DCASE2017_SE(DataReader):
 
         self.audio_files = self.devdataset.audio_files
 
-    def read_files(self) -> HoldTaskDataset:
-        info = joblib.load(self.get_path())
-        self.audio_files = info['audio_files']
-        return super().read_files()
-
-    def write_files(self, taskDataset):
-        super().write_files(taskDataset)
-        dict = {'audio_files': self.audio_files}
-        joblib.dump(dict, self.get_path())
-
-    def calculate_input(self, files, resample_to=None):
-        inputs = self.calculate_features(files, resample_to)
+    def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict):
         print("Calculating input done")
-        return inputs
-
-    def calculate_features(self, files, resample_to):
-        inputs = []
         perc = 0
-        for audio_idx in range(len(files)):
-            read_wav = self.load_wav(files[audio_idx], resample_to)
-            inputs.append(self.extraction_method.extract_features(read_wav))
-            if perc < (audio_idx / len(files)) * 100:
+        for audio_idx in range(len(self.audio_files)):
+            read_wav = self.preprocess_signal(self.load_wav(self.audio_files[audio_idx]), **preprocess_parameters)
+            taskDataset.extract_and_add_input(read_wav)
+            if perc < (audio_idx / len(self.audio_files)) * 100:
                 print("Percentage done: {}".format(perc))
                 perc += 1
         print("Calculating input done")
-        return inputs
 
-    def calculate_taskDataset(self, **kwargs) -> HoldTaskDataset:
+    def calculate_taskDataset(self,
+                              taskDataset: HoldTaskDataset,
+                              **kwargs):
         distinct_labels = self.devdataset.scene_labels()
         targets = []
 
@@ -85,17 +78,10 @@ class DCASE2017_SE(DataReader):
             annotations = self.devdataset.meta.filter(self.audio_files[file_id])
             target = annotations.to_event_roll(label_list=self.devdataset.event_labels(),
                                                time_resolution=1)
-
             targets.append(target)
-
             print(file_id / len(self.audio_files))
 
-        inputs = self.calculate_input(**kwargs)
-
-        taskDataset = self.__create_taskDataset__()
-        taskDataset.initialize(inputs=inputs,
-                               targets=targets,
-                               task=MultiLabelTask(name='DCASE2017_SE', output_labels=distinct_labels),
-                               )
-        taskDataset.prepare_inputs()
-        return taskDataset
+        taskDataset.add_task_and_targets(
+            targets=targets,
+            task=MultiLabelTask(name='DCASE2017_SE', output_labels=distinct_labels)
+        )

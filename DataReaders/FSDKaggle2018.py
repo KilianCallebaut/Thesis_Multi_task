@@ -1,8 +1,6 @@
 import os
-from typing import List
 
 import pandas as pd
-import torch
 from numpy import long
 
 from DataReaders.DataReader import DataReader
@@ -16,9 +14,9 @@ class FSDKaggle2018(DataReader):
     root = r"F:\Thesis_Datasets\FSDKaggle2018\freesound-audio-tagging"
     audio_folder = r"audio_train"
 
-    def __init__(self, extraction_method, **kwargs):
+    def __init__(self, **kwargs):
         print('start FSDKaggle 2018')
-        super().__init__(extraction_method, **kwargs)
+        super().__init__(**kwargs)
         print('done FSDKaggle 2018')
 
     def get_path(self):
@@ -28,30 +26,39 @@ class FSDKaggle2018(DataReader):
         return os.path.join(self.get_base_path()['testing_base_path'], 'FSDKaggle2018.obj')
 
     def get_base_path(self):
-        return dict(training_base_path=self.object_path.format('train'),
+        return dict(base_path=self.object_path.format('train'),
                     testing_base_path=self.object_path.format('eval'))
 
     def load_files(self):
         self.file_labels = pd.read_csv(os.path.join(self.root, 'train.csv'))
         self.file_labels_val = pd.read_csv(os.path.join(self.root, 'test_post_competition.csv'))
 
-    def calculate_input(self, files, resample_to=None) -> List[torch.tensor]:
-        inputs = []
+    def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict):
         perc = 0
+        files = [os.path.join(self.root, self.audio_folder, name) for name in self.file_labels['fname']]
 
         for audio_idx in range(len(files)):
             path = files[audio_idx]
-            read_wav = self.load_wav(path, resample_to)
-            if not read_wav:
-                inputs.append(torch.tensor([]))
-                continue
-            inputs.append(self.extraction_method.extract_features(read_wav))
+            read_wav = self.preprocess_signal(self.load_wav(path), **preprocess_parameters)
+            taskDataset.add_input(read_wav)
+
             if perc < (audio_idx / len(self.file_labels)) * 100:
                 print("Percentage done: {}".format(perc))
                 perc += 1
-        return inputs
 
-    def calculate_taskDataset(self, **kwargs) -> HoldTaskDataset:
+        files = [os.path.join(self.root, 'audio_test', name) for name in self.file_labels_val['fname']]
+        for audio_idx in range(len(files)):
+            path = files[audio_idx]
+            read_wav = self.preprocess_signal(self.load_wav(path), **preprocess_parameters)
+            taskDataset.test_set.add_input(read_wav)
+
+            if perc < (audio_idx / len(self.file_labels)) * 100:
+                print("Percentage done: {}".format(perc))
+                perc += 1
+
+    def calculate_taskDataset(self,
+                              taskDataset: HoldTaskDataset,
+                              **kwargs):
         distinct_labels = self.file_labels.label.unique()
         distinct_labels.sort()
         targets = []
@@ -63,28 +70,8 @@ class FSDKaggle2018(DataReader):
             target = [long(distinct_labels[label_id] == f) for label_id in range(len(distinct_labels))]
             targets_val.append(target)
 
-        inputs = self.calculate_input(
-            files=[os.path.join(self.root, self.audio_folder, name) for name in self.file_labels['fname']], **kwargs)
-        inputs_val = self.calculate_input(
-            files=[os.path.join(self.root, 'audio_test', name) for name in self.file_labels_val['fname']], **kwargs)
-
-        for i_id in range(len(inputs)):
-            if len(inputs[i_id]) == 0:
-                inputs.remove(inputs[i_id])
-                targets.remove(targets[i_id])
-        for i_id in range(len(inputs_val)):
-            if len(inputs_val[i_id]) == 0:
-                inputs_val.remove(inputs_val[i_id])
-                targets_val.remove(targets_val[i_id])
-        taskDataset = self.__create_taskDataset__()
-        taskDataset.initialize_train_test(
-            task=MultiClassTask(
-                name='FSDKaggle2018',
-                output_labels=distinct_labels),
-            training_inputs=inputs,
-            training_targets=targets,
-            testing_inputs=inputs_val,
-            testing_targets=targets_val
-        )
-        # taskDataset.prepare_inputs()
-        return taskDataset
+        task = MultiClassTask(
+            name='FSDKaggle2018',
+            output_labels=distinct_labels)
+        taskDataset.add_task_and_targets(task=task, targets=targets)
+        taskDataset.test_set.add_task_and_targets(task=task, targets=targets_val)

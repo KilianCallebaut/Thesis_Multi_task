@@ -31,7 +31,7 @@ class Task(ABC):
         return False
 
     @abstractmethod
-    def decision_making(self, output):
+    def decision_making(self, output) -> torch.tensor:
         # if self.classification_type == 'multi-class':
         #     return default_max_multi_class(output)
         # elif self.classification_type == 'multi-label':
@@ -39,7 +39,7 @@ class Task(ABC):
         pass
 
     @abstractmethod
-    def translate_labels(self, output):
+    def translate_labels(self, output) -> torch.tensor:
         # if self.classification_type == 'multi-class':
         #     return torch.max(output, 1)[1]
         # else:

@@ -1,22 +1,14 @@
 import os
 from datetime import timedelta
 from timeit import default_timer as timer
-from typing import List
 
 import joblib
 import numpy as np
-import torch
 
 from Tasks.Task import MultiLabelTask
 from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 
-try:
-    import cPickle
-except BaseException:
-    import _pickle as cPickle
-
 from DataReaders.DataReader import DataReader
-from Tasks.TaskDataset import TaskDataset
 
 
 class ChenAudiosetDataset(DataReader):
@@ -45,9 +37,9 @@ class ChenAudiosetDataset(DataReader):
 
     target_list = []
 
-    def __init__(self, extraction_method, **kwargs):
+    def __init__(self, **kwargs):
         print('start chen')
-        super().__init__(extraction_method, **kwargs)
+        super().__init__(**kwargs)
         print('done chen')
 
     def get_path(self):
@@ -56,12 +48,9 @@ class ChenAudiosetDataset(DataReader):
     def get_base_path(self):
         return dict(base_path=self.object_path)
 
-    def check_files(self):
-        return super().check_files() and \
+    def check_files(self, extraction_method):
+        return super().check_files(extraction_method) and \
                os.path.isfile(self.get_path())
-
-    def read_files(self) -> HoldTaskDataset:
-        return super().read_files()
 
     def load_files(self):
         if os.path.isfile(self.get_path()):
@@ -115,34 +104,30 @@ class ChenAudiosetDataset(DataReader):
         self.np_objects = np_objects
         self.wav_files = wav_files
 
-    def calculate_taskDataset(self, **kwargs) -> HoldTaskDataset:
+    def calculate_taskDataset(self, taskDataset: HoldTaskDataset, **kwargs):
         print('Calculating input')
-        inputs = self.calculate_input(self.wav_files, **kwargs)
+        # inputs = self.calculate_input(self.wav_files, **kwargs)
         print('Input calculated')
 
         targets, distinct_targets = self.calculate_targets()
 
         name = "chen_audioset"
-        taskDataset = self.__create_taskDataset__()
-        taskDataset.initialize(inputs=inputs, targets=targets,
-                               task=MultiLabelTask(name=name, output_labels=distinct_targets),
-                               grouping=[fold for fold in range(len(self.wav_files)) for _ in
-                                         self.wav_files[fold]])
-        taskDataset.prepare_inputs()
-        return taskDataset
+        taskDataset.add_task_and_targets(targets=targets,
+                                         task=MultiLabelTask(name=name,
+                                                             output_labels=distinct_targets))
+        taskDataset.add_grouping(grouping=[fold for fold in range(len(self.wav_files)) for _ in
+                                           self.wav_files[fold]])
 
-    def calculate_input(self, files, resample_to=None) -> List[torch.tensor]:
-        inputs = []
-
+    def calculate_input(self,
+                        taskDataset: HoldTaskDataset,
+                        preprocess_parameters: dict):
         i = 0
-        for folder in files:
+        for folder in self.wav_files:
             for file in folder:
-                read_wav = self.load_wav(file, resample_to)
-                inputs.append(self.extraction_method.extract_features(read_wav))
+                read_wav = self.preprocess_signal(self.load_wav(file), **preprocess_parameters)
+                taskDataset.extract_and_add_input(read_wav)
             i += 1
             print('Percentage done: {}'.format(i / len(self.wav_files)), end='\r')
-
-        return inputs
 
     def calculate_targets(self):
         targets = [[l[2] for l in x['labels']] for f in

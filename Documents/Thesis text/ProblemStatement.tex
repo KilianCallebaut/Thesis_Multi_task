@@ -83,10 +83,11 @@ As a basis for developing the framework, following the example set in a differen
 From the observations made in the previous sections, a number of non-functional requirements have been drawn up. These requirements are goals for the design of the software framework. The requirements are as follows:
 
 \begin{itemize}
-	\item \textbf{Modular:} The framework aims to provide a helpful tool to build deep learning multi-task pipelines, for which the individual parts of the pipeline are likely to be tinkered with in order to develop optimal solutions.. The different components should be modifiable and be interchangeable independently from the rest of the components. 
+	\item \textbf{Modular:} The framework aims to provide a helpful tool to build deep learning multi-task pipelines, for which the individual parts of the pipeline are likely to be tinkered with in order to develop optimal solutions. The different components should be modifiable and be interchangeable independently from the rest of the components. A developer should only have to worry about one part of the pipeline at a time, without having to worry about disruptions further down.
 	\item \textbf{Extendible:} The framework should provide open hooks for features and functionalities that likely require change. 
 	\item \textbf{Fast prototyping:} Developers using the framework should be met with an environment that provides them with the tools necessary to develop their own multi task pipelines fast.
-	\item \textbf{Comprehensible:} New developers using the framework should get a clear development structure and guiding through examples, warnings and hints.
+	\item \textbf{Cutting Double Work:} Anticipate that multi-task models will be designed through iterated variations and that the system can be run with largely the same variables without having to recalculate the same things as before.
+	\item \textbf{Developmental Side-rails:} New developers using the framework should get a clear development structure and guiding through examples, warnings and hints.
 	\item \textbf{Robust:} The framework should be able to dynamically handle possible differences in input and desired pipeline functionalities.
 	\item \textbf{Portable:} The developed code should be transferable to different devices with possibly more constrained resources.
 \end{itemize}

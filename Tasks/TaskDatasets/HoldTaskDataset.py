@@ -4,15 +4,13 @@ from typing import List, Tuple
 import numpy as np
 import torch
 from sklearn.model_selection import GroupKFold, StratifiedKFold
-from sklearn.model_selection._split import _BaseKFold
+from sklearn.model_selection._split import _BaseKFold, BaseCrossValidator
 from sklearn.preprocessing import LabelEncoder
 from skmultilearn.model_selection import IterativeStratification
 
 from DataReaders.ExtractionMethod import ExtractionMethod
 from Tasks.Task import Task
 from Tasks.TaskDataset import TaskDataset
-from Tasks.TaskDatasets.TestTaskDataset import TestTaskDataset
-from Tasks.TaskDatasets.TrainTaskDataset import TrainTaskDataset
 
 
 class HoldTaskDataset(TaskDataset):
@@ -24,66 +22,53 @@ class HoldTaskDataset(TaskDataset):
                  extraction_method: ExtractionMethod,
                  base_path: str = '',
                  index_mode=False,
-                 training_base_path: str = None,
                  testing_base_path: str = None):
         super().__init__(extraction_method, base_path, index_mode)
-        assert (base_path or (training_base_path and testing_base_path),
-                'Either a base_path or a training_base_path and testing_base_path should be given')
-        self.training_set = TrainTaskDataset(
-            extraction_method=self.extraction_method,
-            base_path=training_base_path if training_base_path else os.path.join(self.base_path, 'train_set'),
-            index_mode=self.index_mode
-        )
-        self.test_set = TestTaskDataset(
+        assert (base_path,
+                'A base_path should be given')
+
+        self.test_set = TaskDataset(
             extraction_method=self.extraction_method,
             base_path=testing_base_path if testing_base_path else os.path.join(self.base_path, 'test_set'),
             index_mode=self.index_mode
         )
 
-
-    def check_train_test_present(self):
-        """
-        Checks if this HoldTaskDataset has predefined train/test split
-        :return: Bool
-        """
-        return len(self.training_set.inputs) > 0 and len(self.test_set.inputs) > 0
+        self.test_indexes = []
 
     ########################################################################################################
-    # Setters
+    # Initialization
     ########################################################################################################
 
-    def initialize_train_test(self, task: Task, training_inputs: List[torch.tensor], training_targets: List[List],
-                              testing_inputs: List[torch.tensor], testing_targets: List[List],
-                              training_grouping: List[int] = None, training_extra_tasks: List[Tuple[Task, List]] = None,
-                              testing_grouping: List[int] = None, testing_extra_tasks: List[Tuple[Task, List]] = None):
-        """
-        Inserts the data for a dataset with predefined train/test splits
-        :param task: The task object for the dataset
-        :param training_inputs:  The list of input tensors for training
-        :param training_targets: The list of targets for training
-        :param testing_inputs: The list of input tensors for testing
-        :param testing_targets: The list of targets for testing
-        :param training_grouping: The grouping list defining which instances belong together for training
-        :param training_extra_tasks: The list of extra task/target tuples for training
-        :param testing_grouping: The grouping list defining which instances belong together for testing
-        :param testing_extra_tasks: The list of extra task/target tuples for testing
-        :return:
-        """
-        self.training_set.initialize(inputs=training_inputs, targets=training_targets, task=task,
-                                     grouping=training_grouping, extra_tasks=training_extra_tasks)
-        self.test_set.initialize(inputs=testing_inputs, targets=testing_targets, task=task,
-                                 grouping=testing_grouping,
-                                 extra_tasks=testing_extra_tasks)
-        self.initialize(inputs=[],
-                        targets=[],
-                        task=task,
-                        grouping=[],
-                        extra_tasks=[])
+    # def add_test_input(self, sig_samplerate: Tuple[np.ndarray, int]):
+    #     """
+    #     Adds an input tensor to the testdataset
+    #     :param sig_samplerate: The tuple with the signal object and the samplerate
+    #     """
+    #     self.test_indexes.append(len(self.test_indexes))
+    #     self.test_set.add_input(sig_samplerate)
+    #
+    # def add_test_task_and_targets(self, task: Task, targets: List[List[int]]):
+    #     """
+    #     Adds a task object with a list of targets to the dataset.
+    #     The targets should be in the same order as their corresponding inputs.
+    #     :param task: The task object to add
+    #     :param targets: The list of target vectors to add
+    #     """
+    #     assert task in self.get_all_tasks(), 'The task must already be in the dataset'
+    #     self.test_set.add_task_and_targets(task, targets)
+    #
+    # def add_test_grouping(self, grouping: List[int]):
+    #     """
+    #     Adds the grouping list to the test set.
+    #     The groupings should be in the same order as their corresponding inputs
+    #     :param grouping: optional Grouping list for defining which data cannot be split up in k folds (see sklearn.model_selection.GroupKfold)
+    #     """
+    #     self.test_set.add_grouping(grouping=[g + max(self.grouping) for g in grouping])
 
     ########################################################################################################
     # Splitters
     ########################################################################################################
-    def k_folds(self, random_state: int =None, n_splits: int =5, kf: _BaseKFold = None):
+    def k_folds(self, random_state: int = None, n_splits: int = 5, kf: BaseCrossValidator = None):
         """
         Produces a k_fold training/test split generator, depending on the task type
 
@@ -171,30 +156,47 @@ class HoldTaskDataset(TaskDataset):
         :param test_index: indexes of the test set
         :return: the taskdataset for the training and test data
         """
+        self.return_data()
 
-        # if self.check_train_test_present():
-        #     self.return_data()
+        self.test_indexes = test_index
 
-        x_train = [self.inputs[i] for i in train_index]
-        y_train = [self.targets[i] for i in train_index]
-        grouping_train = [self.grouping[i] for i in train_index] if self.grouping else None
-        extra_tasks_train = [(t[0], [t[1][i] for i in train_index]) for t in
-                             self.extra_tasks] if self.extra_tasks else None
+        self.distribute_data()
+        # self.test_set.inputs = [self.inputs[i] for i in test_index]
+        # self.test_set.targets = [self.targets[i] for i in test_index]
+        # self.test_set.grouping = [self.grouping[i] for i in test_index] if self.grouping else None
+        # self.test_set.extra_tasks = [(t[0], [t[1][i] for i in test_index]) for t in
+        #                              self.extra_tasks] if self.extra_tasks else None
+        #
+        # self.inputs = [self.inputs[i] for i in train_index]
+        # self.targets = [self.targets[i] for i in train_index]
+        # self.grouping = [self.grouping[i] for i in train_index] if self.grouping else None
+        # self.extra_tasks = [(t[0], [t[1][i] for i in train_index]) for t in
+        #                     self.extra_tasks] if self.extra_tasks else None
 
-        x_val = [self.inputs[i] for i in test_index]
-        y_val = [self.targets[i] for i in test_index]
-        grouping_val = [self.grouping[i] for i in test_index] if self.grouping else None
-        extra_tasks_val = [(t[0], [t[1][i] for i in test_index]) for t in
-                           self.extra_tasks] if self.extra_tasks else None
+    def return_data(self):
+        """
+        Returns the test set data to the main object
+        """
+        self.test_indexes.sort()
+        for i in range(len(self.test_indexes)):
+            self.inputs.insert(self.test_indexes[i], self.test_set.inputs[i])
+            self.targets.insert(self.test_indexes[i], self.test_set.targets[i])
+            self.grouping.insert(self.test_indexes[i], self.test_set.grouping[i])
+            for t in self.extra_tasks:
+                t[1].insert(self.test_indexes[i], self.test_set.extra_tasks[1][i])
 
-        self.training_set.initialize(inputs=x_train, targets=y_train,
-                                     task=self.task, grouping=grouping_train,
-                                     extra_tasks=extra_tasks_train)
-        self.test_set.initialize(inputs=x_val, targets=y_val,
-                                 task=self.task, grouping=grouping_val,
-                                 extra_tasks=extra_tasks_val)
+    def distribute_data(self):
+        """
+        Distributes the data over the test set according to the saved test_indexes
+        """
+        self.test_indexes.sort(reverse=True)
+        self.test_set.inputs = [self.inputs.pop(i) for i in self.test_indexes]
+        self.test_set.targets = [self.targets.pop(i) for i in self.test_indexes]
+        self.test_set.grouping = [self.grouping.pop(i) for i in self.test_indexes] if self.grouping else None
+        self.test_set.extra_tasks = [(t[0], [t[1].pop(i) for i in self.test_indexes]) for t in
+                                     self.extra_tasks] if self.extra_tasks else None
 
-    def generate_train_test_set(self, random_state: int = None, n_splits=5, kf: _BaseKFold = None):
+    def generate_train_test_set(self, random_state: int = None, n_splits=5, kf: BaseCrossValidator = None):
         """
         Generates and returns the train and test split
         :param random_state:
@@ -202,62 +204,81 @@ class HoldTaskDataset(TaskDataset):
         :param kf:
         :return:
         """
-        if self.check_train_test_present():
+        if self.test_indexes:
             for i in range(n_splits):
-                yield self.training_set, self.test_set
+                yield self, self.test_set
         else:
             for train, test in self.k_folds(random_state=random_state, n_splits=n_splits, kf=kf):
                 self.get_split_by_index(train_index=train, test_index=test)
-                yield self.training_set, self.test_set
+                yield self, self.test_set
 
     ########################################################################################################
     # Filtering
     ########################################################################################################
-
     def sample_labels(self, dic_of_labels_limits, random_state=None):
-        if self.check_train_test_present():
-            self.training_set.sample_labels(dic_of_labels_limits=dic_of_labels_limits, random_state=random_state)
-            self.test_set.sample_labels(dic_of_labels_limits=dic_of_labels_limits, random_state=random_state)
-        else:
-            super().sample_labels(dic_of_labels_limits=dic_of_labels_limits, random_state=random_state)
+        """
+
+        :param dic_of_labels_limits:
+        :param random_state:
+        :return:
+        """
+        self.return_data()
+        super().sample_labels(dic_of_labels_limits=dic_of_labels_limits,
+                              random_state=random_state)
+        self.test_indexes = [i for i in self.test_indexes if self.inputs[i] in self.inputs]
+        self.distribute_data()
 
     ########################################################################################################
     # Transformation
     ########################################################################################################
     def normalize_fit(self):
-        self.training_set.normalize_fit()
+        assert len(self.test_set) > 0, 'scaling calculation should only happen on the training set'
+        self.normalize_fit()
 
     def prepare_inputs(self):
-        if self.check_train_test_present():
-            self.training_set.prepare_inputs()
+        """
+        Applies preparation of the input instances defined in the extraction method
+        on each input instance in the TaskDataset.
+        """
+        super().prepare_inputs()
+        if self.test_set:
             self.test_set.prepare_inputs()
-        else:
-            super().prepare_inputs()
 
     ########################################################################################################
     # I/O
     ########################################################################################################
     def save(self):
-        if self.check_train_test_present():
-            self.training_set.save()
+        super().save()
+        if self.test_set:
             self.test_set.save()
-        else:
-            super().save()
 
     def load(self):
-        if os.path.isdir(self.training_set.base_path):
-            self.training_set.load()
+        super().load()
+        if self.test_set:
             self.test_set.load()
-        else:
-            super().load()
 
     @staticmethod
     def check(extraction_method: ExtractionMethod, base_path: str = None,
-              training_base_path: str = None, testing_base_path: str = None):
+              testing_base_path: str = None, index_mode: bool = False):
+        """
+        Checks if there are stored taskdatsets for this extraction method
+        :param extraction_method: The extraction method object under which name the data is saved
+        :param base_path: The path to the folder where the data is saved
+        :param testing_base_path: The path to the folder where the predefined testing data is saved
+        :param index_mode: Whether or not the data is stored in index_mode or not
+        :return: Whether or not there is stored data
+        """
+
         if base_path:
-            return super().check(base_path=base_path, extraction_method=extraction_method)
-        elif training_base_path and testing_base_path:
-            return super().check(base_path=training_base_path, extraction_method=extraction_method) and super().check(
-                base_path=testing_base_path, extraction_method=extraction_method)
+            TaskDataset.check(base_path=base_path,
+                              extraction_method=extraction_method,
+                              index_mode=index_mode)
+        elif testing_base_path:
+            return TaskDataset.check(base_path=base_path,
+                                     extraction_method=extraction_method,
+                                     index_mode=index_mode) \
+                   and TaskDataset.check(base_path=testing_base_path,
+                                         extraction_method=extraction_method,
+                                         index_mode=index_mode)
         else:
             raise ValueError('Either a base_path or the training_base_path and testing_base_path should be given')

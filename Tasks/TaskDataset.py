@@ -38,14 +38,9 @@ class TaskDataset(Dataset):
         """
         Initializes the Taskdataset object
 
-        :param inputs: list of tensors of size (n_samples, n_features)
-        :param targets: list of binary representing the targets
-        :param task: Task object containing the name, list of distinct output labels and possible additional parameters
         :param extraction_method: ExtractionMethod object, responsible for appropriate transformations and name of the data for saving and loading
         :param base_path: The path to the folder where the data should be saved
         :param index_mode: Boolean to switch on/off index mode
-        :param grouping: optional Grouping list for defining which data cannot be split up in k folds (see sklearn.model_selection.GroupKfold)
-        :param extra_tasks: List of Tuples (Task, targets) holding additional tasks on the same inputs
         """
         self.index_mode = index_mode
         self.extraction_method = extraction_method
@@ -59,53 +54,112 @@ class TaskDataset(Dataset):
 
         self.inputs = []
         self.targets = []
+        self.task = None
         self.grouping = []
         self.extra_tasks = []
 
-    ########################################################################################################
-    # Setters
-    ########################################################################################################
-    def initialize(self, inputs: List[torch.tensor], targets: List[List[int]], task: Task, grouping: List[int] = None,
-                   extra_tasks: List[Tuple[Task, List[List[int]]]] = None):
-        assert len(inputs) == len(targets), 'There must be as many inputs as there are targets'
-        if grouping:
-            assert len(grouping) == len(inputs), 'The grouping must contain as many elements as the inputs'
-        if extra_tasks:
-            for t in extra_tasks:
-                assert len(t[1]) == len(inputs), 'Task {} does not have as many targets as there are inputs'.format(
-                    t[0].name)
-        self.inputs = inputs  # List of tensors
-        self.targets = targets  # List of binary strings
-        self.task = task
-        self.grouping = grouping
-        self.extra_tasks = extra_tasks
-
-        for t in self.get_all_tasks():
-            self.start_index_list += [self.total_target_size]
-            self.total_target_size += len(t.output_labels)
-            self.stop_index_list += [self.total_target_size]
-
         if self.index_mode:
-            self.write_index_files()
-            self.to_index_mode()
+            self.switch_index_methods()
+        if not os.path.exists(self.base_path):
+            os.mkdir(self.base_path)
+
+    ########################################################################################################
+    # Initialization
+    ########################################################################################################
+
+    def add_input(self, input_tensor: torch.tensor):
+        """
+        Adds an input tensor to the dataset
+        :param input_tensor: The feature matrix to insert into the dataset
+        """
+        self.inputs.append(input_tensor)
+
+    def extract_and_add_input(self,
+                              sig_samplerate: Tuple[np.ndarray, int]):
+        """
+        Adds an input tensor to the dataset
+        :param sig_samplerate: The tuple with the signal object and the samplerate
+        """
+
+        if len(sig_samplerate[0].shape) > 1:
+            input_tensor = np.vstack(
+                [self.extraction_method.extract_features((sig_samplerate[0][i], sig_samplerate[1])) for i in
+                 range(sig_samplerate[0].shape[0])])
+        else:
+            input_tensor = self.extraction_method.extract_features(sig_samplerate)
+        self.add_input(input_tensor)
+
+    def add_task_and_targets(self, task: Task, targets: List[List[int]]):
+        """
+        Adds a task object with a list of targets to the dataset.
+        The targets should be in the same order as their corresponding inputs
+        :param task: The task object to add
+        :param targets: The list of target vectors to add
+        """
+        assert len(targets) == len(self.inputs), 'There must be as many targets as there are inputs'
+        for t in targets:
+            assert len(t) == len(targets[0]), 'Each target vector must have the same length'
+        if not self.targets:
+            self.targets = targets
+            self.task = task
+        else:
+            self.extra_tasks.append((task, targets))
+
+        self.start_index_list += [self.total_target_size]
+        self.total_target_size += len(task.output_labels)
+        self.stop_index_list += [self.total_target_size]
+
+    def add_grouping(self, grouping: List[int]):
+        """
+        Adds the grouping list.
+        The groupings should be in the same order as their corresponding inputs
+        :param grouping: optional Grouping list for defining which data cannot be split up in k folds (see sklearn.model_selection.GroupKfold)
+        """
+        assert len(grouping) == len(self.inputs), 'There must be as many elements in the grouping as there are inputs'
+        self.grouping = grouping
+
+    def validate(self):
+        """
+        Checks if the object is valid
+        :return: Bool
+        """
+        assert len(self.targets) == len(self.inputs), 'There must be as many targets as there are inputs'
+        for t in self.targets:
+            assert len(t) == len(self.targets[0]), 'Each target vector must have the same length'
+        for t_e in self.extra_tasks:
+            for t in t_e[1]:
+                assert len(t) == len(t_e[1][0]), 'Each target vector must have the same length'
+        if self.grouping:
+            assert len(self.grouping) == len(self.inputs), 'There must be as many elements in the grouping as there are inputs'
+
+        if self.inputs and self.targets and self.task:
+            return True
+        return False
 
     ########################################################################################################
     # Getters
     ########################################################################################################
 
     def __getitem__(self, index):
-        return self.extraction_method.scale_transform(self.get_input(index)), \
+        """
+        The getter method for returning inputs for the data loading of the training
+        :param index: The index of the data instance to get
+        :return: The feature matrix, the (combined) target vector and the task group
+        """
+        return self.get_input(index), \
                torch.from_numpy(self.get_all_targets(index)), \
                torch.tensor([t.task_group for t in self.get_all_tasks()])
 
     def get_input(self, index):
+        if self.flag_scaled:
+            return self.extraction_method.scale_transform(self.inputs[index].float())
         return self.inputs[index].float()
 
     def get_all_targets(self, index):
         targets = np.zeros(self.total_target_size, dtype=int)
         targets[self.start_index_list[0]:self.stop_index_list[0]] = self.targets[index]
         for i in range(len(self.extra_tasks)):
-            targets[self.start_index_list[i+1]:self.stop_index_list[i+1]] = self.extra_tasks[i][1][index]
+            targets[self.start_index_list[i + 1]:self.stop_index_list[i + 1]] = self.extra_tasks[i][1][index]
         return targets
 
     def get_all_tasks(self):
@@ -121,6 +175,12 @@ class TaskDataset(Dataset):
     # Combining
     ########################################################################################################
     def pad_targets(self, start_index_list: List[int], stop_index_list: List[int], total_size: int):
+        """
+        Store the necessary data to combine the targets from each tasks with others
+        :param start_index_list: List of starting indexes per task for the combined target vector
+        :param stop_index_list: List of ending indexes per task for the combined target vector
+        :param total_size: Total size of the combined target vector
+        """
         self.start_index_list = start_index_list
         self.stop_index_list = stop_index_list
         self.total_target_size = total_size
@@ -138,6 +198,7 @@ class TaskDataset(Dataset):
         sampled_targets = self.targets
         sampled_inputs = self.inputs
         sampled_grouping = self.grouping
+        sampled_extra_tasks = self.extra_tasks
         if random_state is not None:
             random.seed(random_state)
 
@@ -154,19 +215,45 @@ class TaskDataset(Dataset):
                 if self.grouping:
                     sampled_grouping = [sampled_grouping[i] for i in range(len(sampled_grouping)) if
                                         (i not in label_set or i in random_label_set)]
+                if self.extra_tasks:
+                    for t in sampled_extra_tasks:
+                        t[1] = [t[1][i] for i in range(len(t[1])) if
+                                (i not in label_set or i in random_label_set)]
         self.inputs = sampled_inputs
         self.targets = sampled_targets
         self.grouping = sampled_grouping
+        self.extra_tasks = sampled_extra_tasks
 
     ########################################################################################################
     # Transformation
     ########################################################################################################
 
+    def normalize_fit(self):
+        """
+        Calculates the necessary metrics on the datset to use later for scaling the inputs
+        """
+        self.extraction_method.scale_reset()
+        self.flag_scaled = False
+        for i in range(len(self.inputs)):
+            self.extraction_method.partial_scale_fit(self.get_input(i))
+
+        self.flag_scaled = True
+
     def prepare_fit(self):
+        """
+        Calculates the necessary metrics on the dataset to use later for preparation
+        """
+        self.extraction_method.prepare_reset()
+        self.prepared = False
         for i in range(len(self.inputs)):
             self.extraction_method.prepare_fit(self.get_input(i))
 
     def prepare_inputs(self):
+        """
+        Applies preparation of the input instances defined in the extraction method
+        on each input instance in the TaskDataset.
+        """
+        self.prepared = False
         if not self.grouping:
             self.grouping = [i for i in range(len(self.inputs))]
         for i in range(len(self.inputs)):
@@ -204,6 +291,7 @@ class TaskDataset(Dataset):
 
     def switch_index_methods(self):
         # replace getitem, get_split_by_index by index based functions
+        self.add_input = types.MethodType(add_input_index_mode, self)
         self.get_input = types.MethodType(get_input_index_mode, self)
         self.save = types.MethodType(save_index_mode, self)
         self.load = types.MethodType(load_index_mode, self)
@@ -218,32 +306,69 @@ class TaskDataset(Dataset):
     ########################################################################################################
     def save(self):
         joblib.dump(self.inputs, os.path.join(self.base_path, '{}_inputs.gz'.format(self.extraction_method.name)))
-        t_s = torch.Tensor(self.targets)
-        torch.save(t_s, os.path.join(self.base_path, 'targets.pt'))
 
         diction = {
             'task': self.task,
+            'targets': self.targets,
             'grouping': self.grouping,
             'extra_tasks': self.extra_tasks
         }
-        joblib.dump(diction, os.path.join(self.base_path, 'other.obj'))
+        joblib.dump(diction, os.path.join(self.base_path, 'task_info.obj'))
+
+        diction = {
+            'extraction_method': self.extraction_method
+        }
+        joblib.dump(diction,
+                    os.path.join(self.base_path, '{}_extraction_method_params'.format(self.extraction_method.name)))
 
     def load(self):
-        inputs = joblib.load(os.path.join(self.base_path, '{}_inputs.gz'.format(self.extraction_method.name)))
-        t_l = torch.load(os.path.join(self.base_path, 'targets.pt'))
-        t_l = [[int(j) for j in i] for i in t_l]
-        diction = joblib.load(os.path.join(self.base_path, 'other.obj'))
-        task = diction['task']
-        grouping = diction['grouping']
-        extra_tasks = diction['extra_tasks']
-        self.initialize(inputs=inputs, targets=t_l, task=task, grouping=grouping, extra_tasks=extra_tasks)
+        self.inputs = joblib.load(os.path.join(self.base_path, '{}_inputs.gz'.format(self.extraction_method.name)))
+        # t_l = torch.load(os.path.join(self.base_path, 'targets.pt'))
+        # self.targets = [[int(j) for j in i] for i in t_l]
+        diction = joblib.load(os.path.join(self.base_path, 'task_info.obj'))
+        self.task = diction['task']
+        self.grouping = diction['grouping']
+        self.extra_tasks = diction['extra_tasks']
+
+        diction = joblib.load(
+            os.path.join(self.base_path, '{}_extraction_method_params'.format(self.extraction_method.name)))
+        self.extraction_method = diction['extraction_method']
 
     @staticmethod
-    def check(base_path: str, extraction_method: ExtractionMethod):
-        return os.path.isfile(os.path.join(base_path, '{}_inputs.gz'.format(extraction_method.name))) \
-               and os.path.isfile(os.path.join(base_path, 'targets.pt')) \
-               and os.path.isfile(os.path.join(base_path, 'other.obj'))
+    def check(base_path: str, extraction_method: ExtractionMethod, index_mode):
+        check = os.path.isfile(os.path.join(base_path, 'task_info.obj')) \
+                and os.path.isfile(
+            os.path.join(base_path, '{}_extraction_method_params'.format(extraction_method.name)))
 
+        if index_mode:
+            return os.path.isdir(os.path.join(base_path, 'input_{}_separated'.format(extraction_method.name))) \
+                   and check
+        else:
+            return os.path.isfile(os.path.join(base_path, '{}_inputs.gz'.format(extraction_method.name))) \
+                   and check
+
+
+########################################################################################################
+# Initialization
+########################################################################################################
+
+def add_input_index_mode(self, input_tensor: torch.tensor):
+    """
+    Adds an input tensor to the dataset
+    :param input_tensor:
+    """
+    separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
+    if not os.path.exists(separated_dir):
+        os.mkdir(separated_dir)
+
+    input_path = os.path.join(separated_dir, 'input_{}.pickle'.format(len(self.inputs)))
+    torch.save(input_tensor, input_path)
+    self.inputs.append((len(self.inputs), 0))
+
+
+########################################################################################################
+# Getters
+########################################################################################################
 
 def get_input_index_mode(self, index):
     separated_file = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name),
@@ -251,33 +376,14 @@ def get_input_index_mode(self, index):
     input_tensor = torch.load(separated_file).float()
     if self.prepared:
         input_tensor = self.extraction_method.prepare_input(input_tensor)[self.inputs[index][1]]
+    if self.flag_scaled:
+        input_tensor = self.extraction_method.scale_transform(input_tensor)
     return input_tensor
 
 
-def save_index_mode(self):
-    t_s = torch.Tensor([self.targets[t] for t in range(len(self.targets)) if self.inputs[t][1] == 0])
-    torch.save(t_s, os.path.join(self.base_path, 'targets.pt'))
-
-    diction = {
-        'task': self.task,
-        'grouping': self.grouping,
-        'extra_tasks': self.extra_tasks
-    }
-    joblib.dump(diction, os.path.join(self.base_path, 'other.obj'))
-
-
-def load_index_mode(self):
-    separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
-    dir_list = os.listdir(separated_dir)
-    self.inputs = [(i, 0) for i in range(len(dir_list))]
-    t_l = torch.load(os.path.join(self.base_path, 'targets.pt'))
-    self.targets = [[int(j) for j in i] for i in t_l]
-    diction = joblib.load(os.path.join(self.base_path, 'other.obj'))
-    self.task = diction['task']
-    self.grouping = diction['grouping']
-    if diction.keys().__contains__('extra_tasks'):
-        self.extra_tasks = diction['extra_tasks']
-
+########################################################################################################
+# Transformation
+########################################################################################################
 
 def prepare_inputs_index_mode(self):
     if not self.grouping:
@@ -291,3 +397,38 @@ def prepare_inputs_index_mode(self):
             for t in self.extra_tasks:
                 t[1].append(t[1][i])
     self.prepared = True
+
+
+########################################################################################################
+# I/O
+########################################################################################################
+
+def save_index_mode(self):
+    diction = {
+        'task': self.task,
+        'targets': self.targets,
+        'grouping': self.grouping,
+        'extra_tasks': self.extra_tasks
+    }
+    joblib.dump(diction, os.path.join(self.base_path, 'task_info.obj'))
+
+    diction = {
+        'extraction_method': self.extraction_method
+    }
+    joblib.dump(diction,
+                os.path.join(self.base_path, '{}_extraction_method_params'.format(self.extraction_method.name)))
+
+
+def load_index_mode(self):
+    separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
+    dir_list = os.listdir(separated_dir)
+    self.inputs = [(i, 0) for i in range(len(dir_list))]
+
+    diction = joblib.load(os.path.join(self.base_path, 'task_info.obj'))
+    self.task = diction['task']
+    self.grouping = diction['grouping']
+    self.extra_tasks = diction['extra_tasks']
+
+    diction = joblib.load(
+        os.path.join(self.base_path, '{}_extraction_method_params'.format(self.extraction_method.name)))
+    self.extraction_method = diction['extraction_method']
