@@ -203,14 +203,6 @@ class Results:
             phase = 'Train'
         return joblib.load(os.path.join(path, self.run_name, "{}_losscurve.gz".format(phase)))
 
-    # def write_loss_curves(self):
-    #     phase = 'Train'
-    #     path = self.training_results_path
-    #     joblib.dump(self.training_curve, os.path.join(path, self.run_name, "{}_losscurve.gz".format(phase)))
-    #     phase = 'Evaluation'
-    #     path = self.evaluation_results_path
-    #     joblib.dump(self.evaluation_curve, os.path.join(path, self.run_name, "{}_losscurve.gz".format(phase)))
-
     def add_loss_to_curve_task(self, epoch, step, loss, task, train):
         if train:
             phase = 'Train'
@@ -218,7 +210,8 @@ class Results:
             if task.name not in self.training_curve_task:
                 self.training_curve_task[task.name] = np.zeros(self.num_epochs)
             self.training_curve_task[task.name][epoch] = loss / step
-            joblib.dump(self.training_curve_task, os.path.join(path, self.run_name, "{}_losscurve_tasks.gz".format(phase)))
+            joblib.dump(self.training_curve_task,
+                        os.path.join(path, self.run_name, "{}_losscurve_tasks.gz".format(phase)))
         else:
             phase = 'Evaluation'
             path = self.evaluation_results_path
@@ -238,15 +231,6 @@ class Results:
             phase = 'Train'
         return joblib.load(os.path.join(path, self.run_name, "{}_losscurve_tasks.gz".format(phase, task.name)))
 
-    # def write_loss_curve_tasks(self):
-    #     path = self.training_results_path
-    #     phase = 'Train'
-    #     joblib.dump(self.training_curve_task, os.path.join(path, self.run_name, "{}_losscurve_tasks.gz".format(phase)))
-    #     path = self.evaluation_results_path
-    #     phase = 'Evaluation'
-    #     joblib.dump(self.evaluation_curve_task,
-    #                 os.path.join(path, self.run_name, "{}_losscurve_tasks.gz".format(phase)))
-
     def flush_writer(self):
         self.writer.flush()
 
@@ -254,5 +238,9 @@ class Results:
         self.writer.close()
 
     @staticmethod
-    def create_model_loader(name, **kwargs):
+    def create_model_loader(name,
+                            num_epochs: int,
+                            task_list: List[Task] = None,
+                            results_path=None,
+                            tensorboard_folder=None):
         return Results(run_name=name, **kwargs)

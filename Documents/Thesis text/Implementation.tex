@@ -1,18 +1,26 @@
-\chapter{Implementation}
+\chapter{Implementation} \label{Impl}
 
-\section{Technology}
+In this chapter, the implementation details are described for how building a multi-task learning pipeline is implemented. 
 
-The implementation is built in python and relies on pytorch for deep learning modeling and training. PyTorch is one of the biggest and most accessible frameworks for developing neural networks. This framework is designed to utilise its objects as to minimize an extra learning curve, as well as lighten any developmental work that it still requires. 
+\section{Technology} \label{Impl:Technology}
 
-\section{System Architecture}
+The implementation is built in python and relies on pytorch \citep{paszke2019pytorch} for deep learning modeling and training. PyTorch is one of the biggest and most accessible frameworks for developing neural networks. This framework is designed to utilise its objects as to minimize an extra learning curve, as well as lighten any developmental work that it still requires. 
 
-TODO: Reiterate the design principles and a description of what functionally has been built
 
-\section{High Level Description}
+\section{High Level Description} \label{Impl:Description}
 
-TODO: Simplified overview of the pipeline
+\begin{figure}
+	\centering
+	\includegraphics[width=\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOverview"}
+	\caption{Simplified Pipeline Overview}
+	\label{fig:simplifiedoverview}
+\end{figure}
 
-\section{Data Reading} \label{Impl:DataRead}
+To illustrate what the resulting pipelines built with the application consist of, a simplified example is given in figure \ref{fig:simplifiedoverview}. Using the model designed in the previous chapter, a sequence of steps can be created resulting in a trained and evaluated multi-task model. \\
+
+The pipeline can be split up into three parts: Data Standardization, Data Loading and Training. In the first section, Data Standardization, labeled audio datasets are transformed into standardized objects. 
+
+\section{Data Standardization} \label{Impl:DataRead}
 
 
 The first part of the pipeline is responsible for reading the audio data from datasets, extracting their features and storing it along their targets in valid objects. This also includes abstractions for reading and writing of files that store these objects for later use. As every dataset has their own structure and storage method, the implementation for every data reader has to be specified by the developer. The structure therefore is built around following the pattern layed out in the \textbf{DataReader} class and extending its functions with dataset specific ones. The pattern goes as follows. \\
@@ -29,33 +37,44 @@ The last one are multiple tasks for the same dataset, which can simply be insert
 
 \subsection{DataReader} \label{Impl:DataRead:DataReader}
 
-TODO: insert Data Reader Model
-TODO: Mention the return taskdataset structure
-TODO: Mention the \_\_create\_taskdataset\_\_ structure
-TODO: Mention that check, read and write files are now non abstract
 
 The \textbf{DataReader} class is meant as a parent class to be extended by specific implementations for each dataset. As previously mentioned, it has a number of abstract functions which require to be extended. Besides those, it also contains an automatic parser for ExtractionMethod objects from text, in case the input is directly read from files e.g. json. Alongside that, it also contains a function to read in wav files at a specific location, using the Librosa library and a separate resampling function, in case the signal is already read. The ability to resample signals is used often in multi-task learning, which makes it the extra parameter in the \textit{calculate\_input} function.
 
+\begin{figure}
+	\centering
+	\includegraphics[width=\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/DataReadingFlow"}
+	\caption{}
+	\label{fig:datareadingflow}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/DataReaderSnip"}
+	\caption{Code which calls the abstract methods that need to be implemented in the DataReader}
+	\label{fig:datareadersnip}
+\end{figure}
+
+
 \subsection{ExtractionMethod} \label{Impl:DataRead:ExtractionMethod}
 
-TODO: insert ExtractionMethod Model
 
 If the DataReader is the workbench to transform audio datasets to TaskDatasets, then the \textbf{ExtractionMethod} class is the hammer. The functionality of this class is instance based, but groups together a number of transformations. The main one of course being feature extraction. This class works similarly to the DataReader class as it has a number of abstract methods to be extended if one wants to make their own implementation. However, a number of them are already available, like the MFCC, the Melspectrogram and the LogbankSummary (TODO: Refer to papers using and explaining these) features. At instantiation, this class should receive extraction parameters and preparation parameters. The extraction parameters should be a dictionary with parameters which can fit in the utilised extraction method. Since these are stored in the object, the same object can easily be reused on different datasets for consistency and easy scalability. 
 
 The other functionalities that were referred to, to possibly be dependent on the extraction method used are data transformations. One is the normalization of data. This requires scalers to be fit on the data to then transform each instance according to the scalers (typically infers calculating the mean and the variance of the whole dataset and then scaling these so that the mean of all instances is 0 and the variance is 1). Aside from scaling the data, the ExtractionMethod object also includes a function for other transformations. A typical use for this is cutting the matrices into same sized frames, as audio data can have varying lengths. This function is already included, along with a slight alternative, where the input matrices are not cut but windowed, meaning one input matrix result in multiple windows of the same size with overlap, so no data is lost. Standard methods for fitting, scaling, inverse scaling entire 2D inputs and 2D inputs per row are also already available and are implemented using the sklearn preprocessing toolbox.
 
-(TODO: Explain the example of the Logbank summary and the MelSpectrogram requiring different handling)
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/ExtractionMethodSnip"}
+	\caption{}
+	\label{fig:extractionmethodsnip}
+\end{figure}
+
 
 \subsection{TaskDataset} \label{Impl:DataRead:TaskDataset}
 
 TODO: Revisit this, the initialization is now different and splits inserting the data from the rest of initialization
 
-\begin{figure}
-	\centering
-	\includegraphics[width=\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDataset Structure"}
-	\caption[TaskDataset Structure]{TaskDataset Structure}
-	\label{fig:taskdataset-structure}
-\end{figure}
 
 The TaskDataset structure is how the framework manages to standardize inputs and targets in one valid object for training. It extends PyTorch's Dataset class to allow for integration with its dataloader objects. This class is responsible for containing the data with functionalities for getting data, storage and transformation. This class is however only a parent class to the Hold-train-test structure, which is set up to deal with functionalities related to generating and handling valid train and test sets. The entire TaskDataset structure is designed to be customizable, but invariant when handling from the outside. There are 3 parts to this that have their own strategies: File management, structure of data, the index mode and combining separate train and test sets. \\
 
@@ -70,19 +89,30 @@ Lastly, the case is examined where a dataset has a predefined train and test set
 % I Think this should be in data loading
 Getting a data instance - i.e. the feature matrix and targets - requires more than just plucking the corresponding elements from the list. While the data loading is discussed later, getting an item at an index from a TaskDataset infers getting three things: the feature matrix as input, the target list as correct output and the task\_group. Getting the feature matrix is a simple indexing operation, after which the scaling transformation is applied. This transformation is applied every time in the get function, as the same data likely has to be rescaled multiple times - e.g. in a five fold cross validation training set-up - so there is no need to revert the transformation every time. \\
 
-
+% Explain that TaskDatasets have a policy that no change is permanent
 
 Getting the target data has to take in account more factors though. First of all, it is required for creating batches that all returned items have the same shape, meaning that every returned input and target list must have the same dimensions. Correctly shaping the input matrices can be done using the prepare inputs functionalities beforehand, but the targets are different. \\
 
 
-% Note for explaining faster data structures like ndarry: Audio data lengths can vary so it's not always possible to create a matrix with predefined shape to store the inputs
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatasetAddInputsSnip"}
+	\caption{}
+	\label{fig:taskdatasetaddinputssnip}
+\end{figure}
 
-\subsection{Examples To Get List}
-Example of creating a DataReader
+\begin{figure}
+	\centering
+	\includegraphics[width=\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatasetAddTargetsSnip"}
+	\caption{}
+	\label{fig:taskdatasetaddtargetssnip}
+\end{figure}
 
-Example of creating a TaskDataset in index mode
 
-Example of creating a HoldTaskDataset with predefined train and test set
+\subsection{Example}
+
+
+
 
 \section{Data Loading} \label{Impl:DataLoad}
 
@@ -140,6 +170,23 @@ However, what is still explained here, is the data loader and what it returns, a
 In \textbf{TaskDatasets}, this function returns three things: the feature matrix at the specified index, the (cummulative) target vector at the specified index and an identifier for which dataset the item belongs to. The difference between index\_mode and without, is solely how it returns the feature matrix. When iterating over the DataLoader, these will thus be returned in 3 separate matrices of the specified batch size. \\
 
 
+\subsection{TrainingSetCreator}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/TrainingSetCreatorOperationsSnip"}
+	\caption{}
+	\label{fig:trainingsetcreatoroperationssnip}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/TrainingSetExecutionExampleSnip"}
+	\caption{}
+	\label{fig:trainingsetexecutionexamplesnip}
+\end{figure}
+
+
 \section{Training} \label{Impl:Training}
 
 When the train and test sets are created, it is time for the training loop. Training and evaluation are designed to not require any modification, as they include hooks for multiple possible extensions. At this point, the only inputs that are necessary for training are the PyTorch model, a \textbf{Results} object, the training set and any additional training parameters. This simplicity yet extendibility for training tries to allow developers to easily change variables anywhere in the process, as quickly as possible, without having to adjust other parts of the pipeline. There are four components to this stage: Model creation, results handling, training updating and evaluation. \\
@@ -149,6 +196,13 @@ When the train and test sets are created, it is time for the training loop. Trai
 Model creation does not have any additional functionalities and simply requires PyTorch Modules. It is up to the developer to create models using PyTorch that can handle their Multi-task requirements. This also allows external models to be plugged into the framework and easily tested. The standard assumption the system does make in training however is that the different classification results are returned in tuples. \\
 
 In order to provide a helpful basis, the framework already has two simple, adjustable models available: A DNN and a CNN. Both consist of an adjustable number of shared layers, with an adjustable number of nodes that branch into different output layers per task that have an activation function, depending on the type of task. Multi-class tasks have a log softmax activation function, while multi-label tasks get a sigmoid activation function. \\ 
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/completeTrainingSnip"}
+	\caption{}
+	\label{fig:completetrainingsnip}
+\end{figure}
 
 \subsection{Results Handling} \label{Impl:Training:Results}
 
@@ -204,32 +258,7 @@ To allow for separate evaluation - e.g. if the developer wants to test a previou
 
 TODO: Describe things like the index mode, which answer additional needs outside of fast development.
 
-\section{Extendibility}
-
-
-Things that are meant to be subclassed
-
-DataReader
-ExtractionMethod
-Task
-TrainingUtils
-
-Things that can be subclassed
-
-Results
-TaskDataset
-
-Things that should be subclassed from outside libraries
-Model
-Sampler
-Any PyTorch object that needs specific functions not available
-
-Things that can vary functionality based on input but should not be changed
-Training \& Evaluation
--> TrainingUtils
--> Task
-TrainingSetCreator
--> ExtractionMethod
+\section{Extendibility} \label{Impl:Extendibility}
 
 In this section, there will be a deeper look at where the framework is open for customization and how the developer is meant to implement this. The framework aims to simplify development, but provide hooks for features that likely need to be modified. In this line of thinking, the framework has different categories to extend the base functionalities depending on the likeliness of change. Each will be examined based on their structure, what is required to introduce the extension and what it should take in account. 
 
@@ -283,3 +312,4 @@ The next instance is the Training class, which of course contains the training f
 	\item The \textbf{Results} can be given as input, which receives and stores the outputs, ground truths and losses every batch then calculates and writes the metrics based on these results every epoch. This also stores the model parameters. 	
 \end{itemize}
 
+\section{Three Implementations}

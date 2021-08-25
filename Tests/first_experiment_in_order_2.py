@@ -66,13 +66,14 @@ def main(argv):
     csc.add_data_reader(SpeechCommands(object_path=os.path.join(data_base, 'SpeechCommands_{}'), index_mode=True))
 
     csc.add_sample_rate(sample_rate=32000)
+    csc.add_signal_preprocessing(preprocess_dict=dict(mono=True))
     csc.add_extraction_method(MelSpectrogramExtractionMethod(**extraction_params))
 
     keys = list(csc.get_keys())
     comb_iterator = itertools.chain(*map(lambda x: itertools.combinations(keys, x), range(0, len(keys) + 1)))
 
     for combo in comb_iterator:
-        key_list = [keys[k] for k in combo]
+        key_list = list(combo)
         fold = 0
         for train, test in csc.generate_training_splits(key_list):
             for i in range(2):

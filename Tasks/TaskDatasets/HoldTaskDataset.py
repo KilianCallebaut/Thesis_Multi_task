@@ -270,9 +270,9 @@ class HoldTaskDataset(TaskDataset):
         """
 
         if base_path:
-            TaskDataset.check(base_path=base_path,
-                              extraction_method=extraction_method,
-                              index_mode=index_mode)
+            return TaskDataset.check(base_path=base_path,
+                                     extraction_method=extraction_method,
+                                     index_mode=index_mode)
         elif testing_base_path:
             return TaskDataset.check(base_path=base_path,
                                      extraction_method=extraction_method,

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  20 AUG 2021 15:22
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  25 AUG 2021 20:31
 entering extended mode
 **./ThesisText.tex
 (ThesisText.tex
@@ -611,44 +611,45 @@ Underfull \hbox (badness 10000) in paragraph at lines 101--102
 
 [18] [19] [20]) (Model.tex [21]
 Chapter 4.
-<../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOverview.
-png, id=82, 1215.54124pt x 452.69125pt>
-File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOver
-view.png Graphic file (type png)
-<use ../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOverv
-iew.png>
-Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
-tion/SimplifiedOverview.png  used on input line 21.
-(pdftex.def)             Requested size: 390.0pt x 145.24406pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 27--28
+Underfull \hbox (badness 10000) in paragraph at lines 14--15
+
+ []
+
+
+Overfull \hbox (1.98898pt too wide) in paragraph at lines 16--17
+\OT1/cmr/m/n/12 the fo-cus will be on pro-vid-ing ab-strac-tions cut-ting ef-fo
+rt of com-bin-ing datasets
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 16--17
 
  []
 
 [22
 
- <../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOverview
-.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 31--32
+]
+Underfull \hbox (badness 10000) in paragraph at lines 18--19
 
  []
 
+<../../../../Documents/TU Delft/Thesis 2/System Explanation/CompleteSystemDiagr
+am.png, id=85, 2271.48625pt x 1262.7175pt>
+File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/CompleteSystem
+Diagram.png Graphic file (type png)
+<use ../../../../Documents/TU Delft/Thesis 2/System Explanation/CompleteSystemD
+iagram.png>
+Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
+tion/CompleteSystemDiagram.png  used on input line 24.
+(pdftex.def)             Requested size: 390.0pt x 216.79782pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 33--34
+Underfull \hbox (badness 10000) in paragraph at lines 29--30
 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 35--36
-
- []
-
-[23]
-Underfull \hbox (badness 10000) in paragraph at lines 37--38
-
- []
-
-
+[23 <../../../../Documents/TU Delft/Thesis 2/System Explanation/CompleteSystemD
+iagram.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 42--43
 
  []
@@ -664,47 +665,37 @@ Underfull \hbox (badness 10000) in paragraph at lines 46--47
  []
 
 [24]
-Underfull \hbox (badness 10000) in paragraph at lines 53--54
+Underfull \hbox (badness 10000) in paragraph at lines 48--49
 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 55--56
-
- []
-
+<../../../../Documents/TU Delft/Thesis 2/System Explanation/CompletePatternDiag
+ram.png, id=95, 2271.48625pt x 1259.70625pt>
+File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/CompletePatter
+nDiagram.png Graphic file (type png)
+<use ../../../../Documents/TU Delft/Thesis 2/System Explanation/CompletePattern
+Diagram.png>
+Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
+tion/CompletePatternDiagram.png  used on input line 52.
+(pdftex.def)             Requested size: 390.0pt x 216.28082pt.
 
 Underfull \hbox (badness 10000) in paragraph at lines 57--58
 
  []
 
-
+[25 <../../../../Documents/TU Delft/Thesis 2/System Explanation/CompletePattern
+Diagram.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 59--60
 
  []
 
-[25]
+
 Underfull \hbox (badness 10000) in paragraph at lines 61--62
 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 63--64
-
- []
-
 [26]
-Underfull \hbox (badness 10000) in paragraph at lines 73--74
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 78--79
-
- []
-
-[27]
-Underfull \hbox (badness 10000) in paragraph at lines 80--81
+Underfull \hbox (badness 10000) in paragraph at lines 79--80
 
  []
 
@@ -718,189 +709,22 @@ Underfull \hbox (badness 10000) in paragraph at lines 84--85
 
  []
 
-
+[27]
 Underfull \hbox (badness 10000) in paragraph at lines 86--87
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 90--91
-
- []
-
-[28]
-Underfull \hbox (badness 10000) in paragraph at lines 92--93
+Underfull \hbox (badness 10000) in paragraph at lines 88--89
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 94--95
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 96--97
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 98--99
-
- []
-
-[29]
-Underfull \hbox (badness 10000) in paragraph at lines 103--104
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 105--106
-
- []
-
-
-Overfull \hbox (12.76404pt too wide) in paragraph at lines 107--108
-\OT1/cmr/m/n/12 TODO: REF-ER-ENCE for the Speaker Iden-ti-fi-ca-tion task, the 
-Ravdess database
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 107--108
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 109--110
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 113--114
-
- []
-
-[30] [31]
-Underfull \hbox (badness 10000) in paragraph at lines 127--128
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 130--131
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 132--133
-
- []
-
-[32]
-Underfull \hbox (badness 10000) in paragraph at lines 144--145
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 146--147
-
- []
-
-
-Overfull \hbox (26.3645pt too wide) in paragraph at lines 149--151
-[]\OT1/cmr/m/n/12 NOPE, FIX GEWOON EEN PA-PER HI-ER-VOOR, GE COVERT DEZELFDE
- []
-
-[33]) (Implementation.tex [34] [35]
-Chapter 5.
-
-Underfull \hbox (badness 10000) in paragraph at lines 18--19
-
- []
-
-[36
-
-]
-Underfull \hbox (badness 10000) in paragraph at lines 22--23
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 24--25
-
- []
-
-[37]
-Overfull \hbox (1.43205pt too wide) in paragraph at lines 26--27
-[]\OT1/cmr/m/n/12 Further fac-tors the data struc-ture can au-to-mat-i-cally de
-al with are datasets
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 26--27
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 28--29
-
- []
-
-[38]
-<../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDataset Structu
-re.png, id=139, 779.91376pt x 897.3525pt>
-File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDataset St
-ructure.png Graphic file (type png)
-<use ../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDataset Str
-ucture.png>
-Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
-tion/TaskDataset Structure.png  used on input line 55.
-(pdftex.def)             Requested size: 390.0pt x 448.71622pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 60--61
-
- []
-
-[39] [40 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatase
-t Structure.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 62--63
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 64--65
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 66--67
-
- []
-
-[41]
-Underfull \hbox (badness 10000) in paragraph at lines 68--69
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 71--72
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 75--76
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 89--90
-
- []
-
-[42]
 Underfull \hbox (badness 10000) in paragraph at lines 93--94
 
  []
 
-
+[28]
 Underfull \hbox (badness 10000) in paragraph at lines 95--96
 
  []
@@ -910,72 +734,78 @@ Underfull \hbox (badness 10000) in paragraph at lines 97--98
 
  []
 
-[43]
+
 Underfull \hbox (badness 10000) in paragraph at lines 99--100
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 101--102
+Underfull \hbox (badness 10000) in paragraph at lines 104--105
 
  []
 
 
+Underfull \hbox (badness 10000) in paragraph at lines 106--107
+
+ []
+
+[29]
 Underfull \hbox (badness 10000) in paragraph at lines 108--109
 
  []
 
-[44]
-Underfull \hbox (badness 10000) in paragraph at lines 110--112
+
+Underfull \hbox (badness 10000) in paragraph at lines 110--111
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 115--116
+Underfull \hbox (badness 10000) in paragraph at lines 112--113
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 117--118
+Underfull \hbox (badness 10000) in paragraph at lines 114--115
 
  []
 
-[45]
-Underfull \hbox (badness 10000) in paragraph at lines 121--122
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 123--124
+[30]
+Underfull \hbox (badness 10000) in paragraph at lines 116--117
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 125--126
+Underfull \hbox (badness 10000) in paragraph at lines 118--119
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 127--128
+Underfull \hbox (badness 10000) in paragraph at lines 124--125
 
  []
 
-[46]
-Underfull \hbox (badness 10000) in paragraph at lines 131--132
+[31]
+<../../../../Documents/TU Delft/Thesis 2/System Explanation/SequenceDiagram.png
+, id=119, 1416.29124pt x 804.00375pt>
+File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/SequenceDiagra
+m.png Graphic file (type png)
+<use ../../../../Documents/TU Delft/Thesis 2/System Explanation/SequenceDiagram
+.png>
+Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
+tion/SequenceDiagram.png  used on input line 128.
+(pdftex.def)             Requested size: 390.0pt x 221.39001pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 133--134
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 136--137
+Underfull \hbox (badness 10000) in paragraph at lines 135--136
 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 138--139
-
- []
-
-[47]
+[32 <../../../../Documents/TU Delft/Thesis 2/System Explanation/SequenceDiagram
+.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 140--141
 
  []
@@ -986,6 +816,11 @@ Underfull \hbox (badness 10000) in paragraph at lines 145--146
  []
 
 
+Underfull \hbox (badness 10000) in paragraph at lines 147--148
+
+ []
+
+[33]
 Underfull \hbox (badness 10000) in paragraph at lines 149--150
 
  []
@@ -995,8 +830,8 @@ Underfull \hbox (badness 10000) in paragraph at lines 151--152
 
  []
 
-[48]
-Underfull \hbox (badness 10000) in paragraph at lines 155--156
+
+Underfull \hbox (badness 10000) in paragraph at lines 153--154
 
  []
 
@@ -1005,12 +840,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 157--158
 
  []
 
-
+[34]
 Underfull \hbox (badness 10000) in paragraph at lines 159--160
 
  []
 
-[49]
+
 Underfull \hbox (badness 10000) in paragraph at lines 161--162
 
  []
@@ -1026,72 +861,458 @@ Underfull \hbox (badness 10000) in paragraph at lines 165--166
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 169--170
+Underfull \hbox (badness 10000) in paragraph at lines 170--171
 
  []
 
-[50]
-Underfull \hbox (badness 10000) in paragraph at lines 173--174
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 175--176
+[35]
+Underfull \hbox (badness 10000) in paragraph at lines 172--173
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 177--178
-
- []
-
-[51]
-Underfull \hbox (badness 10000) in paragraph at lines 185--186
-
+Overfull \hbox (12.76404pt too wide) in paragraph at lines 174--175
+\OT1/cmr/m/n/12 TODO: REF-ER-ENCE for the Speaker Iden-ti-fi-ca-tion task, the 
+Ravdess database
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 187--188
+Underfull \hbox (badness 10000) in paragraph at lines 174--175
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 176--177
+
+ []
+
+<../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievModel.png, 
+id=134, 436.63126pt x 274.77657pt>
+File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievModel.
+png Graphic file (type png)
+<use ../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievModel.p
+ng>
+Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
+tion/GeorgievModel.png  used on input line 181.
+(pdftex.def)             Requested size: 390.0pt x 245.43083pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 186--187
+
+ []
+
+[36] [37 <../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievMo
+del.png>]
+<../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievObjectModel
+1.png, id=142, 1175.39125pt x 1384.17125pt>
+File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievObject
+Model1.png Graphic file (type png)
+<use ../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievObjectM
+odel1.png>
+Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
+tion/GeorgievObjectModel1.png  used on input line 203.
+(pdftex.def)             Requested size: 390.0pt x 459.27017pt.
+<../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievObjectModel
+2.png, id=143, 2018.54124pt x 1877.0125pt>
+File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievObject
+Model2.png Graphic file (type png)
+<use ../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievObjectM
+odel2.png>
+Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
+tion/GeorgievObjectModel2.png  used on input line 210.
+(pdftex.def)             Requested size: 390.0pt x 362.65067pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 216--217
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 218--219
+
+ []
+
+[38] [39 <../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievOb
+jectModel1.png>] [40 <../../../../Documents/TU Delft/Thesis 2/System Explanatio
+n/GeorgievObjectModel2.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 220--221
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 223--224
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 225--226
+
+ []
+
+[41]
+Underfull \hbox (badness 10000) in paragraph at lines 237--238
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 239--240
+
+ []
+
+[42]) (Implementation.tex [43] [44]
+Chapter 5.
+<../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOverview.
+png, id=168, 1215.54124pt x 452.69125pt>
+File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOver
+view.png Graphic file (type png)
+<use ../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOverv
+iew.png>
+Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
+tion/SimplifiedOverview.png  used on input line 14.
+(pdftex.def)             Requested size: 390.0pt x 145.24406pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 19--20
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 26--27
+
+ []
+
+[45
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 30--31
+
+ []
+
+[46 <../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOverv
+iew.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 32--33
+
+ []
+
+
+Overfull \hbox (1.43205pt too wide) in paragraph at lines 34--35
+[]\OT1/cmr/m/n/12 Further fac-tors the data struc-ture can au-to-mat-i-cally de
+al with are datasets
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 34--35
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 36--37
+
+ []
+
+[47]
+<../../../../Documents/TU Delft/Thesis 2/System Explanation/DataReadingFlow.png
+, id=180, 308.65312pt x 558.58687pt>
+File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/DataReadingFlo
+w.png Graphic file (type png)
+<use ../../../../Documents/TU Delft/Thesis 2/System Explanation/DataReadingFlow
+.png>
+Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
+tion/DataReadingFlow.png  used on input line 45.
+(pdftex.def)             Requested size: 390.0pt x 705.86028pt.
+
+
+LaTeX Warning: Float too large for page by 184.19359pt on input line 48.
+
+<../../../../Documents/TU Delft/Thesis 2/System Explanation/DataReaderSnip.png,
+ id=181, 545.78906pt x 392.21532pt>
+File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/DataReaderSnip
+.png Graphic file (type png)
+<use ../../../../Documents/TU Delft/Thesis 2/System Explanation/DataReaderSnip.
+png>
+Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
+tion/DataReaderSnip.png  used on input line 52.
+(pdftex.def)             Requested size: 390.0pt x 280.26425pt.
+[48] [49 <../../../../Documents/TU Delft/Thesis 2/System Explanation/DataReadin
+gFlow.png>] [50 <../../../../Documents/TU Delft/Thesis 2/System Explanation/Dat
+aReaderSnip.png>]
+<../../../../Documents/TU Delft/Thesis 2/System Explanation/ExtractionMethodSni
+p.png, id=193, 717.43031pt x 199.49532pt>
+File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/ExtractionMeth
+odSnip.png Graphic file (type png)
+<use ../../../../Documents/TU Delft/Thesis 2/System Explanation/ExtractionMetho
+dSnip.png>
+Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
+tion/ExtractionMethodSnip.png  used on input line 68.
+(pdftex.def)             Requested size: 390.0pt x 108.45033pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 79--80
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 81--82
+
+ []
+
+[51 <../../../../Documents/TU Delft/Thesis 2/System Explanation/ExtractionMetho
+dSnip.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 83--84
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 85--86
+
+ []
+
+
+LaTeX Warning: Reference `fig:taskdataset-structure' on page 52 undefined on in
+put line 87.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 87--88
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 90--91
 
  []
 
 [52]
-Underfull \hbox (badness 10000) in paragraph at lines 191--192
+Underfull \hbox (badness 10000) in paragraph at lines 94--95
+
+ []
+
+<../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatasetAddInput
+sSnip.png, id=201, 698.61pt x 198.7425pt>
+File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatasetAdd
+InputsSnip.png Graphic file (type png)
+<use ../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatasetAddI
+nputsSnip.png>
+Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
+tion/TaskDatasetAddInputsSnip.png  used on input line 99.
+(pdftex.def)             Requested size: 390.0pt x 110.94931pt.
+<../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatasetAddTarge
+tsSnip.png, id=202, 644.4075pt x 279.29344pt>
+File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatasetAdd
+TargetsSnip.png Graphic file (type png)
+<use ../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatasetAddT
+argetsSnip.png>
+Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
+tion/TaskDatasetAddTargetsSnip.png  used on input line 106.
+(pdftex.def)             Requested size: 390.0pt x 169.03484pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 119--120
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 193--194
+Underfull \hbox (badness 10000) in paragraph at lines 123--124
+
+ []
+
+[53 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatasetAddI
+nputsSnip.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 125--126
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 197--198
+Underfull \hbox (badness 10000) in paragraph at lines 127--128
+
+ []
+
+[54 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatasetAddT
+argetsSnip.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 129--130
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 199--200
+Underfull \hbox (badness 10000) in paragraph at lines 131--132
 
  []
 
-[53]
-Underfull \hbox (badness 10000) in paragraph at lines 201--202
 
- []
+LaTeX Warning: Reference `fig:taskdataset-structure' on page 55 undefined on in
+put line 138.
 
-[54]
-Underfull \hbox (badness 10000) in paragraph at lines 238--239
+
+Underfull \hbox (badness 10000) in paragraph at lines 138--139
 
  []
 
 [55]
-Underfull \hbox (badness 10000) in paragraph at lines 247--248
+Underfull \hbox (badness 10000) in paragraph at lines 140--142
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 249--250
+Underfull \hbox (badness 10000) in paragraph at lines 145--146
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 147--148
+
+ []
+
+[56]
+Underfull \hbox (badness 10000) in paragraph at lines 151--152
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 153--154
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 155--156
+
+ []
+
+[57]
+Underfull \hbox (badness 10000) in paragraph at lines 157--158
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 161--162
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 166--167
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 168--169
+
+ []
+
+[58]
+Underfull \hbox (badness 10000) in paragraph at lines 170--171
+
+ []
+
+<../../../../Documents/TU Delft/Thesis 2/System Explanation/TrainingSetCreatorO
+perationsSnip.png, id=224, 649.67719pt x 328.97906pt>
+File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/TrainingSetCre
+atorOperationsSnip.png Graphic file (type png)
+<use ../../../../Documents/TU Delft/Thesis 2/System Explanation/TrainingSetCrea
+torOperationsSnip.png>
+Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
+tion/TrainingSetCreatorOperationsSnip.png  used on input line 177.
+(pdftex.def)             Requested size: 390.0pt x 197.48935pt.
+<../../../../Documents/TU Delft/Thesis 2/System Explanation/TrainingSetExecutio
+nExampleSnip.png, id=225, 679.03688pt x 121.20282pt>
+File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/TrainingSetExe
+cutionExampleSnip.png Graphic file (type png)
+<use ../../../../Documents/TU Delft/Thesis 2/System Explanation/TrainingSetExec
+utionExampleSnip.png>
+Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
+tion/TrainingSetExecutionExampleSnip.png  used on input line 184.
+(pdftex.def)             Requested size: 390.0pt x 69.61154pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 192--193
+
+ []
+
+[59 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TrainingSetCrea
+torOperationsSnip.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 196--197
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 198--199
+
+ []
+
+<../../../../Documents/TU Delft/Thesis 2/System Explanation/completeTrainingSni
+p.png, id=231, 680.5425pt x 534.49687pt>
+File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/completeTraini
+ngSnip.png Graphic file (type png)
+<use ../../../../Documents/TU Delft/Thesis 2/System Explanation/completeTrainin
+gSnip.png>
+Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
+tion/completeTrainingSnip.png  used on input line 202.
+(pdftex.def)             Requested size: 390.0pt x 306.30568pt.
+[60 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TrainingSetExec
+utionExampleSnip.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 209--210
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 211--212
+
+ []
+
+[61 <../../../../Documents/TU Delft/Thesis 2/System Explanation/completeTrainin
+gSnip.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 213--214
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 215--216
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 217--218
+
+ []
+
+[62]
+Underfull \hbox (badness 10000) in paragraph at lines 219--220
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 223--224
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 227--228
+
+ []
+
+[63]
+Underfull \hbox (badness 10000) in paragraph at lines 229--230
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 231--232
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 239--240
+
+ []
+
+[64]
+Underfull \hbox (badness 10000) in paragraph at lines 241--242
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 245--246
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 247--248
+
+ []
+
+[65]
+Underfull \hbox (badness 10000) in paragraph at lines 251--252
 
  []
 
@@ -1101,54 +1322,79 @@ Underfull \hbox (badness 10000) in paragraph at lines 253--254
  []
 
 
-Overfull \hbox (2.57825pt too wide) in paragraph at lines 255--256
+Underfull \hbox (badness 10000) in paragraph at lines 255--256
+
+ []
+
+[66]
+Underfull \hbox (badness 10000) in paragraph at lines 267--268
+
+ []
+
+[67]
+Underfull \hbox (badness 10000) in paragraph at lines 276--277
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 278--279
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 282--283
+
+ []
+
+[68]
+Overfull \hbox (2.57825pt too wide) in paragraph at lines 284--285
 \OT1/cmr/m/n/12 The \OT1/cmr/bx/n/12 Hold-Task-Dataset\OT1/cmr/m/n/12 , \OT1/cm
 r/bx/n/12 Train-Task-Dataset \OT1/cmr/m/n/12 and \OT1/cmr/bx/n/12 Test-Task-Dat
 aset \OT1/cmr/m/n/12 classes
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 255--256
-
- []
-
-[56]
-Underfull \hbox (badness 10000) in paragraph at lines 257--258
+Underfull \hbox (badness 10000) in paragraph at lines 284--285
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 259--260
-
- []
-
-[57]
-Underfull \hbox (badness 10000) in paragraph at lines 263--264
+Underfull \hbox (badness 10000) in paragraph at lines 286--287
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 267--268
+Underfull \hbox (badness 10000) in paragraph at lines 288--289
+
+ []
+
+[69]
+Underfull \hbox (badness 10000) in paragraph at lines 292--293
 
  []
 
 
-Overfull \hbox (3.15048pt too wide) in paragraph at lines 269--270
+Underfull \hbox (badness 10000) in paragraph at lines 296--297
+
+ []
+
+
+Overfull \hbox (3.15048pt too wide) in paragraph at lines 298--299
 \OT1/cmr/bx/n/12 ingSetCre-ator\OT1/cmr/m/n/12 . The Con-cat-Train-ingSetCre-at
 or just cre-ates Train-ingSetCre-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 269--270
+Underfull \hbox (badness 10000) in paragraph at lines 298--299
 
  []
 
-[58]
-Underfull \hbox (badness 10000) in paragraph at lines 271--272
+[70]
+Underfull \hbox (badness 10000) in paragraph at lines 300--301
 
  []
 
-[59]) (Evaluation.tex [60]
+[71]) (Evaluation.tex [72]
 Chapter 6.
 ! You can't use `macro parameter character #' in vertical mode.
 l.3 #
@@ -1158,36 +1404,39 @@ I'll just pretend that you didn't ask for it.
 If you're in the wrong mode, you might be able to
 return to the right one by typing `I}' or `I$' or `I\par'.
 
-) (Conclusion.tex [61
+) (Conclusion.tex [73
 
 ]
 Chapter 7.
-) (ThesisText.bbl [62
+) (ThesisText.bbl [74
 
-] [63
+] [75
 
-]) [64] (ThesisText.aux)
+]) [76] (ThesisText.aux)
+
+LaTeX Warning: There were undefined references.
+
 
 LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
  ) 
 Here is how much of TeX's memory you used:
- 12474 strings out of 481212
- 257970 string characters out of 2905973
- 474603 words of memory out of 3000000
- 27825 multiletter control sequences out of 15000+200000
+ 12617 strings out of 481212
+ 267021 string characters out of 2905973
+ 475027 words of memory out of 3000000
+ 27955 multiletter control sequences out of 15000+200000
  541546 words of font info for 50 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 68i,6n,64p,2083b,292s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 68i,6n,64p,2083b,294s stack positions out of 5000i,500n,10000p,200000b,50000s
  <C:\Users\mrKC1\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm
 1200.pk><C:/Users/mrKC1/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfon
 ts/cm/cmbx12.pfb><C:/Users/mrKC1/AppData/Local/Programs/MiKTeX/fonts/type1/publ
 ic/amsfonts/cm/cmr12.pfb><C:/Users/mrKC1/AppData/Local/Programs/MiKTeX/fonts/ty
 pe1/public/amsfonts/cm/cmr17.pfb><C:/Users/mrKC1/AppData/Local/Programs/MiKTeX/
 fonts/type1/public/amsfonts/cm/cmti12.pfb>
-Output written on ThesisText.pdf (66 pages, 263248 bytes).
+Output written on ThesisText.pdf (78 pages, 1093063 bytes).
 PDF statistics:
- 243 PDF objects out of 1000 (max. 8388607)
+ 308 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 23 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 88 words of extra memory for PDF output out of 10000 (max. 10000000)
 

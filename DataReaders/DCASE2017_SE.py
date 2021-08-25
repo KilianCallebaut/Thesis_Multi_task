@@ -1,5 +1,7 @@
+import math
 import os
 
+import dcase_util
 import joblib
 from dcase_util.datasets import TUTSoundEvents_2017_DevelopmentSet
 
@@ -57,12 +59,17 @@ class DCASE2017_SE(DataReader):
         self.audio_files = self.devdataset.audio_files
 
     def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict):
-        print("Calculating input done")
         perc = 0
         for audio_idx in range(len(self.audio_files)):
-            read_wav = self.preprocess_signal(self.load_wav(self.audio_files[audio_idx]), **preprocess_parameters)
-            taskDataset.extract_and_add_input(read_wav)
-            if perc < (audio_idx / len(self.audio_files)) * 100:
+            audio_cont = dcase_util.containers.AudioContainer().load(
+                filename=self.audio_files[audio_idx]
+            )
+            segmented_signals, meta = audio_cont.segments(segment_length_seconds=1.0)
+            for ss in segmented_signals:
+                read_wav = self.preprocess_signal((ss, audio_cont.fs),
+                                                  **preprocess_parameters)
+                taskDataset.extract_and_add_input(read_wav)
+            while perc < (audio_idx / len(self.audio_files)) * 100:
                 print("Percentage done: {}".format(perc))
                 perc += 1
         print("Calculating input done")
@@ -75,10 +82,13 @@ class DCASE2017_SE(DataReader):
 
         for file_id in range(len(self.audio_files)):
             # targets in the form list Tensor 2d (nr_frames, nr_labels) of length nr_files
+            audio_cont = dcase_util.containers.AudioContainer().load(filename=self.audio_files[file_id])
             annotations = self.devdataset.meta.filter(self.audio_files[file_id])
             target = annotations.to_event_roll(label_list=self.devdataset.event_labels(),
-                                               time_resolution=1)
-            targets.append(target)
+                                               time_resolution=1,
+                                               length_seconds=math.floor(audio_cont.duration_sec)).data
+            for t in target.T:
+                targets.append(t)
             print(file_id / len(self.audio_files))
 
         taskDataset.add_task_and_targets(

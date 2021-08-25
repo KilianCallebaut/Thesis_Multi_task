@@ -48,10 +48,6 @@ class ChenAudiosetDataset(DataReader):
     def get_base_path(self):
         return dict(base_path=self.object_path)
 
-    def check_files(self, extraction_method):
-        return super().check_files(extraction_method) and \
-               os.path.isfile(self.get_path())
-
     def load_files(self):
         if os.path.isfile(self.get_path()):
             obj = joblib.load(self.get_path())

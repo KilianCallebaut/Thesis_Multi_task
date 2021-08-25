@@ -1,3 +1,4 @@
+import math
 from abc import abstractmethod, ABC
 from typing import Tuple
 
@@ -99,9 +100,9 @@ class DataReader(ABC):
                                **self.get_base_path())
 
     def check_files(self, extraction_method):
-        HoldTaskDataset.check(extraction_method=extraction_method,
-                              index_mode=self.index_mode,
-                              **self.get_base_path())
+        return HoldTaskDataset.check(extraction_method=extraction_method,
+                                     index_mode=self.index_mode,
+                                     **self.get_base_path())
 
     def read_files(self, taskDataset: HoldTaskDataset):
         taskDataset.load()
@@ -117,15 +118,44 @@ class DataReader(ABC):
                           sig_samplerate: Tuple[np.ndarray, int],
                           resample_to: int = None,
                           mono: bool = False) -> Tuple[np.ndarray, int]:
+
         if sig_samplerate[0].dtype != np.dtype('float32'):
             sig_samplerate = (sig_samplerate[0].astype('float32'), sig_samplerate[1])
 
-        if len(sig_samplerate[0].shape) > 1 and mono:
-            sig_samplerate = (np.mean(sig_samplerate[0], axis=1), sig_samplerate[1])
+        if len(sig_samplerate[0].shape) > 1:
+            channel = np.argmin(sig_samplerate[0].shape)
+            if mono:
+                sig_samplerate = (np.mean(sig_samplerate[0], axis=channel), sig_samplerate[1])
 
         if resample_to is not None:
             sig_samplerate = (librosa.core.resample(sig_samplerate[0], sig_samplerate[1], resample_to), resample_to)
         return sig_samplerate
+
+    def time_split_signal(self,
+                          sig_sample_rate: Tuple[np.ndarray, int],
+                          time_resolution: float,
+                          time_overlap: float = None):
+        window_size = math.floor(sig_sample_rate[1] * time_resolution)
+        window_hop = math.floor(sig_sample_rate[1] * time_overlap) if time_overlap else window_size
+
+        windowed_signals = []
+        start_frame = window_size
+
+        end_frame = start_frame + window_hop * math.floor(
+            (float(sig_sample_rate[0].shape[0] - start_frame) / window_hop))
+        for frame_idx in range(start_frame, end_frame + 1, window_hop):
+            window = sig_sample_rate[0][frame_idx - window_size:frame_idx, :]
+            assert window.shape[0] == window_size
+            windowed_signals.append(window)
+
+        if start_frame > sig_sample_rate[0].shape[0]:
+            window = np.vstack(
+                [sig_sample_rate[0], np.zeros(start_frame - sig_sample_rate[0].shape[0], *sig_sample_rate[0].shape[1:])])
+            windowed_signals.append(window)
+        elif end_frame < sig_sample_rate[0].shape[0]:
+            window = sig_sample_rate[0][sig_sample_rate[0].shape[0] - window_size:sig_sample_rate[0].shape[0], :]
+            windowed_signals.append(window)
+        return windowed_signals
 
     def load_wav(self, loc) -> Tuple[np.ndarray, int]:
         sig, fs = soundfile.read(loc)

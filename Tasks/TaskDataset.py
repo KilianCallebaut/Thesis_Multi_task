@@ -82,9 +82,10 @@ class TaskDataset(Dataset):
         """
 
         if len(sig_samplerate[0].shape) > 1:
-            input_tensor = np.vstack(
-                [self.extraction_method.extract_features((sig_samplerate[0][i], sig_samplerate[1])) for i in
-                 range(sig_samplerate[0].shape[0])])
+            channel = 0 if sig_samplerate[0].shape[0] < sig_samplerate[0].shape[1] else 1
+            input_tensor = torch.tensor(
+                [self.extraction_method.extract_features((sig_samplerate[0][:, i], sig_samplerate[channel])) for i in
+                 range(sig_samplerate[0].shape[channel])])
         else:
             input_tensor = self.extraction_method.extract_features(sig_samplerate)
         self.add_input(input_tensor)
@@ -130,7 +131,8 @@ class TaskDataset(Dataset):
             for t in t_e[1]:
                 assert len(t) == len(t_e[1][0]), 'Each target vector must have the same length'
         if self.grouping:
-            assert len(self.grouping) == len(self.inputs), 'There must be as many elements in the grouping as there are inputs'
+            assert len(self.grouping) == len(
+                self.inputs), 'There must be as many elements in the grouping as there are inputs'
 
         if self.inputs and self.targets and self.task:
             return True

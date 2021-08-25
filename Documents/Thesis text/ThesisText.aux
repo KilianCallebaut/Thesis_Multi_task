@@ -44,123 +44,179 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.5.1}Data Reading}{18}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.5.2}Data Loading}{19}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.5.3}Training}{21}\protected@file@percent }
+\citation{roberts1996evolving}
+\citation{schmid1997systematic}
 \@writefile{toc}{\contentsline {chapter}{\numberline {4}System Design}{22}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\@writefile{toc}{\contentsline {section}{\numberline {4.1}Assumptions}{22}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {4.1}{\ignorespaces Simplified System overview}}{22}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4.2}Creating standardized objects}{23}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2.1}Variations}{24}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4.3}Manipulating datasets}{25}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4.4}Combining Datasets}{27}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4.5}Creating Model}{27}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4.6}Training and Evaluating Model}{27}\protected@file@percent }
+\newlabel{Design}{{4}{22}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.1}Framework Design}{22}\protected@file@percent }
+\newlabel{Design:Framework}{{4.1}{22}}
+\citation{bouassida2001uml}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.1}{\ignorespaces Complete System Class Diagram}}{23}\protected@file@percent }
+\newlabel{fig:completesystemdiagram}{{4.1}{23}}
+\citation{bouassida2001uml}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.2}{\ignorespaces The framework's pattern diagram}}{25}\protected@file@percent }
+\newlabel{fig:completepatterndiagram}{{4.2}{25}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.2}Assumptions}{26}\protected@file@percent }
+\newlabel{Design:Assumptions}{{4.2}{26}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.3}Creating standardized objects}{27}\protected@file@percent }
+\newlabel{Design:StandardizedObjects}{{4.3}{27}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3.1}Variations}{28}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.4}Manipulating datasets}{29}\protected@file@percent }
+\newlabel{Design:Manipulating}{{4.4}{29}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.5}Combining Datasets}{31}\protected@file@percent }
+\newlabel{Design:Combining}{{4.5}{31}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.3}{\ignorespaces Sequence diagram illustrating how the TrainingSetCreator extracts the data from datasets to training and test sets}}{32}\protected@file@percent }
+\newlabel{fig:sequencediagram}{{4.3}{32}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.6}Creating Model}{33}\protected@file@percent }
+\newlabel{Design:Model}{{4.6}{33}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.7}Training and Evaluating Model}{33}\protected@file@percent }
+\newlabel{Design:Training}{{4.7}{33}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.8}Three Implementations}{34}\protected@file@percent }
+\newlabel{Design:Implementations}{{4.8}{34}}
 \citation{roberts1996evolving}
 \citation{roberts1996evolving}
-\@writefile{toc}{\contentsline {section}{\numberline {4.7}Three Implementations}{29}\protected@file@percent }
 \citation{georgiev2017low}
+\citation{georgiev2017low}
+\citation{georgiev2017low}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.4}{\ignorespaces The Multi-Task pipeline and Model used in \cite  {georgiev2017low}}}{37}\protected@file@percent }
+\newlabel{fig:georgievmodel}{{4.4}{37}}
+\citation{georgiev2017low}
+\citation{georgiev2017low}
+\citation{georgiev2017low}
+\citation{georgiev2017low}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.5}{\ignorespaces Object model instantiating the set-up from \cite  {georgiev2017low} after the TaskDatasets are created}}{39}\protected@file@percent }
+\newlabel{fig:georgievobjectmodel1}{{4.5}{39}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.6}{\ignorespaces Object model instantiating the set-up from \cite  {georgiev2017low} after the train and test sets are created along with the input objects for the Training}}{40}\protected@file@percent }
+\newlabel{fig:georgievobjectmodel2}{{4.6}{40}}
 \citation{xu2019multi}
-\@writefile{toc}{\contentsline {section}{\numberline {4.8}Easy changeable variables}{34}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.8.1}Different datasets}{34}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.8.2}Different Sample Rate}{34}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.8.3}Different Feature Extraction}{34}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.8.4}Different Data Transformation}{34}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.8.5}Different Dataloading}{34}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.8.6}Different DL Model}{34}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.8.7}Different Optimizer}{34}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.8.8}Different loss calculation}{34}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.8.9}Different loss combination}{34}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.8.10}Different Stopping Criteria}{34}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.8.11}Different Saving Locations}{34}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4.9}Easy expansions}{34}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.9.1}Adding Datasets}{34}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.9.2}Adding Tasks to datasets}{34}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4.10}Simplifying abstractions}{34}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.10.1}Saving/Reading Extracted Datasets}{34}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.10.2}Index Mode}{34}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.10.3}Combination of different datasets}{34}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.10.4}Train/test generation}{35}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.10.5}Training}{35}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.10.6}Evaluation}{35}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.10.7}Result Saving and Visualizing}{35}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.10.8}Interrupted Learning}{35}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4.11}Developmental side rails}{35}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.11.1}Abstract Data Reader}{35}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.11.2}Abstract Extraction Method}{35}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.11.3}Standardized valid input}{35}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.11.4}Centralized Train/test Operations}{35}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{\numberline {5}Implementation}{36}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.9}Easy changeable variables}{43}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.9.1}Different datasets}{43}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.9.2}Different Sample Rate}{43}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.9.3}Different Feature Extraction}{43}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.9.4}Different Data Transformation}{43}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.9.5}Different Dataloading}{43}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.9.6}Different DL Model}{43}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.9.7}Different Optimizer}{43}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.9.8}Different loss calculation}{43}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.9.9}Different loss combination}{43}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.9.10}Different Stopping Criteria}{43}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.9.11}Different Saving Locations}{43}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.10}Easy expansions}{43}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.10.1}Adding Datasets}{43}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.10.2}Adding Tasks to datasets}{43}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.11}Simplifying abstractions}{43}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.11.1}Saving/Reading Extracted Datasets}{43}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.11.2}Index Mode}{43}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.11.3}Combination of different datasets}{43}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.11.4}Train/test generation}{44}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.11.5}Training}{44}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.11.6}Evaluation}{44}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.11.7}Result Saving and Visualizing}{44}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.11.8}Interrupted Learning}{44}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.12}Developmental side rails}{44}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.12.1}Abstract Data Reader}{44}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.12.2}Abstract Extraction Method}{44}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.12.3}Standardized valid input}{44}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.12.4}Centralized Train/test Operations}{44}\protected@file@percent }
+\citation{paszke2019pytorch}
+\@writefile{toc}{\contentsline {chapter}{\numberline {5}Implementation}{45}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\@writefile{toc}{\contentsline {section}{\numberline {5.1}Technology}{36}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5.2}System Architecture}{36}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5.3}High Level Description}{36}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5.4}Data Reading}{36}\protected@file@percent }
-\newlabel{Impl:DataRead}{{5.4}{36}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4.1}Structure}{37}\protected@file@percent }
-\newlabel{Impl:DataRead:Structure}{{5.4.1}{37}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4.2}DataReader}{38}\protected@file@percent }
-\newlabel{Impl:DataRead:DataReader}{{5.4.2}{38}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4.3}ExtractionMethod}{38}\protected@file@percent }
-\newlabel{Impl:DataRead:ExtractionMethod}{{5.4.3}{38}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4.4}TaskDataset}{39}\protected@file@percent }
-\newlabel{Impl:DataRead:TaskDataset}{{5.4.4}{39}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5.1}{\ignorespaces TaskDataset Structure}}{40}\protected@file@percent }
-\newlabel{fig:taskdataset-structure}{{5.1}{40}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4.5}Examples To Get List}{42}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5.5}Data Loading}{43}\protected@file@percent }
-\newlabel{Impl:DataLoad}{{5.5}{43}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.1}Combining TaskDatasets}{43}\protected@file@percent }
-\newlabel{Impl:DataLoad:Combining}{{5.5.1}{43}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.2}Generating Train and Test Sets}{44}\protected@file@percent }
-\newlabel{Impl:DataLoad:GenerateTrainTest}{{5.5.2}{44}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.3}Preparing Inputs to same size}{45}\protected@file@percent }
-\newlabel{Impl:DataLoad:Prep}{{5.5.3}{45}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.4}Scaling Inputs}{46}\protected@file@percent }
-\newlabel{Impl:DataLoad:Scale}{{5.5.4}{46}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.5}Filtering Inputs}{47}\protected@file@percent }
-\newlabel{Impl:DataLoad:Filter}{{5.5.5}{47}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.6}Loading Data}{47}\protected@file@percent }
-\newlabel{Impl:DataLoad:Load}{{5.5.6}{47}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.6}Training}{48}\protected@file@percent }
-\newlabel{Impl:Training}{{5.6}{48}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.1}Model Creation}{48}\protected@file@percent }
-\newlabel{Impl:Training:Model}{{5.6.1}{48}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.2}Results Handling}{49}\protected@file@percent }
-\newlabel{Impl:Training:Results}{{5.6.2}{49}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.3}Training Updating}{51}\protected@file@percent }
-\newlabel{Impl:Training:Updating}{{5.6.3}{51}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.4}Evaluation}{53}\protected@file@percent }
-\newlabel{Impl:Training:Evaluation}{{5.6.4}{53}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.7}Complementary tools}{54}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5.8}Extendibility}{54}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.8.1}Classes that are meant to be extended}{55}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.8.2}Classes that can be extended}{56}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.8.3}Classes that should be extended from outside libraries}{58}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.8.4}Classes that should not be extended}{58}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{\numberline {6}Evaluation}{61}\protected@file@percent }
+\newlabel{Impl}{{5}{45}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.1}Technology}{45}\protected@file@percent }
+\newlabel{Impl:Technology}{{5.1}{45}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.2}High Level Description}{45}\protected@file@percent }
+\newlabel{Impl:Description}{{5.2}{45}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5.1}{\ignorespaces Simplified Pipeline Overview}}{46}\protected@file@percent }
+\newlabel{fig:simplifiedoverview}{{5.1}{46}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.3}Data Standardization}{46}\protected@file@percent }
+\newlabel{Impl:DataRead}{{5.3}{46}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.1}Structure}{46}\protected@file@percent }
+\newlabel{Impl:DataRead:Structure}{{5.3.1}{46}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.2}DataReader}{48}\protected@file@percent }
+\newlabel{Impl:DataRead:DataReader}{{5.3.2}{48}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.3}ExtractionMethod}{48}\protected@file@percent }
+\newlabel{Impl:DataRead:ExtractionMethod}{{5.3.3}{48}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5.2}{\ignorespaces }}{49}\protected@file@percent }
+\newlabel{fig:datareadingflow}{{5.2}{49}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5.3}{\ignorespaces Code which calls the abstract methods that need to be implemented in the DataReader}}{50}\protected@file@percent }
+\newlabel{fig:datareadersnip}{{5.3}{50}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5.4}{\ignorespaces }}{51}\protected@file@percent }
+\newlabel{fig:extractionmethodsnip}{{5.4}{51}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.4}TaskDataset}{51}\protected@file@percent }
+\newlabel{Impl:DataRead:TaskDataset}{{5.3.4}{51}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5.5}{\ignorespaces }}{53}\protected@file@percent }
+\newlabel{fig:taskdatasetaddinputssnip}{{5.5}{53}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.5}Example}{53}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5.4}Data Loading}{53}\protected@file@percent }
+\newlabel{Impl:DataLoad}{{5.4}{53}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5.6}{\ignorespaces }}{54}\protected@file@percent }
+\newlabel{fig:taskdatasetaddtargetssnip}{{5.6}{54}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4.1}Combining TaskDatasets}{54}\protected@file@percent }
+\newlabel{Impl:DataLoad:Combining}{{5.4.1}{54}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4.2}Generating Train and Test Sets}{55}\protected@file@percent }
+\newlabel{Impl:DataLoad:GenerateTrainTest}{{5.4.2}{55}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4.3}Preparing Inputs to same size}{56}\protected@file@percent }
+\newlabel{Impl:DataLoad:Prep}{{5.4.3}{56}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4.4}Scaling Inputs}{57}\protected@file@percent }
+\newlabel{Impl:DataLoad:Scale}{{5.4.4}{57}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4.5}Filtering Inputs}{58}\protected@file@percent }
+\newlabel{Impl:DataLoad:Filter}{{5.4.5}{58}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4.6}Loading Data}{58}\protected@file@percent }
+\newlabel{Impl:DataLoad:Load}{{5.4.6}{58}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5.7}{\ignorespaces }}{59}\protected@file@percent }
+\newlabel{fig:trainingsetcreatoroperationssnip}{{5.7}{59}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5.8}{\ignorespaces }}{60}\protected@file@percent }
+\newlabel{fig:trainingsetexecutionexamplesnip}{{5.8}{60}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4.7}TrainingSetCreator}{60}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5.5}Training}{60}\protected@file@percent }
+\newlabel{Impl:Training}{{5.5}{60}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.1}Model Creation}{60}\protected@file@percent }
+\newlabel{Impl:Training:Model}{{5.5.1}{60}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5.9}{\ignorespaces }}{61}\protected@file@percent }
+\newlabel{fig:completetrainingsnip}{{5.9}{61}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.2}Results Handling}{61}\protected@file@percent }
+\newlabel{Impl:Training:Results}{{5.5.2}{61}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.3}Training Updating}{63}\protected@file@percent }
+\newlabel{Impl:Training:Updating}{{5.5.3}{63}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.4}Evaluation}{66}\protected@file@percent }
+\newlabel{Impl:Training:Evaluation}{{5.5.4}{66}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.6}Complementary tools}{67}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5.7}Extendibility}{67}\protected@file@percent }
+\newlabel{Impl:Extendibility}{{5.7}{67}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.7.1}Classes that are meant to be extended}{67}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.7.2}Classes that can be extended}{69}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.7.3}Classes that should be extended from outside libraries}{70}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.7.4}Classes that should not be extended}{70}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5.8}Three Implementations}{72}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {6}Evaluation}{73}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\@writefile{toc}{\contentsline {section}{\numberline {6.1}Goals and Results}{61}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6.2}Discussion on the implementation}{61}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6.3}Memory Saving (and such)}{61}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6.4}Requirements}{61}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6.1}Goals and Results}{73}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6.2}Discussion on the implementation}{73}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6.3}Memory Saving (and such)}{73}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6.4}Requirements}{73}\protected@file@percent }
 \bibstyle{plainnat}
 \bibdata{references}
-\@writefile{toc}{\contentsline {chapter}{\numberline {7}Conclusion}{62}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {7}Conclusion}{74}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\@writefile{toc}{\contentsline {section}{\numberline {7.1}Future Work}{62}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7.1}Future Work}{74}\protected@file@percent }
 \bibcite{boregowda2018environmental}{{1}{2018}{{BoreGowda}}{{}}}
-\bibcite{caruana1997multitask}{{2}{1997}{{Caruana}}{{}}}
-\bibcite{de2012deap}{{3}{2012}{{De~Rainville et~al.}}{{De~Rainville, Fortin, Gardner, Parizeau, and Gagn{\'e}}}}
-\bibcite{duan2014survey}{{4}{2014}{{Duan et~al.}}{{Duan, Zhang, Roe, and Towsey}}}
-\bibcite{gemmeke2017audio}{{5}{2017}{{Gemmeke et~al.}}{{Gemmeke, Ellis, Freedman, Jansen, Lawrence, Moore, Plakal, and Ritter}}}
-\bibcite{georgiev2017heterogeneous}{{6}{2017}{{Georgiev}}{{}}}
-\bibcite{georgiev2017low}{{7}{2017}{{Georgiev et~al.}}{{Georgiev, Bhattacharya, Lane, and Mascolo}}}
-\bibcite{oneto2019taking}{{8}{2019}{{Oneto et~al.}}{{Oneto, Doninini, Elders, and Pontil}}}
-\bibcite{roberts1996evolving}{{9}{1996}{{Roberts et~al.}}{{Roberts, Johnson, et~al.}}}
-\bibcite{sakti2016deep}{{10}{2016}{{Sakti et~al.}}{{Sakti, Kawanishi, Neubig, Yoshino, and Nakamura}}}
-\bibcite{tagliasacchi2020multi}{{11}{2020}{{Tagliasacchi et~al.}}{{Tagliasacchi, de~Chaumont~Quitry, and Roblek}}}
-\bibcite{tonami2019joint}{{12}{2019}{{Tonami et~al.}}{{Tonami, Imoto, Niitsuma, Yamanishi, and Yamashita}}}
-\bibcite{xu2019multi}{{13}{2019}{{Xu et~al.}}{{Xu, Huang, Cheng, and Song}}}
+\bibcite{bouassida2001uml}{{2}{2001}{{Bouassida et~al.}}{{Bouassida, Ben-Abdallah, and Gargouri}}}
+\bibcite{caruana1997multitask}{{3}{1997}{{Caruana}}{{}}}
+\bibcite{de2012deap}{{4}{2012}{{De~Rainville et~al.}}{{De~Rainville, Fortin, Gardner, Parizeau, and Gagn{\'e}}}}
+\bibcite{duan2014survey}{{5}{2014}{{Duan et~al.}}{{Duan, Zhang, Roe, and Towsey}}}
+\bibcite{gemmeke2017audio}{{6}{2017}{{Gemmeke et~al.}}{{Gemmeke, Ellis, Freedman, Jansen, Lawrence, Moore, Plakal, and Ritter}}}
+\bibcite{georgiev2017heterogeneous}{{7}{2017}{{Georgiev}}{{}}}
+\bibcite{georgiev2017low}{{8}{2017}{{Georgiev et~al.}}{{Georgiev, Bhattacharya, Lane, and Mascolo}}}
+\bibcite{oneto2019taking}{{9}{2019}{{Oneto et~al.}}{{Oneto, Doninini, Elders, and Pontil}}}
+\bibcite{paszke2019pytorch}{{10}{2019}{{Paszke et~al.}}{{Paszke, Gross, Massa, Lerer, Bradbury, Chanan, Killeen, Lin, Gimelshein, Antiga, et~al.}}}
+\bibcite{roberts1996evolving}{{11}{1996}{{Roberts et~al.}}{{Roberts, Johnson, et~al.}}}
+\bibcite{sakti2016deep}{{12}{2016}{{Sakti et~al.}}{{Sakti, Kawanishi, Neubig, Yoshino, and Nakamura}}}
+\bibcite{schmid1997systematic}{{13}{1997}{{Schmid}}{{}}}
+\bibcite{tagliasacchi2020multi}{{14}{2020}{{Tagliasacchi et~al.}}{{Tagliasacchi, de~Chaumont~Quitry, and Roblek}}}
+\bibcite{tonami2019joint}{{15}{2019}{{Tonami et~al.}}{{Tonami, Imoto, Niitsuma, Yamanishi, and Yamashita}}}
+\bibcite{xu2019multi}{{16}{2019}{{Xu et~al.}}{{Xu, Huang, Cheng, and Song}}}

@@ -1,32 +1,83 @@
-\chapter{System Design}
+\chapter{System Design} \label{Design}
 
 % Typing datasets
 % Typing tasks
 % Typing combining methods
 
 
-\section{Assumptions}
+
+
+\section{Framework Design} \label{Design:Framework}
+TODO: Explain how the system was modeled based on the design requirements
+TODO: Explain the concept of hotspots
+
+Development frameworks have been defined by \cite{roberts1996evolving} as "reusable designs of all or part of a software system described by a set of abstract classes and the way instances of those classes collaborate". The bread and butter of framework design is developing abstractions that cut usual required work, while identifying the points where an implementing application likely requires to change. These variable points in an application domain are called hot-spots \cite{schmid1997systematic}. In the context of a framework, these are the points where the software allows to plug in application specific classes or subsystems. These hot-spots come in two forms: white-box and black-box hot-spots. White-box hot-spots require programming the plugged in blocks of code, while black-box hot-spots give the option to select from pre-implemented solutions. \\
+
+Expanding existing ground work for deep learning systems with abstractions for developing and researching multi-task learning set-ups, means that the focus will be on providing abstractions cutting effort of combining datasets and tasks, but also that providing exhaustive possibilities are nearly impossible. Therefore, the design will only offer white-box solutions, but with a number of pre-made implementations addressing commonly available features in deep learning.\\
+
+The nature of variability in the envisioned use is not static for a developed application. Researching multi-task set-ups requires implementing and executing multiple variations and comparing their results. The hot-spots thus have to be variable at run-time while ensuring the validity of the pipeline and differentiability of the different instantiations. Furthermore, in the interest of fast development, every variation in dataset handling must both be able to be implemented for one specific dataset or implemented for all at once.\\
+
+
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/CompleteSystemDiagram"}
+	\caption[Complete System Class Diagram]{Class Diagram}
+	\label{fig:completesystemdiagram}
+\end{figure}
+
+With these characteristics of variations in the framework in mind, the design UML is drawn up following the design principles from \citet{bouassida2001uml}. The definitions of white-box and black-box hot-spots differ slightly, in that they do not go for all descendants here. In stead black-box hot-spots cover classes with predefined code that can change their functionality based on allowed input variables for the class, yet should not be modified in code. The reason for this change is that in the original definitions complete class hierarchies where either white-box or black-box hot-spots where the classes and all of its inheritants either contained default code -and the desired implementation should be chosen from available options- or it did not. This is too rigid as it only allows extra extensions in a class if there is no default code.\\
+
+In figure \ref{fig:completesystemdiagram} is the framework's extended UML class diagram. The explanation of the extra annotations goes as follows:
+
+\begin{enumerate}
+	\item Classes with a grey box in the top indicate that these classes  compose a white-box hot-spot. These classes require an extending implementation from the developer that can expand the original methods defined in the class.
+	\item Classes with a black box in the top indicate that these classes are black-box hot-spots. These have default code present in their implementation and should not be modified.
+	\item Grey circles in front of methods signify functions that change from one implementation to another. These are abstract methods that express variation points.
+	\item Generalization relationships marked {incomplete} have base implementations that already have pre-made inheritants, but can be extended with extra classes.
+	\item Highlighted borders signify that a class belongs to the program's core. The core are the 'frozen' parts of the system, which will remain unchanged in implementing applications made with the framework.
+\end{enumerate}
+
+
+Going into the model overview, without going into the details and inner workings, a structural explanation will be given. First thing to note is the central class TaskDatset, which is the encompassing object that standardizes the data and ensures its validity as input for the rest of the system. This is connected to possibly multiple Task objects which keeps task related information, separated from the dataset itself. Datasets can have multiple tasks and the same tasks can be found in multiple datasets. It also has an ExtractionMethod object which decouples all data transformation implementations. \\
+
+On top of the TaskDatasets are two classes where it functions as a component in a composition structure. These are the HoldTaskDataset - which adds training set splitting and managing functionalities - and the ConcatTaskDataset - which adds the possibility to combine other datasets.\\
+
+Alongside these, two creating classes can be found: the DataReader and the TrainingSetCreator. The DataReader has a grey square as it should be extended for every dataset implemented. This transitions a raw dataset to a standardized object. The TrainingSetCreator then take the different standardized objects, transforms and combines them into valid input for the training and evaluation functionalities.\\
+ 
+This leads to the final section of the model, which is centered around the Training class. This in turn requires 4 classes to function: The ConcatTaskDataset for its input data, torch's nn Module for the Multi-Task model, a Results object for calculating and storing results and a TrainingUtils object for decoupling some of its methods and allowing their variation. While Task objects are contained in the TaskDataset, there is still a line drawn from the Training class, as these objects contain data that can change Task dependent functionalities in the Training class.\\
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/CompletePatternDiagram"}
+	\caption{The framework's pattern diagram}
+	\label{fig:completepatterndiagram}
+\end{figure}
+
+To further clarify the roles played by the classes in the network, a pattern diagram following the example in \citet{bouassida2001uml}. Two patterns - the composite patterns the ConcatTaskDataset and the HoldTaskDataset creates with the TaskDataset - are already mentioned above. The Task and the ExtractionMethod classes are also obvious strategy patterns as they decouple implementations from the original classes. The ExtractionMethod accumulates a few data transformations, which can be matched together through its implementing Decorator pattern. \\
+
+How these classes function and why these methodologies were chosen will be explained further in the section, but two classes should be still highlighted in the overview. One is the TaskDataset which also has a builder role. This includes adding partmental creator functionalities, which are used here to ensure that a TaskDataset is correctly implemented as well as facilitating the process of building such complex object. The other is the Pipeline pattern of the TrainingSetCreator. This creates a sequence of operations that lead from the raw datasets to combined inputs for a specific training set-up. The Pipeline pattern is what allows every step up to training to be scalable, modularly variable and correctly executed. \\
+
+One guiding design rule for this framework was that no class should assume anything about the underlying implementation of another. This is to ensure modularity in the system. Given that the framework is a white-box implementation, most developmental speed-up is made by letting the developer only focus on one class per responsibility and giving the ability to execute the same parallel operations as if they were performed on one object. The overall design envisions the whole pipeline from datasets to trained models, but these can be picked apart according to the developer's needs. A TaskDataset will always be valid input for training and evaluation, no matter if it came from a DataReader. A Results object can always write data to and read data from files, no matter if it happens in training. \\
+
+
+\section{Assumptions} \label{Design:Assumptions}
+
+Before resuming to the detailed explanations of the operation designs, a small summary of the design assumptions made is given:
 
 \begin{itemize}
-	\item For feature extraction, the device can hold each entire extracted dataset separately in memory, but no 
-	\item the model creation is central
-	\item training loop and evaluation loop should not change
+	\item The device is unlikely to hold many datasets in memory at once, yet for systems that can, this might still be desirable for the speed-up it can provide. 
+	\item The model creation is central and developers should be able to build pytorch models unrestrained. 
+	\item The training and evaluation loops should not required modification, as they are static for all (gradient descent based) applications, but they should take variable functionalities.
+	\item Hot spots for variation will likely have to be varied at each point within the runtime itself
+	\item Preprocessing will have to be both easily made the same for multiple datasets as have an individual process for each one
 \end{itemize}
 
 
-TODO: Explain how the system was modeled based on the design requirements
-
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=\textwidth]{../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOverview}
-	\caption{Simplified System overview}
-\end{figure}
-
-\section{Creating standardized objects}
+\section{Creating standardized objects} \label{Design:StandardizedObjects}
 
 One of the most important aspects of this framework is the addition of standardized objects to encapsulate the input. These allow for easy manipulation and combination of different datasets. The objective is that once created, the developer should not have to worry about them further down the pipeline. \\
 
-TODO: Give in the model for the TaskDataset
 
 The standardized object is called the TaskDataset. This contains the feature matrices extracted from the audio files in the dataset, their target labels which form the ground truths and their corresponding task information. Creating these objects from the raw datasets is a complex task which requires the navigation of their storage structure, that is specific for each dataset. Developers should thus be responsible for getting the correct data out of the dataset but should get proper assurance the object was created correctly. \\
 
@@ -45,16 +96,20 @@ Next variation are datasets that have target data for multiple tasks. While one 
 
 The last one are datasets that have "groupings". What is meant here are datasets consisting of audio files that are already split, with each part having their own ground truth, but cannot be divided later (e.g. parts of the same split going to the training set and the test set). For this instance, the same formality is used as in sklearn's splitting functions and a grouping list can be stored where the index corresponding to each instance belonging together contains the same number. \\
 
-The objective is to treat the resulting TaskDataset uniformly regardless of variation. The strategy for handling each of these cases will be discussed in the appropriate sections later.
+The objective is to treat the resulting TaskDataset uniformly regardless of variation. The strategy for handling each of these cases will be discussed in the appropriate sections later. \\
 
 
-\section{Manipulating datasets}
+\section{Manipulating datasets} \label{Design:Manipulating}
 
 As mentioned before the created standardized objects are also responsible for providing easy manipulation abilities for datasets. The choice was made to include dataset changing handles on the object itself, which can be called by other classes, without having them know the underlying representation of the object itself. These handles fall into two categories: functions that transform data instances and functions that change the collection itself. \\
 
 The functions that transform instances are the most likely to change, as these have to be tweaked based on their effect on performance of the resulting recognition system. What we understand under these are data scaling methods, windowing functions, but also feature extraction as this transforms the original time series representation to one fit for the required learning task. The data scaling and other possibly required preparation functions will depend on the feature extraction method used. For example, a feature extraction method which outputs a time dependent representation will require a windowing function that cuts the feature matrices to the same shape in order to fit them in the same batches, while one that outputs matrices of the same shape will not. To adress this along with the likelihood of change, the instance transformation functions are encapsulated in an object called the Extraction\_Method. \\
 
-This is an abstract template that developers have to extend in order to define their required implementation. Parameters for these implementations can be given on the fly as input to instantiate these objects. The whole object is then stored in return as input in the TaskDataset which will then use it when the call is made to transform the data. \\
+This is an abstract template that developers have to extend in order to define their required implementation. Parameters for these implementations can be given on the fly as input to instantiate these objects. The whole object is then stored in return as input in the TaskDataset which will then use it when the call is made to transform the data. The extraction\_method object has a decorator inheritant, with a number of premade classes that already implement numerous transformation functions, as can be seen in figure \ref{fig:completesystemdiagram}.\\
+
+The extracion\_method object accumulates a number of transformations that depend on which extraction method is used. These can be categorized as feature extractors, scalers, preparation fitters and preparation executors. Feature extractors create a feature matrix tensor from a given time series representing an audio file. Scalers include calculating metrics for scaling and then using those to execute the scaling of the data. Preparation fitters and executors are separated. Executors mainly concise of framing and segmenting operations which transform the data in matrices of the same size. Fitters calculate the parameters for these operations, but these operations can always be executed with parameters given by the user.\\
+
+The Extraction\_Method object has another hidden function which lies in its name variable. The TaskDataset uses this object's name to store its extracted feature matrices to files. This happens in the interest of being able to quickly reiterate and compare different variations. The extraction method itself also gets stored, to allow for recreating the input at a different time than the original extraction and transformations were done.\\
 
 Functions that change the collection itself then are ones that filter and split the data. For these ones it does not matter what is contained in the actual instances, but simply how the collection is composed. Filtering the data instances - based on their associated labels - is present to offer the ability of adjusting the label distribution. This happens through taking a (pseudo)random sample of data instances with the associated label of the defined size the developer wants the (maximum) amount of labels to be. The rest then gets filtered out of the current dataset object. \\
 
@@ -64,20 +119,32 @@ Creating training and test sets themselves do not simply happen at random either
 
 
 
-\section{Combining Datasets}
+\section{Combining Datasets} \label{Design:Combining}
 
-When the datasets are created and prepared for training, they need to be combined as a single dataset, but from which the instances can be processed differently per task in training and evaluation. The solution for this is another composite object called the ConcatTaskDataset. Built on the groundwork from PyTorch's ConcatDataset, this class contains a list of TaskDatasets and builds a front for the data loading in training making it seem like one big dataset. Alongside this, the class contains methods for differentiating the different tasks afterwards. At instantiation every individual dataset gets loaded with information to combine the target vectors into one. More detailed information on the exact problems that need to be addressed and how it achieves this are given in TODO: refer to section.
+When the datasets are created and prepared for training, they need to be combined as a single dataset, but from which the instances can be processed differently per task in training and evaluation. The solution for this is another composite object called the ConcatTaskDataset. Built on the groundwork from PyTorch's ConcatDataset, this class contains a list of TaskDatasets and builds a front for the data loading in training making it seem like one big dataset. Alongside this, the class contains methods for differentiating the different tasks afterwards. At instantiation every individual dataset gets loaded with information to combine the target vectors into one. More detailed information on the exact problems that need to be addressed and how it achieves this are given in section \ref{Impl:DataLoad}. \\
 
-\section{Creating Model}
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/SequenceDiagram"}
+	\caption{Sequence diagram illustrating how the TrainingSetCreator extracts the data from datasets to training and test sets}
+	\label{fig:sequencediagram}
+\end{figure}
+
+To illustrate the execution flow of creating the input for training and evaluation a sequence diagram is given in figure \ref{fig:sequencediagram}. In the above sections the designs are detailed for the individual handling of the datasets. This diagram illustrates how the TrainingSetCreator brings the operations together by functioning the handles present on the above classes. As mentioned in \ref{Design:Framework}, this class is a pipeline pattern where dataset and manipulations can be optionally added and scaled to individual or all TaskDatasets at the same time.\\
+
+Not only does this add modularly replaceable sections in the handling of data, the TaskDataset objects are reset every time a new pipeline piece gets added. This allows modifying the creation of a TaskDataset while keeping the ones that do not need to be altered. Imagine the situation where multiple TaskDatasets are created and combined, when the developer wants to alter the creation of one of them. In stead of having to recreate all the objects, only one of them is reset and remade. \\
+
+
+\section{Creating Model} \label{Design:Model}
 
 This framework is aimed at providing a facilitating extension to PyTorch for training and testing multi-head hard parameter sharing models. Model creation thus puts as little requirements on designing the actual models as possible. The rest of the system builds on Pytorch's classes as to ensure that the input would be valid for any PyTorch module. The only presumption the system has to make is that the output is a tuple with each entry being the predicted results for each task in the order of the task list from the input dataset. While no class was made that ensures the developer does this correctly - with the model creation being central, the developer should have the freedom to create whatever they want, adjusting the functionalities around it if necessary - there are two base multi-head networks, a CNN and a DNN, available which has variable layers based on the input. These also already include adaptations based on the type of task. In this area the mantra is that the developer knows best. \\
 
 
-\section{Training and Evaluating Model}
+\section{Training and Evaluating Model} \label{Design:Training}
 
 When the model is designed and the input dataset is created, they will be inserted into the method which trains and/or evaluates a model. These two are similar, with the only exception that the training function updates the model parameters every loop. Training (and evaluating) a model happens through a method which should remain static, but can vary its functionalities based on input. The reason for this is that the framework can only ensure the validity of the created pipeline if it controls how inputs are received and outputs are processed. In other words if it knows what it is going to do with the received data. \\
 
-The handling of objects and data which the rest of the system does not rely on however, can be overwritten in numerous ways, depending on the required change. These are all discussed in TODO: REFERENCE. Every batch statistics are calculated from comparing the model's results to the ground truths. This happens through an adapter class that takes the predicted results and is responsible for writing them to the correct files. This class, the Results object, is wired to write results already to TensorBoard. This library provides easy visualization for deep learning metrics. This happens live, both in the training and evaluation loop, so that developer can follow the progress and intervene during the loop if necessary. The developer can easily extend this class and define their own desired metric calculations, as the results only receive the ground truths, predictions and the loss. \\
+The handling of objects and data which the rest of the system does not rely on however, can be overwritten in numerous ways, depending on the required change. These are all discussed in section \ref{Impl:Extendibility}. Every batch statistics are calculated from comparing the model's results to the ground truths. This happens through an adapter class that takes the predicted results and is responsible for writing them to the correct files. This class, the Results object, is wired to write results already to TensorBoard. This library provides easy visualization for deep learning metrics. This happens live, both in the training and evaluation loop, so that developer can follow the progress and intervene during the loop if necessary. The developer can easily extend this class and define their own desired metric calculations, as the results only receive the ground truths, predictions and the loss. \\
 
 Alongside metric calculation and storage, the Results object also provides checkpointing function for the model's parameters. This makes it possible to retrieve a model's previous states. The Results object thus acts as a unique adapter for each training run, managing and distributing files resulting from training and evaluation. Because of this design choice, it is possible to continue or restart previous runs by instantiating the same Results object and giving it to the "blind" training and evaluation functions. \\
 
@@ -85,7 +152,7 @@ Especially the evaluation function dynamically uses this, as it can either take 
 
 Changing non-metric related functions - like early stopping - can be done by another extra object which can be given as input, namely the Training\_Utils object. This simply contains functions, for which the developer can write an extending object and give as input. \\ 
 
-\section{Three Implementations}
+\section{Three Implementations} \label{Design:Implementations}
 
 With the base strategies in the pipeline designed, it might seem complex without a clear reason why its abstractions were built. This section will give insight to how the framework was developed alongside giving clear examples of how the previous designs are instantiated. \\
 
@@ -108,9 +175,15 @@ The chosen tasks here were Speaker Identification, Emotion Recognition, Stress D
 
 For extracting features they utilised both MFCC TODO: REFERENCE and their own created summary of filter banks. This summary consists of creating different statistical aggregation metrics (e.g. the mean, the standard deviation, the median, ...) per coefficient from extracted log filter banks TODO: Reference. This creates a representation from an audio sample independent of time and requiring less space.\\
 
-TODO: Include their model 
 
-For design purposes, the multi-task pipeline is examined. The system is built for low quality audio with a sample rate of 8 kHZ. From the audio MFCC or the logbank summaries are extracted. Each task has a different dataset but all the inputs require the same extraction. The resulting matrices are then normalized using the mean and the standard deviation from the numerical data. This is then used as input for training the model, which is done using gradient descent. The data is fed to the training module in stratified batches. In this context, it means that a batch contains samples from every dataset, with the amount of samples from every dataset matching internal size ratios of the datasets. \\
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievModel"}
+	\caption{The Multi-Task pipeline and Model used in \cite{georgiev2017low}}
+	\label{fig:georgievmodel}
+\end{figure}
+
+For design purposes, the multi-task pipeline is examined. The system is built for low quality audio with a sample rate of 8 kHZ. From the audio MFCC or the logbank summaries are extracted. Each task has a different dataset but all the inputs require the same extraction. The resulting matrices are then normalized using the mean and the standard deviation from the numerical data. This is then used as input for training the model, which is done using gradient descent. The data is fed to the training module in stratified batches. In this context, it means that a batch contains samples from every dataset, with the amount of samples from every dataset matching internal size ratios of the datasets. The summary of this can be found in figure \ref{fig:georgievmodel} \\
 
 A few lessons have been made from recreating this exact set-up. 
 
@@ -124,7 +197,27 @@ A few lessons have been made from recreating this exact set-up.
 \end{itemize}
 
 
-TODO: Model instantiation and explain \\
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievObjectModel1"}
+	\caption{Object model instantiating the set-up from \cite{georgiev2017low} after the TaskDatasets are created}
+	\label{fig:georgievobjectmodel1}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievObjectModel2"}
+	\caption{Object model instantiating the set-up from \cite{georgiev2017low} after the train and test sets are created along with the input objects for the Training}
+	\label{fig:georgievobjectmodel2}
+\end{figure}
+
+
+In figures \ref{fig:georgievobjectmodel1} and \ref{fig:georgievobjectmodel2} two object models depicting instantiations of the set-up. In the first image is the situation where the TrainingSetCreator executed the TaskDataset generation method in each DataReader class. This illustrates how a Dataset which has a predefined test set is combined with the others which do not, while all of them have the same transformations in the ExtractionMethod object. The ExtractionMethod object then is composed of a LogbankSummaryExtraction, a PerCellScaling, a FramePreparation and a MedianWindowSizePreparationFitter object, accumulated in the LogbankSummaryExtractionMethod. A step-by-step explanation goes as follows:\\
+
+The LogbankSummaryMethod extracts summaries of logbank filters as explained in the paper. PerCellScaling standardizes the data by calculating the mean and standard deviation of every separate cell aggregated from every feature matrix in the dataset. These are then used to achieve a per cell data distribution with a mean of 0 and a deviation of 1. FramePreparation cuts the matrices to frames of the same window size. This size is then decided by calculating the median matrix size in the dataset in the MedianWindowSizePreparationFitter. \\
+ 
+In the next object model, it is demonstrated then what the situation is after the other datasets have their testDatasets split off and how these are accumulated in their concatenated train and test sets. These, along with a Results object and Multi-Task model form the input for training.\\
 
 
 {\large \textbf{A Multi-task Learning Approach Based on Convolutional Neural Network for Acoustic Scene Classification}} \\
@@ -170,7 +263,7 @@ Explain further extensions
 
 \subsection{Different DL Model}
 
-\subsection{Different Optimizer}
+\subsection{Different Optimizer}G
 
 \subsection{Different loss calculation}
 

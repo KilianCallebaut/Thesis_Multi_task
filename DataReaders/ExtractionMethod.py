@@ -163,6 +163,7 @@ class BaseExtractionMethod(ExtractionMethod):
     def name(self, value):
         self.extraction_method.name = value
 
+
 #### EXTRACTION METHODS #####
 
 class LogbankExtraction(BaseExtractionMethod):
@@ -291,7 +292,7 @@ class FramePreparation(BaseExtractionMethod):
 
     def prepare_input(self, input_tensor: torch.tensor) -> List[torch.tensor]:
         assert 'window_size' in self.preparation_params, 'Framing transforms require window_size parameter'
-        window_size = self.preparation_params['window_size']
+        window_size = int(self.preparation_params['window_size'])
         if window_size > len(input_tensor):
             frame = torch.vstack(
                 [input_tensor, torch.zeros((window_size - input_tensor.shape[0], input_tensor.shape[1]))])

@@ -30,7 +30,7 @@ class DCASE2017_SS(DataReader):
                     testing_base_path=self.object_path.format('eval'))
 
     def get_path(self):
-        return os.path.join(self.get_base_path()['training_base_path'],
+        return os.path.join(self.get_base_path()['base_path'],
                             'DCASE2017_SS.obj')
 
     def get_eval_path(self):

@@ -1,4 +1,4 @@
-\begin{thebibliography}{13}
+\begin{thebibliography}{16}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -9,6 +9,12 @@
 HB~BoreGowda.
 \newblock Environmental sound recognition: A survey.
 \newblock 2018.
+
+\bibitem[Bouassida et~al.(2001)Bouassida, Ben-Abdallah, and
+  Gargouri]{bouassida2001uml}
+Nadia Bouassida, Han{\^e}ne Ben-Abdallah, and Fa{\"\i}ez Gargouri.
+\newblock A uml based design language for framework reuse.
+\newblock In \emph{OOIS 2001}, pages 211--221. Springer, 2001.
 
 \bibitem[Caruana(1997)]{caruana1997multitask}
 Rich Caruana.
@@ -59,6 +65,14 @@ Luca Oneto, Michele Doninini, Amon Elders, and Massimiliano Pontil.
 \newblock In \emph{Proceedings of the 2019 AAAI/ACM Conference on AI, Ethics,
   and Society}, pages 227--237, 2019.
 
+\bibitem[Paszke et~al.(2019)Paszke, Gross, Massa, Lerer, Bradbury, Chanan,
+  Killeen, Lin, Gimelshein, Antiga, et~al.]{paszke2019pytorch}
+Adam Paszke, Sam Gross, Francisco Massa, Adam Lerer, James Bradbury, Gregory
+  Chanan, Trevor Killeen, Zeming Lin, Natalia Gimelshein, Luca Antiga, et~al.
+\newblock Pytorch: An imperative style, high-performance deep learning library.
+\newblock \emph{Advances in neural information processing systems},
+  32:\penalty0 8026--8037, 2019.
+
 \bibitem[Roberts et~al.(1996)Roberts, Johnson, et~al.]{roberts1996evolving}
 Don Roberts, Ralph Johnson, et~al.
 \newblock Evolving frameworks: A pattern language for developing
@@ -74,6 +88,12 @@ Sakriani Sakti, Seiji Kawanishi, Graham Neubig, Koichiro Yoshino, and Satoshi
   simultaneous recognition of speech and environmental sounds.
 \newblock In \emph{2016 IEEE Spoken Language Technology Workshop (SLT)}, pages
   35--42. IEEE, 2016.
+
+\bibitem[Schmid(1997)]{schmid1997systematic}
+Han~Albrecht Schmid.
+\newblock Systematic framework design by generalization.
+\newblock \emph{Communications of the ACM}, 40\penalty0 (10):\penalty0 48--51,
+  1997.
 
 \bibitem[Tagliasacchi et~al.(2020)Tagliasacchi, de~Chaumont~Quitry, and
   Roblek]{tagliasacchi2020multi}

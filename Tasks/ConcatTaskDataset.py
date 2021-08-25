@@ -28,6 +28,7 @@ class ConcatTaskDataset(ConcatDataset):
             datasets[d].task.set_task_group(distinct_tasks.index(datasets[d].task))
             for t in datasets[d].extra_tasks:
                 t[0].set_task_group(distinct_tasks.index(t))
+        self.__make_same_tasks_same_objects__(datasets)
         super().__init__(datasets)
 
     def get_task_list(self) -> List[Task]:
@@ -40,6 +41,11 @@ class ConcatTaskDataset(ConcatDataset):
                 if t not in all_tasks:
                     all_tasks.append(t)
         return all_tasks
+
+    def __make_same_tasks_same_objects__(self, datasets: List[TaskDataset]):
+        distinct = self.__get_distinct_tasks__(datasets)
+        for d in datasets:
+            d.task = distinct[distinct.index(d.task)]
 
     def get_target_flags(self):
         """

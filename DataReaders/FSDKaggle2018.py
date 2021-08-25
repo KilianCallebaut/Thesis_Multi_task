@@ -36,7 +36,6 @@ class FSDKaggle2018(DataReader):
     def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict):
         perc = 0
         files = [os.path.join(self.root, self.audio_folder, name) for name in self.file_labels['fname']]
-
         for audio_idx in range(len(files)):
             path = files[audio_idx]
             read_wav = self.preprocess_signal(self.load_wav(path), **preprocess_parameters)
@@ -46,13 +45,18 @@ class FSDKaggle2018(DataReader):
                 print("Percentage done: {}".format(perc))
                 perc += 1
 
+        self.skipped = []
         files = [os.path.join(self.root, 'audio_test', name) for name in self.file_labels_val['fname']]
         for audio_idx in range(len(files)):
             path = files[audio_idx]
-            read_wav = self.preprocess_signal(self.load_wav(path), **preprocess_parameters)
+            read_wav = self.load_wav(path)
+            if read_wav is None:
+                self.skipped.append(audio_idx)
+                continue
+            read_wav = self.preprocess_signal(read_wav, **preprocess_parameters)
             taskDataset.test_set.add_input(read_wav)
 
-            if perc < (audio_idx / len(self.file_labels)) * 100:
+            if perc < (audio_idx / len(files)) * 100:
                 print("Percentage done: {}".format(perc))
                 perc += 1
 
@@ -66,12 +70,19 @@ class FSDKaggle2018(DataReader):
             target = [long(distinct_labels[label_id] == f) for label_id in range(len(distinct_labels))]
             targets.append(target)
         targets_val = []
+
+        ind = 0
         for f in self.file_labels_val.label.to_numpy():
+            if ind in self.skipped:
+                ind += 1
+                continue
             target = [long(distinct_labels[label_id] == f) for label_id in range(len(distinct_labels))]
             targets_val.append(target)
+            ind += 1
 
         task = MultiClassTask(
             name='FSDKaggle2018',
             output_labels=distinct_labels)
         taskDataset.add_task_and_targets(task=task, targets=targets)
         taskDataset.test_set.add_task_and_targets(task=task, targets=targets_val)
+

@@ -1,3 +1,4 @@
+import copy
 from typing import Optional, List
 
 from sklearn.model_selection import BaseCrossValidator
@@ -18,6 +19,7 @@ class ConcatTrainingSetCreator:
         self.data_readers = {}
         self.extraction_methods = {}
         self.sample_rates = {}
+        self.preproccesing = {}
         self.dics_of_label_limits = {}
         self.validators = {}
         self.taskdatasets = {}
@@ -27,7 +29,7 @@ class ConcatTrainingSetCreator:
     def get_keys(self):
         return self.data_readers.keys()
 
-    def reset_taskDatasets(self, class_list: List[str]=None):
+    def reset_taskDatasets(self, class_list: List[str] = None):
         if class_list and self.taskdatasets:
             for k in self.taskdatasets.keys():
                 if k not in class_list:
@@ -39,18 +41,18 @@ class ConcatTrainingSetCreator:
                         data_reader: DataReader):
         self.data_readers[type(data_reader).__name__] = data_reader
 
-
     def __add__pipe__(self,
                       addition,
                       dictionary: dict,
                       key: str = None):
         if not key:
             for k in self.data_readers.keys():
-                dictionary[k] = addition
+                dictionary[k] = copy.copy(addition)
+            self.reset_taskDatasets()
         else:
             assert key in self.data_readers, 'There is not dataset with this key'
             dictionary[key] = addition
-        self.reset_taskDatasets()
+            self.reset_taskDatasets([k for k in self.data_readers.keys() if k is not key])
 
     def __get__pipe__(self,
                       dictionary: dict,
@@ -60,12 +62,20 @@ class ConcatTrainingSetCreator:
         else:
             return None
 
+    ###############
+    # Extraction
+    ###############
+
     def add_extraction_method(self,
                               extraction_method: ExtractionMethod,
                               key: str = None):
         self.__add__pipe__(addition=extraction_method,
                            dictionary=self.extraction_methods,
                            key=key)
+
+    ###############
+    # Signal Preprocessing
+    ###############
 
     def add_sample_rate(self,
                         sample_rate: int,
@@ -74,12 +84,27 @@ class ConcatTrainingSetCreator:
                            dictionary=self.sample_rates,
                            key=key)
 
+    def add_signal_preprocessing(self,
+                                 preprocess_dict: dict,
+                                 key: str = None):
+        self.__add__pipe__(addition=preprocess_dict,
+                           dictionary=self.preproccesing,
+                           key=key)
+
+    ###############
+    # Filtering
+    ###############
+
     def add_sampling(self,
                      dic_of_labels_limits: dict,
                      key: str = None):
         self.__add__pipe__(addition=dic_of_labels_limits,
                            dictionary=self.dics_of_label_limits,
                            key=key)
+
+    ###############
+    # Splitting
+    ###############
 
     def add_cross_validator(self,
                             validator: BaseCrossValidator,
@@ -93,9 +118,14 @@ class ConcatTrainingSetCreator:
         for dr in self.data_readers.keys():
             if (class_list and dr not in class_list) or dr in self.taskdatasets.keys():
                 continue
-            tsk = self.data_readers[dr].return_taskDataset(extraction_method=self.extraction_methods[dr],
-                                                           resample_to=self.__get__pipe__(key=dr,
-                                                                                          dictionary=self.sample_rates))
+            tsk = self.data_readers[dr].return_taskDataset(
+                extraction_method=self.__get__pipe__(key=dr, dictionary=self.extraction_methods),
+                resample_to=self.__get__pipe__(key=dr,
+                                               dictionary=self.sample_rates),
+                **self.__get__pipe__(key=dr,
+                                     dictionary=self.preproccesing)
+
+            )
             if dr in self.dics_of_label_limits:
                 tsk.sample_labels(self.__get__pipe__(key=dr, dictionary=self.dics_of_label_limits[dr]))
 
@@ -124,4 +154,4 @@ class ConcatTrainingSetCreator:
             fold += 1
             for t in train_tests:
                 t[0].normalize_fit()
-            yield ConcatTaskDataset([t[0] for t in train_tests]), ConcatTaskDataset([t[1] for t in train_tests])
+            yield ConcatTaskDataset([t[0] for t in train_tests]), ConcatTaskDataset([t[1] for t in train_tests]), fold
