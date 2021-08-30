@@ -32,22 +32,32 @@ Speech recognition tasks
 Lu et al 2004
 Seltzer 2013
 Dong et al. 2015
-Kim et al. 2017
 sakti et al 2016
 Meyer
-“Speech enhancement
-and recognition using multi-task learning of long short-term memory recurrent neural networks chen
+“Speech enhancement and recognition using multi-task learning of long short-term memory recurrent neural networks chen
 
-\textbf{}
+\textbf{Multi-Task Speech Recognition Tasks.} For Automatic Speech Recognition, multi-task learning has been around for a while. \cite{lu2004multitask} proposed an architecture where noisy speech audio is fed into a Recurrent Neural Network that has a number of shared layers with three output heads. One for the prediction of words, one for enhancing speech and one for gender detection. With adding these auxiliary tasks on the same dataset, they succesfully managed to improve the original task's - Speech recognition - performance. Their reasoning for utilising multi-task learning was that performance degrades dramatically for when there is a mismatch between train and testing conditions. Multi-Task learning added robustness to classification performance. \\
+
+A lot of the work done in multi-task speech recognition focuses on this sort of improvement of the original signal's representation through adding additional optimization goals. \cite{seltzer2013multi} focus on the improvement of phoneme recognition by adding the prediction of the phone labels, state contexts and phone contexts - context here being predicting the label in the previous and next time frame. TODO: FIND MORE EXAMPLES\\
+
+Eventually though, speech recognition tasks found a broader application for multi-task learning. \cite{dong2015multi} takes this idea of a shared model building more robust feature representations and uses it as a way to model the english language for multi-language translation. This made the system share information for translating english to numerous other languages at once, but also makes it possible to greatly expand the dataset for training a robust representation of speech in a language. This is because it is now able to train from both parallel (i.e. translation for each target language) datasets as non-parallel ones.
+
+
 
 Shift towards Multi-Task as performance improver
 
 - Same dataset auxiliary
+Kim et al. 2017
 lee 2019
 abrol 2020
 Deshmukh 2020
 zeng et al 2019
 Fernando 2020
+
+\textbf{General purpose audio}
+
+\textbf{Auxiliary same dataset}
+
 
 
 - Other dataset other task
