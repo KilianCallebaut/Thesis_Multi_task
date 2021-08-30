@@ -10,7 +10,7 @@ TODO: Explain multi task learning with unimportant auxiliary task for performanc
 \section{Multi-task Deep Learning Audio Tasks}
 TODO: Explain the merging of these fields and what (little) work has been done there so far. Also what it requires for more work to be done and what the current work lacks.
 
-Audio recognition tasks have only recently seen the adoption of multi-task frameworks, but for a quickly expanding set of reasons. This section maps out the key applications where, why and how deep learning systems where created to address problems. Single task focused systems were the way to go as instinctively it made sense that the best performances would be obtained by focusing on improving solely on building a system addressing that problem. Two factors however changed this notion. For one, systems in real life contexts often have to perform multiple related tasks at once TODO: REFERENCE. For another, sharing information between related tasks have been shown to improve performances as it averages noise patterns and creates a more robust representation of the original data for the final classifier(s) TODO: REFERENCE. Here, it will be demonstrated how these factors influenced the recent evolution towards trying to build systems that optimise for multiple objectives at once. 
+Audio recognition tasks have only recently seen the adoption of multi-task frameworks, but for a quickly expanding set of reasons. This section maps out the key applications where, why and how deep learning systems where created to address problems. Single task focused systems were the way to go as instinctively it made sense that the best performances would be obtained by focusing on improving solely on building a system addressing that problem. Two factors however changed this notion. For one, systems in real life contexts often have to perform multiple related tasks at once TODO: REFERENCE. For another, sharing information between related tasks have been shown to improve performances as it averages noise patterns and creates a more robust representation of the original data for the final classifier(s) TODO: REFERENCE. Here, it will be demonstrated how these factors influenced the recent evolution towards trying to build systems that optimise for multiple objectives at once. //
 
 TODO: create table of papers
 
@@ -20,7 +20,13 @@ prof-life log Ziaei 2013
 Zhang et al 2019
 Park 2020
 
-\textbf{Demonstrating Necessities.} What will be done first is demonstrate the context where multiple tasks need to be performed, but were not optimized at the same time in a multi-task setting.  
+
+
+\textbf{Demonstrating Necessities.} What will be done first is demonstrate the context where multiple tasks need to be performed, but were not optimized at the same time in a multi-task setting. For painting a clearer picture of contexts where multiple tasks have to be learned for the same data, this work will first delve into the context where this has been addressed without a multi-task framework. In TODO:REFERENCE, a lifelogging system is designed which tries to annotate the naturalistic audio from a sensor device with different types of labels to create a contextual summary of a person's day. This takes an audio stream and performs speech activity detection, the results of which then in turn uses for its other tasks. It estimates the amount of speakers in an audio segment; uses that estimate to then recognize the speakers and determine the primary and secondary speakers. At the same time it also performs the task of "environmental sniffing" or detecting the current environment of the device. The results of this set-up are illustrated in TODO: GET DIAGRAM. This example is given to illustrate the need and the types of tasks that would be learned at the same time in a context. Task information is shared here, but segmentally in stead of parallel. The thing is however that this does not share information to improve the representation, which ignores potentially useful information. This also requires every task to be performed individually, a set-up which might not always be allowed in terms of time and resource constraints.//
+
+To clarify how this singular focus forms the basis for problems in naturalistic audio contexts, the work done by \cite{park2020augmenting} is addressed. Here, the context of an audio device is being detected in a short time frame of seconds, by recognizing events that are tied together in wat they call contexts. First of all is the obvious need in this case for fast detection. Second point lies in their results. They find that including the detection of speech events significantly reduces the performance of the general classifier's performance. Speech audio is different in structure from other background audio events and likely requires its own model for reliable detection.//
+
+With the first example being one of tasks connected segmentially and the second being unified in the same classifier, the stage is set for exploring the compromise between the two: separated, yet parallel task inference. While Multi-Task settings had demonstrated their use in visual tasks TODO: REFERENCE, the adoption in audio tasks was (similar to the trajectory of deep learning algorithms) a bit slower to develop. The first domain that showed its potential were speech recognition tasks.//
 
 Speech recognition tasks
 Lu et al 2004
@@ -32,6 +38,7 @@ Meyer
 “Speech enhancement
 and recognition using multi-task learning of long short-term memory recurrent neural networks chen
 
+\textbf{}
 
 Shift towards Multi-Task as performance improver
 
