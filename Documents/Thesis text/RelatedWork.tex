@@ -1,13 +1,71 @@
 \chapter{Related Work}
 
-\section{Audio Classification}
+\section{Audio Recognition}
 TODO: Explain the field of audio classification, how it normally works, what kind of tasks there are and what kind of things are researched
 
 \section{Multi-task Learning}
 TODO: Explain the field of multi-task learning, where it came from, what the paradigm brought in improvements and what kind of things are researched
+TODO: Explain multi task learning with unimportant auxiliary task for performance improvement
 
 \section{Multi-task Deep Learning Audio Tasks}
 TODO: Explain the merging of these fields and what (little) work has been done there so far. Also what it requires for more work to be done and what the current work lacks.
+
+Audio recognition tasks have only recently seen the adoption of multi-task frameworks, but for a quickly expanding set of reasons. This section maps out the key applications where, why and how deep learning systems where created to address problems. Single task focused systems were the way to go as instinctively it made sense that the best performances would be obtained by focusing on improving solely on building a system addressing that problem. Two factors however changed this notion. For one, systems in real life contexts often have to perform multiple related tasks at once TODO: REFERENCE. For another, sharing information between related tasks have been shown to improve performances as it averages noise patterns and creates a more robust representation of the original data for the final classifier(s) TODO: REFERENCE. Here, it will be demonstrated how these factors influenced the recent evolution towards trying to build systems that optimise for multiple objectives at once. 
+
+TODO: create table of papers
+
+Where it was used:
+Multiple tasks that needed to be performed but were done without multi-task
+prof-life log Ziaei 2013
+Zhang et al 2019
+Park 2020
+
+\textbf{Demonstrating Necessities.} What will be done first is demonstrate the context where multiple tasks need to be performed, but were not optimized at the same time in a multi-task setting.  
+
+Speech recognition tasks
+Lu et al 2004
+Seltzer 2013
+Dong et al. 2015
+Kim et al. 2017
+sakti et al 2016
+Meyer
+“Speech enhancement
+and recognition using multi-task learning of long short-term memory recurrent neural networks chen
+
+
+Shift towards Multi-Task as performance improver
+
+- Same dataset auxiliary
+lee 2019
+abrol 2020
+Deshmukh 2020
+zeng et al 2019
+Fernando 2020
+
+
+- Other dataset other task
+Sakti et al 2016
+Tonami 2019
+xu 2019
+Huang 2020
+Imoto
+Jung et al 2020
+komatsu 2020
+
+
+- Same Task split in two
+Morfi 2018
+Pankajakshan
+Phan et al 2019
+Xia 2020
+
+
+Multi-Task Learning for other purposes
+Georgiev
+Tagliasacchi
+
+
+
 
 \section{Development Frameworks}
 TODO: Get examples in from other development frameworks, how they answered the needs in their fields and why they are needed
