@@ -1,4 +1,4 @@
-\begin{thebibliography}{16}
+\begin{thebibliography}{20}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -58,12 +58,33 @@ Petko Georgiev, Sourav Bhattacharya, Nicholas~D Lane, and Cecilia Mascolo.
 \newblock \emph{Proceedings of the ACM on Interactive, Mobile, Wearable and
   Ubiquitous Technologies}, 1\penalty0 (3):\penalty0 1--19, 2017.
 
+\bibitem[Lu et~al.(2004)Lu, Lu, Sehgal, Gupta, Du, Tham, Green, and
+  Wan]{lu2004multitask}
+Youyi Lu, Fei Lu, Siddharth Sehgal, Swati Gupta, Jingsheng Du, Chee~Hong Tham,
+  Phil Green, and Vincent Wan.
+\newblock Multitask learning in connectionist speech recognition.
+\newblock In \emph{Proceedings of the Australian International Conference on
+  Speech Science and Technology}. Citeseer, 2004.
+
+\bibitem[Meyer(2019)]{meyer2019multi}
+Josh Meyer.
+\newblock \emph{Multi-task and transfer learning in low-resource speech
+  recognition}.
+\newblock PhD thesis, The University of Arizona, 2019.
+
 \bibitem[Oneto et~al.(2019)Oneto, Doninini, Elders, and
   Pontil]{oneto2019taking}
 Luca Oneto, Michele Doninini, Amon Elders, and Massimiliano Pontil.
 \newblock Taking advantage of multitask learning for fair classification.
 \newblock In \emph{Proceedings of the 2019 AAAI/ACM Conference on AI, Ethics,
   and Society}, pages 227--237, 2019.
+
+\bibitem[Park et~al.(2020)Park, Min, Bhattacharya, and
+  Kawsar]{park2020augmenting}
+Chunjong Park, Chulhong Min, Sourav Bhattacharya, and Fahim Kawsar.
+\newblock Augmenting conversational agents with ambient acoustic contexts.
+\newblock In \emph{22nd International Conference on Human-Computer Interaction
+  with Mobile Devices and Services}, pages 1--9, 2020.
 
 \bibitem[Paszke et~al.(2019)Paszke, Gross, Massa, Lerer, Bradbury, Chanan,
   Killeen, Lin, Gimelshein, Antiga, et~al.]{paszke2019pytorch}
@@ -94,6 +115,13 @@ Han~Albrecht Schmid.
 \newblock Systematic framework design by generalization.
 \newblock \emph{Communications of the ACM}, 40\penalty0 (10):\penalty0 48--51,
   1997.
+
+\bibitem[Seltzer and Droppo(2013)]{seltzer2013multi}
+Michael~L Seltzer and Jasha Droppo.
+\newblock Multi-task learning in deep neural networks for improved phoneme
+  recognition.
+\newblock In \emph{2013 IEEE International Conference on Acoustics, Speech and
+  Signal Processing}, pages 6965--6969. IEEE, 2013.
 
 \bibitem[Tagliasacchi et~al.(2020)Tagliasacchi, de~Chaumont~Quitry, and
   Roblek]{tagliasacchi2020multi}
