@@ -8,18 +8,10 @@ TODO: Explain the field of multi-task learning, where it came from, what the par
 TODO: Explain multi task learning with unimportant auxiliary task for performance improvement
 
 \section{Multi-task Deep Learning Audio Tasks}
-TODO: Explain the merging of these fields and what (little) work has been done there so far. Also what it requires for more work to be done and what the current work lacks.
 
 Audio recognition tasks have only recently seen the adoption of multi-task frameworks, but for a quickly expanding set of reasons. This section maps out the key applications where, why and how deep learning systems where created to address problems. Single task focused systems were the way to go as instinctively it made sense that the best performances would be obtained by focusing on improving solely on building a system addressing that problem. Two factors however changed this notion. For one, systems in real life contexts often have to perform multiple related tasks at once TODO: REFERENCE. For another, sharing information between related tasks have been shown to improve performances as it averages noise patterns and creates a more robust representation of the original data for the final classifier(s) TODO: REFERENCE. Here, it will be demonstrated how these factors influenced the recent evolution towards trying to build systems that optimise for multiple objectives at once.\\
 
 TODO: create table of papers
-
-Where it was used:
-Multiple tasks that needed to be performed but were done without multi-task
-prof-life log Ziaei 2013
-Zhang et al 2019
-Park 2020
-
 
 
 \textbf{Non-Parallel Multiple Tasks.} What will be done first is demonstrate the context where multiple tasks need to be performed, but were not optimized at the same time in a multi-task setting. For painting a clearer picture of contexts where multiple tasks have to be learned for the same data, this work will first delve into the context where this has been addressed without a multi-task framework. In TODO:REFERENCE, a lifelogging system is designed which tries to annotate the naturalistic audio from a sensor device with different types of labels to create a contextual summary of a person's day. This takes an audio stream and performs speech activity detection, the results of which then in turn uses for its other tasks. It estimates the amount of speakers in an audio segment; uses that estimate to then recognize the speakers and determine the primary and secondary speakers. At the same time it also performs the task of "environmental sniffing" or detecting the current environment of the device. The results of this set-up are illustrated in TODO: GET DIAGRAM. This example is given to illustrate the need and the types of tasks that would be learned at the same time in a context. Task information is shared here, but segmentally in stead of parallel. The thing is however that this does not share information to improve the representation, which ignores potentially useful information. This also requires every task to be performed individually, a set-up which might not always be allowed in terms of time and resource constraints.\\
@@ -33,25 +25,11 @@ With the first example being one of tasks connected segmentially and the second 
 
 \cite{lu2004multitask} proposed an architecture where noisy speech audio is fed into a Recurrent Neural Network that has a number of shared layers with three output heads. One for the prediction of words, one for enhancing speech and one for gender detection. With adding these auxiliary tasks on the same dataset, they succesfully managed to improve the original task's - Speech recognition - performance. Their reasoning for utilising multi-task learning was that performance degrades dramatically for when there is a mismatch between train and testing conditions. Multi-Task learning added robustness to classification performance. \\
 
-A lot of the work done in multi-task speech recognition focuses on this sort of improvement of the original signal's representation through adding additional optimization goals. \cite{seltzer2013multi} focus on the improvement of phoneme recognition by adding the prediction of the phone labels, state contexts and phone contexts - context here being predicting the label in the previous and next time frame. 
-%TODO: FIND MORE EXAMPLES\\
+A lot of the work done in multi-task speech recognition focuses on this sort of improvement of the original signal's representation through adding additional optimization goals. \cite{seltzer2013multi} focus on the improvement of phoneme recognition by adding the prediction of the phone labels, state contexts and phone contexts - context here being predicting the label in the previous and next time frame. \\
 
+\textbf{General purpose audio} The techniques that were found for Speech Recognition purposes eventually found their way for general purpose audio tasks. There are a few trends within acoustic multi-task definitions that will be discussed here, which will be important bases for the system to cover.  The trends deal with how the additional task was utilised in the same model. Four of these trends are addressed in this section: Auxiliary tasks on the same dataset, combining tasks from different datasets, splitting a task and finally multi-task learning for non-performance related issues. \\
 
-Shift towards Multi-Task as performance improver
-
-- Same dataset auxiliary
-Kim et al. 2017
-lee 2019
-abrol 2020
-Deshmukh 2020
-zeng et al 2019
-Fernando 2020
-
-\textbf{General purpose audio}
-
-The techniques that were found for Speech Recognition purposes eventually found their way for general purpose audio tasks. There are a few trends within acoustic multi-task definitions that will be discussed here, which will be important bases for the system to cover.  The trends deal with how the additional task was utilised in the same model. Four of these trends are addressed in this section: Auxiliary tasks on the same dataset, combining tasks from different datasets, splitting a task and finally multi-task learning for non-performance related issues. \\
-
-\textbf{Auxiliary tasks on the same dataset.} The first strain of set-ups concern audio tasks that receive an additional task on the same dataset. This is usually with the aim to improve the original task's performance. These in turn come in two forms: supervised tasks \citep{kim2017speech} \citep{zeng2019spectrogram} \citep{abrol2020learning} \citep{fernando2020temporarily} \citep{wu2020domain} \citep{sun2017compressed} \citep{lopez2019keyword} \citep{panchapagesan2016multi} and self-supervised tasks \citep{lee2019label}  \citep{deshmukh2020multi} \citep{lu2004multitask}.  \\
+\textbf{Auxiliary tasks on the same dataset.} The first strain of set-ups concern audio tasks that receive an additional task on the same dataset. This is usually with the aim to improve the original task's performance. These in turn come in two forms: supervised tasks \citep{kim2017speech} \citep{zeng2019spectrogram} \citep{abrol2020learning} \citep{fernando2020temporarily} \citep{wu2020domain} \citep{sun2017compressed} \citep{lopez2019keyword} \citep{panchapagesan2016multi} and self-supervised tasks \citep{lee2019label}  \citep{deshmukh2020multi} \citep{pankajakshan2019polyphonic} \citep{lu2004multitask}.  \\
 
 Often, the auxiliary task is not important and only serves to help the neural network create a representation of the data that is formed for its qualities the additional tasks require. With a supervised task as an auxiliary task, this takes a more semantic form. The task is semantically related. In \cite{zeng2019spectrogram}, the multi-task set-up results are explored for combining speaker identification and accent recognition in one case and emotion recognition in speech and emotion recognition in song in another. In both these instances, the semantic connections for the targets are clear.  \cite{abrol2020learning} does this concept slightly different and learns basically the same task but at different abstraction levels, in order to improve learn leveraging hierarchical relation structures. The set-up for \cite{fernando2020temporarily} contains detecting speech activity along with predicting the next audio segment, using layers of LSTM. Here layers  are shared at different levels, with a generative adversarial network that learns the loss function.\\
 
@@ -60,31 +38,64 @@ For the other scenario where the set-up adds a self-supervised task, this usuall
 
 For the system to be created this signifies a lot of different possibilities in terms of possible targets, beyond simple labels as well as a possibly inexhaustible range for models and training requirements. Any abstraction made in this regard must be fully adaptable. Tasks should also freely be addable or retractable in order to investigate its combinations to the main task. Furthermore, grouping instances should be possible, as seen in the example for Multiple Instance Learning. \\
 
-- Other dataset other task
-Sakti et al 2016
-Tonami 2019
-xu 2019
-Huang 2020
-Imoto
-Jung et al 2020
-komatsu 2020
+
+\textbf{Different datasets, different tasks.} Another utilisation of multi-task set-ups is to bring together two different tasks with - usually - two different datasets. The idea is to bring two tasks together that could prove to be beneficial for each other as successfully performing their combined task is directly beneficial for the task at hand. The improvement is either aimed for one task like in the previous case, or it is to benefit the performance of both tasks at once. \\
+
+One of the clearest and more popular examples of this set-up is in set-ups that combine the Acoustic Event Detection (AED) task - which detects which sound events are present at each time frame - and the Acoustic Scene Recognition (ASR) - which detects in which background scene a sound sample takes place in \citep{tonami2019joint} \citep{xu2019multi} \citep{imoto2020sound} \citep{jung2020acoustic} \citep{komatsu2020scene}. The idea is that information on detecting specific scenes will help in detecting events, either by learning the noise pattern related to that scene or because certain events are inherently linked to certain scenes. \cite{tonami2019joint} does exactly this, building a simple multi-head model that shares three layers before venturing off in task specific networks. The labels which improved in this context are investigated, finding that labels which are only connected to each other but not other labels in the parallel task improve significantly in accurate detection. \cite{xu2019multi} performs this but with a sole focus on improving AED. \cite{imoto2020sound} builds on this but reforms the ASR to output soft labels (percentages in stead of deterministic labels). For training there is a separate independent network for ASR that teaches the ASR task in the multi-head model in what is a called a teacher-student learning framework. Finally \citep{jung2020acoustic} and \citep{komatsu2020scene} adopt a model, where the different task results are directly combined afterwards to only output better labels for one task.\\
+
+Other examples are limited and underdeveloped.  The work done by \cite{sakti2016deep} might give a hint for the reason. They tried to bring together speech recognition with environmental sound detection, yet have to end up limiting the shared layers in both tasks, mainly finding that combined features improve the set-up slightly. These two tasks might have been too unrelated for the multi-task set-up to offer improvement, but very little investigation into this aspect was performed. The final example is found in the work by \cite{huang2020guided} and \cite{huang2020multi}. This is interesting as it finds a way to improve its intended task (AED) with weaker labeled data. It combines its model at different layers with splitting branches, adding an optional side branch for stronger labeled data that improves overal performance if available. This potential for extending original datasets with weaker datasets but with likely more instances is immense, which was proven by winning first place in the 2019 DCASE Task 4 competition. This shows how the multi-task framework has been gaining momentum over recent years, with the capacity to improve available task information, whether it is by simply providing more contextual information or finding a way to provide more valuable training data.\\
 
 
-- Same Task split in two
-Morfi 2018
-Pankajakshan
-Phan et al 2019
-\citep{phan2017dnn}
-Xia 2020
-\citep{nwe2017convolutional}
+
+\textbf{Same task split.} Present in the last example \cite{huang2020guided} is the idea of using a multi-task framework to split a complex task in two separate tasks and combining the results for a single improved prediction. This mostly happens for AED tasks, by redefining this task as two tasks: determining the event type and determining the time . This either happens through splitting the task into a classification task for the type and a sound activity detection task that simply outputs whether any sound event is present in a time frame \citep{morfi2018deep} \citep{pankajakshan2019polyphonic}. The other way it has been performed was by adding a regression task for the time offset of events to add more exact information on when the time exactly starts. These always involve some sort of result fusion after (probabilistic) prediction output. \\
+
+In \cite{phan2017dnn} and \cite{phan2019unifying} also resembles this model, but is only a multi-task framework right at the end, as it optimizes for different criteria. One is the detection error, one is the distance error of events and the final is the confidence in the first two predictions. This does not completely defines the task as different ones, simply optimizes for different criteria, but still requires fusion after the fact. \\
+
+The final interesting case is that in \cite{nwe2017convolutional}. This splits up ASR into multiple tasks, which are all still ASR but in different recording conditions. The labels are split up into three groups: Indoor scenes, sparse outdoor scenes and crowded outdoor scenes, each group being defined as its own task. \\
+
+In essence tasks on datasets can be reconstructed in an infinite amount of ways. The system should offer this level of control over datasets and tasks. With the idea in \cite{huang2020guided}, it should also take in account parallel models that influence the training of the multi-task framework that was built.\\
 
 
-Multi-Task Learning for other purposes
-Georgiev
-Tagliasacchi
+\textbf{Multi-Task Learning For Other Reasons.} Finally, there are the cases where the multi-task set-up is used for reasons that do not relate to performance improvements of any kind. This idea is still limited, but illustrates how much further the multi-task framework's applicability goes. These investigate the capabilities of combining datasets and tasks that are unrelated and possibly require combining a large amount of heterogeous tasks to be combined together, compared to the previous trends.\\
+
+In \cite{georgiev2017heterogeneous}, a multi-task framework is used as a means to compress deep learning models that have to perform different tasks. Even in the instances where independent models are technically more optimal, it might be preferable to combine their network layers. This is useful if the model has to be deployed on computationally constrained devices. Multiple independent models can require too high resource costs, so the argument is that using a multi-task framework that does not sacrifice too much in terms of performance compresses the amount of complexity for execution of the same tasks.\\
+
+For the same reasons, the work in \cite{tagliasacchi2020multi} is performed, but offers more adaptation to the different tasks. Both of these examples bring together numerous tasks and datasets. These require a lot of work on combining dataset differences for execution in the same network. Also take in account that there is a process to arrive at these models, in which design and parameter differences have to be varied (often for each dataset in the same way), evaluated and compared with the variations before. \\
+
+What is taken away from each of these trends, is that there are numerous opportunities in acoustic multi-task learning. An huge amounts of variations and possibilities still have to be explored. Facilitating free experimentation with the differences in tasks and the way to combine these would be crucial for promoting further research in these fields. A platform could be built that can dynamically handle these cases while offering abstractions that quickly deal with physical problems that can arise from these cases. \\
+
+Summarizing the take aways from observing these trends goes as follows. In the first case, datasets can have multiple tasks defined on them. Extra tasks come in different forms themselves, even as aggregated forms from other tasks (multiple instance learning). In the second case, different tasks and different datasets get combined. This of course necessitates dealing with dataset differences while the different ones can be seen as one big dataset or not. Models outside the multi-head model can also be brought in to affect training. The performance effect on the datasets and the output labels also needs options to be evaluated closely. The third case clarifies that developers need a lot of control over both tasks and datasets. The final case demonstrates that multi-task networks are implemented for more than performance improvements and a possibly huge amount of datasets and tasks can be combined together. Handling of these are as likely to be different for each case as they are to be the same for all.\\
 
 
 
 
 \section{Development Frameworks}
 TODO: Get examples in from other development frameworks, how they answered the needs in their fields and why they are needed
+
+Frameworks offer designs and pieces of code that are reusable and functionally allow the creation of different applications within its domain. These code structures are generic, intended to reduce the cost of development. The flexibility of frameworks are hard to design compared to specific applications as a lot of possibilities and abstractions have to be planned for beforehand. Framework design is its own subject that has a lengthy research history already. \\
+
+\cite{schmid1997systematic} and \cite{roberts1996evolving} are early works discussing the characteristics of framework development. The main element that has to be designed for is variability. Software patterns have to be put in to place that are organized in two parts \citep{ben2004uml}: hot-spots and the core. Hot-spots are places in a system where implementing applications have their own specific adaptation in place. The core is common to all applications derived from the framework. \\
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.49\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/BlackBox"}
+	\includegraphics[width=0.49\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/WhiteBox"}	\caption[Black White Box Hot Spot]{Black box hot-spot (left) and White box hot-spot (right)}
+	\label{fig:blackbox}
+\end{figure}
+
+Hot-spots come in two forms: black box and white box. Black box hot-spots have their variations predefined and implementations can only pick one. White box hot-spots require a developer's own implementation by programming a class or subsystem. These are illustrated in figure \ref{fig:blackbox}.\\
+
+Variability itself comes with a few characteristics \citep{schmid1997systematic}. 
+\begin{itemize}
+	\item The common responsibility which overcouples different alternatives.
+	\item different alternatives that realize the common responsibility
+	\item The variability type that depends on the subjects structure.
+	\item The multiplicity of alternatives and the structure of alternatives
+	\item The point in time where the alternative is picked and implemented (fixed or at run-time)
+\end{itemize}
+
+UML design of a framework has to visualize the flexibility and points of variability clearly. This means that some extensions are necessary compared to the usual standards for normal applications. This is a subject which has been researched in a number of papers \citep{bouassida2001uml} \citep{ben2004uml}. The main takeaway is that the points of extension should be clear for developers immediately. Designing of a framework requires abstraction from specific implementations and how this happened in this work will be expanded upon in section \ref{Design:Framework}. \\
+
+No prior work is found on offering a framework for multi-task deep learning, let alone for audio purposes. Closely related is \cite{dcase-repo_2021}, a tool released by the time behind the yearly dcase \cite{dcase} competition for audio recognition tasks. This is a standalone library which offers tools for processing audio and metadata files. The designs are mostly based around offering containers which come with functionalities for processing audio and metadata. However, this adds a lot of extra layers to the data which is a problem for verifying different datasets are processed in the same way. This also separates target handling from the inputs, which forms a problem for operations that rely on their connection (e.g. filtering). Training functionalities are present but need to fit in the predefined mold and do not allow multiple different datasets (without having to redefine them as exactly the same dataset). Finally, this requires that data is stored in similar ways to their own datasets which is not always the case. All these elements contribute to the overlying problem for multi-task set-ups that deals with collections of datasets, for which this implementation the handling of data is too individualistic. \\
+
+

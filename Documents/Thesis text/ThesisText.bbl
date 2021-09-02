@@ -1,9 +1,16 @@
-\begin{thebibliography}{20}
+\begin{thebibliography}{40}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Abrol and Sharma(2020)]{abrol2020learning}
+Vinayak Abrol and Pulkit Sharma.
+\newblock Learning hierarchy aware embedding from raw audio for acoustic scene
+  classification.
+\newblock \emph{IEEE/ACM Transactions on Audio, Speech, and Language
+  Processing}, 28:\penalty0 1964--1973, 2020.
 
 \bibitem[BoreGowda(2018)]{boregowda2018environmental}
 HB~BoreGowda.
@@ -29,12 +36,27 @@ Fran{\c{c}}ois-Michel De~Rainville, F{\'e}lix-Antoine Fortin, Marc-Andr{\'e}
 \newblock In \emph{Proceedings of the 14th annual conference companion on
   Genetic and evolutionary computation}, pages 85--92, 2012.
 
+\bibitem[Deshmukh et~al.(2020)Deshmukh, Raj, and Singh]{deshmukh2020multi}
+Soham Deshmukh, Bhiksha Raj, and Rita Singh.
+\newblock Multi-task learning for interpretable weakly labelled sound event
+  detection.
+\newblock \emph{arXiv preprint arXiv:2008.07085}, 2020.
+
 \bibitem[Duan et~al.(2014)Duan, Zhang, Roe, and Towsey]{duan2014survey}
 Shufei Duan, Jinglan Zhang, Paul Roe, and Michael Towsey.
 \newblock A survey of tagging techniques for music, speech and environmental
   sound.
 \newblock \emph{Artificial Intelligence Review}, 42\penalty0 (4):\penalty0
   637--661, 2014.
+
+\bibitem[Fernando et~al.(2020)Fernando, Sridharan, McLaren, Priyasad, Denman,
+  and Fookes]{fernando2020temporarily}
+Tharindu Fernando, Sridha Sridharan, Mitchell McLaren, Darshana Priyasad, Simon
+  Denman, and Clinton Fookes.
+\newblock Temporarily-aware context modeling using generative adversarial
+  networks for speech activity detection.
+\newblock \emph{IEEE/ACM Transactions on Audio, Speech, and Language
+  Processing}, 28:\penalty0 1159--1169, 2020.
 
 \bibitem[Gemmeke et~al.(2017)Gemmeke, Ellis, Freedman, Jansen, Lawrence, Moore,
   Plakal, and Ritter]{gemmeke2017audio}
@@ -58,6 +80,66 @@ Petko Georgiev, Sourav Bhattacharya, Nicholas~D Lane, and Cecilia Mascolo.
 \newblock \emph{Proceedings of the ACM on Interactive, Mobile, Wearable and
   Ubiquitous Technologies}, 1\penalty0 (3):\penalty0 1--19, 2017.
 
+\bibitem[Huang et~al.(2020{\natexlab{a}})Huang, Lin, Ma, Wang, Liu, Qian, Liu,
+  and Ouch]{huang2020guided}
+Yuxin Huang, Liwei Lin, Shuo Ma, Xiangdong Wang, Hong Liu, Yueliang Qian, Min
+  Liu, and Kazushige Ouch.
+\newblock Guided multi-branch learning systems for dcase 2020 task 4.
+\newblock \emph{arXiv preprint arXiv:2007.10638}, 2020{\natexlab{a}}.
+
+\bibitem[Huang et~al.(2020{\natexlab{b}})Huang, Wang, Lin, Liu, and
+  Qian]{huang2020multi}
+Yuxin Huang, Xiangdong Wang, Liwei Lin, Hong Liu, and Yueliang Qian.
+\newblock Multi-branch learning for weakly-labeled sound event detection.
+\newblock In \emph{ICASSP 2020-2020 IEEE International Conference on Acoustics,
+  Speech and Signal Processing (ICASSP)}, pages 641--645. IEEE,
+  2020{\natexlab{b}}.
+
+\bibitem[Imoto et~al.(2020)Imoto, Tonami, Koizumi, Yasuda, Yamanishi, and
+  Yamashita]{imoto2020sound}
+Keisuke Imoto, Noriyuki Tonami, Yuma Koizumi, Masahiro Yasuda, Ryosuke
+  Yamanishi, and Yoichi Yamashita.
+\newblock Sound event detection by multitask learning of sound events and
+  scenes with soft scene labels.
+\newblock In \emph{ICASSP 2020-2020 IEEE International Conference on Acoustics,
+  Speech and Signal Processing (ICASSP)}, pages 621--625. IEEE, 2020.
+
+\bibitem[Jung et~al.(2020)Jung, Shim, Kim, Kim, and Yu]{jung2020acoustic}
+Jee-weon Jung, Hye-jin Shim, Ju-ho Kim, Seung-bin Kim, and Ha-Jin Yu.
+\newblock Acoustic scene classification using audio tagging.
+\newblock \emph{arXiv preprint arXiv:2003.09164}, 2020.
+
+\bibitem[Kim et~al.(2017)Kim, Lee, Ha, Lee, Lee, and Kim]{kim2017speech}
+Nam~Kyun Kim, Jiwon Lee, Hun~Kyu Ha, Geon~Woo Lee, Jung~Hyuk Lee, and Hong~Kook
+  Kim.
+\newblock Speech emotion recognition based on multi-task learning using a
+  convolutional neural network.
+\newblock In \emph{2017 Asia-Pacific Signal and Information Processing
+  Association Annual Summit and Conference (APSIPA ASC)}, pages 704--707. IEEE,
+  2017.
+
+\bibitem[Komatsu et~al.(2020)Komatsu, Imoto, and Togami]{komatsu2020scene}
+Tatsuya Komatsu, Keisuke Imoto, and Masahito Togami.
+\newblock Scene-dependent acoustic event detection with scene conditioning and
+  fake-scene-conditioned loss.
+\newblock In \emph{ICASSP 2020-2020 IEEE International Conference on Acoustics,
+  Speech and Signal Processing (ICASSP)}, pages 646--650. IEEE, 2020.
+
+\bibitem[Lee et~al.(2019)Lee, Gong, Padhy, Rouditchenko, and
+  Ndirango]{lee2019label}
+Tyler Lee, Ting Gong, Suchismita Padhy, Andrew Rouditchenko, and Anthony
+  Ndirango.
+\newblock Label-efficient audio classification through multitask learning and
+  self-supervision.
+\newblock \emph{arXiv preprint arXiv:1910.12587}, 2019.
+
+\bibitem[L{\'o}pez-Espejo et~al.(2019)L{\'o}pez-Espejo, Tan, and
+  Jensen]{lopez2019keyword}
+Iv{\'a}n L{\'o}pez-Espejo, Zheng-Hua Tan, and Jesper Jensen.
+\newblock Keyword spotting for hearing assistive devices robust to external
+  speakers.
+\newblock \emph{arXiv preprint arXiv:1906.09417}, 2019.
+
 \bibitem[Lu et~al.(2004)Lu, Lu, Sehgal, Gupta, Du, Tham, Green, and
   Wan]{lu2004multitask}
 Youyi Lu, Fei Lu, Siddharth Sehgal, Swati Gupta, Jingsheng Du, Chee~Hong Tham,
@@ -72,12 +154,42 @@ Josh Meyer.
   recognition}.
 \newblock PhD thesis, The University of Arizona, 2019.
 
+\bibitem[Morfi and Stowell(2018)]{morfi2018deep}
+Veronica Morfi and Dan Stowell.
+\newblock Deep learning for audio event detection and tagging on low-resource
+  datasets.
+\newblock \emph{Applied Sciences}, 8\penalty0 (8):\penalty0 1397, 2018.
+
+\bibitem[Nwe et~al.(2017)Nwe, Dat, and Ma]{nwe2017convolutional}
+Tin~Lay Nwe, Tran~Huy Dat, and Bin Ma.
+\newblock Convolutional neural network with multi-task learning scheme for
+  acoustic scene classification.
+\newblock In \emph{2017 Asia-Pacific Signal and Information Processing
+  Association Annual Summit and Conference (APSIPA ASC)}, pages 1347--1350.
+  IEEE, 2017.
+
 \bibitem[Oneto et~al.(2019)Oneto, Doninini, Elders, and
   Pontil]{oneto2019taking}
 Luca Oneto, Michele Doninini, Amon Elders, and Massimiliano Pontil.
 \newblock Taking advantage of multitask learning for fair classification.
 \newblock In \emph{Proceedings of the 2019 AAAI/ACM Conference on AI, Ethics,
   and Society}, pages 227--237, 2019.
+
+\bibitem[Panchapagesan et~al.(2016)Panchapagesan, Sun, Khare, Matsoukas,
+  Mandal, Hoffmeister, and Vitaladevuni]{panchapagesan2016multi}
+Sankaran Panchapagesan, Ming Sun, Aparna Khare, Spyros Matsoukas, Arindam
+  Mandal, Bj{\"o}rn Hoffmeister, and Shiv Vitaladevuni.
+\newblock Multi-task learning and weighted cross-entropy for dnn-based keyword
+  spotting.
+\newblock In \emph{Interspeech}, volume~9, pages 760--764, 2016.
+
+\bibitem[Pankajakshan et~al.(2019)Pankajakshan, Bear, and
+  Benetos]{pankajakshan2019polyphonic}
+Arjun Pankajakshan, Helen~L Bear, and Emmanouil Benetos.
+\newblock Polyphonic sound event and sound activity detection: A multi-task
+  approach.
+\newblock In \emph{2019 IEEE Workshop on Applications of Signal Processing to
+  Audio and Acoustics (WASPAA)}, pages 323--327. IEEE, 2019.
 
 \bibitem[Park et~al.(2020)Park, Min, Bhattacharya, and
   Kawsar]{park2020augmenting}
@@ -93,6 +205,22 @@ Adam Paszke, Sam Gross, Francisco Massa, Adam Lerer, James Bradbury, Gregory
 \newblock Pytorch: An imperative style, high-performance deep learning library.
 \newblock \emph{Advances in neural information processing systems},
   32:\penalty0 8026--8037, 2019.
+
+\bibitem[Phan et~al.(2017)Phan, Krawczyk-Becker, Gerkmann, and
+  Mertins]{phan2017dnn}
+Huy Phan, Martin Krawczyk-Becker, Timo Gerkmann, and Alfred Mertins.
+\newblock Dnn and cnn with weighted and multi-task loss functions for audio
+  event detection.
+\newblock \emph{arXiv preprint arXiv:1708.03211}, 2017.
+
+\bibitem[Phan et~al.(2019)Phan, Ch{\'e}n, Koch, Pham, McLoughlin, Mertins, and
+  De~Vos]{phan2019unifying}
+Huy Phan, Oliver~Y Ch{\'e}n, Philipp Koch, Lam Pham, Ian McLoughlin, Alfred
+  Mertins, and Maarten De~Vos.
+\newblock Unifying isolated and overlapping audio event detection with
+  multi-label multi-task convolutional recurrent neural networks.
+\newblock In \emph{ICASSP 2019-2019 IEEE International Conference on Acoustics,
+  Speech and Signal Processing (ICASSP)}, pages 51--55. IEEE, 2019.
 
 \bibitem[Roberts et~al.(1996)Roberts, Johnson, et~al.]{roberts1996evolving}
 Don Roberts, Ralph Johnson, et~al.
@@ -123,6 +251,14 @@ Michael~L Seltzer and Jasha Droppo.
 \newblock In \emph{2013 IEEE International Conference on Acoustics, Speech and
   Signal Processing}, pages 6965--6969. IEEE, 2013.
 
+\bibitem[Sun et~al.(2017)Sun, Snyder, Gao, Nagaraja, Rodehorst, Panchapagesan,
+  Strom, Matsoukas, and Vitaladevuni]{sun2017compressed}
+Ming Sun, David Snyder, Yixin Gao, Varun~K Nagaraja, Mike Rodehorst, Sankaran
+  Panchapagesan, Nikko Strom, Spyros Matsoukas, and Shiv Vitaladevuni.
+\newblock Compressed time delay neural network for small-footprint keyword
+  spotting.
+\newblock In \emph{Interspeech}, pages 3607--3611, 2017.
+
 \bibitem[Tagliasacchi et~al.(2020)Tagliasacchi, de~Chaumont~Quitry, and
   Roblek]{tagliasacchi2020multi}
 Marco Tagliasacchi, F{\'e}lix de~Chaumont~Quitry, and Dominik Roblek.
@@ -138,11 +274,22 @@ Noriyuki Tonami, Keisuke Imoto, Masahiro Niitsuma, Ryosuke Yamanishi, and
 \newblock In \emph{2019 IEEE Workshop on Applications of Signal Processing to
   Audio and Acoustics (WASPAA)}, pages 338--342. IEEE, 2019.
 
+\bibitem[Wu et~al.(2020)Wu, Jia, Nie, and Li]{wu2020domain}
+Haiwei Wu, Yan Jia, Yuanfei Nie, and Ming Li.
+\newblock Domain aware training for far-field small-footprint keyword spotting.
+\newblock \emph{arXiv preprint arXiv:2005.03633}, 2020.
+
 \bibitem[Xu et~al.(2019)Xu, Huang, Cheng, and Song]{xu2019multi}
 Kuilong Xu, Shilei Huang, Gang Cheng, and Xiao Song.
 \newblock A multi-task learning approach based on convolutional neural network
   for acoustic scene classification.
 \newblock In \emph{Proceedings of the 2019 2nd International Conference on
   Algorithms, Computing and Artificial Intelligence}, pages 23--27, 2019.
+
+\bibitem[Zeng et~al.(2019)Zeng, Mao, Peng, and Yi]{zeng2019spectrogram}
+Yuni Zeng, Hua Mao, Dezhong Peng, and Zhang Yi.
+\newblock Spectrogram based multi-task audio classification.
+\newblock \emph{Multimedia Tools and Applications}, 78\penalty0 (3):\penalty0
+  3705--3722, 2019.
 
 \end{thebibliography}
