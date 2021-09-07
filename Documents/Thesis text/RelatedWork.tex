@@ -3,6 +3,27 @@
 \section{Audio Recognition}
 TODO: Explain the field of audio classification, how it normally works, what kind of tasks there are and what kind of things are researched
 
+Audio contains a rich amount of information. As one of the more important senses, audio provides humans with perceptual information about their environment and its occupants. Machines can analyse audio in the same way, in search of performing numerous functions humans do simultaneously. These tasks include for example deriving semantic information like recognizing speech TODO: REFERENCE, contextual information like recognizing the scene TODO: REFERENCE or entity identification like recognizing a piece of music. Audio classification is important for the field of pattern recognition, finding an ever expanding amount of applications. \\
+
+Audio data and its relating tasks have been grouped and divided using numerous definitions, which change the focus and structure of the systems built. For one, the sound data can be classified according to domain groups. \cite{duan2014survey} does this by subdividing them into human voice sounds, artificial sounds and natural sounds. Human voice includes speech, coughs and singing. Artificial sounds refer to human activity based sounds like traffic, aircraft and music. Natural sounds then include animals, weather and nature sounds. However within the same document, they utilise another distinction between sound data namely music, speech and environmental sounds. The point is that applications have been developed which target different definitions of sound collections that are targeted. Grouping music together in the same domain with other human activity noise makes sense for applications that only need to identify a sound in an audio fragment as music as in \cite{park2020augmenting}, but not when the exact music piece needs to be identified in the presence of background noise TODO: REFERENCE.\\
+
+Audio recognition tasks thus refer to the automated annotating of audio data for various sounds and/or sound groups present within. A typical \textbf{pipeline} for audio recognition tasks goes as follows: \\
+
+\begin{enumerate}
+	\item Microphone records raw audio and stores it as a sampled time series. 
+	\item Preprocessing is applied to accentuate certain properties in the audio signals, the choice of which is often dependant on the eventual application and what the system needs to be able to differentiate within the signals \citep{georgiev2017heterogeneous}. 
+	\item These time series then are divided into either overlapping or non-overlapping frames, for which each frame a feature gets calculated. The features of all the frames are then stored as a collection which represents a single data input instance. This is also called the \textbf{feature matrix}. A comprehensive overview of features are given in \cite{mitrovic2010features}
+	\item The feature matrices are transformed in context of the other matrices, augmenting the extracted feature representations or scaling the values to the same specified value range. 
+	\item The collections of data instances then form inputs for classification or regression problems. A number of instances are used for training a neural network which learns a representation of the data that it can optimally use for deriving the correct labels.
+\end{enumerate}
+
+There are two distinctions in audio based learning tasks: instance-level and frame-level tasks. The difference between these is if the task needs to produce labels for the whole audio fragment or for events present within an audio fragment. The latter is a complexer task than the former.  Instance level tasks include Acoustic Scene Recognition, Audio Tagging, Speaker Identification and Emotion Recognition. Frame level tasks include Acoustic Event Detection and Automatic Speech Recognition. \\
+
+Labels in instance based recognition work pretty straight forward. The data contains audio clips for which one or multiple labels are linked, depending if multiple classes can be present at once. A system thus takes a whole sound clip, extracts its features and outputs the corresponding labels the clip is an instance of. Labels in frame based recognition are different. As stated, clips are subdivided in frames and the output of the system is a series of labels, one for each frame which corresponds to a specific time step. \\
+
+TODO: Give deeper explanations of example fields and how they work (AED, ASC, ASR)
+TODO: Explain the type of research done in the field
+
 \section{Multi-task Learning}
 TODO: Explain the field of multi-task learning, where it came from, what the paradigm brought in improvements and what kind of things are researched
 TODO: Explain multi task learning with unimportant auxiliary task for performance improvement
