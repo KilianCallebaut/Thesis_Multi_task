@@ -5,6 +5,10 @@ Reallocating 'name_of_file' (item size: 1) to 9 items.
 The style file: plainnat.bst
 Reallocating 'name_of_file' (item size: 1) to 11 items.
 Database file #1: references.bib
+Repeated entry---line 396 of file references.bib
+ : @article{xia2019multi
+ :                      ,
+I'm skipping whatever remains of this entry
 Repeated entry---line 516 of file references.bib
  : @article{georgiev2017heterogeneous
  :                                   ,
@@ -12,6 +16,10 @@ I'm skipping whatever remains of this entry
 Repeated entry---line 533 of file references.bib
  : @article{tagliasacchi2020multi
  :                               ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 585 of file references.bib
+ : @article{xia2019multi
+ :                      ,
 I'm skipping whatever remains of this entry
 Repeated entry---line 596 of file references.bib
  : @inproceedings{tonami2019joint
@@ -49,47 +57,80 @@ Repeated entry---line 874 of file references.bib
  : @inproceedings{nwe2017convolutional
  :                                    ,
 I'm skipping whatever remains of this entry
+Repeated entry---line 908 of file references.bib
+ : @article{schmid1997systematic
+ :                              ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 933 of file references.bib
+ : @inproceedings{de2012deap
+ :                          ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 940 of file references.bib
+ : @article{paszke2019pytorch
+ :                           ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 977 of file references.bib
+ : @inproceedings{oneto2019taking
+ :                               ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 985 of file references.bib
+ : @article{lee2019label
+ :                      ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 991 of file references.bib
+ : @inproceedings{seltzer2013multi
+ :                                ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 999 of file references.bib
+ : @article{phan2017dnn
+ :                     ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 1005 of file references.bib
+ : @inproceedings{komatsu2020scene
+ :                                ,
+I'm skipping whatever remains of this entry
 Warning--empty journal in boregowda2018environmental
+Warning--empty year in dcase
 Warning--empty journal in georgiev2017heterogeneous
-You've used 40 entries,
+You've used 48 entries,
             2773 wiz_defined-function locations,
-            798 strings with 13650 characters,
-and the built_in function-call counts, 23928 in all, are:
-= -- 2118
-> -- 1665
-< -- 27
-+ -- 560
-- -- 519
-* -- 1994
-:= -- 3593
-add.period$ -- 133
-call.type$ -- 40
-change.case$ -- 290
-chr.to.int$ -- 39
-cite$ -- 82
-duplicate$ -- 1033
-empty$ -- 1743
-format.name$ -- 565
-if$ -- 5089
+            842 strings with 14943 characters,
+and the built_in function-call counts, 27442 in all, are:
+= -- 2431
+> -- 1863
+< -- 33
++ -- 628
+- -- 579
+* -- 2270
+:= -- 4130
+add.period$ -- 158
+call.type$ -- 48
+change.case$ -- 334
+chr.to.int$ -- 47
+cite$ -- 99
+duplicate$ -- 1196
+empty$ -- 2039
+format.name$ -- 635
+if$ -- 5827
 int.to.chr$ -- 2
 int.to.str$ -- 1
-missing$ -- 39
-newline$ -- 208
-num.names$ -- 160
-pop$ -- 623
+missing$ -- 45
+newline$ -- 248
+num.names$ -- 192
+pop$ -- 717
 preamble$ -- 1
-purify$ -- 251
+purify$ -- 287
 quote$ -- 0
-skip$ -- 856
+skip$ -- 985
 stack$ -- 0
-substring$ -- 897
-swap$ -- 215
-text.length$ -- 19
+substring$ -- 1006
+swap$ -- 231
+text.length$ -- 21
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 440
-warning$ -- 2
-while$ -- 195
+type$ -- 528
+warning$ -- 3
+while$ -- 228
 width$ -- 0
-write$ -- 529
-(There were 11 error messages)
+write$ -- 630
+(There were 21 error messages)

@@ -1,4 +1,4 @@
-\begin{thebibliography}{40}
+\begin{thebibliography}{48}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -11,6 +11,13 @@ Vinayak Abrol and Pulkit Sharma.
   classification.
 \newblock \emph{IEEE/ACM Transactions on Audio, Speech, and Language
   Processing}, 28:\penalty0 1964--1973, 2020.
+
+\bibitem[Ben-Abdallah et~al.(2004)Ben-Abdallah, Bouassida, Gargouri, and
+  Hamadou]{ben2004uml}
+Han{\^e}ne Ben-Abdallah, Nadia Bouassida, Faiez Gargouri, and Abdelmajid~Ben
+  Hamadou.
+\newblock A uml based framework design method.
+\newblock \emph{J. Object Technol.}, 3\penalty0 (8):\penalty0 97--120, 2004.
 
 \bibitem[BoreGowda(2018)]{boregowda2018environmental}
 HB~BoreGowda.
@@ -27,6 +34,17 @@ Nadia Bouassida, Han{\^e}ne Ben-Abdallah, and Fa{\"\i}ez Gargouri.
 Rich Caruana.
 \newblock Multitask learning.
 \newblock \emph{Machine learning}, 28\penalty0 (1):\penalty0 41--75, 1997.
+
+\bibitem[Dcase()]{dcase}
+Dcase.
+\newblock Detection and classification of acoustic scenes and events.
+\newblock URL \url{http://dcase.community/}.
+
+\bibitem[Dcase-Repo(2021)]{dcaserepo2021}
+Dcase-Repo.
+\newblock Dcase\-repo/dcase_util: A collection of utilities for detection and
+  classification of acoustic scenes and events, 2021.
+\newblock URL \url{https://github.com/DCASE-REPO/dcase_util}.
 
 \bibitem[De~Rainville et~al.(2012)De~Rainville, Fortin, Gardner, Parizeau, and
   Gagn{\'e}]{de2012deap}
@@ -125,6 +143,13 @@ Tatsuya Komatsu, Keisuke Imoto, and Masahito Togami.
 \newblock In \emph{ICASSP 2020-2020 IEEE International Conference on Acoustics,
   Speech and Signal Processing (ICASSP)}, pages 646--650. IEEE, 2020.
 
+\bibitem[Kremer et~al.(2018)Kremer, Borgholt, and
+  Maal{\o}e]{kremer2018inductive}
+Jan Kremer, Lasse Borgholt, and Lars Maal{\o}e.
+\newblock On the inductive bias of word-character-level multi-task learning for
+  speech recognition.
+\newblock \emph{arXiv preprint arXiv:1812.02308}, 2018.
+
 \bibitem[Lee et~al.(2019)Lee, Gong, Padhy, Rouditchenko, and
   Ndirango]{lee2019label}
 Tyler Lee, Ting Gong, Suchismita Padhy, Andrew Rouditchenko, and Anthony
@@ -153,6 +178,13 @@ Josh Meyer.
 \newblock \emph{Multi-task and transfer learning in low-resource speech
   recognition}.
 \newblock PhD thesis, The University of Arizona, 2019.
+
+\bibitem[Mitrovi{\'c} et~al.(2010)Mitrovi{\'c}, Zeppelzauer, and
+  Breiteneder]{mitrovic2010features}
+Dalibor Mitrovi{\'c}, Matthias Zeppelzauer, and Christian Breiteneder.
+\newblock Features for content-based audio retrieval.
+\newblock In \emph{Advances in computers}, volume~78, pages 71--150. Elsevier,
+  2010.
 
 \bibitem[Morfi and Stowell(2018)]{morfi2018deep}
 Veronica Morfi and Dan Stowell.
@@ -229,6 +261,11 @@ Don Roberts, Ralph Johnson, et~al.
 \newblock \emph{Pattern languages of program design}, 3:\penalty0 471--486,
   1996.
 
+\bibitem[Ruder(2017)]{ruder2017overview}
+Sebastian Ruder.
+\newblock An overview of multi-task learning in deep neural networks.
+\newblock \emph{arXiv preprint arXiv:1706.05098}, 2017.
+
 \bibitem[Sakti et~al.(2016)Sakti, Kawanishi, Neubig, Yoshino, and
   Nakamura]{sakti2016deep}
 Sakriani Sakti, Seiji Kawanishi, Graham Neubig, Koichiro Yoshino, and Satoshi
@@ -279,6 +316,13 @@ Haiwei Wu, Yan Jia, Yuanfei Nie, and Ming Li.
 \newblock Domain aware training for far-field small-footprint keyword spotting.
 \newblock \emph{arXiv preprint arXiv:2005.03633}, 2020.
 
+\bibitem[Xia et~al.(2019)Xia, Togneri, Sohel, Zhao, and Huang]{xia2019multi}
+Xianjun Xia, Roberto Togneri, Ferdous Sohel, Yuanjun Zhao, and Defeng Huang.
+\newblock Multi-task learning for acoustic event detection using event and
+  frame position information.
+\newblock \emph{IEEE Transactions on Multimedia}, 22\penalty0 (3):\penalty0
+  569--578, 2019.
+
 \bibitem[Xu et~al.(2019)Xu, Huang, Cheng, and Song]{xu2019multi}
 Kuilong Xu, Shilei Huang, Gang Cheng, and Xiao Song.
 \newblock A multi-task learning approach based on convolutional neural network
@@ -291,5 +335,11 @@ Yuni Zeng, Hua Mao, Dezhong Peng, and Zhang Yi.
 \newblock Spectrogram based multi-task audio classification.
 \newblock \emph{Multimedia Tools and Applications}, 78\penalty0 (3):\penalty0
   3705--3722, 2019.
+
+\bibitem[Zhang and Yang(2018)]{zhang2018overview}
+Yu~Zhang and Qiang Yang.
+\newblock An overview of multi-task learning.
+\newblock \emph{National Science Review}, 5\penalty0 (1):\penalty0 30--43,
+  2018.
 
 \end{thebibliography}
