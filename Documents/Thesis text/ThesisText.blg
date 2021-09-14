@@ -94,7 +94,7 @@ Warning--empty year in dcase
 Warning--empty journal in georgiev2017heterogeneous
 You've used 48 entries,
             2773 wiz_defined-function locations,
-            842 strings with 14943 characters,
+            842 strings with 14942 characters,
 and the built_in function-call counts, 27442 in all, are:
 = -- 2431
 > -- 1863

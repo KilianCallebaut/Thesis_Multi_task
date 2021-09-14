@@ -42,9 +42,9 @@ Dcase.
 
 \bibitem[Dcase-Repo(2021)]{dcaserepo2021}
 Dcase-Repo.
-\newblock Dcase\-repo/dcase_util: A collection of utilities for detection and
+\newblock Dcase-repo/dcase\_util: A collection of utilities for detection and
   classification of acoustic scenes and events, 2021.
-\newblock URL \url{https://github.com/DCASE-REPO/dcase_util}.
+\newblock URL \url{https://github.com/DCASE-REPO/dcase\_util}.
 
 \bibitem[De~Rainville et~al.(2012)De~Rainville, Fortin, Gardner, Parizeau, and
   Gagn{\'e}]{de2012deap}

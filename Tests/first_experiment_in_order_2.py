@@ -22,8 +22,8 @@ from Tests.config_reader import *
 from Training.Training import Training
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-drive = 'F'
-data_base = r'F:\Thesis_Results\Data_Readers'
+drive = 'E'
+data_base = r'E:\Thesis_Results\Data_Readers'
 
 
 def main(argv):

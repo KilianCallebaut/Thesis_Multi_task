@@ -1,75 +1,83 @@
 \chapter{Evaluation}
 
-% IDEA: get paper examples and discuss how to implement them
+\section{Functional evaluation}
+In this section, the framework is examined in terms of the specific ways it offers new shortcuts to multi-task application development. These relate back to the requirements set out in the non-functional requirements in section \ref{problem:nonfunc}. The functionalities are subdivided into 4 sections that are meant to validate that the different aspects of facilitating development are met. 
 
-\section{Goals and Results}
+\subsection{Easy changeable variables}
 
-\section{Discussion on the implementation}
+The first aspect of facilitating development is making different parts of the deep learning pipeline easily variable. This 
 
-\section{Memory Saving (and such)}
+\subsubsection{Different Datasets}
 
-TODO: Any objective demonstration of the system's functionalities (like index mode)
+\subsubsection{Different Sample Rate}
 
-\section{Requirements}
+\subsubsection{Different Feature Extraction}
 
-TODO: Going back to the (non-)functional requirements and how the system addresses them
+\subsubsection{Different Data Transformation}
 
+\subsubsection{Different Dataloading}
 
-\section{Easy changeable variables}
+\subsubsection{Different DL Model}
 
-\subsection{Different datasets}
+\subsubsection{Different Optimizer}
 
-\subsection{Different Sample Rate}
+\subsubsection{Different loss calculation}
 
-\subsection{Different Feature Extraction}
+\subsubsection{Different loss combination}
 
-\subsection{Different Data Transformation}
+\subsubsection{Different Stopping Criteria}
 
-\subsection{Different Dataloading}
+\subsubsection{Different Saving Locations}
 
-\subsection{Different DL Model}
+\subsection{Easy expansions}
 
-\subsection{Different Optimizer}G
+\subsubsection{Adding Datasets}
 
-\subsection{Different loss calculation}
+\subsubsection{Adding Tasks to datasets}
 
-\subsection{Different loss combination}
+\subsection{Simplifying abstractions}
 
-\subsection{Different Stopping Criteria}
+\subsubsection{Saving/Reading Extracted Datasets}
 
-\subsection{Different Saving Locations}
+\subsubsection{Creation Pipeline}
 
-\section{Easy expansions}
+\subsubsection{Index Mode}
 
-\subsection{Adding Datasets}
-
-\subsection{Adding Tasks to datasets}
-
-\section{Simplifying abstractions}
-
-\subsection{Saving/Reading Extracted Datasets}
-
-\subsection{Index Mode}
-
-\subsection{Combination of different datasets}
+\subsubsection{Combination of different datasets}
 TODO: The ConcatTaskDataset function
 
-\subsection{Train/test generation}
+\subsubsection{Train/test generation}
 
+\subsubsection{Training}
+
+\subsubsection{Evaluation}
+
+\subsubsection{Result Saving and Visualizing}
+
+\subsubsection{Interrupted Learning}
+
+\subsection{Developmental side rails}
+
+\subsubsection{Abstract Data Reader}
+
+\subsubsection{Abstract Extraction Method}
+
+\subsubsection{Standardized valid input}
+
+\subsubsection{Centralized Train/test Operations}
+\section{Research Evaluation}
+% Go over the papers and discuss the possibility of implementation
+\section{Discussion of the implementation choices}
+\section{Requirements}
+\subsection{Data Reading}
+\begin{itemize}
+	\item Standardizing Input - The TaskDataset object is developed for assuring that the data is valid throughout the rest of the process. It's extension of PyTorch's Dataset class ensures that it can be utilised by the PyTorch framework. The builder pattern allows the TaskDataset to be built incrementally and valid along the way, with each step including various validity checks.
+	% How do we know this works?
+	% What validity checks?
+	\item Handling dataset differences - The DataReader class is an abstract class that the developer must extend to deal with the peculiarities of navigating each dataset structure to extract the correct information. This corresponds to it being a white box hot-spot. Predefined train/test splits can be stored through the HoldTaskDataset structure and pre-split audio segments can be kept together by defining the grouping. 
+	% Through unit testing, demonstrate the checks
+	\item Scalable preprocessing - Preprocessing audio signals and preprocessing feature matrices happen in different places, as TaskDatasets should only contain valid input instances at any point. Preprocessing signals can utilise an (optional) function from the DataReader class with parameters that are received when the TaskDataset is extracted. Reusing the method can thus hand developers easy replicability of the signal preprocessing. These can be further scaled by using the TrainingSetCreator. In this class, any preprocessing or transformation can be added 'on the fly'. This means that if a functionality (e.g. resampling) is added, any previous 
+	% What preprocessing do we have for both signals and feature matrices
+\end{itemize}
+\subsection{Data Loading}
 \subsection{Training}
-
-\subsection{Evaluation}
-
-\subsection{Result Saving and Visualizing}
-
-\subsection{Interrupted Learning}
-
-\section{Developmental side rails}
-
-\subsection{Abstract Data Reader}
-
-\subsection{Abstract Extraction Method}
-
-\subsection{Standardized valid input}
-
-\subsection{Centralized Train/test Operations}
