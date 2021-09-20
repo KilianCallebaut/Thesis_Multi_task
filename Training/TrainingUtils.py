@@ -13,3 +13,6 @@ class TrainingUtils:
             return True
 
         return False
+
+    def extra_operation(self, **kwargs):
+        pass

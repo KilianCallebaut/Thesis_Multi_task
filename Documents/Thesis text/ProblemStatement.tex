@@ -1,5 +1,6 @@
 \chapter{Problem Statement} \label{problem}
 TODO: Explain that this chapter is about defining the problem and what the solving system should be
+TODO: clarify the analysis performed to identify the requirements
 
 \section{Use Cases}
 TODO: Explain the need for requirements by clarifying examples
@@ -77,6 +78,22 @@ As a basis for developing the framework, following the example set in a differen
 
 \textbf{Hypothesis 5.} \textit{Optimal resource usage is not required, but the system should be executable. Concatenating multiple datasets means more space is required and more time will be needed to execute. The framework should assume the entire concatenated dataset possibly can not fit in memory and device failures can happen while executing, which should not automatically require a restart of the entire process.}\\
 
+Using these hypotheses, the outline is made for what the most important characteristics are for this framework. These serve as the concrete steps the framework should offer for speeding up multi-task application development. The characteristics go as follows:
+
+\textbf{Singular focus for changes.}  Grant the ability to make focused changes in the pipeline which are anticipated in the rest of the system so that other parts of the pipeline do not require adaptation. An example of this is the easy addition of extra datasets with heterogeneous task types which should not require any change in the training functions.
+
+\textbf{Treat combined datasets as one} Combining multiple datasets for training a single model often requires that the pre-processing is done in the same way. Development can be sped up by granting the developers the ability to treat the datasets as if they were one, creating input feature matrices that have been subjected to the same processes from the original audio. These processes should be executable without having to replicate the same functions for each individual dataset, as in stead giving to option to apply them to all at once.
+
+\textbf{Make variations without recalculating unnecessary objects} In research, one must often vary design choices and parameters and investigate the effect of the change. This implies that one changes a certain element in the pipeline and reruns the training and testing of the model which already can take up considerable time. However, there often are elements that can be kept from a previous iteration and do not have to be recalculated or reloaded. The framework should offer the functionality to replace something at runtime which recalculates the necessary replaced part but keeps the others.
+
+\textbf{Compare the effect of design decisions} If a developer needs to compare design choices they need to be able to directly compare the effect of each one in terms of performance, side-by-side. 
+
+\textbf{Reproduce testing conditions} Reproducibility is a major element in scientific research, which should not be overlooked for developing applications. The data handling steps should be reproducible after a training run has been completed in order to verify the results. This goes for example for example for creating the same train/test splits in a k-fold cross validation set-up. Another case is when the data is scaled based on metrics from the training data. When a new dataset is then brought in to test a trained model, this data should be scaled using the same metrics.
+
+\textbf{Make research variations possible} The research into multi-task learning for audio set-ups is still relatively new. The framework should - if not directly implementing - make the used techniques possible to implement. The framework should provide hooks for implementing the different ways multi-task learning has been implemented.
+
+\textbf{Allow large combinations in memory constraints} Large datasets can be inhibited through memory constraints, which should be solved by offering a streaming set-up for reading data.
+
 
 \section{Non-functional Requirements} \label{problem:nonfunc}
 
@@ -142,5 +159,6 @@ Training and evaluation based on the batches of input data deal with predicting 
 	\item Metric calculation, storage and visualization: Metrics are different evaluation criteria based on the predicted output labels compared to the true output labels. Calculating and inspecting these are a crucial of research, so the framework must provide an easy way of doing so in which it is also possible to compare the results to previous ones. Furthermore, the developer must also be able to extend these with their own implementation and additions.
 	\item Interrupted Learning: Sometimes a training run can fail or be stopped in the middle of its execution. This is more likely when the running time is longer due to the increase in inputs from combining multiple datasets. To deal with this the framework must provide a feature called interrupted learning, in which a training run can restart where it left last time around.
 	\item Separate evaluation: To follow the line of modularity, the system must not assume that training and evaluation will always happen together, but a developer can use the system to simply evaluate a model or a previous training run. Therefore it must be able to evaluate models and historical runs without much hassle.
+	\item Direct comparison of different runs: Grant the ability to visually compare the results of different train/test runs which relate to different variables, design choices, ...
 \end{itemize}
 

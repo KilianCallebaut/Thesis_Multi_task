@@ -65,9 +65,9 @@ class MultiTaskHardSharing(nn.Module):
             nn.init.constant_(self.task_nets[t].bias, 0)
 
     def activate(self, x, activation):
-        if activation == 'softmax':
+        if activation == 'multi-class':
             return F.softmax(x, dim=-1)
-        elif activation == 'sigmoid':
+        elif activation == 'multi-label':
             return F.sigmoid(x)
 
     def forward(self, x):
@@ -76,5 +76,6 @@ class MultiTaskHardSharing(nn.Module):
             x = layer(x)
             x = F.relu(x)
         x = self.hidden[-1](x)
-        return tuple(self.activate(self.task_nets[task_model_id](x), self.classification_types[task_model_id])
-                     for task_model_id in range(len(self.task_list)))
+        return tuple(self.activate(self.task_nets[task_model_id](x),
+                                   self.classification_types[task_model_id])
+                     for task_model_id in range(len(self.classification_types)))

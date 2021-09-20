@@ -12,7 +12,7 @@ from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 
 class DCASE2017_SE(DataReader):
     object_path = r"C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\DCASE2017_SE_{}"
-    wav_folder = 'F:\\Thesis_Datasets\\DCASE2017\\TUT-sound-events-2017-development\\audio\\'
+    data_path = 'F:\\Thesis_Datasets\\DCASE2017\\'
 
     def __init__(self, **kwargs):
         print('start DCASE2017 SE')
@@ -41,7 +41,7 @@ class DCASE2017_SE(DataReader):
 
     def load_files(self):
         self.devdataset = TUTSoundEvents_2017_DevelopmentSet(
-            data_path='F:\\Thesis_Datasets\\DCASE2017\\',
+            data_path=self.data_path,
             log_system_progress=False,
             show_progress_in_console=True,
             use_ascii_progress_bar=True,

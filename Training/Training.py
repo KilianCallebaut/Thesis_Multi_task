@@ -162,7 +162,7 @@ class Training:
                 step += 1
                 torch.cuda.empty_cache()
 
-            training_utils.extra_operation(**kwargs)
+            training_utils.extra_operation(results=results, **kwargs)
             results.add_epoch_metrics(epoch, step, True)
             results.add_model_parameters(epoch, model)
 
@@ -229,11 +229,7 @@ class Training:
                 if blank:
                     training_results.load_model_parameters(epoch, blank_model)
 
-                # running_loss = 0.0
                 step = 0
-                # task_predictions = [[] for _ in task_list]
-                # task_labels = [[] for _ in task_list]
-                # task_running_losses = [0 for _ in task_list]
 
                 perc = 0
                 begin = datetime.datetime.now()

@@ -11,7 +11,7 @@ from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 class FSDKaggle2018(DataReader):
     object_path = r"C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\FSDKaggle2018_{}"
     # object_path = r"E:\Thesis_results\Data_Readers\FSDKaggle2018"
-    root = r"F:\Thesis_Datasets\FSDKaggle2018\freesound-audio-tagging"
+    data_path = r"F:\Thesis_Datasets\FSDKaggle2018\freesound-audio-tagging"
     audio_folder = r"audio_train"
 
     def __init__(self, **kwargs):
@@ -20,7 +20,7 @@ class FSDKaggle2018(DataReader):
         print('done FSDKaggle 2018')
 
     def get_path(self):
-        return os.path.join(self.get_base_path()['training_base_path'], 'FSDKaggle2018.obj')
+        return os.path.join(self.get_base_path()['base_path'], 'FSDKaggle2018.obj')
 
     def get_eval_path(self):
         return os.path.join(self.get_base_path()['testing_base_path'], 'FSDKaggle2018.obj')
@@ -30,12 +30,12 @@ class FSDKaggle2018(DataReader):
                     testing_base_path=self.object_path.format('eval'))
 
     def load_files(self):
-        self.file_labels = pd.read_csv(os.path.join(self.root, 'train.csv'))
-        self.file_labels_val = pd.read_csv(os.path.join(self.root, 'test_post_competition.csv'))
+        self.file_labels = pd.read_csv(os.path.join(self.data_path, 'train.csv'))
+        self.file_labels_val = pd.read_csv(os.path.join(self.data_path, 'test_post_competition.csv'))
 
     def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict):
         perc = 0
-        files = [os.path.join(self.root, self.audio_folder, name) for name in self.file_labels['fname']]
+        files = [os.path.join(self.data_path, self.audio_folder, name) for name in self.file_labels['fname']]
         for audio_idx in range(len(files)):
             path = files[audio_idx]
             read_wav = self.preprocess_signal(self.load_wav(path), **preprocess_parameters)
@@ -46,7 +46,7 @@ class FSDKaggle2018(DataReader):
                 perc += 1
 
         self.skipped = []
-        files = [os.path.join(self.root, 'audio_test', name) for name in self.file_labels_val['fname']]
+        files = [os.path.join(self.data_path, 'audio_test', name) for name in self.file_labels_val['fname']]
         for audio_idx in range(len(files)):
             path = files[audio_idx]
             read_wav = self.load_wav(path)

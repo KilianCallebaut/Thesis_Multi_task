@@ -17,25 +17,29 @@ class DataReader(ABC):
 
     def __init__(self,
                  object_path: str = None,
-                 index_mode: bool = False,
+                 data_path: str = None,
                  **kwargs):
         if object_path:
             self.object_path = object_path
-
-        self.index_mode = index_mode
+        if data_path:
+            self.data_path = data_path
 
     def return_taskDataset(self,
                            extraction_method: ExtractionMethod,
+                           recalculate: bool = False,
+                           index_mode: bool = False,
                            **preprocess_parameters) -> HoldTaskDataset:
         """
         Either reads or calculates the HoldTaskDataset object from the dataset
+        :param index_mode: Get matrices by reading from the disk
+        :param recalculate: Defines whether to automatically read the extracted data if available or not
         :param extraction_method: The extraction method object to extract the inputs with
         :param preprocess_parameters: The preprocessing parameters see preprocess_signal
         :return: HoldTaskDataset: The standardized object
         """
 
-        taskDataset = self.__create_taskDataset__(extraction_method)
-        if self.check_files(extraction_method):
+        taskDataset = self.__create_taskDataset__(extraction_method, index_mode)
+        if self.check_files(taskDataset) and not recalculate:
             print('reading')
             self.read_files(taskDataset)
         else:
@@ -92,17 +96,15 @@ class DataReader(ABC):
         """
         pass
 
-    def __create_taskDataset__(self, extraction_method: ExtractionMethod) -> HoldTaskDataset:
+    def __create_taskDataset__(self, extraction_method: ExtractionMethod, index_mode) -> HoldTaskDataset:
         assert 'base_path' in self.get_base_path() or (
                 'training_base_path' in self.get_base_path() and 'testing_base_path' in self.get_base_path()), 'base_path or training_base_path and testing_base_path keys required'
         return HoldTaskDataset(extraction_method=extraction_method,
-                               index_mode=self.index_mode,
+                               index_mode=index_mode,
                                **self.get_base_path())
 
-    def check_files(self, extraction_method):
-        return HoldTaskDataset.check(extraction_method=extraction_method,
-                                     index_mode=self.index_mode,
-                                     **self.get_base_path())
+    def check_files(self, taskDataset):
+        return taskDataset.check()
 
     def read_files(self, taskDataset: HoldTaskDataset):
         taskDataset.load()

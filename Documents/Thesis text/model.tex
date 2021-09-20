@@ -4,7 +4,7 @@
 % Typing tasks
 % Typing combining methods
 
-
+TODO: What are the key decisions that were made and why?
 
 
 \section{Framework Design} \label{Design:Framework}
@@ -18,7 +18,7 @@ Expanding existing ground work for deep learning systems with abstractions for d
 The nature of variability in the envisioned use is not static for a developed application. Researching multi-task set-ups requires implementing and executing multiple variations and comparing their results. The hot-spots thus have to be variable at run-time while ensuring the validity of the pipeline and differentiability of the different instantiations. Furthermore, in the interest of fast development, every variation in dataset handling must both be able to be implemented for one specific dataset or implemented for all at once.\\
 
 
-
+TODO: Class diagram is pretty detailed, include higher level explanation
 \begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/CompleteSystemDiagram"}
@@ -136,7 +136,7 @@ Not only does this add modularly replaceable sections in the handling of data, t
 
 
 \section{Creating Model} \label{Design:Model}
-
+TODO: Create visual representation of dev workflow
 This framework is aimed at providing a facilitating extension to PyTorch for training and testing multi-head hard parameter sharing models. Model creation thus puts as little requirements on designing the actual models as possible. The rest of the system builds on Pytorch's classes as to ensure that the input would be valid for any PyTorch module. The only presumption the system has to make is that the output is a tuple with each entry being the predicted results for each task in the order of the task list from the input dataset. While no class was made that ensures the developer does this correctly - with the model creation being central, the developer should have the freedom to create whatever they want, adjusting the functionalities around it if necessary - there are two base multi-head networks, a CNN and a DNN, available which has variable layers based on the input. These also already include adaptations based on the type of task. In this area the mantra is that the developer knows best. \\
 
 

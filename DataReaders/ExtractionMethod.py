@@ -87,7 +87,7 @@ class NeutralExtractionMethod(ExtractionMethod):
 
     def scale_reset(self):
         for s in self.scalers:
-            s._reset()
+            self.scalers[s]._reset()
 
     def prepare_reset(self):
         self.prep_calcs = dict()
@@ -241,7 +241,7 @@ class PerDimensionScaling(BaseExtractionMethod):
         :param input_tensor: ndarray
         :return: transformed input
         """
-        return self.scalers[0].transform(input_tensor)
+        return torch.tensor(self.scalers[0].transform(input_tensor))
 
     def inverse_scale_transform(self, input_tensor) -> torch.tensor:
         """
@@ -249,7 +249,7 @@ class PerDimensionScaling(BaseExtractionMethod):
         :param input_tensor: ndarray
         :return: original input
         """
-        return self.scalers[0].inverse_transform(input_tensor)
+        return torch.tensor(self.scalers[0].inverse_transform(input_tensor))
 
 
 class PerCelScaling(BaseExtractionMethod):
@@ -272,7 +272,7 @@ class PerCelScaling(BaseExtractionMethod):
         :return: transformed input
         """
         for i in range(input_tensor.shape[0]):
-            input_tensor[i, :] = self.scalers[i].transform(input_tensor[i, :].reshape(1, -1))
+            input_tensor[i, :] = torch.tensor(self.scalers[i].transform(input_tensor[i, :].reshape(1, -1)))
         return input_tensor
 
     def inverse_scale_transform(self, input_tensor: torch.tensor) -> torch.tensor:
@@ -282,7 +282,7 @@ class PerCelScaling(BaseExtractionMethod):
         :return: original input
         """
         for i in range(input_tensor.shape[0]):
-            input_tensor[i, :] = self.scalers[i].inverse_transform(input_tensor[i, :].reshape(1, -1))
+            input_tensor[i, :] = torch.tensor(self.scalers[i].inverse_transform(input_tensor[i, :].reshape(1, -1)))
         return input_tensor
 
 
@@ -294,8 +294,12 @@ class FramePreparation(BaseExtractionMethod):
         assert 'window_size' in self.preparation_params, 'Framing transforms require window_size parameter'
         window_size = int(self.preparation_params['window_size'])
         if window_size > len(input_tensor):
+            assert 'min_value' in self.preparation_params, 'Framing transforms require min_value parameter if padding needs to occur'
+        if window_size > len(input_tensor):
             frame = torch.vstack(
-                [input_tensor, torch.zeros((window_size - input_tensor.shape[0], input_tensor.shape[1]))])
+                [input_tensor, torch.ones(
+                    (window_size - input_tensor.shape[0], input_tensor.shape[1])) * self.preparation_params[
+                     'min_value']])
         else:
             frame = input_tensor[0:window_size]
         return [frame]
@@ -308,10 +312,13 @@ class WindowPreparation(BaseExtractionMethod):
         assert 'window_hop' in self.preparation_params, 'Window preparation requires a window_hop parameter'
         window_size = self.preparation_params['window_size']
         window_hop = self.preparation_params['window_hop']
+
         windowed_inputs = []
         start_frame = window_size
 
         end_frame = start_frame + window_hop * math.floor((float(input_tensor.shape[0] - start_frame) / window_hop))
+        if start_frame > len(input_tensor):
+            assert 'min_value' in self.preparation_params, 'Window transforms require min_value parameter if padding needs to occur'
         for frame_idx in range(start_frame, end_frame + 1, window_hop):
             window = input_tensor[frame_idx - window_size:frame_idx, :]
             assert window.shape == (window_size, input_tensor.shape[1])
@@ -319,7 +326,9 @@ class WindowPreparation(BaseExtractionMethod):
 
         if start_frame > input_tensor.shape[0]:
             window = torch.vstack(
-                [input_tensor, torch.zeros(start_frame - input_tensor.shape[0], input_tensor.shape[1])])
+                [input_tensor,
+                 torch.ones(start_frame - input_tensor.shape[0], input_tensor.shape[1]) * self.preparation_params[
+                     'min_value']])
             windowed_inputs.append(window)
         elif end_frame < input_tensor.shape[0]:
             window = input_tensor[input_tensor.shape[0] - window_size:input_tensor.shape[0], :]
@@ -328,14 +337,41 @@ class WindowPreparation(BaseExtractionMethod):
 
 
 #### PREPARATION FITTER METHODS #####
+class PreparationFitter(BaseExtractionMethod):
+    def prepare_fit(self, input_tensor: torch.tensor):
+        if 'min_value' not in self.preparation_params:
+            self.preparation_params['min_value'] = torch.min(input_tensor).item()
+        else:
+            self.preparation_params['min_value'] = min(self.preparation_params['min_value'],
+                                                       torch.min(input_tensor).item())
 
-class MedianWindowSizePreparationFitter(BaseExtractionMethod):
+
+class MedianWindowSizePreparationFitter(PreparationFitter):
 
     def prepare_fit(self, input_tensor: torch.tensor):
+        super().prepare_fit(input_tensor)
         if not 'cum_sizes' in self.prep_calcs:
             self.prep_calcs['cum_sizes'] = []
         self.prep_calcs['cum_sizes'].append(len(input_tensor))
         self.preparation_params['window_size'] = statistics.median(self.prep_calcs['cum_sizes'])
+
+
+class MinWindowSizePreparationFitter(PreparationFitter):
+    def prepare_fit(self, input_tensor: torch.tensor):
+        super().prepare_fit(input_tensor)
+        if not 'cum_sizes' in self.prep_calcs:
+            self.prep_calcs['cum_sizes'] = []
+        self.prep_calcs['cum_sizes'].append(len(input_tensor))
+        self.preparation_params['window_size'] = min(self.prep_calcs['cum_sizes'])
+
+
+class MaxWindowSizePreparationFitter(PreparationFitter):
+    def prepare_fit(self, input_tensor: torch.tensor):
+        super().prepare_fit(input_tensor)
+        if not 'cum_sizes' in self.prep_calcs:
+            self.prep_calcs['cum_sizes'] = []
+        self.prep_calcs['cum_sizes'].append(len(input_tensor))
+        self.preparation_params['window_size'] = max(self.prep_calcs['cum_sizes'])
 
 
 ############################################

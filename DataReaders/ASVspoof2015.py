@@ -13,8 +13,8 @@ from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 
 
 class ASVspoof2015(DataReader):
-    Wav_folder = r"F:\Thesis_Datasets\Automatic Speaker Verification Spoofing and Countermeasures Challenge 2015\DS_10283_853\wav"
-    Label_folder = r"F:\Thesis_Datasets\Automatic Speaker Verification Spoofing and Countermeasures Challenge 2015\DS_10283_853"
+    # Wav_folder = r"F:\Thesis_Datasets\Automatic Speaker Verification Spoofing and Countermeasures Challenge 2015\DS_10283_853\wav"
+    data_path = r"F:\Thesis_Datasets\Automatic Speaker Verification Spoofing and Countermeasures Challenge 2015\DS_10283_853"
     object_path = r"C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\ASVspoof2015_{}"
 
     def __init__(self, **kwargs):
@@ -28,39 +28,39 @@ class ASVspoof2015(DataReader):
     def get_base_path(self):
         return dict(base_path=self.object_path.format('train'))
 
-    def check_files(self, extraction_method):
-        return super().check_files(extraction_method) and \
+    def check_files(self, taskDataset):
+        return super().check_files(taskDataset) and \
                os.path.isfile(self.get_path())
 
     def load_files(self):
-        if os.path.isfile(self.get_path()):
-            info = joblib.load(self.get_path())
-            self.files = info['files']
-            self.truths = info['truths']
-            return
+        # if os.path.isfile(self.get_path()):
+        #     info = joblib.load(self.get_path())
+        #     self.files = info['files']
+        #     self.truths = info['truths']
+        #     return
 
-        self.truths = pd.read_csv(os.path.join(self.Label_folder, 'CM_protocol', 'cm_train.trn'), sep=' ', header=None,
+        self.truths = pd.read_csv(os.path.join(self.data_path, 'CM_protocol', 'cm_train.trn'), sep=' ', header=None,
                                   names=['folder', 'file', 'method', 'source'])
         # self.truths = self.truths.append(add)
-        truths_male = pd.read_csv(os.path.join(self.Label_folder, 'Joint_ASV_CM_protocol', 'ASV_male_development.ndx'),
+        truths_male = pd.read_csv(os.path.join(self.data_path, 'Joint_ASV_CM_protocol', 'ASV_male_development.ndx'),
                                   sep=' ',
                                   header=None,
                                   names=['folder', 'file', 'method', 'source'])
         truths_female = pd.read_csv(
-            os.path.join(self.Label_folder, 'Joint_ASV_CM_protocol', 'ASV_female_development.ndx'), sep=' ',
+            os.path.join(self.data_path, 'Joint_ASV_CM_protocol', 'ASV_female_development.ndx'), sep=' ',
             header=None,
             names=['folder', 'file', 'method', 'source'])
-        male_eval = pd.read_csv(os.path.join(self.Label_folder, 'Joint_ASV_CM_protocol', 'ASV_male_evaluation.ndx'),
+        male_eval = pd.read_csv(os.path.join(self.data_path, 'Joint_ASV_CM_protocol', 'ASV_male_evaluation.ndx'),
                                 sep=' ', header=None,
                                 names=['folder', 'file', 'method', 'source'])
-        female_eval = pd.read_csv(os.path.join(self.Label_folder, 'Joint_ASV_CM_protocol', 'ASV_female_evaluation.ndx'),
+        female_eval = pd.read_csv(os.path.join(self.data_path, 'Joint_ASV_CM_protocol', 'ASV_female_evaluation.ndx'),
                                   sep=' ',
                                   header=None,
                                   names=['folder', 'file', 'method', 'source'])
-        male_enrol = pd.read_csv(os.path.join(self.Label_folder, 'Joint_ASV_CM_protocol', 'ASV_male_enrolment.ndx'),
+        male_enrol = pd.read_csv(os.path.join(self.data_path, 'Joint_ASV_CM_protocol', 'ASV_male_enrolment.ndx'),
                                  sep=' ', header=None,
                                  names=['folder', 'file', 'method', 'source'])
-        female_enrol = pd.read_csv(os.path.join(self.Label_folder, 'Joint_ASV_CM_protocol', 'ASV_female_enrolment.ndx'),
+        female_enrol = pd.read_csv(os.path.join(self.data_path, 'Joint_ASV_CM_protocol', 'ASV_female_enrolment.ndx'),
                                    sep=' ',
                                    header=None,
                                    names=['folder', 'file', 'method', 'source'])
@@ -74,7 +74,7 @@ class ASVspoof2015(DataReader):
         # self.truths = self.truths[(self.truths.method == 'human')]
         self.truths.sort_values(['folder', 'file'], inplace=True)
 
-        self.files = [os.path.join(self.Wav_folder, x[0], x[1]) for x in self.truths.to_numpy()]
+        self.files = [os.path.join(self.data_path, 'wav', x[0], x[1]) for x in self.truths.to_numpy()]
 
     def read_files(self, taskDataset: HoldTaskDataset) -> HoldTaskDataset:
         info = joblib.load(self.get_path())

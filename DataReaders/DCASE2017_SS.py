@@ -12,13 +12,7 @@ from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 class DCASE2017_SS(DataReader):
     object_path = r"C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\DCASE2017_SS_{}"
     # object_path = r"E:\Thesis_Results\Data_Readers\DCASE2017_SS_{}"
-    wav_folder = 'F:\\Thesis_Datasets\\DCASE2017\\TUT-acoustic-scenes-2017-development\\audio\\'
-    wav_folder_eval = 'F:\\Thesis_Datasets\\DCASE2017\\TUT-acoustic-scenes-2017-evaluation\\audio\\'
-
-    # wav_folder = 'C:\\Users\\mrKC1\\PycharmProjects\\Thesis\\ExternalClassifiers\\DCASE2017-baseline-system-master' \
-    #              '\\applications\\data\\TUT-acoustic-scenes-2017-development\\audio\\'
-    # wav_folder_eval = 'C:\\Users\\mrKC1\\PycharmProjects\\Thesis\\ExternalClassifiers\\DCASE2017-baseline-system-master' \
-    #                   '\\applications\\data\\TUT-acoustic-scenes-2017-evaluation\\audio\\'
+    data_path = 'F:\\Thesis_Datasets\\DCASE2017\\'
 
     def __init__(self, **kwargs):
         print('start DCASE2017 SS')
@@ -45,7 +39,7 @@ class DCASE2017_SS(DataReader):
     def load_files(self):
         # MetaDataContainer(filename=)
         self.devdataset = TUTAcousticScenes_2017_DevelopmentSet(
-            data_path='F:\\Thesis_Datasets\\DCASE2017\\',
+            data_path=self.data_path,
             log_system_progress=False,
             show_progress_in_console=True,
             use_ascii_progress_bar=True,
@@ -57,7 +51,7 @@ class DCASE2017_SS(DataReader):
 
         ).initialize()
         self.evaldataset = TUTAcousticScenes_2017_EvaluationSet(
-            data_path='F:\\Thesis_Datasets\\DCASE2017\\',
+            data_path=self.data_path,
             log_system_progress=False,
             show_progress_in_console=True,
             use_ascii_progress_bar=True,

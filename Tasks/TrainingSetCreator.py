@@ -1,4 +1,5 @@
 import copy
+from types import FunctionType
 from typing import Optional, List
 
 from sklearn.model_selection import BaseCrossValidator
@@ -6,15 +7,20 @@ from sklearn.model_selection import BaseCrossValidator
 from DataReaders.DataReader import DataReader
 from DataReaders.ExtractionMethod import ExtractionMethod
 from Tasks.ConcatTaskDataset import ConcatTaskDataset
+from Tasks.TaskDataset import TaskDataset
 
 
 class ConcatTrainingSetCreator:
 
     def __init__(self,
                  random_state: Optional[int],
-                 nr_runs: Optional[int] = 5):
+                 nr_runs: Optional[int] = 5,
+                 index_mode: bool = False,
+                 recalculate=False):
         self.random_state = random_state
         self.nr_runs = nr_runs
+        self.index_mode = index_mode
+        self.recalculate = recalculate
 
         self.data_readers = {}
         self.extraction_methods = {}
@@ -23,7 +29,9 @@ class ConcatTrainingSetCreator:
         self.dics_of_label_limits = {}
         self.validators = {}
         self.taskdatasets = {}
+        self.transformations = {}
 
+        self.taskdataset_methods = [tf for tf, y in TaskDataset.__dict__.items() if type(y) == FunctionType]
         self.model = None
 
     def get_keys(self):
@@ -33,8 +41,9 @@ class ConcatTrainingSetCreator:
         if class_list and self.taskdatasets:
             for k in self.taskdatasets.keys():
                 if k not in class_list:
-                    self.taskdatasets.pop(k)
+                    del self.taskdatasets[k]
         else:
+            del self.taskdatasets
             self.taskdatasets = {}
 
     def add_data_reader(self,
@@ -50,7 +59,7 @@ class ConcatTrainingSetCreator:
                 dictionary[k] = copy.copy(addition)
             self.reset_taskDatasets()
         else:
-            assert key in self.data_readers, 'There is not dataset with this key'
+            assert key in self.data_readers, 'There is no dataset with this key'
             dictionary[key] = addition
             self.reset_taskDatasets([k for k in self.data_readers.keys() if k is not key])
 
@@ -59,6 +68,14 @@ class ConcatTrainingSetCreator:
                       key: str = None):
         if key in dictionary:
             return dictionary[key]
+        else:
+            return None
+
+    def __clear__pipe__(self,
+                        dictionary: dict,
+                        key: str = None):
+        if key in dictionary:
+            del dictionary[key]
         else:
             return None
 
@@ -113,7 +130,39 @@ class ConcatTrainingSetCreator:
                            dictionary=self.validators,
                            key=key)
 
-    def create_taskdatasets(self, class_list: List[str] = None):
+    ###############
+    # Transformations
+    ###############
+    def add_transformation_call(self,
+                                function: str,
+                                key: str = None,
+                                **kwargs):
+        assert function in self.taskdataset_methods, 'input is not a TaskDataset method'
+        if not key:
+            for dr in list(self.get_keys()):
+                if dr not in self.transformations:
+                    self.transformations[dr] = []
+                self.transformations[dr].append((function, kwargs))
+
+        else:
+            assert key in self.data_readers, 'There is no dataset with this key'
+            if key not in self.transformations:
+                self.transformations[key] = []
+            self.transformations[key].append((function, kwargs))
+
+    def __execute_functions__(self,
+                              key: str,
+                              task: TaskDataset):
+        for fname, kwargs in self.transformations[key]:
+            func = getattr(task, fname)
+            if kwargs:
+                func(**kwargs)
+            else:
+                func()
+
+    def create_taskdatasets(self,
+                            class_list: List[str] = None,
+                            execute_transformations=True):
         self.reset_taskDatasets(class_list)
         for dr in self.data_readers.keys():
             if (class_list and dr not in class_list) or dr in self.taskdatasets.keys():
@@ -122,29 +171,32 @@ class ConcatTrainingSetCreator:
                 extraction_method=self.__get__pipe__(key=dr, dictionary=self.extraction_methods),
                 resample_to=self.__get__pipe__(key=dr,
                                                dictionary=self.sample_rates),
+                recalculate=self.recalculate,
+                index_mode=self.index_mode,
                 **self.__get__pipe__(key=dr,
                                      dictionary=self.preproccesing)
 
             )
             if dr in self.dics_of_label_limits:
-                tsk.sample_labels(self.__get__pipe__(key=dr, dictionary=self.dics_of_label_limits[dr]))
+                tsk.sample_labels(self.__get__pipe__(key=dr, dictionary=self.dics_of_label_limits))
 
-            tsk.prepare_fit()
-            tsk.prepare_inputs()
+            if execute_transformations and dr in self.transformations:
+                self.__execute_functions__(dr, tsk)
             self.taskdatasets[dr] = tsk
-        return self.taskdatasets
+        return ConcatTaskDataset(list(self.taskdatasets.values()))
 
     def generate_training_splits(self, class_list: List[str] = None):
-        self.create_taskdatasets(class_list)
+        self.create_taskdatasets(class_list,
+                                 execute_transformations=False)
         task_gens = []
         for dr in self.taskdatasets.keys():
             tsk = self.taskdatasets[dr]
             task_gens.append(
                 tsk.generate_train_test_set(random_state=self.random_state,
                                             n_splits=self.nr_runs,
-                                            kf=self.__get__pipe__(dictionary=self.validators,
-                                                                  key=dr
-                                                                  )
+                                            kf=self.__get__pipe__(
+                                                dictionary=self.validators,
+                                                key=dr)
                                             )
             )
 
@@ -153,5 +205,8 @@ class ConcatTrainingSetCreator:
             print("Fold: {}".format(fold))
             fold += 1
             for t in train_tests:
-                t[0].normalize_fit()
+                self.__execute_functions__(
+                    list(self.taskdatasets.keys())[train_tests.index(t)],
+                    t[0]
+                )
             yield ConcatTaskDataset([t[0] for t in train_tests]), ConcatTaskDataset([t[1] for t in train_tests]), fold

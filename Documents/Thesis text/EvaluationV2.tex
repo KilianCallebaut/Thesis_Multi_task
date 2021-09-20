@@ -1,0 +1,34 @@
+\chapter{Evaluation}
+
+\section{Demonstrate}
+
+\section{Literature Evaluation}
+
+%TODO: Dive in the literature and describe its implementation on the software, which components can be adjusted or nah
+
+\section{Fulfilment of the Requirements}
+
+\subsection{Non-functional Requirements}
+\begin{itemize}
+	\item \textbf{Modular:} 
+	\item \textbf{Extendible:} 
+	\item \textbf{Fast prototyping:} 
+	\item \textbf{Cutting Double Work:} 
+	\item \textbf{Developmental Side-rails:} 
+	\item \textbf{Robust:} 
+	\item \textbf{Portable:} 
+\end{itemize}
+
+\subsection{Funtional Requirements}
+\subsubsection{Data Reading}
+\begin{itemize}
+	\item Standardizing Input - The TaskDataset object is developed for assuring that the data is valid throughout the rest of the process. It's extension of PyTorch's Dataset class ensures that it can be utilised by the PyTorch framework. The builder pattern allows the TaskDataset to be built incrementally and valid along the way, with each step including various validity checks.
+	% How do we know this works?
+	% What validity checks?
+	\item Handling dataset differences - The DataReader class is an abstract class that the developer must extend to deal with the peculiarities of navigating each dataset structure to extract the correct information. This corresponds to it being a white box hot-spot. Predefined train/test splits can be stored through the HoldTaskDataset structure and pre-split audio segments can be kept together by defining the grouping. 
+	% Through unit testing, demonstrate the checks
+	\item Scalable preprocessing - Preprocessing audio signals and preprocessing feature matrices happen in different places, as TaskDatasets should only contain valid input instances at any point. Preprocessing signals can utilise an (optional) function from the DataReader class with parameters that are received when the TaskDataset is extracted. Reusing the method can thus hand developers easy replicability of the signal preprocessing. These can be further scaled by using the TrainingSetCreator. In this class, any preprocessing or transformation can be added 'on the fly'. This means that if a functionality (e.g. resampling) is added, any previous 
+	% What preprocessing do we have for both signals and feature matrices
+\end{itemize}
+\subsubsection{Data Loading}
+\subsubsection{Training}

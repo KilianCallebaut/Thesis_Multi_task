@@ -3,7 +3,6 @@ import math
 import os
 import pathlib
 
-
 dataset_options = [
     'asvspoof',
     'chen',
@@ -39,10 +38,6 @@ def read_config(name: str):
         if 'split' in data.keys():
             data['test_size'] = read_config('test_size_split') if data.pop('split') else read_config('test_size_val')
             data['test_size'] = data['test_size']['test_size']
-        # if 'window' in data.keys():
-        #     window_feat = read_config('preparation_params_general_window') if data.pop('window') else read_config(
-        #         'preparation_params_general_no_window')
-        #     data = {**data, **window_feat}
         return data
 
 
@@ -54,18 +49,3 @@ def write_preparation_params(name: str, split: bool, window: bool, dic_of_labels
         dic_of_labels_limits=dic_of_labels_limits
     )
     write_config(name_comp, param)
-
-def calculate_window_size(extraction_params):
-    # Number of seconds for window size
-    sec = 1
-    winlen = extraction_params['winlen']
-    winstep = extraction_params['winstep']
-    win_size = 1 + math.ceil((sec-winlen)/winstep)
-    win_hop = math.floor(win_size/4)
-    write_config('preparation_params_general_window', dict(window_size=win_size, window_hop=win_hop))
-
-def set_windowed(win: bool, network: str):
-    for d in dataset_options:
-        param = read_config('preparation_params_{}_{}'.format(d, network))
-        write_preparation_params('{}_{}'.format(d, network), param['split'], win, param['dic_of_labels_limits'])
-

@@ -12,7 +12,7 @@ from DataReaders.DataReader import DataReader
 
 
 class ChenAudiosetDataset(DataReader):
-    root = r'F:\Thesis_Datasets\audioset_chen\audioset_filtered'
+    data_path = r'F:\Thesis_Datasets\audioset_chen\audioset_filtered'
     train_dir = "balanced_train_segments"
     object_path = r"C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\ChenAudiosetDataset"
     # object_path = r"E:\Thesis_Results\Data_Readers\ChenAudiosetDataset"
@@ -24,7 +24,6 @@ class ChenAudiosetDataset(DataReader):
     np_objects = []
     files = []
     wav_files = []
-    # log_banks = []
 
     AllLabels = []
     AllFlatenedFielsLabels = []
@@ -58,9 +57,9 @@ class ChenAudiosetDataset(DataReader):
         files = []
         np_objects = []
         wav_files = []
-        print(os.path.join(self.root, self.train_dir))
+        print(os.path.join(self.data_path, self.train_dir))
 
-        for _, dirs, _ in os.walk(os.path.join(self.root, self.train_dir)):
+        for _, dirs, _ in os.walk(os.path.join(self.data_path, self.train_dir)):
             cdt = len(dirs)
             cd = 0
             cn = 0
@@ -73,16 +72,15 @@ class ChenAudiosetDataset(DataReader):
                 filedir = []
                 np_dir = []
                 wav_dir = []
-                for file in os.listdir(os.path.join(self.root, self.train_dir, dir)):
-                    filepath = os.path.join(self.root, self.train_dir, dir, file)
+                for file in os.listdir(os.path.join(self.data_path, self.train_dir, dir)):
+                    filepath = os.path.join(self.data_path, self.train_dir, dir, file)
                     if file.endswith('.npy'):
                         np_obj = np.load(filepath, allow_pickle=True)
                         filedir.append(np_obj.item())
                         np_dir.append(np_obj)
 
                         wav_loc = np_obj.item()['wav_file'].split(r'/')[6]
-                        wav_loc = os.path.join(self.root, self.train_dir, dir, wav_loc)
-                        # wav_read = librosa.load(os.path.join(self.root, self.train_dir, dir, wav_loc))
+                        wav_loc = os.path.join(self.data_path, self.train_dir, dir, wav_loc)
                         wav_dir.append(wav_loc)
 
                 files.append(filedir)

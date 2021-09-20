@@ -10,7 +10,7 @@ from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 class SpeechCommands(DataReader):
     object_path = r"C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\SpeechCommands_{}"
     # object_path = r"E:\Thesis_Results\Data_Readers\SpeechCommands_{}"
-    root = r"F:\Thesis_Datasets\SpeechCommands"
+    data_path = r"F:\Thesis_Datasets\SpeechCommands"
 
     def __init__(self, **kwargs):
         self.sample_rate = 16000
@@ -24,7 +24,7 @@ class SpeechCommands(DataReader):
 
     def load_files(self):
         self.ds, self.ds_info = tfds.load('speech_commands', split=['train', 'test'], shuffle_files=False,
-                                          data_dir=self.root, with_info=True)
+                                          data_dir=self.data_path, with_info=True)
         print('Done loading Speech Commands dataset')
 
     def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict):
