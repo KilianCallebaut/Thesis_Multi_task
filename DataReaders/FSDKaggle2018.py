@@ -29,11 +29,14 @@ class FSDKaggle2018(DataReader):
         return dict(base_path=self.object_path.format('train'),
                     testing_base_path=self.object_path.format('eval'))
 
+    def get_task_name(self) -> str:
+        return 'FSDKaggle2018'
+
     def load_files(self):
         self.file_labels = pd.read_csv(os.path.join(self.data_path, 'train.csv'))
         self.file_labels_val = pd.read_csv(os.path.join(self.data_path, 'test_post_competition.csv'))
 
-    def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict):
+    def calculate_input(self, taskDataset: HoldTaskDataset, **preprocess_parameters):
         perc = 0
         files = [os.path.join(self.data_path, self.audio_folder, name) for name in self.file_labels['fname']]
         for audio_idx in range(len(files)):
@@ -81,7 +84,7 @@ class FSDKaggle2018(DataReader):
             ind += 1
 
         task = MultiClassTask(
-            name='FSDKaggle2018',
+            name=self.get_task_name(),
             output_labels=distinct_labels)
         taskDataset.add_task_and_targets(task=task, targets=targets)
         taskDataset.test_set.add_task_and_targets(task=task, targets=targets_val)

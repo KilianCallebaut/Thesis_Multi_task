@@ -1,3 +1,4 @@
+import math
 import os
 
 import joblib
@@ -12,10 +13,11 @@ class Ravdess(DataReader):
     # object_path = r"E:\Thesis_Results\Data_Readers\Ravdess"
     data_path = r"F:\Thesis_Datasets\Ravdess"
 
-    def __init__(self, **kwargs):
+    def __init__(self, mode = 0, **kwargs):
         print('start ravdess')
         super().__init__(**kwargs)
         print('Done loading Ravdess')
+        self.mode=mode
 
     def get_path(self):
         return os.path.join(self.get_base_path()['base_path'], 'Ravdess.obj')
@@ -23,8 +25,11 @@ class Ravdess(DataReader):
     def get_base_path(self):
         return dict(base_path=self.object_path)
 
-    def check_files(self, extraction_method):
-        return super().check_files(extraction_method) and \
+    def get_task_name(self) -> str:
+        return 'Ravdess_stress' if self.mode==1 else 'Ravdess'
+
+    def check_files(self, taskDataset, **kwargs):
+        return super().check_files(taskDataset) and \
                os.path.isfile(self.get_path())
 
     def load_files(self):
@@ -54,37 +59,52 @@ class Ravdess(DataReader):
                              }
                         )
 
-    def read_files(self, taskDataset):
+    def read_files(self, taskDataset, **kwargs):
         info = joblib.load(self.get_path())
         self.files = info['files']
         return super().read_files(taskDataset)
 
-    def write_files(self, taskDataset):
+    def write_files(self, taskDataset, **kwargs):
         dict = {'files': self.files}
         joblib.dump(dict, self.get_path())
         super().write_files(taskDataset=taskDataset)
 
-    def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict):
-        inputs = []
+    def calculate_input(self, taskDataset: HoldTaskDataset, **preprocess_parameters):
+        mode = kwargs.get('mode') if 'mode' in kwargs else None
         perc = 0
-
         for file_idx in range(len(self.files)):
             file = self.files[file_idx]
-            read_wav = self.preprocess_signal(self.load_wav(file['file']), **preprocess_parameters)
-            taskDataset.extract_and_add_input(read_wav)
-            if perc < (file_idx / len(self.files)) * 100:
-                print("Percentage done: {}".format(perc))
-                perc += 1
-        return inputs
+            if mode == 0:
+                read_wav = self.preprocess_signal(self.load_wav(file['file']), **preprocess_parameters)
+                taskDataset.extract_and_add_input(read_wav)
+                if perc < (file_idx / len(self.files)) * 100:
+                    print("Percentage done: {}".format(perc))
+                    perc += 1
+            elif mode == 1 and (int(file['emotion']) == 6 or int(file['emotion']) == 1):
+                sig, samplerate = self.load_wav(file['file'])
+                sig = sig[0:math.floor(1.28 * samplerate)]
+                read_wav = self.preprocess_signal((sig, samplerate), **preprocess_parameters)
+                taskDataset.extract_and_add_input(read_wav)
+                if perc < (file_idx / len(self.files)) * 100:
+                    print("Percentage done: {}".format(perc))
+                    perc += 1
 
     def calculate_taskDataset(self,
                               taskDataset: HoldTaskDataset,
                               **kwargs):
         print('Calculating input')
-        targets = [f['emotion'] for f in self.files]
+        if 'mode' in kwargs and kwargs.get('mode') == 1:
+            targets = [f['emotion'] for f in self.files if int(f['emotion']) == 6 or int(f['emotion']) == 1]
+            taskname = self.get_task_name() + "_stress"
+            grouping = [f['actor'] for f in self.files if int(f['emotion']) == 6 or int(f['emotion']) == 1]
+        else:
+            targets = [f['emotion'] for f in self.files]
+            taskname = self.get_task_name()
+            grouping = [f['actor'] for f in self.files]
+
         distinct_targets = list(set(targets))
         targets = [[int(b == f) for b in distinct_targets] for f in targets]
         taskDataset.add_task_and_targets(
             targets=targets,
-            task=MultiClassTask(name="Ravdess", output_labels=distinct_targets))
-        taskDataset.add_grouping(grouping=[f['actor'] for f in self.files])
+            task=MultiClassTask(name=taskname, output_labels=distinct_targets))
+        taskDataset.add_grouping(grouping=grouping)

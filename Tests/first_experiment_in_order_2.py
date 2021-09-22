@@ -88,8 +88,12 @@ def main(argv):
     csc.add_sample_rate(sample_rate=32000)
     csc.add_signal_preprocessing(preprocess_dict=dict(mono=True))
     csc.add_extraction_method(MelSpectrogramExtractionMethod(**extraction_params))
+    csc.add_transformation_call('prepare_fit')
+    csc.add_transformation_call('prepare_inputs')
+    csc.add_transformation_call('normalize_fit')
+    csc.add_transformation_call('normalize_inputs')
+
     data = csc.create_taskdatasets(class_list=[ChenAudiosetDataset.__name__])
-    data.normalize_fit()
     model = mtmf.create_model(MultiTaskHardSharingConvolutional.__name__,
                               task_list=data.get_task_list())
     results = Training.create_results(modelname=model.name,

@@ -28,7 +28,8 @@ class DataReader(ABC):
                            extraction_method: ExtractionMethod,
                            recalculate: bool = False,
                            index_mode: bool = False,
-                           **preprocess_parameters) -> HoldTaskDataset:
+                           preprocess_parameters: dict = None,
+                           **kwargs) -> HoldTaskDataset:
         """
         Either reads or calculates the HoldTaskDataset object from the dataset
         :param index_mode: Get matrices by reading from the disk
@@ -39,18 +40,18 @@ class DataReader(ABC):
         """
 
         taskDataset = self.__create_taskDataset__(extraction_method, index_mode)
-        if self.check_files(taskDataset) and not recalculate:
+        if self.check_files(taskDataset, **kwargs) and not recalculate:
             print('reading')
-            self.read_files(taskDataset)
+            self.read_files(taskDataset, **kwargs)
         else:
             print('calculating')
             self.load_files()
             self.calculate_input(taskDataset=taskDataset,
-                                 preprocess_parameters=preprocess_parameters)
-
-            self.calculate_taskDataset(taskDataset)
+                                 preprocess_parameters=preprocess_parameters,
+                                 **kwargs)
+            self.calculate_taskDataset(taskDataset, **kwargs)
             taskDataset.validate()
-            self.write_files(taskDataset)
+            self.write_files(taskDataset, **kwargs)
         return taskDataset
 
     @abstractmethod
@@ -64,6 +65,10 @@ class DataReader(ABC):
         pass
 
     @abstractmethod
+    def get_task_name(self) -> str:
+        pass
+
+    @abstractmethod
     def load_files(self):
         """
         Load in the required files from the dataset to later extract the input and targets from
@@ -71,7 +76,7 @@ class DataReader(ABC):
         pass
 
     @abstractmethod
-    def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict):
+    def calculate_input(self, taskDataset: HoldTaskDataset, **preprocess_parameters):
         """
         Extract and add the input tensors to the taskDataset object using add_input for complete tensors,
         extract_and_add_input for extracting and adding feature matrices using the extraction_method object.
@@ -103,13 +108,13 @@ class DataReader(ABC):
                                index_mode=index_mode,
                                **self.get_base_path())
 
-    def check_files(self, taskDataset):
-        return taskDataset.check()
+    def check_files(self, taskDataset, **kwargs):
+        return taskDataset.check(self.get_task_name())
 
-    def read_files(self, taskDataset: HoldTaskDataset):
+    def read_files(self, taskDataset: HoldTaskDataset, **kwargs):
         taskDataset.load()
 
-    def write_files(self, taskDataset: HoldTaskDataset):
+    def write_files(self, taskDataset: HoldTaskDataset, **kwargs):
         taskDataset.save()
 
     def resample(self, sig, sample_rate, resample_to):
@@ -152,7 +157,8 @@ class DataReader(ABC):
 
         if start_frame > sig_sample_rate[0].shape[0]:
             window = np.vstack(
-                [sig_sample_rate[0], np.zeros(start_frame - sig_sample_rate[0].shape[0], *sig_sample_rate[0].shape[1:])])
+                [sig_sample_rate[0],
+                 np.zeros(start_frame - sig_sample_rate[0].shape[0], *sig_sample_rate[0].shape[1:])])
             windowed_signals.append(window)
         elif end_frame < sig_sample_rate[0].shape[0]:
             window = sig_sample_rate[0][sig_sample_rate[0].shape[0] - window_size:sig_sample_rate[0].shape[0], :]

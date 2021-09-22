@@ -13,7 +13,7 @@ from Tasks.TaskDataset import TaskDataset
 class ConcatTrainingSetCreator:
 
     def __init__(self,
-                 random_state: Optional[int],
+                 random_state: Optional[int] = None,
                  nr_runs: Optional[int] = 5,
                  index_mode: bool = False,
                  recalculate=False):
@@ -26,6 +26,7 @@ class ConcatTrainingSetCreator:
         self.extraction_methods = {}
         self.sample_rates = {}
         self.preproccesing = {}
+        self.extra_arguments = {}
         self.dics_of_label_limits = {}
         self.validators = {}
         self.taskdatasets = {}
@@ -109,6 +110,17 @@ class ConcatTrainingSetCreator:
                            key=key)
 
     ###############
+    # Extra Arguments
+    ###############
+
+    def add_extra_taskDataset_args(self,
+                                   kwargs: dict,
+                                   key: str = None):
+        self.__add__pipe__(addition=kwargs,
+                           dictionary=self.extra_arguments,
+                           key=key)
+
+    ###############
     # Filtering
     ###############
 
@@ -137,18 +149,26 @@ class ConcatTrainingSetCreator:
                                 function: str,
                                 key: str = None,
                                 **kwargs):
-        assert function in self.taskdataset_methods, 'input is not a TaskDataset method'
+        assert function in self.taskdataset_methods, 'Input is not a TaskDataset method'
         if not key:
             for dr in list(self.get_keys()):
                 if dr not in self.transformations:
                     self.transformations[dr] = []
-                self.transformations[dr].append((function, kwargs))
+                tr_names = [t[0] for t in self.transformations[dr]]
+                if function in tr_names:
+                    self.transformations[dr][tr_names.index(function)] = (function, kwargs)
+                else:
+                    self.transformations[dr].append((function, kwargs))
 
         else:
             assert key in self.data_readers, 'There is no dataset with this key'
             if key not in self.transformations:
                 self.transformations[key] = []
-            self.transformations[key].append((function, kwargs))
+            tr_names = [t[0] for t in self.transformations[key]]
+            if function in tr_names:
+                self.transformations[key][tr_names.index(function)] = (function, kwargs)
+            else:
+                self.transformations[key].append((function, kwargs))
 
     def __execute_functions__(self,
                               key: str,
@@ -167,15 +187,21 @@ class ConcatTrainingSetCreator:
         for dr in self.data_readers.keys():
             if (class_list and dr not in class_list) or dr in self.taskdatasets.keys():
                 continue
-            tsk = self.data_readers[dr].return_taskDataset(
+
+            task_input_dict = dict(
                 extraction_method=self.__get__pipe__(key=dr, dictionary=self.extraction_methods),
                 resample_to=self.__get__pipe__(key=dr,
                                                dictionary=self.sample_rates),
                 recalculate=self.recalculate,
                 index_mode=self.index_mode,
-                **self.__get__pipe__(key=dr,
-                                     dictionary=self.preproccesing)
-
+            )
+            if self.__get__pipe__(key=dr, dictionary=self.preproccesing):
+                task_input_dict.update(
+                    dict(preprocess_parameters=self.__get__pipe__(key=dr, dictionary=self.preproccesing)))
+            if self.__get__pipe__(key=dr, dictionary=self.extra_arguments):
+                task_input_dict.update(**self.__get__pipe__(key=dr, dictionary=self.extra_arguments))
+            tsk = self.data_readers[dr].return_taskDataset(
+                **task_input_dict
             )
             if dr in self.dics_of_label_limits:
                 tsk.sample_labels(self.__get__pipe__(key=dr, dictionary=self.dics_of_label_limits))

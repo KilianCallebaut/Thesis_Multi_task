@@ -28,17 +28,14 @@ class ASVspoof2015(DataReader):
     def get_base_path(self):
         return dict(base_path=self.object_path.format('train'))
 
-    def check_files(self, taskDataset):
+    def get_task_name(self) -> str:
+        return 'ASVspoof2015'
+
+    def check_files(self, taskDataset, **kwargs):
         return super().check_files(taskDataset) and \
                os.path.isfile(self.get_path())
 
     def load_files(self):
-        # if os.path.isfile(self.get_path()):
-        #     info = joblib.load(self.get_path())
-        #     self.files = info['files']
-        #     self.truths = info['truths']
-        #     return
-
         self.truths = pd.read_csv(os.path.join(self.data_path, 'CM_protocol', 'cm_train.trn'), sep=' ', header=None,
                                   names=['folder', 'file', 'method', 'source'])
         # self.truths = self.truths.append(add)
@@ -76,13 +73,13 @@ class ASVspoof2015(DataReader):
 
         self.files = [os.path.join(self.data_path, 'wav', x[0], x[1]) for x in self.truths.to_numpy()]
 
-    def read_files(self, taskDataset: HoldTaskDataset) -> HoldTaskDataset:
+    def read_files(self, taskDataset: HoldTaskDataset, **kwargs) -> HoldTaskDataset:
         info = joblib.load(self.get_path())
         self.files = info['files']
         self.truths = info['truths']
         return super().read_files(taskDataset)
 
-    def write_files(self, taskDataset: HoldTaskDataset):
+    def write_files(self, taskDataset: HoldTaskDataset, **kwargs):
         super().write_files(taskDataset)
         dict = {'files': self.files,
                 'truths': self.truths,
@@ -91,7 +88,7 @@ class ASVspoof2015(DataReader):
 
     def calculate_input(self,
                         taskDataset: HoldTaskDataset,
-                        preprocess_parameters: dict):
+                        **preprocess_parameters):
         print('training')
         perc = 0
 
@@ -115,6 +112,9 @@ class ASVspoof2015(DataReader):
                       for label_id in range(len(distinct_labels))]
             targets.append(target)
 
-        taskDataset.add_task_and_targets(task=MultiClassTask(name='ASVspoof2015',
-                                                             output_labels=distinct_labels),
-                                         targets=targets)
+        taskDataset.add_task_and_targets(
+            task=MultiClassTask(
+                name=self.get_task_name(),
+                output_labels=distinct_labels),
+            targets=targets
+        )

@@ -50,7 +50,7 @@ class TaskDataset(Dataset):
         self.stop_index_list = []
         self.total_target_size = 0
 
-        self.prepared = False
+        self.flag_prepared = False
         self.flag_scaled = False
 
         self.inputs = []
@@ -176,7 +176,7 @@ class TaskDataset(Dataset):
         self.stop_index_list = taskDataset.stop_index_list
         self.total_target_size = taskDataset.total_target_size
 
-        self.prepared = taskDataset.prepared
+        self.flag_prepared = taskDataset.prepared
         self.flag_scaled = taskDataset.flag_scaled
 
     def __len__(self):
@@ -246,11 +246,30 @@ class TaskDataset(Dataset):
         print("Calculate Normalize Fit")
 
         self.extraction_method.scale_reset()
-        self.flag_scaled = False
+        if self.flag_scaled:
+            self.inverse_normalize_inputs()
         for i in range(len(self.inputs)):
             self.extraction_method.partial_scale_fit(self.get_input(i))
 
+    def normalize_inputs(self):
+        """
+        Scales the inputs using the normalization defined in the ExtractionMethod object
+        """
+        print("Calculate Normalization")
+        self.inverse_normalize_inputs()
+        for i in range(len(self.inputs)):
+            self.inputs[i] = self.extraction_method.scale_transform(self.get_input(i))
         self.flag_scaled = True
+
+    def inverse_normalize_inputs(self):
+        """
+        Inverses the scaling of inputs (if they have been scaled)
+        """
+        print('Inversing normalization')
+        if self.flag_scaled:
+            for i in range(len(self.inputs)):
+                self.inputs[i] = self.extraction_method.inverse_scale_transform(self.get_input(i))
+            self.flag_scaled = False
 
     def prepare_fit(self):
         """
@@ -259,7 +278,7 @@ class TaskDataset(Dataset):
         print("Calculate Preparation Fit")
 
         self.extraction_method.prepare_reset()
-        self.prepared = False
+        self.flag_prepared = False
         for i in range(len(self.inputs)):
             self.extraction_method.prepare_fit(self.get_input(i))
 
@@ -268,7 +287,8 @@ class TaskDataset(Dataset):
         Applies preparation of the input instances defined in the extraction method
         on each input instance in the TaskDataset.
         """
-        self.prepared = False
+        print("Prepare Inputs")
+        self.flag_prepared = False
         if not self.grouping:
             self.grouping = [i for i in range(len(self.inputs))]
         for i in range(len(self.inputs)):
@@ -281,7 +301,7 @@ class TaskDataset(Dataset):
                 for t in self.extra_tasks:
                     t[1].append(t[1][i])
 
-        self.prepared = True
+        self.flag_prepared = True
 
     ########################################################################################################
     # Index mode
@@ -300,53 +320,63 @@ class TaskDataset(Dataset):
         self.get_input = types.MethodType(get_input_index_mode, self)
         self.save = types.MethodType(save_index_mode, self)
         self.load_inputs = types.MethodType(load_inputs_index_mode, self)
+        self.normalize_inputs = types.MethodType(normalize_inputs_index_mode, self)
+        self.inverse_normalize_inputs = types.MethodType(inverse_normalize_inputs_index_mode, self)
         self.prepare_inputs = types.MethodType(prepare_inputs_index_mode, self)
 
     ########################################################################################################
     # I/O
     ########################################################################################################
     def save(self):
-        joblib.dump(self.inputs, os.path.join(self.base_path, '{}_inputs.gz'.format(self.extraction_method.name)))
+        joblib.dump(self.inputs,
+                    os.path.join(self.base_path, '{}_{}_inputs.gz'.format(self.task.name, self.extraction_method.name)))
+        self.save_task_info()
 
+    def save_task_info(self):
         diction = {
             'task': self.task,
             'targets': self.targets,
             'grouping': self.grouping,
             'extra_tasks': self.extra_tasks
         }
-        joblib.dump(diction, os.path.join(self.base_path, 'task_info.obj'))
+        joblib.dump(diction, os.path.join(self.base_path, '{}_info.obj'.format(self.task.name)))
 
         diction = {
             'extraction_method': self.extraction_method
         }
         joblib.dump(diction,
-                    os.path.join(self.base_path, '{}_extraction_method_params'.format(self.extraction_method.name)))
+                    os.path.join(self.base_path,
+                                 '{}_{}_extraction_method_params'.format(self.task.name, self.extraction_method.name)))
 
     def load(self):
         self.load_inputs()
-        diction = joblib.load(os.path.join(self.base_path, 'task_info.obj'))
+        diction = joblib.load(os.path.join(self.base_path, '{}_info.obj'.format(self.task.name)))
         self.task = diction['task']
         self.targets = diction['targets']
         self.grouping = diction['grouping']
         self.extra_tasks = diction['extra_tasks']
 
         diction = joblib.load(
-            os.path.join(self.base_path, '{}_extraction_method_params'.format(self.extraction_method.name)))
+            os.path.join(self.base_path,
+                         '{}_{}_extraction_method_params'.format(self.task.name, self.extraction_method.name)))
         self.extraction_method.__dict__.update(diction['extraction_method'].__dict__)
 
     def load_inputs(self):
-        self.inputs = joblib.load(os.path.join(self.base_path, '{}_inputs.gz'.format(self.extraction_method.name)))
+        self.inputs = joblib.load(
+            os.path.join(self.base_path, '{}_{}_inputs.gz'.format(self.task.name, self.extraction_method.name)))
 
-    def check(self):
-        check = os.path.isfile(os.path.join(self.base_path, 'task_info.obj')) \
-                and os.path.isfile(
-            os.path.join(self.base_path, '{}_extraction_method_params'.format(self.extraction_method.name)))
+    def check(self, taskname):
+        check = os.path.isfile(os.path.join(self.base_path, '{}_info.obj'.format(taskname))) and os.path.isfile(
+            os.path.join(self.base_path,
+                         '{}_{}_extraction_method_params'.format(taskname, self.extraction_method.name)))
 
         if self.index_mode:
-            return os.path.isdir(os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))) \
+            return os.path.isdir(os.path.join(self.base_path, '{}_input_{}_separated'.format(taskname,
+                                                                                             self.extraction_method.name))) \
                    and check
         else:
-            return os.path.isfile(os.path.join(self.base_path, '{}_inputs.gz'.format(self.extraction_method.name))) \
+            return os.path.isfile(
+                os.path.join(self.base_path, '{}_{}_inputs.gz'.format(taskname, self.extraction_method.name))) \
                    and check
 
 
@@ -359,7 +389,8 @@ def add_input_index_mode(self, input_tensor: torch.tensor):
     Adds an input tensor to the dataset
     :param input_tensor:
     """
-    separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
+    separated_dir = os.path.join(self.base_path,
+                                 '{}_input_{}_separated'.format(self.task.name, self.extraction_method.name))
     if not os.path.exists(separated_dir):
         os.mkdir(separated_dir)
 
@@ -373,10 +404,11 @@ def add_input_index_mode(self, input_tensor: torch.tensor):
 ########################################################################################################
 
 def get_input_index_mode(self, index):
-    separated_file = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name),
+    separated_file = os.path.join(self.base_path,
+                                  '{}_input_{}_separated'.format(self.task.name, self.extraction_method.name),
                                   'input_{}.pickle'.format(self.inputs[index][0]))
     input_tensor = torch.load(separated_file)
-    if self.prepared:
+    if self.flag_prepared:
         input_tensor = self.extraction_method.prepare_input(input_tensor)[self.inputs[index][1]]
     if self.flag_scaled:
         input_tensor = self.extraction_method.scale_transform(input_tensor)
@@ -386,6 +418,14 @@ def get_input_index_mode(self, index):
 ########################################################################################################
 # Transformation
 ########################################################################################################
+
+def normalize_inputs_index_mode(self):
+    self.flag_scaled = True
+
+
+def inverse_normalize_inputs_index_mode(self):
+    self.flag_scaled = False
+
 
 def prepare_inputs_index_mode(self):
     if not self.grouping:
@@ -398,7 +438,7 @@ def prepare_inputs_index_mode(self):
             self.grouping.append(self.grouping[i])
             for t in self.extra_tasks:
                 t[1].append(t[1][i])
-    self.prepared = True
+    self.flag_prepared = True
 
 
 ########################################################################################################
@@ -406,22 +446,11 @@ def prepare_inputs_index_mode(self):
 ########################################################################################################
 
 def save_index_mode(self):
-    diction = {
-        'task': self.task,
-        'targets': self.targets,
-        'grouping': self.grouping,
-        'extra_tasks': self.extra_tasks
-    }
-    joblib.dump(diction, os.path.join(self.base_path, 'task_info.obj'))
-
-    diction = {
-        'extraction_method': self.extraction_method
-    }
-    joblib.dump(diction,
-                os.path.join(self.base_path, '{}_extraction_method_params'.format(self.extraction_method.name)))
+    self.save_task_info()
 
 
 def load_inputs_index_mode(self):
-    separated_dir = os.path.join(self.base_path, 'input_{}_separated'.format(self.extraction_method.name))
+    separated_dir = os.path.join(self.base_path,
+                                 '{}_input_{}_separated'.format(self.task.name, self.extraction_method.name))
     dir_list = os.listdir(separated_dir)
     self.inputs = [(i, 0) for i in range(len(dir_list))]

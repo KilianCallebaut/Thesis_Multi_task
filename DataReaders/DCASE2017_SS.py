@@ -31,8 +31,11 @@ class DCASE2017_SS(DataReader):
         return os.path.join(self.get_base_path()['testing_base_path'],
                             'DCASE2017_SS.obj')
 
-    def check_files(self, extraction_method):
-        return super().check_files(extraction_method) and \
+    def get_task_name(self) -> str:
+        return 'DCASE2017_SS'
+
+    def check_files(self, taskDataset, **kwargs):
+        return super().check_files(taskDataset) and \
                os.path.isfile(self.get_path()) and \
                os.path.isfile(self.get_eval_path())
 
@@ -64,12 +67,12 @@ class DCASE2017_SS(DataReader):
         self.audio_files = self.devdataset.audio_files
         self.audio_files_eval = self.evaldataset.audio_files
 
-    def read_files(self, taskDataset: HoldTaskDataset):
+    def read_files(self, taskDataset: HoldTaskDataset, **kwargs):
         self.audio_files = joblib.load(self.get_path())
         self.audio_files_eval = joblib.load(self.get_eval_path())
         return super().read_files(taskDataset)
 
-    def write_files(self, taskDataset: HoldTaskDataset):
+    def write_files(self, taskDataset: HoldTaskDataset, **kwargs):
         super().write_files(taskDataset=taskDataset)
         dict = {'audio_files': self.audio_files}
         joblib.dump(dict, self.get_path())
@@ -77,7 +80,7 @@ class DCASE2017_SS(DataReader):
         dict = {'audio_files_eval': self.audio_files_eval}
         joblib.dump(dict, self.get_eval_path())
 
-    def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict):
+    def calculate_input(self, taskDataset: HoldTaskDataset, **preprocess_parameters):
         perc = 0
         for audio_idx in range(len(self.audio_files)):
             read_wav = self.preprocess_signal(self.load_wav(self.audio_files[audio_idx]), **preprocess_parameters)
@@ -121,7 +124,7 @@ class DCASE2017_SS(DataReader):
             targets_val.append(target)
             print(file_id / len(self.audio_files_eval))
 
-        task = MultiClassTask(name='DCASE2017_SS', output_labels=distinct_labels)
+        task = MultiClassTask(name=self.get_task_name(), output_labels=distinct_labels)
         taskDataset.add_task_and_targets(
             task=task,
             targets=targets

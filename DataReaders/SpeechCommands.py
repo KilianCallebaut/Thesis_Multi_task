@@ -22,12 +22,15 @@ class SpeechCommands(DataReader):
         return dict(base_path=self.object_path.format('train'),
                     testing_base_path=self.object_path.format('eval'))
 
+    def get_task_name(self) -> str:
+        return "SpeechCommands"
+
     def load_files(self):
         self.ds, self.ds_info = tfds.load('speech_commands', split=['train', 'test'], shuffle_files=False,
                                           data_dir=self.data_path, with_info=True)
         print('Done loading Speech Commands dataset')
 
-    def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict):
+    def calculate_input(self, taskDataset: HoldTaskDataset, **preprocess_parameters):
         for audio_label in self.ds[0].as_numpy_iterator():
             audio = audio_label["audio"]
             fs = self.sample_rate
@@ -58,7 +61,7 @@ class SpeechCommands(DataReader):
             targets_t.append(audio_label["label"])
         targets_t = [[int(b == f) for b in range(len(self.ds_info.features['label'].names))] for f in targets_t]
 
-        task = MultiClassTask(name="SpeechCommands",
+        task = MultiClassTask(name=self.get_task_name(),
                               output_labels=self.ds_info.features['label'].names)
         taskDataset.add_task_and_targets(
             task=task,

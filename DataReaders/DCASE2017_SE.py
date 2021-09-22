@@ -25,16 +25,19 @@ class DCASE2017_SE(DataReader):
     def get_base_path(self):
         return dict(base_path=self.object_path.format('train'))
 
-    def check_files(self, extraction_method):
-        return super().check_files(extraction_method) and \
+    def get_task_name(self) -> str:
+        return 'DCASE2017_SE'
+
+    def check_files(self, taskDataset, **kwargs):
+        return super().check_files(taskDataset) and \
                os.path.isfile(self.get_path())
 
-    def read_files(self, taskDataset: HoldTaskDataset):
+    def read_files(self, taskDataset: HoldTaskDataset, **kwargs):
         info = joblib.load(self.get_path())
         self.audio_files = info['audio_files']
         super().read_files(taskDataset)
 
-    def write_files(self, taskDataset):
+    def write_files(self, taskDataset, **kwargs):
         super().write_files(taskDataset)
         dict = {'audio_files': self.audio_files}
         joblib.dump(dict, self.get_path())
@@ -58,7 +61,7 @@ class DCASE2017_SE(DataReader):
 
         self.audio_files = self.devdataset.audio_files
 
-    def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict):
+    def calculate_input(self, taskDataset: HoldTaskDataset, **preprocess_parameters):
         perc = 0
         for audio_idx in range(len(self.audio_files)):
             audio_cont = dcase_util.containers.AudioContainer().load(
@@ -93,5 +96,5 @@ class DCASE2017_SE(DataReader):
 
         taskDataset.add_task_and_targets(
             targets=targets,
-            task=MultiLabelTask(name='DCASE2017_SE', output_labels=distinct_labels)
+            task=MultiLabelTask(name=self.get_task_name(), output_labels=distinct_labels)
         )

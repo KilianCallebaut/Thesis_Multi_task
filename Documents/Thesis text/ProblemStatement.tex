@@ -78,23 +78,6 @@ As a basis for developing the framework, following the example set in a differen
 
 \textbf{Hypothesis 5.} \textit{Optimal resource usage is not required, but the system should be executable. Concatenating multiple datasets means more space is required and more time will be needed to execute. The framework should assume the entire concatenated dataset possibly can not fit in memory and device failures can happen while executing, which should not automatically require a restart of the entire process.}\\
 
-Using these hypotheses, the outline is made for what the most important characteristics are for this framework. These serve as the concrete steps the framework should offer for speeding up multi-task application development. The characteristics go as follows:
-
-\textbf{Singular focus for changes.}  Grant the ability to make focused changes in the pipeline which are anticipated in the rest of the system so that other parts of the pipeline do not require adaptation. An example of this is the easy addition of extra datasets with heterogeneous task types which should not require any change in the training functions.
-
-\textbf{Treat combined datasets as one} Combining multiple datasets for training a single model often requires that the pre-processing is done in the same way. Development can be sped up by granting the developers the ability to treat the datasets as if they were one, creating input feature matrices that have been subjected to the same processes from the original audio. These processes should be executable without having to replicate the same functions for each individual dataset, as in stead giving to option to apply them to all at once.
-
-\textbf{Make variations without recalculating unnecessary objects} In research, one must often vary design choices and parameters and investigate the effect of the change. This implies that one changes a certain element in the pipeline and reruns the training and testing of the model which already can take up considerable time. However, there often are elements that can be kept from a previous iteration and do not have to be recalculated or reloaded. The framework should offer the functionality to replace something at runtime which recalculates the necessary replaced part but keeps the others.
-
-\textbf{Compare the effect of design decisions} If a developer needs to compare design choices they need to be able to directly compare the effect of each one in terms of performance, side-by-side. 
-
-\textbf{Reproduce testing conditions} Reproducibility is a major element in scientific research, which should not be overlooked for developing applications. The data handling steps should be reproducible after a training run has been completed in order to verify the results. This goes for example for example for creating the same train/test splits in a k-fold cross validation set-up. Another case is when the data is scaled based on metrics from the training data. When a new dataset is then brought in to test a trained model, this data should be scaled using the same metrics.
-
-\textbf{Make research variations possible} The research into multi-task learning for audio set-ups is still relatively new. The framework should - if not directly implementing - make the used techniques possible to implement. The framework should provide hooks for implementing the different ways multi-task learning has been implemented.
-
-\textbf{Allow large combinations in memory constraints} Large datasets can be inhibited through memory constraints, which should be solved by offering a streaming set-up for reading data.
-
-
 \section{Non-functional Requirements} \label{problem:nonfunc}
 
 From the observations made in the previous sections, a number of non-functional requirements have been drawn up. These requirements are goals for the design of the software framework. The requirements are as follows:
@@ -106,7 +89,7 @@ From the observations made in the previous sections, a number of non-functional 
 	\item \textbf{Cutting Double Work:} Anticipate that multi-task models will be designed through iterated variations and that the system can be run with largely the same variables without having to recalculate the same things as before.
 	\item \textbf{Developmental Side-rails:} New developers using the framework should get a clear development structure and guiding through examples, warnings and hints.
 	\item \textbf{Robust:} The framework should be able to dynamically handle possible differences in input and desired pipeline functionalities.
-	\item \textbf{Portable:} The developed code should be transferable to different devices with possibly more constrained resources.
+
 \end{itemize}
 
 \section{Functional Requirements}
@@ -144,7 +127,8 @@ Combining and loading the data for training has the following functional require
 	\item Filtering data: Research in deep learning often deals with adjusting the distribution of instances with certain labels in a dataset, for which the framework should be able to provide a filtering method.
 	\item Reusing data: Data is likely to be reused and reiterated over with different transformations and such applied. The system must be prepared for this and only store the base extracted feature matrices without any of the subsequent adjustments.
 	\item Batching multiple tasks: Batches of input are done matrices that append inputs from different datasets and targets from different tasks together. These inputs and targets must have the same shape in order to be able to fit together in a matrix. The framework must provide for this instance automatic functions that make this possible, for the task targets. For inputs however, they either have to be cut or padded to the same shape, so the developer must have the tools available to achieve this.
-	\item Replicability: An important part in research is the ability to replicate the results. Any randomness based operations the system adds must come with pseudo random number generators that make it possible to receive the same output every time.
+	\item Replicability: An important part in research is the ability to replicate the results. Any randomness based operations the system adds must come with pseudo random number generators that make it possible to receive the same output every time.This goes for example for example for creating the same train/test splits in a k-fold cross validation set-up. Another case is when the data is scaled based on metrics from the training data. When a new dataset is then brought in to test a trained model, this data should be scaled using the same metrics.
+	
 \end{itemize}
 
 \subsection{Training}

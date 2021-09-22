@@ -1,5 +1,3 @@
-import os
-
 import numpy as np
 from sklearn.model_selection import GroupKFold, StratifiedKFold
 from sklearn.model_selection._split import BaseCrossValidator
@@ -194,9 +192,16 @@ class HoldTaskDataset(TaskDataset):
     ########################################################################################################
     # Transformation
     ########################################################################################################
-    def normalize_fit(self):
-        assert len(self.test_set) > 0, 'scaling calculation should only happen on the training set'
-        super().normalize_fit()
+
+    def normalize_inputs(self):
+        super().normalize_inputs()
+        if len(self.test_set):
+            self.test_set.normalize_inputs()
+
+    def inverse_normalize_inputs(self):
+        super().inverse_normalize_inputs()
+        if len(self.test_set):
+            self.test_set.inverse_normalize_inputs()
 
     def prepare_inputs(self):
         """
@@ -220,13 +225,13 @@ class HoldTaskDataset(TaskDataset):
         if self.test_set.base_path != self.base_path:
             self.test_set.load()
 
-    def check(self):
+    def check(self, taskname):
         """
         Checks if there are stored taskdatsets for this extraction method
         :return: Whether or not there is stored data
         """
         if self.test_set.base_path != self.base_path:
-            return self.test_set.check() \
-                   and super().check()
+            return self.test_set.check(taskname) \
+                   and super().check(taskname)
         else:
-            return super().check()
+            return super().check(taskname)

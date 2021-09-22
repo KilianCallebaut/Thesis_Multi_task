@@ -5,10 +5,9 @@ from timeit import default_timer as timer
 import joblib
 import numpy as np
 
+from DataReaders.DataReader import DataReader
 from Tasks.Task import MultiLabelTask
 from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
-
-from DataReaders.DataReader import DataReader
 
 
 class ChenAudiosetDataset(DataReader):
@@ -46,6 +45,9 @@ class ChenAudiosetDataset(DataReader):
 
     def get_base_path(self):
         return dict(base_path=self.object_path)
+
+    def get_task_name(self) -> str:
+        return "chen_audioset"
 
     def load_files(self):
         if os.path.isfile(self.get_path()):
@@ -105,7 +107,7 @@ class ChenAudiosetDataset(DataReader):
 
         targets, distinct_targets = self.calculate_targets()
 
-        name = "chen_audioset"
+        name = self.get_task_name()
         taskDataset.add_task_and_targets(targets=targets,
                                          task=MultiLabelTask(name=name,
                                                              output_labels=distinct_targets))
@@ -114,7 +116,7 @@ class ChenAudiosetDataset(DataReader):
 
     def calculate_input(self,
                         taskDataset: HoldTaskDataset,
-                        preprocess_parameters: dict):
+                        **preprocess_parameters):
         i = 0
         for folder in self.wav_files:
             for file in folder:
