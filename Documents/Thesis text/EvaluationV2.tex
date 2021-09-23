@@ -1,6 +1,6 @@
 \chapter{Evaluation}
 
-\section{Demonstrate}
+\section{Demonstrate Implementations}
 
 \section{Literature Evaluation}
 
@@ -32,6 +32,8 @@
 	% What preprocessing do we have for both signals and feature matrices
 	\item File storage abstraction: There are handles on the TaskDataset which can be called to store, load or check the TaskDataset to or from files, which are specific for the currently used extraction method and task.
 	\item Quick Reading: The DataReader automatically checks if there is a stored TaskDataset available for the given extraction\_method and task and loads it if so.
+	\item Create multiple input objects from the same dataset: (DEMONSTRATE) The framework is open ended in how the TaskDataset object is extracted from the data and allows extra parameters for the DataReader to be given at initialization. TaskDatasets are stored using the ExtractionMethod object's name and the (main) Task's name, so for every new variation of these will be automatically linked to different files.
+	\item Tasks and datasets are a many to many relationship: Tasks can be present in multiple datasets. The tasks need to have the same name, output labels and classification type in order to be seen as the same. When combined in the ConcatTaskDataset, the target vectors will automatically be placed in the same positions, which will make them be seen as the same task in the training function. Datasets can have multiple tasks to an unlimited degree in its list of extra tasks, which always combines them with a list of targets of the same amount of input instances. 
 \end{itemize}
 \subsubsection{Data Loading}
 \begin{itemize}
@@ -49,7 +51,7 @@
 \begin{itemize}
 	\item Predicting multiple tasks: Each dataset can have multiple tasks linked to their targets. There are automatic filters for the output to isolate the task specific predictions. 
 	\item Task specific output handling: Handling of the task functions, like loss calculation and decision making of the eventual classes from the probabilities are stored in the Task objects 
-	\item Loss calculation specifiable: The calculation of the Loss of each task is definable in the Task object. However, currently, losses are always tied to tasks, which have target labels. This is not always the case, as in the research \citep{tagliasacchi2020multi}
+	\item Loss calculation specifiable: The calculation of the Loss of each task is definable in the Task object. However, currently, losses are always tied to tasks, which have target labels. This is not always the case, as in the research \citep{tagliasacchi2020multi} \citep{wu2020domain}, losses have also been calculated based on cost functions from internal model parameters. Since these loss functions are not linked to datasets, but to the models themselves, for which the framework does not offer modules which can be used in the training function for specific handling, it is up to the developer to implement these in the Training\_Utils object.
 	\item Loss combination specifiable: Implemented in the Training\_Utils object
 	\item Metric calculation, storage and visualization: Gives predictions, true labels and losses to the Results object which calculates the metrics, stores them and writes them to tensorboard where they can easily be compared to other results
 	\item Interrupted Learning: (DEMONSTRATE) Implemented by recreating the Results object and starting the training loop from the given epoch.
