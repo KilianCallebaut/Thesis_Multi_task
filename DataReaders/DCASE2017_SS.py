@@ -80,7 +80,7 @@ class DCASE2017_SS(DataReader):
         dict = {'audio_files_eval': self.audio_files_eval}
         joblib.dump(dict, self.get_eval_path())
 
-    def calculate_input(self, taskDataset: HoldTaskDataset, **preprocess_parameters):
+    def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict, **kwargs):
         perc = 0
         for audio_idx in range(len(self.audio_files)):
             read_wav = self.preprocess_signal(self.load_wav(self.audio_files[audio_idx]), **preprocess_parameters)

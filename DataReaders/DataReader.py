@@ -23,12 +23,13 @@ class DataReader(ABC):
             self.object_path = object_path
         if data_path:
             self.data_path = data_path
+        self.skip_files=[]
 
     def return_taskDataset(self,
                            extraction_method: ExtractionMethod,
                            recalculate: bool = False,
                            index_mode: bool = False,
-                           preprocess_parameters: dict = None,
+                           preprocess_parameters=None,
                            **kwargs) -> HoldTaskDataset:
         """
         Either reads or calculates the HoldTaskDataset object from the dataset
@@ -39,6 +40,8 @@ class DataReader(ABC):
         :return: HoldTaskDataset: The standardized object
         """
 
+        if preprocess_parameters is None:
+            preprocess_parameters = {}
         taskDataset = self.__create_taskDataset__(extraction_method, index_mode)
         if self.check_files(taskDataset, **kwargs) and not recalculate:
             print('reading')
@@ -76,7 +79,7 @@ class DataReader(ABC):
         pass
 
     @abstractmethod
-    def calculate_input(self, taskDataset: HoldTaskDataset, **preprocess_parameters):
+    def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict, **kwargs):
         """
         Extract and add the input tensors to the taskDataset object using add_input for complete tensors,
         extract_and_add_input for extracting and adding feature matrices using the extraction_method object.
@@ -112,7 +115,7 @@ class DataReader(ABC):
         return taskDataset.check(self.get_task_name())
 
     def read_files(self, taskDataset: HoldTaskDataset, **kwargs):
-        taskDataset.load()
+        taskDataset.load(self.get_task_name())
 
     def write_files(self, taskDataset: HoldTaskDataset, **kwargs):
         taskDataset.save()

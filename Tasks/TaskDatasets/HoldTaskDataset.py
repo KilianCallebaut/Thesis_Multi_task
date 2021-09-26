@@ -183,11 +183,11 @@ class HoldTaskDataset(TaskDataset):
         :param random_state:
         :return:
         """
-        self.return_data()
         super().sample_labels(dic_of_labels_limits=dic_of_labels_limits,
                               random_state=random_state)
-        self.test_indexes = [i for i in self.test_indexes if self.inputs[i] in self.inputs]
-        self.distribute_data()
+        if len(self.test_set):
+            self.test_set.sample_labels(dic_of_labels_limits=dic_of_labels_limits,
+                                        random_state=random_state)
 
     ########################################################################################################
     # Transformation
@@ -220,10 +220,10 @@ class HoldTaskDataset(TaskDataset):
         if self.test_set.base_path != self.base_path:
             self.test_set.save()
 
-    def load(self):
-        super().load()
+    def load(self, taskname):
+        super().load(taskname)
         if self.test_set.base_path != self.base_path:
-            self.test_set.load()
+            self.test_set.load(taskname)
 
     def check(self, taskname):
         """

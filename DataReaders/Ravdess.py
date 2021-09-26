@@ -13,11 +13,11 @@ class Ravdess(DataReader):
     # object_path = r"E:\Thesis_Results\Data_Readers\Ravdess"
     data_path = r"F:\Thesis_Datasets\Ravdess"
 
-    def __init__(self, mode = 0, **kwargs):
+    def __init__(self, mode=0, **kwargs):
         print('start ravdess')
         super().__init__(**kwargs)
         print('Done loading Ravdess')
-        self.mode=mode
+        self.mode = mode
 
     def get_path(self):
         return os.path.join(self.get_base_path()['base_path'], 'Ravdess.obj')
@@ -26,7 +26,7 @@ class Ravdess(DataReader):
         return dict(base_path=self.object_path)
 
     def get_task_name(self) -> str:
-        return 'Ravdess_stress' if self.mode==1 else 'Ravdess'
+        return 'Ravdess_stress' if self.mode == 1 else 'Ravdess'
 
     def check_files(self, taskDataset, **kwargs):
         return super().check_files(taskDataset) and \
@@ -69,8 +69,8 @@ class Ravdess(DataReader):
         joblib.dump(dict, self.get_path())
         super().write_files(taskDataset=taskDataset)
 
-    def calculate_input(self, taskDataset: HoldTaskDataset, **preprocess_parameters):
-        mode = kwargs.get('mode') if 'mode' in kwargs else None
+    def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict, **kwargs):
+        mode = self.mode
         perc = 0
         for file_idx in range(len(self.files)):
             file = self.files[file_idx]

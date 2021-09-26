@@ -61,7 +61,7 @@ class DCASE2017_SE(DataReader):
 
         self.audio_files = self.devdataset.audio_files
 
-    def calculate_input(self, taskDataset: HoldTaskDataset, **preprocess_parameters):
+    def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict, **kwargs):
         perc = 0
         for audio_idx in range(len(self.audio_files)):
             audio_cont = dcase_util.containers.AudioContainer().load(

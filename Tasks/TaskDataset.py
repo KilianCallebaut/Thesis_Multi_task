@@ -73,6 +73,8 @@ class TaskDataset(Dataset):
         Adds an input tensor to the dataset
         :param input_tensor: The feature matrix to insert into the dataset
         """
+        if len(input_tensor.shape) ==1:
+            input_tensor = input_tensor[None, :]
         self.inputs.append(input_tensor)
 
     def extract_and_add_input(self,
@@ -84,7 +86,7 @@ class TaskDataset(Dataset):
 
         if len(sig_samplerate[0].shape) > 1:
             channel = 0 if sig_samplerate[0].shape[0] < sig_samplerate[0].shape[1] else 1
-            input_tensor = torch.tensor(
+            input_tensor = torch.stack(
                 [self.extraction_method.extract_features((sig_samplerate[0][:, i], sig_samplerate[channel])) for i in
                  range(sig_samplerate[0].shape[channel])])
         else:
@@ -154,8 +156,6 @@ class TaskDataset(Dataset):
                torch.tensor([t.task_group for t in self.get_all_tasks()])
 
     def get_input(self, index):
-        if self.flag_scaled:
-            return self.extraction_method.scale_transform(self.inputs[index]).float()
         return self.inputs[index].float()
 
     def get_all_targets(self, index):
@@ -176,7 +176,7 @@ class TaskDataset(Dataset):
         self.stop_index_list = taskDataset.stop_index_list
         self.total_target_size = taskDataset.total_target_size
 
-        self.flag_prepared = taskDataset.prepared
+        self.flag_prepared = taskDataset.flag_prepared
         self.flag_scaled = taskDataset.flag_scaled
 
     def __len__(self):
@@ -230,6 +230,10 @@ class TaskDataset(Dataset):
                     for t in sampled_extra_tasks:
                         t[1] = [t[1][i] for i in range(len(t[1])) if
                                 (i not in label_set or i in random_label_set)]
+            if dic_of_labels_limits[l] == 0:
+                for i in range(len(sampled_targets)):
+                    sampled_targets[i].pop(self.task.output_labels.index(l))
+                self.task.output_labels.remove(l)
         self.inputs = sampled_inputs
         self.targets = sampled_targets
         self.grouping = sampled_grouping
@@ -256,7 +260,6 @@ class TaskDataset(Dataset):
         Scales the inputs using the normalization defined in the ExtractionMethod object
         """
         print("Calculate Normalization")
-        self.inverse_normalize_inputs()
         for i in range(len(self.inputs)):
             self.inputs[i] = self.extraction_method.scale_transform(self.get_input(i))
         self.flag_scaled = True
@@ -265,8 +268,8 @@ class TaskDataset(Dataset):
         """
         Inverses the scaling of inputs (if they have been scaled)
         """
-        print('Inversing normalization')
         if self.flag_scaled:
+            print('Inversing normalization')
             for i in range(len(self.inputs)):
                 self.inputs[i] = self.extraction_method.inverse_scale_transform(self.get_input(i))
             self.flag_scaled = False
@@ -348,9 +351,9 @@ class TaskDataset(Dataset):
                     os.path.join(self.base_path,
                                  '{}_{}_extraction_method_params'.format(self.task.name, self.extraction_method.name)))
 
-    def load(self):
-        self.load_inputs()
-        diction = joblib.load(os.path.join(self.base_path, '{}_info.obj'.format(self.task.name)))
+    def load(self, taskname):
+        self.load_inputs(taskname)
+        diction = joblib.load(os.path.join(self.base_path, '{}_info.obj'.format(taskname)))
         self.task = diction['task']
         self.targets = diction['targets']
         self.grouping = diction['grouping']
@@ -358,12 +361,12 @@ class TaskDataset(Dataset):
 
         diction = joblib.load(
             os.path.join(self.base_path,
-                         '{}_{}_extraction_method_params'.format(self.task.name, self.extraction_method.name)))
+                         '{}_{}_extraction_method_params'.format(taskname, self.extraction_method.name)))
         self.extraction_method.__dict__.update(diction['extraction_method'].__dict__)
 
-    def load_inputs(self):
+    def load_inputs(self, taskname):
         self.inputs = joblib.load(
-            os.path.join(self.base_path, '{}_{}_inputs.gz'.format(self.task.name, self.extraction_method.name)))
+            os.path.join(self.base_path, '{}_{}_inputs.gz'.format(taskname, self.extraction_method.name)))
 
     def check(self, taskname):
         check = os.path.isfile(os.path.join(self.base_path, '{}_info.obj'.format(taskname))) and os.path.isfile(
@@ -389,6 +392,8 @@ def add_input_index_mode(self, input_tensor: torch.tensor):
     Adds an input tensor to the dataset
     :param input_tensor:
     """
+    if len(input_tensor.shape) == 1:
+        input_tensor = input_tensor[None, :]
     separated_dir = os.path.join(self.base_path,
                                  '{}_input_{}_separated'.format(self.task.name, self.extraction_method.name))
     if not os.path.exists(separated_dir):
@@ -449,8 +454,8 @@ def save_index_mode(self):
     self.save_task_info()
 
 
-def load_inputs_index_mode(self):
+def load_inputs_index_mode(self, taskname):
     separated_dir = os.path.join(self.base_path,
-                                 '{}_input_{}_separated'.format(self.task.name, self.extraction_method.name))
+                                 '{}_input_{}_separated'.format(taskname, self.extraction_method.name))
     dir_list = os.listdir(separated_dir)
     self.inputs = [(i, 0) for i in range(len(dir_list))]

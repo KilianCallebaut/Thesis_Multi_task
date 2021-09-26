@@ -35,7 +35,6 @@ class Training:
                           **kwargs)
         return results
 
-
     # Source: https://www.cs.toronto.edu/~lczhang/321/tut/tut04.pdf
     # Also helpful: https://github.com/sugi-chan/pytorch_multitask/blob/master/pytorch%20multi-task-Copy2.ipynb
     @staticmethod
@@ -71,14 +70,13 @@ class Training:
             device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         if not optimizer:
-            # optimizer = optim.SGD(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
             optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
 
         if not training_utils:
             training_utils = TrainingUtils()
 
-        #
         target_flags = concat_dataset.get_target_flags()
+        model.to(device)
 
         # Epoch
         for epoch in range(start_epoch, num_epochs):
@@ -219,6 +217,7 @@ class Training:
             training_utils = TrainingUtils()
 
         blank_model.eval()
+        blank_model.to(device)
 
         with torch.no_grad():
             print("Start Evaluation")

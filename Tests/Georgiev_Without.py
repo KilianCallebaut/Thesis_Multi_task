@@ -24,12 +24,10 @@ def main(argv):
     csc.add_data_reader(Ravdess(object_path=drive + r'Thesis_Results\Data_Readers\Ravdess',
                                 data_path=drive + r'Thesis_Datasets\Ravdess',
                                 mode=1))
-    csc.add_data_reader(ASVspoof2015(object_path=os.path.join(drive, r'Thesis_Results\Data_Readers\ASVspoof2015'),
-                                     data_path=drive + r'Thesis_Datasets\Automatic Speaker Verification Spoofing and Countermeasures Challenge 2015'))
+    csc.add_data_reader(ASVspoof2015(object_path=os.path.join(drive, r'Thesis_Results\Data_Readers\ASVspoof2015')))
     csc.add_sample_rate(8000)
     csc.add_extraction_method(extraction_method=LogbankSummaryExtraction(
-        PerCelScaling(NeutralExtractionMethod()),
-        extraction_params=dict(winlen=0.03, winstep=0.01, nfilt=24, nfft=512)))
+        PerCelScaling(NeutralExtractionMethod(extraction_params=dict(winlen=0.03, winstep=0.01, nfilt=24, nfft=512)))))
     csc.add_transformation_call('normalize_fit')
     csc.add_transformation_call('normalize_inputs')
 

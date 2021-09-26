@@ -30,7 +30,7 @@ class SpeechCommands(DataReader):
                                           data_dir=self.data_path, with_info=True)
         print('Done loading Speech Commands dataset')
 
-    def calculate_input(self, taskDataset: HoldTaskDataset, **preprocess_parameters):
+    def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict, **kwargs):
         for audio_label in self.ds[0].as_numpy_iterator():
             audio = audio_label["audio"]
             fs = self.sample_rate

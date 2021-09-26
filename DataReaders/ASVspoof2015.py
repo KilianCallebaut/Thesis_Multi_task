@@ -88,7 +88,8 @@ class ASVspoof2015(DataReader):
 
     def calculate_input(self,
                         taskDataset: HoldTaskDataset,
-                        **preprocess_parameters):
+                        preprocess_parameters: dict,
+                        **kwargs):
         print('training')
         perc = 0
 

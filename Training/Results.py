@@ -37,25 +37,28 @@ class Results:
             self.run_name = self.audioset_file_base + "_" + str(
                 datetime.now().strftime("%d_%m_%Y_%H_%M_%S"))
 
-        if results_path:
-            self.training_results_path = os.path.join(results_path, 'Training_Results')
-            self.evaluation_results_path = os.path.join(results_path, 'Evaluation_Results')
-            self.model_checkpoints_path = os.path.join(results_path, 'Model_Checkpoints')
-
         if not tensorboard_folder:
             self.tensorboard_folder = 'TensorBoard'
         else:
             self.tensorboard_folder = tensorboard_folder
 
-        if not os.path.exists(os.path.join(self.training_results_path, self.run_name)):
-            os.makedirs(os.path.join(self.training_results_path, self.run_name))
-        if not os.path.exists(os.path.join(self.evaluation_results_path, self.run_name)):
-            os.makedirs(os.path.join(self.evaluation_results_path, self.run_name))
-        if not os.path.exists(os.path.join(self.training_results_path, self.tensorboard_folder)):
-            os.makedirs(os.path.join(self.training_results_path, self.tensorboard_folder))
+        if results_path:
+            self.training_results_path = os.path.join(results_path, 'Training_Results', self.run_name)
+            self.evaluation_results_path = os.path.join(results_path, 'Evaluation_Results', self.run_name)
+            self.model_checkpoints_path = os.path.join(results_path, 'Model_Checkpoints', self.run_name)
+            self.tensorboard_path = os.path.join(results_path, self.tensorboard_folder, self.run_name)
+
+        if not os.path.exists(self.training_results_path):
+            os.makedirs(self.training_results_path)
+        if not os.path.exists(self.evaluation_results_path):
+            os.makedirs(self.evaluation_results_path)
+        if not os.path.exists(self.tensorboard_path):
+            os.makedirs(self.tensorboard_path)
+        if not os.path.exists(self.model_checkpoints_path):
+            os.makedirs(self.model_checkpoints_path)
 
         self.writer = SummaryWriter(
-            log_dir=os.path.join(self.training_results_path, self.tensorboard_folder, self.run_name))
+            log_dir=self.tensorboard_path)
         self.num_epochs = num_epochs
         self.training_curve = np.zeros(self.num_epochs)
         self.evaluation_curve = np.zeros(self.num_epochs)
@@ -87,7 +90,7 @@ class Results:
             print('TASK {}: '.format(tsk.name), end='')
             print(tsk.output_labels)
             epoch_metrics = metrics.classification_report(self.task_truths[tsk.name], self.task_predictions[tsk.name],
-                                                          output_dict=True)
+                                                          output_dict=True, target_names=tsk.output_labels)
             self.add_class_report(epoch, epoch_metrics, tsk, training)
             self.add_loss_to_curve_task(epoch, step, self.task_running_losses[tsk.name], tsk, training)
             if tsk.classification_type == "multi-class":
@@ -106,11 +109,11 @@ class Results:
             self.task_running_losses[t.name] = 0
 
     def add_model_parameters(self, nr_epoch, model):
-        path = os.path.join(self.model_checkpoints_path, self.run_name + "epoch_{}.pth".format(nr_epoch))
+        path = os.path.join(self.model_checkpoints_path, "epoch_{}.pth".format(nr_epoch))
         torch.save({'epoch': nr_epoch, 'model_state_dict': model.state_dict()}, path)
 
     def load_model_parameters(self, nr_epoch, model):
-        path = os.path.join(self.model_checkpoints_path, self.run_name + "epoch_{}.pth".format(nr_epoch))
+        path = os.path.join(self.model_checkpoints_path, "epoch_{}.pth".format(nr_epoch))
         checkpoint = torch.load(path, map_location=device)
         model.load_state_dict(checkpoint['model_state_dict'])
 
@@ -121,7 +124,7 @@ class Results:
             path = self.training_results_path
             phase = 'Train'
         joblib.dump(mat,
-                    os.path.join(path, self.run_name, "{}_conf_mat_{}_epoch_{}.gz".format(phase, task.name, epoch)))
+                    os.path.join(path, "{}_conf_mat_{}_epoch_{}.gz".format(phase, task.name, epoch)))
         fig = plt.figure()
         plt.imshow(mat)
         self.writer.add_figure('{}/Confusion matrix/{}'.format(phase, task.name), fig, epoch)
@@ -135,7 +138,7 @@ class Results:
             path = self.training_results_path
             phase = 'Train'
         return joblib.load(
-            os.path.join(path, self.run_name, "{}_conf_mat_{}_epoch_{}.gz".format(phase, task.name, epoch)))
+            os.path.join(path, "{}_conf_mat_{}_epoch_{}.gz".format(phase, task.name, epoch)))
 
     def add_multi_confusion_matrix(self, epoch, mat, task, train):
         path = self.evaluation_results_path
@@ -144,7 +147,7 @@ class Results:
             path = self.training_results_path
             phase = 'Train'
         joblib.dump(mat,
-                    os.path.join(path, self.run_name, "{}_conf_mat_{}_epoch_{}.gz".format(phase, task.name, epoch)))
+                    os.path.join(path, "{}_conf_mat_{}_epoch_{}.gz".format(phase, task.name, epoch)))
         print(mat)
 
     def load_multi_confusion_matrix(self, epoch, task, train):
@@ -154,7 +157,7 @@ class Results:
             path = self.training_results_path
             phase = 'Train'
         return joblib.load(
-            os.path.join(path, self.run_name, "{}_conf_mat_{}_epoch_{}.gz".format(phase, task.name, epoch)))
+            os.path.join(path, "{}_conf_mat_{}_epoch_{}.gz".format(phase, task.name, epoch)))
 
     def add_class_report(self, epoch, report, task, train):
         path = self.evaluation_results_path
@@ -163,7 +166,7 @@ class Results:
             path = self.training_results_path
             phase = 'Train'
         joblib.dump(report,
-                    os.path.join(path, self.run_name, "{}_class_report_{}_epoch_{}.gz".format(phase, task.name, epoch)))
+                    os.path.join(path, "{}_class_report_{}_epoch_{}.gz".format(phase, task.name, epoch)))
 
         for key, value in report.items():
             if type(value) is dict:
@@ -180,19 +183,19 @@ class Results:
             path = self.training_results_path
             phase = 'Train'
         return joblib.load(
-            os.path.join(path, self.run_name, "{}_class_report_{}_epoch_{}.gz".format(phase, task.name, epoch)))
+            os.path.join(path, "{}_class_report_{}_epoch_{}.gz".format(phase, task.name, epoch)))
 
     def add_loss_to_curve(self, epoch, step, loss, train):
         if train:
             phase = 'Train'
             path = self.training_results_path
             self.training_curve[epoch] = loss / step
-            joblib.dump(self.training_curve, os.path.join(path, self.run_name, "{}_losscurve.gz".format(phase)))
+            joblib.dump(self.training_curve, os.path.join(path, "{}_losscurve.gz".format(phase)))
         else:
             phase = 'Evaluation'
             path = self.evaluation_results_path
             self.evaluation_curve[epoch] = loss / step
-            joblib.dump(self.evaluation_curve, os.path.join(path, self.run_name, "{}_losscurve.gz".format(phase)))
+            joblib.dump(self.evaluation_curve, os.path.join(path, "{}_losscurve.gz".format(phase)))
         self.writer.add_scalar("{}/Loss".format(phase), loss / step, epoch)
 
     def load_loss_curve(self, train):
@@ -201,7 +204,7 @@ class Results:
         if train:
             path = self.training_results_path
             phase = 'Train'
-        return joblib.load(os.path.join(path, self.run_name, "{}_losscurve.gz".format(phase)))
+        return joblib.load(os.path.join(path, "{}_losscurve.gz".format(phase)))
 
     def add_loss_to_curve_task(self, epoch, step, loss, task, train):
         if train:
@@ -211,7 +214,7 @@ class Results:
                 self.training_curve_task[task.name] = np.zeros(self.num_epochs)
             self.training_curve_task[task.name][epoch] = loss / step
             joblib.dump(self.training_curve_task,
-                        os.path.join(path, self.run_name, "{}_losscurve_tasks.gz".format(phase)))
+                        os.path.join(path, "{}_losscurve_tasks.gz".format(phase)))
         else:
             phase = 'Evaluation'
             path = self.evaluation_results_path
@@ -219,7 +222,7 @@ class Results:
                 self.evaluation_curve_task[task.name] = np.zeros(self.num_epochs)
             self.evaluation_curve_task[task.name][epoch] = loss / step
             joblib.dump(self.evaluation_curve_task,
-                        os.path.join(path, self.run_name, "{}_losscurve_tasks.gz".format(phase)))
+                        os.path.join(path, "{}_losscurve_tasks.gz".format(phase)))
 
         self.writer.add_scalar("{}/Loss/{}".format(phase, task.name), loss / step, epoch)
 
@@ -229,7 +232,7 @@ class Results:
         if train:
             path = self.training_results_path
             phase = 'Train'
-        return joblib.load(os.path.join(path, self.run_name, "{}_losscurve_tasks.gz".format(phase, task.name)))
+        return joblib.load(os.path.join(path, "{}_losscurve_tasks.gz".format(phase, task.name)))
 
     def flush_writer(self):
         self.writer.flush()

@@ -4,6 +4,7 @@ from timeit import default_timer as timer
 
 import joblib
 import numpy as np
+import torch
 
 from DataReaders.DataReader import DataReader
 from Tasks.Task import MultiLabelTask
@@ -11,9 +12,9 @@ from Tasks.TaskDatasets.HoldTaskDataset import HoldTaskDataset
 
 
 class ChenAudiosetDataset(DataReader):
-    data_path = r'F:\Thesis_Datasets\audioset_chen\audioset_filtered'
+    data_path = r'E:\Thesis_Datasets\audioset_chen\audioset_filtered'
     train_dir = "balanced_train_segments"
-    object_path = r"C:\Users\mrKC1\PycharmProjects\Thesis\data\Data_Readers\ChenAudiosetDataset"
+    object_path = r"E:\Thesis_Results\Data_Readers\ChenAudiosetDataset"
     # object_path = r"E:\Thesis_Results\Data_Readers\ChenAudiosetDataset"
 
     # Bools for choosing random selection because overrepresented in dataset
@@ -35,10 +36,11 @@ class ChenAudiosetDataset(DataReader):
 
     target_list = []
 
-    def __init__(self, **kwargs):
+    def __init__(self, mode=0, **kwargs):
         print('start chen')
         super().__init__(**kwargs)
         print('done chen')
+        self.mode = mode
 
     def get_path(self):
         return os.path.join(self.object_path, "ChenAudiosetDataset.obj")
@@ -47,6 +49,8 @@ class ChenAudiosetDataset(DataReader):
         return dict(base_path=self.object_path)
 
     def get_task_name(self) -> str:
+        if self.mode == 1:
+            return 'park_audioset'
         return "chen_audioset"
 
     def load_files(self):
@@ -101,33 +105,47 @@ class ChenAudiosetDataset(DataReader):
         self.wav_files = wav_files
 
     def calculate_taskDataset(self, taskDataset: HoldTaskDataset, **kwargs):
-        print('Calculating input')
-        # inputs = self.calculate_input(self.wav_files, **kwargs)
-        print('Input calculated')
-
         targets, distinct_targets = self.calculate_targets()
 
         name = self.get_task_name()
         taskDataset.add_task_and_targets(targets=targets,
                                          task=MultiLabelTask(name=name,
                                                              output_labels=distinct_targets))
-        taskDataset.add_grouping(grouping=[fold for fold in range(len(self.wav_files)) for _ in
-                                           self.wav_files[fold]])
+        taskDataset.add_grouping(grouping=[fold for fold in range(len(self.wav_files)) for fi in
+                                           self.wav_files[fold] if fi not in self.skip_files])
+        print('Task Calculated')
 
     def calculate_input(self,
                         taskDataset: HoldTaskDataset,
-                        **preprocess_parameters):
+                        preprocess_parameters: dict,
+                        **kwargs):
         i = 0
+        start = timer()
         for folder in self.wav_files:
             for file in folder:
-                read_wav = self.preprocess_signal(self.load_wav(file), **preprocess_parameters)
-                taskDataset.extract_and_add_input(read_wav)
+                if self.mode == 2:
+                    taskDataset.add_input(torch.tensor(
+                        self.files[self.wav_files.index(folder)][folder.index(file)]['embedding_normalized']))
+                    continue
+                try:
+
+                    read_wav = self.preprocess_signal(self.load_wav(file), **preprocess_parameters)
+                    taskDataset.extract_and_add_input(read_wav)
+                except RuntimeError:
+                    self.skip_files.append(file)
             i += 1
-            print('Percentage done: {}'.format(i / len(self.wav_files)), end='\r')
+            end = timer()
+            timedel = end - start
+            print('Percentage done: {} estimated time: {}'.format(i / len(self.wav_files), timedelta(
+                seconds=timedel * (len(self.wav_files) - i))), end='\r')
+            start = timer()
+        print('Input calculated')
 
     def calculate_targets(self):
-        targets = [[l[2] for l in x['labels']] for f in
-                   self.files for x in f]
+        targets = [[l[2] for l in x['labels']] for f in self.files for x in f if
+                   os.path.join(self.data_path, *x['wav_file'].split(r'/')[4:]) not in self.skip_files]
+        if self.mode == 1 or self.mode == 2:
+            targets = [self.group_events(e) for e in targets]
         # distinct_targets = list(set([x for l in targets for x in l if x != 'None of the above']))
         distinct_targets = list(set([x for l in targets for x in l]))
 
@@ -135,6 +153,32 @@ class ChenAudiosetDataset(DataReader):
         # at the index where it is in distinct_targets order
         targets = [[int(b in f) for b in distinct_targets] for f in targets]
         return targets, distinct_targets
+
+    def group_events(self, list_of_events):
+        grouped_list = []
+        for e in list_of_events:
+            if e in ['Crowd', 'Chatter', 'Hubbub, speech noise, speech babble']:
+                grouped_list.append('crowd')
+            elif e in ['Applause', 'Clapping']:
+                grouped_list.append('applause')
+            elif e in ['Laughter']:
+                grouped_list.append('Laughter')
+            elif e in ['Typing', 'Clicking']:
+                grouped_list.append('typing/clicking')
+            elif e in ['Door', 'Knock']:
+                grouped_list.append('door')
+            elif e in ['Silence']:
+                grouped_list.append('silence')
+            elif e in ['Television']:
+                grouped_list.append('television')
+            elif e in ['Walk, footsteps']:
+                grouped_list.append('walk')
+            elif e in ['Speech', 'Female speech, woman speaking', 'Male speech, man speaking', 'Conversation']:
+                grouped_list.append('speech')
+            else:
+                grouped_list.append('others')
+        grouped_list = list(set(grouped_list))
+        return grouped_list
 
     # def contains_label(self, folder, label):
     #     for f in folder:

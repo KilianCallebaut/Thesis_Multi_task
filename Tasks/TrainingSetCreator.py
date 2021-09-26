@@ -173,12 +173,13 @@ class ConcatTrainingSetCreator:
     def __execute_functions__(self,
                               key: str,
                               task: TaskDataset):
-        for fname, kwargs in self.transformations[key]:
-            func = getattr(task, fname)
-            if kwargs:
-                func(**kwargs)
-            else:
-                func()
+        if key in self.transformations:
+            for fname, kwargs in self.transformations[key]:
+                func = getattr(task, fname)
+                if kwargs:
+                    func(**kwargs)
+                else:
+                    func()
 
     def create_taskdatasets(self,
                             class_list: List[str] = None,
@@ -206,7 +207,7 @@ class ConcatTrainingSetCreator:
             if dr in self.dics_of_label_limits:
                 tsk.sample_labels(self.__get__pipe__(key=dr, dictionary=self.dics_of_label_limits))
 
-            if execute_transformations and dr in self.transformations:
+            if execute_transformations:
                 self.__execute_functions__(dr, tsk)
             self.taskdatasets[dr] = tsk
         return ConcatTaskDataset(list(self.taskdatasets.values()))

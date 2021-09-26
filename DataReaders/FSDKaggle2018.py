@@ -36,7 +36,7 @@ class FSDKaggle2018(DataReader):
         self.file_labels = pd.read_csv(os.path.join(self.data_path, 'train.csv'))
         self.file_labels_val = pd.read_csv(os.path.join(self.data_path, 'test_post_competition.csv'))
 
-    def calculate_input(self, taskDataset: HoldTaskDataset, **preprocess_parameters):
+    def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict, **kwargs):
         perc = 0
         files = [os.path.join(self.data_path, self.audio_folder, name) for name in self.file_labels['fname']]
         for audio_idx in range(len(files)):
