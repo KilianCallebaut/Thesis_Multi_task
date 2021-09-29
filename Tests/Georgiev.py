@@ -16,7 +16,7 @@ drive = r"E:/"
 
 
 def main(argv):
-    csc = ConcatTrainingSetCreator(nr_runs=10)
+    csc = ConcatTrainingSetCreator(nr_runs=5)
     csc.add_data_reader(DCASE2017_SS(object_path=drive + r'Thesis_Results\Data_Readers\DCASE2017_SS_{}',
                                      data_path=drive + r'Thesis_Datasets\DCASE2017'))
     csc.add_data_reader(Ravdess(object_path=drive + r'Thesis_Results\Data_Readers\Ravdess',
@@ -29,7 +29,7 @@ def main(argv):
     csc.add_sample_rate(8000)
     csc.add_extraction_method(extraction_method=LogbankSummaryExtraction(
         PerCelScaling(NeutralExtractionMethod()),
-        extraction_params=dict(winlen=0.03, winstep=0.01, nfilt=24, nfft=512)))
+        extraction_params=dict(winlen=0.03, winstep=0.01, nfilt=24, nfft=512)), multiply=False)
     csc.add_transformation_call('normalize_fit')
     csc.add_transformation_call('normalize_inputs')
 

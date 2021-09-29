@@ -8,6 +8,62 @@
 % Componetns: Data Reading, Data Loading (Trainingsetcreator) and training
 % Compare to implementation without?
 
+% Make a table of lines of code comparisons
+% Make comparisons with published results
+
+% Make observation of reused lines of code, per section
+% Make observations on what would be the problems from the original implementations if other things are required
+
+\begin{table}[ht]
+	\caption{Implementations LOC comparisons} % title of Table
+	\centering % used for centering table
+	\begin{tabular}%{p{0.2\textwidth}p{0.6\textwidth}p{0.2\textwidth}} % centered columns (4 columns)
+		\hline\hline %inserts double horizontal lines
+		Title & Total LOC  & Data Reading LOC & Data Loading LOC & Training LOC  \\ [0.5ex] % inserts table
+		%heading
+		\hline % inserts single horizontal line
+		\citet{park2020augmenting} Without &  &  \\ \hline
+		\citet{park2020augmenting} With &  &  \\ \hline
+		\citet{georgiev2017low} Without &  &  \\ \hline
+		\citet{georgiev2017low} With &  &  \\ \hline
+		\citet{xu2019multi} Without &  &  \\ \hline
+		\citet{xu2019multi} With &  &  \\ \hline
+		Own Experiments &  &  \\ \hline
+	\end{tabular}
+	\label{table:LOC} % is used to refer this table in the text
+\end{table}
+
+\begin{table}[ht]
+	\caption{Reported metric comparisons} % title of Table
+	\centering % used for centering table
+	\begin{tabular}%{p{0.2\textwidth}p{0.6\textwidth}p{0.2\textwidth}} % centered columns (4 columns)
+		\hline\hline %inserts double horizontal lines
+		Title & Metric & Reported & Implementation  \\ [0.5ex] % inserts table
+		%heading
+		\hline % inserts single horizontal line
+		\citet{park2020augmenting} &  &  \\ \hline
+		\citet{georgiev2017low} &  &  \\ \hline
+		\citet{xu2019multi} &  &  \\ \hline
+	\end{tabular}
+	\label{table:metric} % is used to refer this table in the text
+\end{table}
+
+\begin{table}[ht]
+	\caption{Reused code} % title of Table
+	\centering % used for centering table
+	\begin{tabular}%{p{0.2\textwidth}p{0.6\textwidth}p{0.2\textwidth}} % centered columns (4 columns)
+		\hline\hline %inserts double horizontal lines
+		Title & Metric & Reported & Implementation  \\ [0.5ex] % inserts table
+		%heading
+		\hline % inserts single horizontal line
+		\citet{park2020augmenting} &  &  \\ \hline
+		\citet{georgiev2017low} &  &  \\ \hline
+		\citet{xu2019multi} &  &  \\ \hline
+		Own Experiments
+	\end{tabular}
+	\label{table:metric} % is used to refer this table in the text
+\end{table}
+
 \section{Literature Evaluation}
 
 %TODO: Dive in the literature and describe its implementation on the software, which components can be adjusted or nah
@@ -17,7 +73,7 @@
 \subsection{Non-functional Requirements}
 \begin{itemize}
 	\item \textbf{Modular:} 
-	%	Demonstrate the replaceability in the 
+	%	Demonstrate the replaceability in the code
 	\item \textbf{Extendible:} 
 	%	Extensibility is discussed in design section
 	\item \textbf{Fast prototyping:} 
@@ -27,7 +83,7 @@
 %	\item \textbf{Developmental Side-rails:}
 %	%  
 	\item \textbf{Robust:} 
-%	
+%	Demonstration + Dive in the literature
 
 \end{itemize}
 

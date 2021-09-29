@@ -93,7 +93,7 @@ class Ravdess(DataReader):
                               taskDataset: HoldTaskDataset,
                               **kwargs):
         print('Calculating input')
-        if 'mode' in kwargs and kwargs.get('mode') == 1:
+        if self.mode == 1:
             targets = [f['emotion'] for f in self.files if int(f['emotion']) == 6 or int(f['emotion']) == 1]
             taskname = self.get_task_name() + "_stress"
             grouping = [f['actor'] for f in self.files if int(f['emotion']) == 6 or int(f['emotion']) == 1]

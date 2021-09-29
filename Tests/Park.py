@@ -22,12 +22,14 @@ class VGGISHExtract(NeutralExtractionMethod):
 
     def extract_features(self, sig_samplerate) -> torch.tensor:
         with torch.no_grad():
-            return self.model.forward(*sig_samplerate).to(torch.device("cpu"))
+            if len(sig_samplerate[0])<sig_samplerate[1]:
+                sig_samplerate[0]
+            return self.model.forward(*sig_samplerate)[None, :]
 
 
 def main(argv):
     csc = ConcatTrainingSetCreator(nr_runs=4, random_state=444)
-    csc.add_data_reader(ChenAudiosetDataset(mode=2))
+    csc.add_data_reader(ChenAudiosetDataset(mode=1))
 
     csc.add_sample_rate(sample_rate=16000)
     csc.add_extraction_method(extraction_method=PerDimensionScaling(
@@ -52,7 +54,7 @@ def main(argv):
                                       results=results,
                                       batch_size=256,
                                       num_epochs=200,
-                                      optimizer=optim.SGD(model.parameters(), lr=0.001))
+                                      optimizer=optim.Adam(model.parameters(), lr=0.001))
         csc.add_sampling(dict(others=500, speech=0))
 
 

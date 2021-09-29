@@ -54,10 +54,11 @@ class ConcatTrainingSetCreator:
     def __add__pipe__(self,
                       addition,
                       dictionary: dict,
-                      key: str = None):
+                      key: str = None,
+                      multiply: bool = True):
         if not key:
             for k in self.data_readers.keys():
-                dictionary[k] = copy.copy(addition)
+                dictionary[k] = copy.copy(addition) if multiply else addition
             self.reset_taskDatasets()
         else:
             assert key in self.data_readers, 'There is no dataset with this key'
@@ -86,10 +87,12 @@ class ConcatTrainingSetCreator:
 
     def add_extraction_method(self,
                               extraction_method: ExtractionMethod,
-                              key: str = None):
+                              key: str = None,
+                              multiply: bool = True):
         self.__add__pipe__(addition=extraction_method,
                            dictionary=self.extraction_methods,
-                           key=key)
+                           key=key,
+                           multiply=multiply)
 
     ###############
     # Signal Preprocessing

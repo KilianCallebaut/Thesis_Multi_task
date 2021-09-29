@@ -133,7 +133,7 @@ class DataReader(ABC):
             sig_samplerate = (sig_samplerate[0].astype('float32'), sig_samplerate[1])
 
         if len(sig_samplerate[0].shape) > 1:
-            channel = np.argmin(sig_samplerate[0].shape)
+            channel = np.argmin(sig_samplerate[0].shape).item()
             if mono:
                 sig_samplerate = (np.mean(sig_samplerate[0], axis=channel), sig_samplerate[1])
 

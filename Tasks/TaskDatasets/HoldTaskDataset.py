@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.model_selection import GroupKFold, StratifiedKFold
-from sklearn.model_selection._split import BaseCrossValidator
+from sklearn.model_selection._split import BaseCrossValidator, KFold
 from sklearn.preprocessing import LabelEncoder
 from skmultilearn.model_selection import IterativeStratification
 
@@ -30,7 +30,7 @@ class HoldTaskDataset(TaskDataset):
     ########################################################################################################
     # Splitters
     ########################################################################################################
-    def k_folds(self, random_state: int = None, n_splits: int = 5, kf: BaseCrossValidator = None):
+    def k_folds(self, random_state: int = None, n_splits: int = 5, kf: BaseCrossValidator = None, stratified = False):
         """
         Produces a k_fold training/test split generator, depending on the task type
 
@@ -103,7 +103,10 @@ class HoldTaskDataset(TaskDataset):
             kf = GroupKFold(n_splits=n_splits)
             return kf.split(inputs, groups=self.grouping)
 
-        if self.task.classification_type == 'multi-label':
+        if not stratified:
+            kf = KFold(n_splits=n_splits, shuffle=True, random_state=random_state)
+            return kf.split(inputs, targets)
+        elif self.task.classification_type == 'multi-label':
             kf = IterativeStratification(n_splits=n_splits)
             targets = np.array(targets)
             return kf.split(inputs, targets)

@@ -35,7 +35,6 @@ class MultiTaskHardSharing(nn.Module):
         super().__init__()
         self.name = 'dnn'
         self.classification_types = [t.classification_type for t in task_list]
-        # self.model = nn.Sequential()
 
         h_sizes = [input_size] + [hidden_size for _ in range(n_hidden)]
 

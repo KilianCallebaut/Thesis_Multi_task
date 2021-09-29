@@ -6,7 +6,7 @@ from Tasks.Task import Task
 
 
 class ParkClassifier(nn.Module):
-    def __init__(self, task_list: List[Task]):
+    def __init__(self, task_list: List[Task]=None, output_amount=0):
         super().__init__()
         self.classifier = nn.Sequential(
             nn.Linear(128, 128),
@@ -31,6 +31,11 @@ class ParkClassifier(nn.Module):
                 nn.LogSoftmax(dim=-1) if t.classification_type == 'multi-class' else nn.Sigmoid()
             )
             for t in task_list]
+        ) if task_list else nn.ModuleList([
+            nn.Sequential(
+                nn.Linear(64, output_amount),
+                nn.Sigmoid()
+            )]
         )
 
     def forward(self, x):

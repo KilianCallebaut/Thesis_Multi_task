@@ -36,10 +36,10 @@ class ASVspoof2015(DataReader):
                os.path.isfile(self.get_path())
 
     def load_files(self):
-        self.truths = pd.read_csv(os.path.join(self.data_path, 'CM_protocol', 'cm_train.trn'), sep=' ', header=None,
-                                  names=['folder', 'file', 'method', 'source'])
+        # self.truths = pd.read_csv(os.path.join(self.data_path, 'CM_protocol', 'cm_train.trn'), sep=' ', header=None,
+        #                           names=['folder', 'file', 'method', 'source'])
         # self.truths = self.truths.append(add)
-        truths_male = pd.read_csv(os.path.join(self.data_path, 'Joint_ASV_CM_protocol', 'ASV_male_development.ndx'),
+        self.truths = pd.read_csv(os.path.join(self.data_path, 'Joint_ASV_CM_protocol', 'ASV_male_development.ndx'),
                                   sep=' ',
                                   header=None,
                                   names=['folder', 'file', 'method', 'source'])
@@ -61,7 +61,7 @@ class ASVspoof2015(DataReader):
                                    sep=' ',
                                    header=None,
                                    names=['folder', 'file', 'method', 'source'])
-        self.truths.append(truths_male)
+        # self.truths.append(truths_male)
         self.truths.append(truths_female)
         self.truths.append(male_eval)
         self.truths.append(female_eval)

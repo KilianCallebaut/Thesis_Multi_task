@@ -85,9 +85,9 @@ class TaskDataset(Dataset):
         """
 
         if len(sig_samplerate[0].shape) > 1:
-            channel = 0 if sig_samplerate[0].shape[0] < sig_samplerate[0].shape[1] else 1
+            channel = 1
             input_tensor = torch.stack(
-                [self.extraction_method.extract_features((sig_samplerate[0][:, i], sig_samplerate[channel])) for i in
+                [self.extraction_method.extract_features((sig_samplerate[0][:, i], sig_samplerate[1])) for i in
                  range(sig_samplerate[0].shape[channel])])
         else:
             input_tensor = self.extraction_method.extract_features(sig_samplerate)
@@ -249,7 +249,7 @@ class TaskDataset(Dataset):
         """
         print("Calculate Normalize Fit")
 
-        self.extraction_method.scale_reset()
+        # self.extraction_method.scale_reset()
         if self.flag_scaled:
             self.inverse_normalize_inputs()
         for i in range(len(self.inputs)):
