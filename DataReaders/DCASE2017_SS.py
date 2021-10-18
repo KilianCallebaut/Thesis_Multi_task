@@ -108,7 +108,7 @@ class DCASE2017_SS(DataReader):
             # targets in the form list Tensor 2d (nr_frames, nr_labels) of length nr_files
             annotations = self.devdataset.meta.filter(self.audio_files[file_id])[0]
 
-            target = [long(distinct_labels[label_id] == annotations.scene_label) for label_id in
+            target = [int(distinct_labels[label_id] == annotations.scene_label) for label_id in
                       range(len(distinct_labels))]
             targets.append(target)
 
@@ -119,7 +119,7 @@ class DCASE2017_SS(DataReader):
             # targets in the form list Tensor 2d (nr_frames, nr_labels) of length nr_files
             annotations = self.evaldataset.meta.filter(self.audio_files_eval[file_id])[0]
 
-            target = [long(distinct_labels[label_id] == annotations.scene_label) for label_id in
+            target = [int(distinct_labels[label_id] == annotations.scene_label) for label_id in
                       range(len(distinct_labels))]
             targets_val.append(target)
             print(file_id / len(self.audio_files_eval))

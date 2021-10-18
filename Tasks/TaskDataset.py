@@ -48,10 +48,10 @@ class TaskDataset(Dataset):
 
         self.start_index_list = []
         self.stop_index_list = []
-        self.total_target_size = 0
 
         self.flag_prepared = False
         self.flag_scaled = False
+        self._total_target_size = 0
 
         self.inputs = []
         self.targets = []
@@ -73,7 +73,7 @@ class TaskDataset(Dataset):
         Adds an input tensor to the dataset
         :param input_tensor: The feature matrix to insert into the dataset
         """
-        if len(input_tensor.shape) ==1:
+        if len(input_tensor.shape) == 1:
             input_tensor = input_tensor[None, :]
         self.inputs.append(input_tensor)
 
@@ -160,9 +160,11 @@ class TaskDataset(Dataset):
 
     def get_all_targets(self, index):
         targets = np.zeros(self.total_target_size, dtype=int)
-        targets[self.start_index_list[0]:self.stop_index_list[0]] = self.targets[index]
+        targets[self.start_index_list[0]:self.start_index_list[0] + len(self.task.output_labels)] = self.targets[index]
         for i in range(len(self.extra_tasks)):
-            targets[self.start_index_list[i + 1]:self.stop_index_list[i + 1]] = self.extra_tasks[i][1][index]
+            targets[
+            self.start_index_list[i + 1]:self.start_index_list[i + 1] + len(self.extra_tasks[i][0].output_labels)] = \
+            self.extra_tasks[i][1][index]
         return targets
 
     def get_all_tasks(self):
@@ -173,14 +175,24 @@ class TaskDataset(Dataset):
 
     def copy_non_data_variables(self, taskDataset):
         self.start_index_list = taskDataset.start_index_list
-        self.stop_index_list = taskDataset.stop_index_list
-        self.total_target_size = taskDataset.total_target_size
+        # self.stop_index_list = taskDataset.stop_index_list
+        # self.total_target_size = taskDataset.total_target_size
 
         self.flag_prepared = taskDataset.flag_prepared
         self.flag_scaled = taskDataset.flag_scaled
 
     def __len__(self):
         return len(self.inputs)
+
+    @property
+    def total_target_size(self):
+        return self._total_target_size + sum(
+            [len(t.output_labels) for t in [self.task] + [tsk[0] for tsk in self.extra_tasks]])
+
+    @total_target_size.setter
+    def total_target_size(self, value):
+        self._total_target_size = value - sum(
+            [len(t.output_labels) for t in [self.task] + [tsk[0] for tsk in self.extra_tasks]])
 
     ########################################################################################################
     # Combining
@@ -206,38 +218,82 @@ class TaskDataset(Dataset):
         :param dic_of_labels_limits: Dictionary specifying the maximum amount of instances a label can have in the dataset
         :param random_state: optional int for reproducability purposes
         """
-        sampled_targets = self.targets
-        sampled_inputs = self.inputs
-        sampled_grouping = self.grouping
-        sampled_extra_tasks = self.extra_tasks
+        print('Sampling labels')
+        # sampled_targets = self.targets
+        # sampled_inputs = self.inputs
+        # sampled_grouping = self.grouping
+        # sampled_extra_tasks = self.extra_tasks
         if random_state is not None:
             random.seed(random_state)
 
         for l in dic_of_labels_limits.keys():
-
-            label_set = [i for i in range(len(sampled_targets))
-                         if sampled_targets[i][self.task.output_labels.index(l)] == 1]
+            if l not in self.task.output_labels:
+                print('{} not in dataset'.format(l))
+            if dic_of_labels_limits[l] == 0:
+                self.remove_label(l)
+                continue
+            label_set = [i for i in range(len(self.targets))
+                         if self.targets[i][self.task.output_labels.index(l)] == 1]
             if len(label_set) > dic_of_labels_limits[l]:
                 random_label_set = random.sample(label_set, dic_of_labels_limits[l])
-                sampled_targets = [sampled_targets[i] for i in range(len(sampled_targets)) if
-                                   (i not in label_set or i in random_label_set)]
-                sampled_inputs = [sampled_inputs[i] for i in range(len(sampled_inputs)) if
-                                  (i not in label_set or i in random_label_set)]
-                if self.grouping:
-                    sampled_grouping = [sampled_grouping[i] for i in range(len(sampled_grouping)) if
-                                        (i not in label_set or i in random_label_set)]
-                if self.extra_tasks:
-                    for t in sampled_extra_tasks:
-                        t[1] = [t[1][i] for i in range(len(t[1])) if
-                                (i not in label_set or i in random_label_set)]
-            if dic_of_labels_limits[l] == 0:
-                for i in range(len(sampled_targets)):
-                    sampled_targets[i].pop(self.task.output_labels.index(l))
-                self.task.output_labels.remove(l)
-        self.inputs = sampled_inputs
-        self.targets = sampled_targets
-        self.grouping = sampled_grouping
-        self.extra_tasks = sampled_extra_tasks
+                self.remove_elements([ind for ind in label_set if ind not in random_label_set])
+                # sampled_targets = [sampled_targets[i] for i in range(len(sampled_targets)) if
+                #                    (i not in label_set or i in random_label_set)]
+                # sampled_inputs = [sampled_inputs[i] for i in range(len(sampled_inputs)) if
+                #                   (i not in label_set or i in random_label_set)]
+                # if self.grouping:
+                #     sampled_grouping = [sampled_grouping[i] for i in range(len(sampled_grouping)) if
+                #                         (i not in label_set or i in random_label_set)]
+                # if self.extra_tasks:
+                #     for t in sampled_extra_tasks:
+                #         t[1] = [t[1][i] for i in range(len(t[1])) if
+                #                 (i not in label_set or i in random_label_set)]
+
+        # self.inputs = sampled_inputs
+        # self.targets = sampled_targets
+        # self.grouping = sampled_grouping
+        # self.extra_tasks = sampled_extra_tasks
+
+    def remove_label(self, label=None, index=None):
+        """
+        Deletes a label from the task and all of its (singular) instances
+        :param label: the label to remove
+        :param index: the index of the label to remove
+        """
+        if isinstance(label, type(self.task.output_labels[0])):
+            index = self.task.output_labels.index(label)
+        elif isinstance(index, int):
+            label = self.task.output_labels[index]
+        else:
+            raise ValueError('either a label or an index must be given')
+        self.remove_label_instances(index)
+        self.task.output_labels.remove(label)
+
+    def remove_label_instances(self, index):
+        """
+        Remove all singualre instances of a certain label and its place in one hot encoding
+        :param index: the index of the label to remove
+        """
+        removal = []
+        for i in range(len(self)):
+            if self.targets[i][index] == 1 and sum(self.targets[i]) == 1:
+                removal.append(i)
+            else:
+                self.targets[i].pop(index)
+        if removal:
+            self.remove_elements(removal)
+
+    def remove_elements(self, indexes):
+        """
+        Removes all elements at index
+        :param indexes: the indexes to remove input and targets
+        """
+        self.targets = [self.targets[index] for index in range(len(self)) if index not in indexes]
+        self.inputs = [self.inputs[index] for index in range(len(self)) if index not in indexes]
+        if self.grouping:
+            self.grouping = [self.grouping[index] for index in range(len(self)) if index not in indexes]
+        for t in self.extra_tasks:
+            t[1] = [t[1][index] for index in range(len(self)) if index not in indexes]
 
     ########################################################################################################
     # Transformation

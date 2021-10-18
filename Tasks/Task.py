@@ -25,7 +25,8 @@ class Task(ABC):
 
     def __eq__(self, other):
         if isinstance(other, Task):
-            return self.output_labels == other.output_labels and self.name == other.name and \
+            return all(self.output_labels[i] == other.output_labels[i] for i in range(len(self.output_labels))) \
+                   and self.name == other.name and \
                    self.classification_type == other.classification_type and \
                    type(self.loss_function) == type(other.loss_function)
         return False
@@ -59,7 +60,7 @@ class MultiClassTask(Task):
         super().__init__(name, output_labels, loss_function)
         self.classification_type = 'multi-class'
         if not loss_function:
-            self.loss_function = nn.CrossEntropyLoss().to(device)
+            self.loss_function = nn.CrossEntropyLoss()
         else:
             self.loss_function = loss_function
 
@@ -83,7 +84,7 @@ class MultiLabelTask(Task):
         super().__init__(name, output_labels, loss_function)
         self.classification_type = 'multi-label'
         if not loss_function:
-            self.loss_function = nn.BCELoss().to(device)
+            self.loss_function = nn.NLLLoss()
         else:
             self.loss_function = loss_function
 

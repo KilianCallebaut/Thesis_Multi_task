@@ -103,13 +103,13 @@ class ASVspoof2015(DataReader):
     def calculate_taskDataset(self, taskDataset: HoldTaskDataset, **kwargs):
         distinct_labels = self.truths.folder.unique()
         distinct_labels.sort()
-        distinct_labels = np.append(distinct_labels, 'unknown')
+        # distinct_labels = np.append(distinct_labels, 'unknown')
 
         targets = []
         for i in range(self.truths.shape[0]):
             target = [int(distinct_labels[label_id] == self.truths.loc[i].folder)
-                      if (self.truths.loc[i].method == 'genuine' or self.truths.loc[i].method == 'human')
-                      else int(label_id == len(distinct_labels) - 1)
+                      # if (self.truths.loc[i].method == 'genuine' or self.truths.loc[i].method == 'human')
+                      # else int(label_id == len(distinct_labels) - 1)
                       for label_id in range(len(distinct_labels))]
             targets.append(target)
 

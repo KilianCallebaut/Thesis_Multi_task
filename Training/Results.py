@@ -77,7 +77,7 @@ class Results:
     def add_batch_results(self, batch_flags: List[List[bool]], truths_batch: List[torch.tensor],
                           predictions_batch: List[torch.tensor], losses_batch: List[torch.tensor],
                           combined_loss: torch.tensor):
-        self.running_loss += combined_loss.item() * len(batch_flags[0])
+        self.running_loss += combined_loss.item() #* len(batch_flags[0])
         for tsk in self.task_list:
             self.task_truths[tsk.name] += truths_batch[self.task_list.index(tsk)].tolist()
             self.task_predictions[tsk.name] += predictions_batch[self.task_list.index(tsk)].tolist()
@@ -109,6 +109,8 @@ class Results:
             self.task_running_losses[t.name] = 0
 
     def add_model_parameters(self, nr_epoch, model):
+        for n, w in model.named_parameters():
+            self.writer.add_histogram(n, w, nr_epoch)
         path = os.path.join(self.model_checkpoints_path, "epoch_{}.pth".format(nr_epoch))
         torch.save({'epoch': nr_epoch, 'model_state_dict': model.state_dict()}, path)
 

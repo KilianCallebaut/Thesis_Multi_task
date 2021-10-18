@@ -47,5 +47,6 @@ class MultiTaskSampler(torch.utils.data.sampler.BatchSampler):
             try:
                 yield next(self.iterator)
             except StopIteration:
+                random.shuffle(self.final_samples_list)
                 self.iterator = iter(self.final_samples_list)
                 break

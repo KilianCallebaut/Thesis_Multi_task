@@ -1,6 +1,6 @@
 import os
 import sys
-
+import numpy as np
 import torch
 from torch import optim
 
@@ -23,26 +23,31 @@ class VGGISHExtract(NeutralExtractionMethod):
     def extract_features(self, sig_samplerate) -> torch.tensor:
         with torch.no_grad():
             if len(sig_samplerate[0])<sig_samplerate[1]:
-                sig_samplerate[0]
+                sig_samplerate = (np.pad(sig_samplerate[0], (0, sig_samplerate[1] - len(sig_samplerate[0]))),sig_samplerate[1])
             return self.model.forward(*sig_samplerate)[None, :]
 
 
 def main(argv):
-    csc = ConcatTrainingSetCreator(nr_runs=4, random_state=444)
-    csc.add_data_reader(ChenAudiosetDataset(mode=1))
+    csc = ConcatTrainingSetCreator(nr_runs=4, random_state=444,
+                                   # recalculate=True
+                                   )
+    csc.add_data_reader(ChenAudiosetDataset(mode=2))
 
-    csc.add_sample_rate(sample_rate=16000)
+    csc.add_signal_preprocessing(dict(resample_to=16000))
     csc.add_extraction_method(extraction_method=PerDimensionScaling(
         VGGISHExtract(
             name='VGGishPark'
         )
     )
     )
-    csc.add_sampling(dict(others=500))
+    # csc.add_transformation_call('normalize_fit')
+    # csc.add_transformation_call('normalize_inputs')
+    # csc.add_sampling(dict(others=500))
+    generator = csc.generate_training_splits()
+    train, test, _ = next(generator)
+    train.datasets[0].sample_labels(dict(others=500))
 
     for i in range(2):
-        generator = csc.generate_training_splits()
-        train, test, _ = next(generator)
         model = ParkClassifier(train.get_task_list())
         results = Training.create_results(modelname=model._get_name(),
                                           task_list=train.get_task_list(),
@@ -55,7 +60,7 @@ def main(argv):
                                       batch_size=256,
                                       num_epochs=200,
                                       optimizer=optim.Adam(model.parameters(), lr=0.001))
-        csc.add_sampling(dict(others=500, speech=0))
+        train.datasets[0].sample_labels(dict(speech=0))
 
 
 if __name__ == "__main__":

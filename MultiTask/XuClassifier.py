@@ -27,16 +27,15 @@ class MultiTaskHardSharingConvolutional(nn.Module):
                 nn.Conv2d(in_channels=in_chan,
                           out_channels=hidden_size,
                           kernel_size=(5, 5), stride=1,
-                          padding=1
-                          )
+                          padding=1, bias=False)
             )
             self.hidden_bn.append(
                 nn.BatchNorm2d(hidden_size)
             )
 
         for k in range(len(self.hidden)):
-            torch.nn.init.xavier_uniform_(self.hidden[k].weight)
-            nn.init.constant_(self.hidden[k].bias, 0.0)
+            torch.nn.init.kaiming_uniform_(self.hidden[k].weight)
+            # nn.init.constant_(self.hidden[k].bias, 0.0)
             nn.init.normal_(self.hidden_bn[k].weight, 1.0, 0.02)
             nn.init.constant_(self.hidden_bn[k].bias, 0.0)
 
@@ -55,7 +54,7 @@ class MultiTaskHardSharingConvolutional(nn.Module):
 
     def activate(self, x, activation):
         if activation == 'multi-class':
-            x = torch.log_softmax(x, dim=-1)
+            x = F.log_softmax(x, dim=-1)
             return x
         elif activation == 'multi-label':
             x = torch.sigmoid(x)

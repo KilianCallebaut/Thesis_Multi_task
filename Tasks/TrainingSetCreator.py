@@ -16,11 +16,14 @@ class ConcatTrainingSetCreator:
                  random_state: Optional[int] = None,
                  nr_runs: Optional[int] = 5,
                  index_mode: bool = False,
-                 recalculate=False):
+                 recalculate: bool = False,
+                 multiply: bool = True
+                 ):
         self.random_state = random_state
         self.nr_runs = nr_runs
         self.index_mode = index_mode
         self.recalculate = recalculate
+        self.multiply = multiply
 
         self.data_readers = {}
         self.extraction_methods = {}
@@ -48,17 +51,17 @@ class ConcatTrainingSetCreator:
             self.taskdatasets = {}
 
     def add_data_reader(self,
-                        data_reader: DataReader):
-        self.data_readers[type(data_reader).__name__] = data_reader
+                        data_reader: DataReader,
+                        name=None):
+        self.data_readers[name if name else type(data_reader).__name__] = data_reader
 
     def __add__pipe__(self,
                       addition,
                       dictionary: dict,
-                      key: str = None,
-                      multiply: bool = True):
+                      key: str = None):
         if not key:
             for k in self.data_readers.keys():
-                dictionary[k] = copy.copy(addition) if multiply else addition
+                dictionary[k] = copy.copy(addition) if self.multiply else addition
             self.reset_taskDatasets()
         else:
             assert key in self.data_readers, 'There is no dataset with this key'
@@ -91,19 +94,11 @@ class ConcatTrainingSetCreator:
                               multiply: bool = True):
         self.__add__pipe__(addition=extraction_method,
                            dictionary=self.extraction_methods,
-                           key=key,
-                           multiply=multiply)
+                           key=key)
 
     ###############
     # Signal Preprocessing
     ###############
-
-    def add_sample_rate(self,
-                        sample_rate: int,
-                        key: str = None):
-        self.__add__pipe__(addition=sample_rate,
-                           dictionary=self.sample_rates,
-                           key=key)
 
     def add_signal_preprocessing(self,
                                  preprocess_dict: dict,
@@ -174,15 +169,47 @@ class ConcatTrainingSetCreator:
                 self.transformations[key].append((function, kwargs))
 
     def __execute_functions__(self,
-                              key: str,
-                              task: TaskDataset):
-        if key in self.transformations:
-            for fname, kwargs in self.transformations[key]:
-                func = getattr(task, fname)
-                if kwargs:
-                    func(**kwargs)
+                              key: str = None):
+        if not key:
+            transformation_names = [[fname for fname, _ in self.transformations[key]] for key in self.transformations]
+            shared_transformations = list(set(transformation_names[0]).intersection(*transformation_names))
+            iterators = {key: 0 for key in self.transformations}
+            shared_run = False
+            while all(iterators[key] < len(self.transformations[key]) for key in self.transformations):
+                if not shared_run:
+                    for key in set(self.transformations.keys()).intersection(self.taskdatasets.keys()):
+                        for i in range(iterators[key], len(self.transformations[key])):
+                            iterators[key] = i
+                            if self.transformations[key][i][0] not in shared_transformations:
+                                self.__execute_function__(task=self.taskdatasets[key],
+                                                          fname=self.transformations[key][i][0],
+                                                          kwargs=self.transformations[key][i][1])
+                            else:
+                                break
+                    shared_run = True
                 else:
-                    func()
+                    for key in set(self.transformations.keys()).intersection(self.taskdatasets.keys()):
+                        self.__execute_function__(task=self.taskdatasets[key],
+                                                  fname=self.transformations[key][iterators[key]][0],
+                                                  kwargs=self.transformations[key][iterators[key]][1])
+                        iterators[key] += 1
+                        if iterators[key] < len(self.transformations[key]) and \
+                                self.transformations[key][iterators[key]][0] not in shared_transformations:
+                            shared_run = False
+        elif key in self.transformations:
+            task = self.taskdatasets[key]
+            for fname, kwargs in self.transformations[key]:
+                self.__execute_function__(task, fname, kwargs)
+
+    def __execute_function__(self,
+                             task,
+                             fname,
+                             kwargs=None):
+        func = getattr(task, fname)
+        if kwargs:
+            func(**kwargs)
+        else:
+            func()
 
     def create_taskdatasets(self,
                             class_list: List[str] = None,
@@ -194,8 +221,7 @@ class ConcatTrainingSetCreator:
 
             task_input_dict = dict(
                 extraction_method=self.__get__pipe__(key=dr, dictionary=self.extraction_methods),
-                resample_to=self.__get__pipe__(key=dr,
-                                               dictionary=self.sample_rates),
+
                 recalculate=self.recalculate,
                 index_mode=self.index_mode,
             )
@@ -210,9 +236,9 @@ class ConcatTrainingSetCreator:
             if dr in self.dics_of_label_limits:
                 tsk.sample_labels(self.__get__pipe__(key=dr, dictionary=self.dics_of_label_limits))
 
-            if execute_transformations:
-                self.__execute_functions__(dr, tsk)
             self.taskdatasets[dr] = tsk
+        if execute_transformations:
+            self.__execute_functions__()
         return ConcatTaskDataset(list(self.taskdatasets.values()))
 
     def generate_training_splits(self, class_list: List[str] = None):
@@ -234,9 +260,5 @@ class ConcatTrainingSetCreator:
         for train_tests in zip(*task_gens):
             print("Fold: {}".format(fold))
             fold += 1
-            for t in train_tests:
-                self.__execute_functions__(
-                    list(self.taskdatasets.keys())[train_tests.index(t)],
-                    t[0]
-                )
+            self.__execute_functions__()
             yield ConcatTaskDataset([t[0] for t in train_tests]), ConcatTaskDataset([t[1] for t in train_tests]), fold

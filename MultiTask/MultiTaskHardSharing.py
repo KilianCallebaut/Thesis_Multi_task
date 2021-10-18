@@ -1,6 +1,6 @@
 import torch
-from torch import nn
 import torch.nn.functional as F
+from torch import nn
 
 
 # https://gist.github.com/AvivNavon/cf2071ffaadfb11dded915f7f4bd638e
@@ -34,7 +34,8 @@ class MultiTaskHardSharing(nn.Module):
     ):
         super().__init__()
         self.name = 'dnn'
-        self.classification_types = [t.classification_type for t in task_list]
+        # self.classification_types = [t.classification_type for t in task_list]
+        self.task_list = task_list
 
         h_sizes = [input_size] + [hidden_size for _ in range(n_hidden)]
 
@@ -50,31 +51,32 @@ class MultiTaskHardSharing(nn.Module):
             torch.nn.init.xavier_uniform_(self.hidden[k].weight)
             nn.init.constant_(self.hidden[k].bias, 0)
 
-        self.task_nets = nn.ModuleList()
+        self.task_nets = nn.ModuleDict()
         for t in task_list:
-            self.task_nets.append(
-                nn.Linear(
-                    hidden_size,
-                    len(t.output_labels)
-                )
+            self.task_nets[t.name] = nn.Linear(
+                hidden_size,
+                len(t.output_labels)
             )
 
-        for t in range(len(self.task_nets)):
+        for t in self.task_nets:
             torch.nn.init.xavier_uniform_(self.task_nets[t].weight)
             nn.init.constant_(self.task_nets[t].bias, 0)
 
     def activate(self, x, activation):
         if activation == 'multi-class':
-            return F.softmax(x, dim=-1)
+            return F.log_softmax(x, dim=-1)
         elif activation == 'multi-label':
             return F.sigmoid(x)
 
     def forward(self, x):
         x = x.flatten(1)
+        # for layer in self.hidden:
+        #     x = layer(x)
+        #     x = F.relu(x)
         for layer in self.hidden[:-1]:
             x = layer(x)
             x = F.relu(x)
         x = self.hidden[-1](x)
-        return tuple(self.activate(self.task_nets[task_model_id](x),
-                                   self.classification_types[task_model_id])
-                     for task_model_id in range(len(self.classification_types)))
+        return tuple(self.activate(self.task_nets[task.name](x),
+                                   task.classification_type)
+                     for task in self.task_list)

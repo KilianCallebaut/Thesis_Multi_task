@@ -227,37 +227,6 @@ def model_loop(loader, distinct_targets, model, writer, optimizer, criterium, ph
 
 
 def main(argv):
-    # csc = ConcatTrainingSetCreator(nr_runs=10)
-    # csc.add_data_reader(DCASE2017_SS(object_path=drive + r'Thesis_Results\Data_Readers\DCASE2017_SS_{}',
-    #                                  data_path=drive + r'Thesis_Datasets\DCASE2017'))
-    # csc.add_data_reader(Ravdess(object_path=drive + r'Thesis_Results\Data_Readers\Ravdess',
-    #                             data_path=drive + r'Thesis_Datasets\Ravdess'))
-    # csc.add_data_reader(Ravdess(object_path=drive + r'Thesis_Results\Data_Readers\Ravdess',
-    #                             data_path=drive + r'Thesis_Datasets\Ravdess',
-    #                             mode=1))
-    # csc.add_data_reader(ASVspoof2015(object_path=os.path.join(drive, r'Thesis_Results\Data_Readers\ASVspoof2015')))
-    # csc.add_sample_rate(8000)
-    # csc.add_extraction_method(extraction_method=LogbankSummaryExtraction(
-    #     PerCelScaling(NeutralExtractionMethod(extraction_params=dict(winlen=0.03, winstep=0.01, nfilt=24, nfft=512)))))
-    # csc.add_transformation_call('normalize_fit')
-    # csc.add_transformation_call('normalize_inputs')
-    #
-    # mtmf = MultiTaskModelFactory()
-    # mtmf.add_modelclass(MultiTaskHardSharing)
-    # mtmf.add_static_model_parameters(MultiTaskHardSharing.__name__, **{"hidden_size": 512, "n_hidden": 4})
-    # keys = list(csc.get_keys())
-    # comb_iterator = itertools.chain(*map(lambda x: itertools.combinations(keys, x), range(1, len(keys) + 1)))
-    #
-    # for combo in comb_iterator:
-    #     key_list = list(combo)
-    #     for train, test, fold in csc.generate_training_splits(key_list):
-    #         model = mtmf.create_model(MultiTaskHardSharing.__name__,
-    #                                   input_size=train.datasets[0].get_input(0).flatten().shape[0],
-    #                                   task_list=train.get_task_list())
-    #         results = Training.create_results(modelname=model.name, task_list=train.get_task_list(), fold=fold,
-    #                                           results_path=os.path.join(drive, 'Thesis_Results'), num_epochs=200)
-    #         Training.run_gradient_descent(model=model, concat_dataset=train, test_dataset=test, results=results,
-    #                                       learning_rate=0.001, batch_size=32, num_epochs=200)
     ## Data Reading
     inputs, targets, groupings, distinct_labels = read_data()
 

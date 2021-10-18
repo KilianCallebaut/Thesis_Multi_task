@@ -217,7 +217,7 @@ class MelSpectrogramExtraction(BaseExtractionMethod):
         feature = librosa.feature.melspectrogram(y=sig_samplerate[0], sr=sig_samplerate[1], **self.extraction_params)
         feature = librosa.power_to_db(feature, ref=np.max)
         feature = librosa.util.normalize(feature)
-        # plot_feature(feature, 16000 )
+        # plot_feature(feature, 44100 )
         return torch.tensor(feature).T
 
 
@@ -271,6 +271,7 @@ class PerCelScaling(BaseExtractionMethod):
         :param input_tensor:
         :return: transformed input
         """
+        device = input_tensor.device
         for i in range(input_tensor.shape[0]):
             input_tensor[i, :] = torch.tensor(self.scalers[i].transform(input_tensor[i, :].reshape(1, -1)))
         return input_tensor
@@ -309,9 +310,9 @@ class WindowPreparation(BaseExtractionMethod):
 
     def prepare_input(self, input_tensor: torch.tensor) -> List[torch.tensor]:
         assert 'window_size' in self.preparation_params, 'Window preparation requires a window_size parameter'
-        assert 'window_hop' in self.preparation_params, 'Window preparation requires a window_hop parameter'
+        # assert 'window_hop' in self.preparation_params, 'Window preparation requires a window_hop parameter'
         window_size = self.preparation_params['window_size']
-        window_hop = self.preparation_params['window_hop']
+        window_hop = window_size if 'window_hop' not in self.preparation_params else self.preparation_params['window_hop']
 
         windowed_inputs = []
         start_frame = window_size

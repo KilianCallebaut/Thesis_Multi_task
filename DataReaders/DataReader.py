@@ -127,7 +127,7 @@ class DataReader(ABC):
     def preprocess_signal(self,
                           sig_samplerate: Tuple[np.ndarray, int],
                           resample_to: int = None,
-                          mono: bool = False) -> Tuple[np.ndarray, int]:
+                          mono: bool = True) -> Tuple[np.ndarray, int]:
 
         if sig_samplerate[0].dtype != np.dtype('float32'):
             sig_samplerate = (sig_samplerate[0].astype('float32'), sig_samplerate[1])

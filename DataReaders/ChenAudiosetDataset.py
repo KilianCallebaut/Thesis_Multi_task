@@ -34,6 +34,7 @@ class ChenAudiosetDataset(DataReader):
     CountFolderPerLabel = []
     CountFolderPerLabelSet = []
 
+    leftovers=[]
     target_list = []
 
     def __init__(self, mode=0, **kwargs):
@@ -128,17 +129,17 @@ class ChenAudiosetDataset(DataReader):
                         self.files[self.wav_files.index(folder)][folder.index(file)]['embedding_normalized']))
                     continue
                 try:
-
                     read_wav = self.preprocess_signal(self.load_wav(file), **preprocess_parameters)
                     taskDataset.extract_and_add_input(read_wav)
                 except RuntimeError:
                     self.skip_files.append(file)
             i += 1
+
             end = timer()
-            timedel = end - start
-            print('Percentage done: {} estimated time: {}'.format(i / len(self.wav_files), timedelta(
-                seconds=timedel * (len(self.wav_files) - i))), end='\r')
-            start = timer()
+            timedel = (end - start)/i
+            print('Percentage done: {} estimated time: {}'.format(i / len(self.wav_files),
+                                                                  timedelta(seconds=timedel * (len(self.wav_files) - i))
+                                                                  ), end='\r')
         print('Input calculated')
 
     def calculate_targets(self):
@@ -177,7 +178,12 @@ class ChenAudiosetDataset(DataReader):
                 grouped_list.append('speech')
             else:
                 grouped_list.append('others')
+
         grouped_list = list(set(grouped_list))
+        if 'silence' in grouped_list and len(grouped_list) > 1:
+            grouped_list.remove('silence')
+        if 'others' in grouped_list and len(grouped_list) > 1:
+            grouped_list.remove('others')
         return grouped_list
 
     # def contains_label(self, folder, label):

@@ -30,10 +30,11 @@ class HoldTaskDataset(TaskDataset):
     ########################################################################################################
     # Splitters
     ########################################################################################################
-    def k_folds(self, random_state: int = None, n_splits: int = 5, kf: BaseCrossValidator = None, stratified = False):
+    def k_folds(self, random_state: int = None, n_splits: int = 5, kf: BaseCrossValidator = None, stratified=False):
         """
         Produces a k_fold training/test split generator, depending on the task type
 
+        :param stratified:
         :param kf: optional input for inserting own sklearn kfold splitter
         :param n_splits: number of folds
         :param random_state: optional int for reproducability purposes
@@ -179,18 +180,27 @@ class HoldTaskDataset(TaskDataset):
     ########################################################################################################
     # Filtering
     ########################################################################################################
-    def sample_labels(self, dic_of_labels_limits, random_state=None):
-        """
+    # def sample_labels(self, dic_of_labels_limits, random_state=None):
+    #     """
+    #
+    #     :param dic_of_labels_limits:
+    #     :param random_state:
+    #     :return:
+    #     """
+    #     super().sample_labels(dic_of_labels_limits=dic_of_labels_limits,
+    #                           random_state=random_state)
+    #     if len(self.test_set):
+    #         self.test_set.sample_labels(dic_of_labels_limits=dic_of_labels_limits,
+    #                                     random_state=random_state)
 
-        :param dic_of_labels_limits:
-        :param random_state:
-        :return:
+    def remove_label_instances(self, index):
         """
-        super().sample_labels(dic_of_labels_limits=dic_of_labels_limits,
-                              random_state=random_state)
+        Remove all singualre instances of a certain label and its place in one hot encoding
+        :param index: the index of the label to remove
+        """
+        super().remove_label_instances(index)
         if len(self.test_set):
-            self.test_set.sample_labels(dic_of_labels_limits=dic_of_labels_limits,
-                                        random_state=random_state)
+            self.test_set.remove_label_instances(index)
 
     ########################################################################################################
     # Transformation
@@ -227,6 +237,8 @@ class HoldTaskDataset(TaskDataset):
         super().load(taskname)
         if self.test_set.base_path != self.base_path:
             self.test_set.load(taskname)
+            self.test_set.task = self.task
+            self.test_set.extraction_method = self.extraction_method
 
     def check(self, taskname):
         """
