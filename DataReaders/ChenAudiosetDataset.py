@@ -34,7 +34,7 @@ class ChenAudiosetDataset(DataReader):
     CountFolderPerLabel = []
     CountFolderPerLabelSet = []
 
-    leftovers=[]
+    leftovers = []
     target_list = []
 
     def __init__(self, mode=0, **kwargs):
@@ -84,6 +84,8 @@ class ChenAudiosetDataset(DataReader):
                     if file.endswith('.npy'):
                         np_obj = np.load(filepath, allow_pickle=True)
                         filedir.append(np_obj.item())
+                        if len(np_obj.item()['labels']) > 1:
+                            b = 1
                         np_dir.append(np_obj)
 
                         wav_loc = np_obj.item()['wav_file'].split(r'/')[6]
@@ -136,7 +138,7 @@ class ChenAudiosetDataset(DataReader):
             i += 1
 
             end = timer()
-            timedel = (end - start)/i
+            timedel = (end - start) / i
             print('Percentage done: {} estimated time: {}'.format(i / len(self.wav_files),
                                                                   timedelta(seconds=timedel * (len(self.wav_files) - i))
                                                                   ), end='\r')

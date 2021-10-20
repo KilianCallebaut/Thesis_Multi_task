@@ -170,6 +170,8 @@ class ConcatTrainingSetCreator:
 
     def __execute_functions__(self,
                               key: str = None):
+        if not set(self.transformations.keys()).intersection(self.taskdatasets.keys()):
+            return
         if not key:
             transformation_names = [[fname for fname, _ in self.transformations[key]] for key in self.transformations]
             shared_transformations = list(set(transformation_names[0]).intersection(*transformation_names))

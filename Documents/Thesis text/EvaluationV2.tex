@@ -51,6 +51,7 @@ Explaining the reduction for training is pretty simple, as the training loop - l
 
 \textbf{Variation Experiment} In this work, the different combinations of a large set of datasets and tasks are tested, variating models and extraction methods. The experiment recreates a scenario that research might face, requiring large combinations, extensive variations and heterogenic task types. The aim here is not to provide new insights into the multi-task set-up or the results, but to evaluate the model's ability for combination and variation demonstrated by how the coding requirements scale compared to the previous cases. Each of the previous cases' datasets and tasks are included in this experiment. In essence this would also provide with a concept for how new research can easily be built of previous work.\\
 
+
 \begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{screenshot005}
@@ -58,6 +59,7 @@ Explaining the reduction for training is pretty simple, as the training loop - l
 	\label{fig:screenshot005}
 \end{figure}
 
+% TODO: Expand on which datasets and what tasks
 In total 7 datasets were used in creating this set-up, with 8 tasks. The dataset linked to two tasks is the same used earlier for \citep{georgiev2017low}. The tasks contain both multi-class and multi-label tasks. Each combination is tested for 2 extraction methods and 2 models. For each run, the feature matrices should be framed in the same size, based on the average feature matrix size and the data normalized. As can be seen in table \ref{table:LOC}, this is the first time the required Training LOC makes a significant jump in the Training stage, simply due to the fact that it varies models. The models are loaded for the first time through the MultiTaskModel factory which mainly functions as a way to concentrate static and dynamic model parameters for creation and isn't absolutely necessary. Otherwise, the training is performed using the same three lines as before: model creation, results creation and training loop instantiation. The Data Loading stage also takes a jump, but is in no way related to the high and diverse amount of datasets, simply the variation of elements in the pipeline. There are  operations performed in the pipeline: resampling, conversion to mono, calculating and framing the feature matrices, normalizing the data. The Data loading code can be found in figure \ref{fig:screenshot005}, which makes it apparent that the extra lines outside the transformation calls are simply due to iterating over the required variations. The actual amount of LOC relating to direct data loading operations is 8.\\
 
 This example makes it clear that all the work concerning datasets comes beforehand in the Data Reading stage, with little extra effort on the developer's side, while the combinatorial aspects are handled by the framework in the background. Nothing has to be explicitly reloaded or recalculated, as seen when adding the ExtractionMethod, by the developer as variations will be handled by the framework and necessary data recalculated when required. The framework thus reduces research variations to singular line changes.\\
@@ -85,34 +87,85 @@ What should again be noted, is that the implementations without the framework di
 
 
 
-\begin{table}[ht]
-	\caption{Reported metric comparisons} % title of Table
-	\centering % used for centering table
-	\begin{tabular}{p{0.25\textwidth}p{0.25\textwidth}p{0.25\textwidth}p{0.25\textwidth}} % centered columns (4 columns)
-		\hline\hline %inserts double horizontal lines
-		Title & Metric & Reported & Implementation  \\ [0.5ex] % inserts table
-		%heading
-		\hline % inserts single horizontal line
-		\citet{park2020augmenting} & Precision & 0.796 & 0.7741 \\ \hline
-		\citet{park2020augmenting} & Recall & 0.804 & 0.763  \\ \hline
-		\citet{park2020augmenting} & F1 Score & 0.8 & 0.7685 \\ \hline
-		\citet{georgiev2017low} & Accuracy Speaker Identification & 0.778 & 0.778 \\ \hline
-		\citet{georgiev2017low} & Accuracy Emotion Recognition & 0.879 & 0.879 \\ \hline
-		\citet{georgiev2017low} & Accuracy Stress Detection & 0.865 & 0.865 \\ \hline
-		\citet{georgiev2017low} & Accuracy Ambient Scene Analysis & 0.825 & 0.825 \\ \hline
-		\citet{xu2019multi} & Unweighted Average Recall & 0.662 & 0.6716 \\ \hline
-	\end{tabular}
-	\label{table:metric} % is used to refer this table in the text
-\end{table}
+%\begin{table}[ht]
+%	\caption{Reported metric comparisons} % title of Table
+%	\centering % used for centering table
+%	\begin{tabular}{p{0.25\textwidth}p{0.25\textwidth}p{0.25\textwidth}p{0.25\textwidth}} % centered columns (4 columns)
+%		\hline\hline %inserts double horizontal lines
+%		Title & Metric & Reported & Implementation  \\ [0.5ex] % inserts table
+%		%heading
+%		\hline % inserts single horizontal line
+%		\citet{park2020augmenting} & Precision & 0.796 & 0.7741 \\ \hline
+%		\citet{park2020augmenting} & Recall & 0.804 & 0.763  \\ \hline
+%		\citet{park2020augmenting} & F1 Score & 0.8 & 0.7685 \\ \hline
+%		\citet{xu2019multi} & Unweighted Average Recall & 0.662 & 0.6716 \\ \hline
+%	\end{tabular}
+%	\label{table:metric} % is used to refer this table in the text
+%\end{table}
+%
+%Following the example from other deep learning frameworks like \cite{colacco2020drecpy} it is important that the framework demonstrates to be consistent with published results. In table \ref{table:metric} the comparative results can be found with the original publications. The decision was made to focus on the best reported performance of the multi-task setting, in order to limit the amount of work time to reproduce some of the results. Papers are often incomplete when it comes to specifics required to reproduce the same elements which can impact the results considerably, which requires careful variation and evaluation of the parameters.\\
+%
+%Starting from the top, the results from the classifier built in \cite{park2020augmenting} come close but slightly below the reports. Multiple node amounts in the DNN were tried, as the original paper lacked to include the exact after the initial layer, yet implying the amount lessen through the figure included. Furthermore, the exact included instances are not the same. The work mentions some cleaning of the dataset was performed, but neglect to mention the specifics. The result is the best performing variation. The amount of nodes was halved in the final two layers and minimal logical clean up was performed (e.g. an audio fragment can not have both silence and another label at the same time). Still, the eventual results end up relatively close to the report.\\
+%
+%???????????????????????
 
-Following the example from other deep learning frameworks like \cite{colacco2020drecpy} it is important that the framework demonstrates to be consistent with published results. In table \ref{table:metric} the comparative results can be found with the original publications. The decision was made to focus on the best reported performance of the multi-task setting, in order to limit the amount of work time to reproduce some of the results. Papers are often incomplete when it comes to specifics required to reproduce the same elements which can impact the results considerably, which requires careful variation and evaluation of the parameters.\\
+%Toon in use case met experiment hoe ge een variatie kunt maken aan 1 element in de pijplijn, terwijl de rest intact blijft
+\section{Experiment use case}
 
-Starting from the top, the results from the classifier built in \cite{park2020augmenting} come close but slightly below the reports. Multiple node amounts in the DNN were tried, as the original paper lacked to include the exact after the initial layer, yet implying the amount lessen through the figure included. Furthermore, the exact included instances are not the same. The work mentions some cleaning of the dataset was performed, but neglect to mention the specifics. The result is the best performing variation. The amount of nodes was halved in the final two layers and minimal logical clean up was performed (e.g. an audio fragment can not have both silence and another label at the same time). Still, the eventual results end up relatively close to the report.\\
+%- Describe the goal of making a huge functioning multi-task network
+% Describe the steps of iterative design, demonstrating how single line changes can be made while keeping the rest of the pipeline intact
+% Demonstrate the comparative capabilities in tensorboard
+% Analysis: implementing baseline 
+% iterative design of classifier
+% variation of meta parameters
+% 
+% architecture
+% design
+% construction
+% testing
+% deployment
+% maintenance
+%- Testing different variations
+%- finding the meta parameters
+% comparing to baseline
+
+%THings that it demonstrates
+% How elements can be added and changed at will at any point
+% - Meta parameter search
+% - Architecture evaluation
+% - Expanding the dataset
+% How testing can be done
+% - How baseline tests can be performed by bringing in previous models 
+% - How comparative visualizations can be made and accessed
+
+% Add datasets
+% simple model structure
+% build pipeline
+% create validation set
+% test architecture and 
+% evaluate
+% loop to test meta parameters
+% Evaluate
+% Run eventual test and training
+
+
+Additional to the paper implementations, is an example case study which has been referred to multiple times in this work. The goal is to present how the framework aids the development of multi-task systems by conducting a development process. As stated in \cite{brown1996framework}, this form of evalution is "intended to reveal the broader charactersistics of a technology when it is applied to a representative “complete” problem in an application domain". This case study involves developing a multi-task, multi-dataset neural network  \\
+
 
 
 \section{Literature Evaluation}
 
 %TODO: Dive in the literature and describe its implementation on the software, which components can be adjusted or nah
+
+In line with the goal to provide a tool that can spur development of multi-task research, this section will examine the papers identified in tables \ref{table:combinations}, \ref{table:combinations2}, \ref{table:combinations3} in order to evaluate the expressiveness of the framework as well as its limitations. Specifically, the examination will be made in terms of changes that are required to achieve some of the necessary features. \\
+
+% Make table with things that require big changes (i.e. the core)
+% Make a table with things that require extensions
+% Make a table that overviews the possible/not possible
+
+
+
+
 
 \section{Fulfilment of the Requirements}
 
@@ -128,7 +181,7 @@ Starting from the top, the results from the classifier built in \cite{park2020au
 	% Demonstration of the research set-up
 %	\item \textbf{Developmental Side-rails:}
 %	%  
-	\item \textbf{Robust:} 
+	\item \textbf{Flexible:} 
 %	Demonstration + Dive in the literature
 
 \end{itemize}

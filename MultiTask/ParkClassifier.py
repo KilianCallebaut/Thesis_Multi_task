@@ -6,24 +6,25 @@ from Tasks.Task import Task
 
 
 class ParkClassifier(nn.Module):
-    def __init__(self, task_list: List[Task]=None, output_amount=0):
+    def __init__(self, task_list: List[Task] = None, output_amount=0):
         super().__init__()
-        s2 = 64
+        s1=128
+        s2 = 128
         self.classifier = nn.Sequential(
-            nn.Linear(128, 128),
-            nn.BatchNorm1d(128),
+            nn.Linear(s1, s1, bias=False),
             nn.LeakyReLU(negative_slope=0.01),
-            nn.Linear(128, 128),
-            nn.BatchNorm1d(128),
+            nn.BatchNorm1d(s1),
+            nn.Linear(s1, s1, bias=False),
             nn.LeakyReLU(negative_slope=0.01),
+            nn.BatchNorm1d(s1),
             nn.Dropout(p=0.2),
-            nn.Linear(128, s2),
-            nn.BatchNorm1d(s2),
+            nn.Linear(128, s2, bias=False),
             nn.LeakyReLU(negative_slope=0.01),
+            nn.BatchNorm1d(s2),
             nn.Dropout(p=0.2),
             nn.Linear(s2, s2),
-            nn.BatchNorm1d(s2),
             nn.LeakyReLU(negative_slope=0.01),
+            nn.BatchNorm1d(s2),
         )
 
         self.output_heads = nn.ModuleList([
@@ -41,5 +42,5 @@ class ParkClassifier(nn.Module):
 
     def forward(self, x):
         x = x.squeeze()
-        x = self.classifier.forward(x)
-        return tuple(head.forward(x) for head in self.output_heads)
+        x = self.classifier(x)
+        return tuple(head(x) for head in self.output_heads)

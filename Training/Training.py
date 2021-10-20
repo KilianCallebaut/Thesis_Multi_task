@@ -73,7 +73,7 @@ class Training:
         if not device:
             device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-        if not training and not optimizer:
+        if training and not optimizer:
             optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
 
         if not training_utils:
@@ -125,25 +125,30 @@ class Training:
                     print('[{}{}], execution time: {}, max time: {}, total time: {}'.format(perc_s, perc_sp, ex, ex_mx,
                                                                                             ex_t),
                           end='\r' if perc != 100 else '\n')
-
-                for i in range(n_tasks):
-                    if sum(batch_flags[i]) == 0:
-                        continue
-
-                    filtered_output = output[i]
-                    filtered_labels = labels
-
-                    if n_tasks > 1:
-                        filtered_output = filtered_output[batch_flags[i], :]
-
-                        filtered_labels = filtered_labels[batch_flags[i], :]
-                        filtered_labels = filtered_labels[:, target_flags[i]]
-                    filtered_labels = task_list[i].translate_labels(filtered_labels)
-
-                    losses_batch[i] = criteria[i](filtered_output, filtered_labels)
-                    output_batch[i] = task_list[i].decision_making(filtered_output).detach()
-                    labels_batch[i] = filtered_labels.detach()
-
+                # losses_batch =
+                # for i in range(n_tasks):
+                #     if sum(batch_flags[i]) == 0:
+                #         continue
+                #
+                #     filtered_output = output[i]
+                #     filtered_labels = labels
+                #
+                #     if n_tasks > 1:
+                #         filtered_output = filtered_output[batch_flags[i], :]
+                #
+                #         filtered_labels = filtered_labels[batch_flags[i], :]
+                #         filtered_labels = filtered_labels[:, target_flags[i]]
+                #     filtered_labels = task_list[i].translate_labels(filtered_labels)
+                #
+                #     losses_batch[i] = criteria[i](filtered_output, filtered_labels)
+                #     output_batch[i] = task_list[i].decision_making(filtered_output).detach()
+                #     labels_batch[i] = filtered_labels.detach()
+                losses_batch, output_batch, labels_batch = training_utils.loss_calculations(task_list=task_list,
+                                                                                            batch_flags=batch_flags,
+                                                                                            target_flags=target_flags,
+                                                                                            output=output,
+                                                                                            labels=labels,
+                                                                                            device=device)
 
                 # training step
                 loss = training_utils.combine_loss(losses_batch)
@@ -171,6 +176,7 @@ class Training:
             results.add_epoch_metrics(epoch, step, training=training)
             if training:
                 results.add_model_parameters(epoch, model)
+            results.writer.add_histogram('inputs train {}'.format(training), inputs, epoch)
 
             if test_dataset:
                 Training.evaluate(model,
@@ -185,10 +191,9 @@ class Training:
 
             if training_utils.early_stop(results=results, epoch=epoch):
                 break
-        print('Training Done')
 
         results.flush_writer()
-        print('Wrote Training Results')
+        print('Wrote {} Results'.format('Training' if training else 'Testing'))
 
         return model, results
 

@@ -289,11 +289,11 @@ class TaskDataset(Dataset):
         :param indexes: the indexes to remove input and targets
         """
         self.targets = [self.targets[index] for index in range(len(self)) if index not in indexes]
-        self.inputs = [self.inputs[index] for index in range(len(self)) if index not in indexes]
         if self.grouping:
             self.grouping = [self.grouping[index] for index in range(len(self)) if index not in indexes]
         for t in self.extra_tasks:
             t[1] = [t[1][index] for index in range(len(self)) if index not in indexes]
+        self.inputs = [self.inputs[index] for index in range(len(self)) if index not in indexes]
 
     ########################################################################################################
     # Transformation
@@ -409,6 +409,7 @@ class TaskDataset(Dataset):
 
     def load(self, taskname):
         self.load_inputs(taskname)
+        self.inputs = [i.cpu() for i in self.inputs]
         diction = joblib.load(os.path.join(self.base_path, '{}_info.obj'.format(taskname)))
         self.task = diction['task']
         self.targets = diction['targets']

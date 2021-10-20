@@ -48,11 +48,12 @@ def main(argv):
     mtmf = MultiTaskModelFactory()
     mtmf.add_modelclass(MultiTaskHardSharingConvolutional)
     mtmf.add_static_model_parameters(MultiTaskHardSharingConvolutional.__name__,
-                                     **read_config('model_params_cnn'),
+                                     hidden_size=64,
+                                     n_hidden=4,
                                      input_channels=1)
     mtmf.add_modelclass(MultiTaskHardSharing)
     mtmf.add_static_model_parameters(MultiTaskHardSharing.__name__,
-                                     **read_config('model_params_dnn'))
+                                     **{"hidden_size": 512, "n_hidden": 4})
 
     csc = ConcatTrainingSetCreator(random_state=123,
                                    nr_runs=4,
@@ -87,7 +88,7 @@ def main(argv):
                                        data_path=os.path.join(drive + ":", r'Thesis_Datasets\SpeechCommands'),
                                        ))
 
-    csc.add_signal_preprocessing(preprocess_dict=dict(sample_rate=32000, mono=True))
+    csc.add_signal_preprocessing(preprocess_dict=dict(resample_to=32000, mono=True))
     for ex in range(2):
         csc.add_extraction_method(
             MelSpectrogramExtractionMethod(**extraction_params)) if ex == 0 else csc.add_extraction_method(
@@ -98,7 +99,7 @@ def main(argv):
         csc.add_transformation_call('normalize_inputs')
 
         keys = list(csc.get_keys())
-        comb_iterator = itertools.chain(*map(lambda x: itertools.combinations(keys, x), range(1, len(keys) + 1)))
+        comb_iterator = itertools.chain(*map(lambda x: itertools.combinations(keys, x), range(0, 2)))
 
         for combo in comb_iterator:
             key_list = list(combo)

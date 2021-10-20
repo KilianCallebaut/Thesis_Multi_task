@@ -81,8 +81,8 @@ class Results:
         for tsk in self.task_list:
             self.task_truths[tsk.name] += truths_batch[self.task_list.index(tsk)].tolist()
             self.task_predictions[tsk.name] += predictions_batch[self.task_list.index(tsk)].tolist()
-            self.task_running_losses[tsk.name] += losses_batch[self.task_list.index(tsk)].item() * sum(
-                batch_flags[self.task_list.index(tsk)])
+            self.task_running_losses[tsk.name] += losses_batch[self.task_list.index(tsk)].item() #\
+                                                  # * sum(batch_flags[self.task_list.index(tsk)])
 
     def add_epoch_metrics(self, epoch: int, step: int, training: bool):
         self.add_loss_to_curve(epoch, step, self.running_loss, training)

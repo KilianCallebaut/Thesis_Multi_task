@@ -5,8 +5,8 @@ import sys
 from DataReaders.ASVspoof2015 import ASVspoof2015
 from DataReaders.DCASE2017_SE import DCASE2017_SE
 from DataReaders.DCASE2017_SS import DCASE2017_SS
-from DataReaders.ExtractionMethod import PerCelScaling, LogbankSummaryExtraction, \
-    NeutralExtractionMethod, MelSpectrogramExtraction, PerDimensionScaling, FramePreparation, \
+from DataReaders.ExtractionMethod import PerCelStandardizing, LogbankSummaryExtraction, \
+    NeutralExtractionMethod, MelSpectrogramExtraction, PerDimensionStandardizing, FramePreparation, \
     MinWindowSizePreparationFitter
 from DataReaders.Ravdess import Ravdess
 from MultiTask.MultiTaskHardSharing import MultiTaskHardSharing

@@ -7,8 +7,8 @@ from torch.utils.data import DataLoader
 
 from DataReaders.ASVspoof2015 import ASVspoof2015
 from DataReaders.DCASE2017_SS import DCASE2017_SS
-from DataReaders.ExtractionMethod import PerCelScaling, LogbankSummaryExtraction, \
-    NeutralExtractionMethod
+from DataReaders.ExtractionMethod import PerCelStandardizing, LogbankSummaryExtraction, \
+    NeutralExtractionMethod, LogbankExtraction, SummaryPreparation
 from DataReaders.Ravdess import Ravdess
 from MultiTask.MultiTaskHardSharing import MultiTaskHardSharing
 from MultiTask.MultiTaskModelFactory import MultiTaskModelFactory
@@ -23,8 +23,7 @@ def main(argv):
                                    # recalculate=True,
                                    multiply=False
                                    )
-    csc.add_data_reader(DCASE2017_SS(object_path=drive + r'Thesis_Results\Data_Readers\DCASE2017_SS_{}',
-                                     data_path=drive + r'Thesis_Datasets\DCASE2017'))
+
     csc.add_data_reader(Ravdess(object_path=drive + r'Thesis_Results\Data_Readers\Ravdess',
                                 data_path=drive + r'Thesis_Datasets\Ravdess'))
     csc.add_data_reader(Ravdess(object_path=drive + r'Thesis_Results\Data_Readers\Ravdess',
@@ -32,12 +31,15 @@ def main(argv):
                                 mode=1), name='Ravdess_stress')
     csc.add_data_reader(ASVspoof2015(object_path=os.path.join(drive, r'Thesis_Results\Data_Readers\ASVspoof2015'),
                                      data_path=drive + r'Thesis_Datasets\Automatic Speaker Verification Spoofing and Countermeasures Challenge 2015\DS_10283_853'))
+    csc.add_data_reader(DCASE2017_SS(object_path=drive + r'Thesis_Results\Data_Readers\DCASE2017_SS_{}',
+                                     data_path=drive + r'Thesis_Datasets\DCASE2017'))
     csc.add_signal_preprocessing(dict(resample_to=8000, mono=True))
-    csc.add_extraction_method(extraction_method=LogbankSummaryExtraction(
-        PerCelScaling(NeutralExtractionMethod()),
+    csc.add_extraction_method(extraction_method=LogbankExtraction(
+        SummaryPreparation(PerCelStandardizing(NeutralExtractionMethod())),
         extraction_params=dict(winlen=0.03, winstep=0.01, nfilt=24, nfft=256),
-        name='GeorgievSummary')
+        name='Georgiev')
     )
+    csc.add_transformation_call('prepare_inputs')
     csc.add_transformation_call('inverse_normalize_inputs')
     csc.add_transformation_call('normalize_fit')
     csc.add_transformation_call('normalize_inputs')

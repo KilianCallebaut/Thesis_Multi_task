@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from python_speech_features import logfbank, mfcc, fbank
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 
 class ExtractionMethod(ABC):
@@ -223,7 +223,7 @@ class MelSpectrogramExtraction(BaseExtractionMethod):
 
 #### SCALING METHODS #####
 
-class PerDimensionScaling(BaseExtractionMethod):
+class PerDimensionStandardizing(BaseExtractionMethod):
 
     def partial_scale_fit(self, input_tensor):
         """
@@ -252,7 +252,7 @@ class PerDimensionScaling(BaseExtractionMethod):
         return torch.tensor(self.scalers[0].inverse_transform(input_tensor))
 
 
-class PerCelScaling(BaseExtractionMethod):
+class PerCelStandardizing(BaseExtractionMethod):
 
     def partial_scale_fit(self, input_tensor):
         """
@@ -285,6 +285,34 @@ class PerCelScaling(BaseExtractionMethod):
         for i in range(input_tensor.shape[0]):
             input_tensor[i, :] = torch.tensor(self.scalers[i].inverse_transform(input_tensor[i, :].reshape(1, -1)))
         return input_tensor
+
+class PerDimensionNormalizing(BaseExtractionMethod):
+
+    def partial_scale_fit(self, input_tensor):
+        """
+        Adds the current input to the scaling calculation
+        :param input_tensor:
+        :return:
+        """
+        if not self.scalers:
+            self.scalers[0] = MinMaxScaler()
+        self.scalers[0].partial_fit(input_tensor)
+
+    def scale_transform(self, input_tensor) -> torch.tensor:
+        """
+        Scales an input for 2D matrix
+        :param input_tensor: ndarray
+        :return: transformed input
+        """
+        return torch.tensor(self.scalers[0].transform(input_tensor))
+
+    def inverse_scale_transform(self, input_tensor) -> torch.tensor:
+        """
+        Undoes a performed scaling
+        :param input_tensor: ndarray
+        :return: original input
+        """
+        return torch.tensor(self.scalers[0].inverse_transform(input_tensor))
 
 
 #### PREPARATION METHODS #####
@@ -335,6 +363,16 @@ class WindowPreparation(BaseExtractionMethod):
             window = input_tensor[input_tensor.shape[0] - window_size:input_tensor.shape[0], :]
             windowed_inputs.append(window)
         return windowed_inputs
+
+class SummaryPreparation(BaseExtractionMethod):
+
+    def prepare_input(self, input_tensor: torch.tensor) -> List[torch.tensor]:
+        return [self.logbank_summary(input_tensor)]
+
+    def logbank_summary(self, lb):
+        return torch.stack([torch.min(lb, 1).values, torch.max(lb, 1).values, torch.std(lb, 1), torch.mean(lb, 1),
+                            torch.median(lb, 1).values, torch.tensor(np.percentile(lb, 25, axis=1)),
+                            torch.tensor(np.percentile(lb, 75, axis=1))])
 
 
 #### PREPARATION FITTER METHODS #####
@@ -387,7 +425,7 @@ class LogbankSummaryExtractionMethod(BaseExtractionMethod):
                  ):
         super().__init__(
             name='LogbankExtractionMethod',
-            extraction_method=LogbankSummaryExtraction(PerCelScaling(
+            extraction_method=LogbankSummaryExtraction(PerCelStandardizing(
                 NeutralExtractionMethod(preparation_params=preparation_params, extraction_params=extraction_params))),
 
         )
@@ -399,7 +437,7 @@ class MFCCExtractionMethod(BaseExtractionMethod):
                  extraction_params: dict = None):
         super().__init__(
             name='MFCCExtractionMethod',
-            extraction_method=MfccExtraction(PerDimensionScaling(FramePreparation(MedianWindowSizePreparationFitter(
+            extraction_method=MfccExtraction(PerDimensionStandardizing(FramePreparation(MedianWindowSizePreparationFitter(
                 NeutralExtractionMethod(preparation_params=preparation_params, extraction_params=extraction_params)
             ))))
         )
@@ -409,7 +447,7 @@ class FilterBankExtractionMethod(BaseExtractionMethod):
     def __init__(self, **kwargs):
         super().__init__(
             name='FilterBankExtractionMethod',
-            extraction_method=FilterBankExtraction(PerDimensionScaling(FramePreparation(
+            extraction_method=FilterBankExtraction(PerDimensionStandardizing(FramePreparation(
                 NeutralExtractionMethod(**kwargs)
             )))
         )
@@ -420,7 +458,7 @@ class MelSpectrogramExtractionMethod(BaseExtractionMethod):
         super().__init__(
             name='MelSpectrogramExtractionMethod',
             extraction_method=MelSpectrogramExtraction(
-                PerDimensionScaling(FramePreparation(MedianWindowSizePreparationFitter(
+                PerDimensionStandardizing(FramePreparation(MedianWindowSizePreparationFitter(
                     NeutralExtractionMethod()
                 )))),
             **kwargs

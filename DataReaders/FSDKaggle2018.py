@@ -42,7 +42,7 @@ class FSDKaggle2018(DataReader):
         for audio_idx in range(len(files)):
             path = files[audio_idx]
             read_wav = self.preprocess_signal(self.load_wav(path), **preprocess_parameters)
-            taskDataset.add_input(read_wav)
+            taskDataset.extract_and_add_input(read_wav)
 
             if perc < (audio_idx / len(self.file_labels)) * 100:
                 print("Percentage done: {}".format(perc))
@@ -57,7 +57,7 @@ class FSDKaggle2018(DataReader):
                 self.skipped.append(audio_idx)
                 continue
             read_wav = self.preprocess_signal(read_wav, **preprocess_parameters)
-            taskDataset.test_set.add_input(read_wav)
+            taskDataset.test_set.extract_and_add_input(read_wav)
 
             if perc < (audio_idx / len(files)) * 100:
                 print("Percentage done: {}".format(perc))

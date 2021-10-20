@@ -60,7 +60,7 @@ class MultiClassTask(Task):
         super().__init__(name, output_labels, loss_function)
         self.classification_type = 'multi-class'
         if not loss_function:
-            self.loss_function = nn.CrossEntropyLoss()
+            self.loss_function = nn.NLLLoss().to(device)
         else:
             self.loss_function = loss_function
 
@@ -84,7 +84,7 @@ class MultiLabelTask(Task):
         super().__init__(name, output_labels, loss_function)
         self.classification_type = 'multi-label'
         if not loss_function:
-            self.loss_function = nn.NLLLoss()
+            self.loss_function = nn.BCELoss().to(device)
         else:
             self.loss_function = loss_function
 

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  14 OCT 2021 02:08
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  19 OCT 2021 16:03
 entering extended mode
 **./ThesisText.tex
 (ThesisText.tex
@@ -1937,55 +1937,15 @@ Underfull \hbox (badness 10000) in paragraph at lines 84--85
 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 99--99
-[]\OT1/cmr/m/n/12 Georgiev et al.
- []
-
-
-Underfull \hbox (badness 2582) in paragraph at lines 99--99
-[]\OT1/cmr/m/n/12 Accuracy Speaker
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 100--100
-[]\OT1/cmr/m/n/12 Georgiev et al.
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 101--101
-[]\OT1/cmr/m/n/12 Georgiev et al.
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 101--101
-[]\OT1/cmr/m/n/12 Accuracy Stress
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 102--102
-[]\OT1/cmr/m/n/12 Georgiev et al.
- []
-
-
-Underfull \hbox (badness 1803) in paragraph at lines 103--103
-[]\OT1/cmr/m/n/12 Unweighted Av-er-
- []
-
-
-Overfull \hbox (48.0pt too wide) in paragraph at lines 91--106
- [][] 
- []
-
-[98] [99]
-Overfull \hbox (10.97643pt too wide) in paragraph at lines 147--148
+[98]
+Overfull \hbox (10.97643pt too wide) in paragraph at lines 149--150
 []\OT1/cmr/m/n/12 Create mul-ti-ple in-put ob-jects from the same dataset: (DEM
 ON-STRATE)
  []
 
-[100] [101]) (Conclusion.tex [102]
+[99] [100]) (Conclusion.tex [101]
 Chapter 7.
-) (ThesisText.bbl [103
+) (ThesisText.bbl [102
 
 ]
 ! Missing $ inserted.
@@ -2212,9 +2172,9 @@ Underfull \hbox (badness 1616) in paragraph at lines 66--70
 /cmr/m/it/12 arXiv preprint
  []
 
-[104
+[103
 
-] [105] [106] [107] [108]) [109] (ThesisText.aux)
+] [104] [105] [106] [107]) [108] (ThesisText.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -2222,7 +2182,7 @@ LaTeX Warning: There were undefined references.
 Here is how much of TeX's memory you used:
  12782 strings out of 481212
  271863 string characters out of 2905973
- 491324 words of memory out of 3000000
+ 491325 words of memory out of 3000000
  28114 multiletter control sequences out of 15000+200000
  541715 words of font info for 51 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -2237,9 +2197,9 @@ s/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/mrKC1/AppData/Local
 /Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/mrKC1/AppD
 ata/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb><C:/Users/m
 rKC1/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on ThesisText.pdf (111 pages, 1518496 bytes).
+Output written on ThesisText.pdf (110 pages, 1517115 bytes).
 PDF statistics:
- 442 PDF objects out of 1000 (max. 8388607)
+ 439 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  118 words of extra memory for PDF output out of 10000 (max. 10000000)
 
