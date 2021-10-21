@@ -64,11 +64,11 @@ def main(argv):
                                                             r"Thesis_Datasets\Automatic Speaker Verification Spoofing "
                                                             r"and Countermeasures Challenge 2015\DS_10283_853"),
                                      ))
-    csc.add_data_reader(
-        ChenAudiosetDataset(object_path=os.path.join(data_base, 'ChenAudiosetDataset'),
-                            data_path=os.path.join(drive + r':\Thesis_Datasets\audioset_chen\audioset_filtered'),
-                            )
-    )
+    # csc.add_data_reader(
+    #     ChenAudiosetDataset(object_path=os.path.join(data_base, 'ChenAudiosetDataset'),
+    #                         data_path=os.path.join(drive + r':\Thesis_Datasets\audioset_chen\audioset_filtered'),
+    #                         )
+    # )
     csc.add_data_reader(DCASE2017_SS(object_path=os.path.join(data_base, 'DCASE2017_SS_{}'),
                                      data_path=os.path.join(drive + ":", r'Thesis_Datasets\DCASE2017')))
     csc.add_data_reader(DCASE2017_SE(object_path=os.path.join(data_base, 'DCASE2017_SE_{}'),

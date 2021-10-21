@@ -41,8 +41,11 @@ class FSDKaggle2018(DataReader):
         files = [os.path.join(self.data_path, self.audio_folder, name) for name in self.file_labels['fname']]
         for audio_idx in range(len(files)):
             path = files[audio_idx]
-            read_wav = self.preprocess_signal(self.load_wav(path), **preprocess_parameters)
-            taskDataset.extract_and_add_input(read_wav)
+            try:
+                read_wav = self.preprocess_signal(self.load_wav(path), **preprocess_parameters)
+                taskDataset.extract_and_add_input(read_wav)
+            except:
+                print(audio_idx)
 
             if perc < (audio_idx / len(self.file_labels)) * 100:
                 print("Percentage done: {}".format(perc))
@@ -52,12 +55,15 @@ class FSDKaggle2018(DataReader):
         files = [os.path.join(self.data_path, 'audio_test', name) for name in self.file_labels_val['fname']]
         for audio_idx in range(len(files)):
             path = files[audio_idx]
-            read_wav = self.load_wav(path)
-            if read_wav is None:
-                self.skipped.append(audio_idx)
-                continue
-            read_wav = self.preprocess_signal(read_wav, **preprocess_parameters)
-            taskDataset.test_set.extract_and_add_input(read_wav)
+            try:
+                read_wav = self.load_wav(path)
+                if read_wav is None:
+                    self.skipped.append(audio_idx)
+                    continue
+                read_wav = self.preprocess_signal(read_wav, **preprocess_parameters)
+                taskDataset.test_set.extract_and_add_input(read_wav)
+            except:
+                print(audio_idx)
 
             if perc < (audio_idx / len(files)) * 100:
                 print("Percentage done: {}".format(perc))
@@ -88,4 +94,3 @@ class FSDKaggle2018(DataReader):
             output_labels=distinct_labels)
         taskDataset.add_task_and_targets(task=task, targets=targets)
         taskDataset.test_set.add_task_and_targets(task=task, targets=targets_val)
-

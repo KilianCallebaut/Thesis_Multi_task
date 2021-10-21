@@ -149,21 +149,74 @@ What should again be noted, is that the implementations without the framework di
 % Run eventual test and training
 
 
-Additional to the paper implementations, is an example case study which has been referred to multiple times in this work. The goal is to present how the framework aids the development of multi-task systems by conducting a development process. As stated in \cite{brown1996framework}, this form of evalution is "intended to reveal the broader charactersistics of a technology when it is applied to a representative “complete” problem in an application domain". This case study involves developing a multi-task, multi-dataset neural network  \\
+Additional to the paper implementations, is an example case study which has been referred to multiple times in this work. The goal is to present how the framework aids the development of multi-task systems by conducting a development process. As stated in \cite{brown1996framework}, this form of evalution is "intended to reveal the broader charactersistics of a technology when it is applied to a representative “complete” problem in an application domain". This case study involves developing a multi-task, multi-dataset neural network which contain a few criteria: \\
 
+\begin{itemize}
+	\item There must be one task that is shared among multiple datasets
+	\item The individual accuracies must reach at least xxx
+	\item The system must be compared to a pre-trained baseline model
+	\item Multiple task types must be present in the combined sets
+	\item The individual performances must be compared to the Multi-Task model outputs
+	\item An extra dataset must be added after completion to test and then expand the training data
+\end{itemize}
+
+%Gender detection in ravdess, asvspoof and chen
 
 
 \section{Literature Evaluation}
 
 %TODO: Dive in the literature and describe its implementation on the software, which components can be adjusted or nah
 
-In line with the goal to provide a tool that can spur development of multi-task research, this section will examine the papers identified in tables \ref{table:combinations}, \ref{table:combinations2}, \ref{table:combinations3} in order to evaluate the expressiveness of the framework as well as its limitations. Specifically, the examination will be made in terms of changes that are required to achieve some of the necessary features. \\
+In line with the goal to provide a tool that can spur development of multi-task research, this section will examine the papers identified in tables \ref{table:combinations}, \ref{table:combinations2}, \ref{table:combinations3} in order to evaluate the expressiveness of the framework as well as its limitations. Specifically, the examination will be made in terms of changes that are required to achieve some of the necessary features. The feature analysis of the framework is performed by analysing the papers as problem contexts for identifying model problems \citep{brown1996framework}. The goal is to identify possible limitations to the architecture and possible future extensions that are required. \\
+
+To do this, an examination of specific techniques that are present in the literature is made and discussed to what degree and facility they can be implemented by the system. From this, conclusions are drawn towards what future development can focus on to provide a more complete framework for multi-task development.\\
+
+% - Targets flexibility other than labels
+% - self-supervised tasks require ...
+% - self-supervised tasks also like adaptation mechanisms
+
+% - Multi input form
+% - training adaptation: targets as inputs
+
+% - Parallel models with one pretrained possible but with some caveats
+% - Loss calculation adaptations: speech signals lu et al
+% - Loss calculation adaptations: weighted loss combinations
+% - Loss calculation adaptation: Teacher student model
+
+% - Non-nn combinations like HMM's have been implemented in pytorch already
+% - Parallel single task models written as cascaded single task models
+
+% - RBM's not possible due to non-gd training
+
+% - One dataset, multiple supervised tasks possible
+% - Multichannel feature extraction available by input
+
+% - Signal processing scaling: data augmentation
+
+
+
+
+
 
 % Make table with things that require big changes (i.e. the core)
 % Make a table with things that require extensions
 % Make a table that overviews the possible/not possible
 
 
+
+\begin{table}[ht]
+	\caption{Core changes required} % title of Table
+	\centering % used for centering table
+	\begin{tabular}{p{0.2\textwidth}p{0.2\textwidth}p{0.2\textwidth}p{0.2\textwidth}p{0.2\textwidth}} % centered columns (4 columns)
+		\hline\hline %inserts double horizontal lines
+		Title &   \\ [0.5ex] % inserts table
+		%heading
+		\hline % inserts single horizontal line
+		\citet{park2020augmenting} Without & 177  & 75 & 24 + 2 & 25 + 10  \\ \hline
+		
+	\end{tabular}
+	\label{table:CoreChanges} % is used to refer this table in the text
+\end{table}
 
 
 
