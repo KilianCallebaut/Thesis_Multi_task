@@ -169,16 +169,37 @@ Additional to the paper implementations, is an example case study which has been
 
 In line with the goal to provide a tool that can spur development of multi-task research, this section will examine the papers identified in tables \ref{table:combinations}, \ref{table:combinations2}, \ref{table:combinations3} in order to evaluate the expressiveness of the framework as well as its limitations. Specifically, the examination will be made in terms of changes that are required to achieve some of the necessary features. The feature analysis of the framework is performed by analysing the papers as problem contexts for identifying model problems \citep{brown1996framework}. The goal is to identify possible limitations to the architecture and possible future extensions that are required. \\
 
-To do this, an examination of specific techniques that are present in the literature is made and discussed to what degree and facility they can be implemented by the system. From this, conclusions are drawn towards what future development can focus on to provide a more complete framework for multi-task development.\\
+To do this, an examination of specific techniques that are present in the literature is made and discussed to what degree and facility they can be implemented by the system. Mainly techniques that haven't been clearly been addressed in previous sections, but have presence in the literature are brought up here. From this, conclusions are drawn towards what future development can focus on to provide a more complete framework for multi-task development and what the limitations are of the (current) design.\\
+
+
+% - Multichannel feature extraction available by input
+% - Signal processing scaling: data augmentation
+
+\underline{\textbf{Input Techniques.}} The first set of techniques are related to input requirements. The framework's data structure for encapsulating inputs is a list of tensors that are, by index, related to one or multiple targets. Each input can either be added directly as a tensor or as a signal from which the feature matrix is extracted on input using the TaskDataset's ExtractionMethod object. In any case, once the data is encapsulated within the TaskDataset, it is always a feature matrix which is ready to serve as input for the training function. There are (limited) functionalities available for transforming audio signals before extraction through the DataReader's process\_signal function.\\
+
+While most research utilize \textbf{mono channel} audio signals \cite{seltzer2013multi} \cite{panchapagesan2016multi} \cite{kim2017speech}, there are instances where \textbf{multi-channel signals} are used, even as much as four \cite{nwe2017convolutional}. The framework's extraction methodology already takes this situation into account, creating parallel feature matrices and concatenating them into a singular input instance. In some instances though, stereo input signals are transformed to mono channel signals in order to reduce the feature matrix size. This situation is already covered as well as part of the process\_signal function, where a multi-channel signal is averaged to a single channel at the command of an input boolean, meaning it can varied at runtime.\\
+
+However, this brings up the way \textbf{signal processing} is handled in the framework. Its limitations become apparent when more signal transformations need to be performed. For example the data augmentations described in \cite{lopez2019keyword} would be a problem in the current setting. In this scenario, multiple randomized signal transformations are applied to a single fragment, before MFCC features are extracted. In order to scale this operation for multiple datasets, the developer has two options. One is to create an extension to the DataReader class which are in turn extended by each of their DataReaders for the individual datasets. The other is to store the signal as a tensor and encapsulate the data augmentation techniques in the preparation function of the ExtractionMethod class. Sadly, there are complicating factors which do not make the described augmentation method possible, as additional noise segments from random files in their dataset as well as the augmentation being recalculated every epoch for 30\% of the dataset. \\
+
+This case thus highlights two problems in the signal preprocessing approach: it is messy to create extra pre-processing functionalities and it is impossible or very complicated to vary steps in creation of the input between epochs. At first sight, creating a standardized approach for addressing this specific situation would be complicated due to the reliance on an additional dataset for noise fragments. The TaskDataset structures are not designed with access to the original dataset in mind, nor do they currently offer any storage of additional information.\\
+
+% - Multi input form
+% - training adaptation: targets as inputs
+Moving on to examining what singular \textbf{input instances} actually are. In pretty much all the research, an input instance is a single feature matrix, which is the result of an extraction methodology applied to an audio signal. However, two works challenge this form.\\
+
+The first one is \cite{fernando2020temporarily}, where the \textbf{input for a single audio fragment comes in three forms}: The time series, the MFCC features and the MFCC deltas.  These three representations are combined into a single LSTM encoder which results in the actual input embedding. This embedding is then used along with a random noise vector as an input for a Generative Adverserial Network (GAN). However this network is trained (encoder LSTM trained separately or together with the rest of the Multi-Task network), there is no issue as tensors can be created which are concatenated from matrices with different dimensions. The one caveat however is that, in order to batch multiple instances, the individual tensor dimensions must be equal, but this is always the case anyway, which is why windowing transformations are standard available. The current implementations however only take two dimensional matrices in account. If every instance does have variable shapes, a custom DataLoader must be created, which would be the case anyway without the framework. No extra complications are introduced due to the option to input the DataLoader in the training and evaluation functions.\\
+
+A more difficult situation however is found in \cite{komatsu2020scene}, where \textbf{target labels from one task are served as input} for the additional task. Targets are not given as input for the model in training, which means that these should be included as part of the input matrix. The issues that this causes however are minimal, as it means that target vectors have to be stored twice, which wastes space. \\
+
+These cases impose less severe issues, but do require forms of extraction and forming the classifier in a way which would inhibit easy addition of new datasets. Besides, the models would also have to include steps to split up these concatenated tensors, which possibly introduce too many undesired calculations. More flexibility to deal with these situations could be provided by allowing multiple input instances per fragment, similar to how multiple targets are possible per instance. \\
 
 % - Targets flexibility other than labels
 % - self-supervised tasks require ...
 % - self-supervised tasks also like adaptation mechanisms
-
-% - Multi input form
-% - training adaptation: targets as inputs
-
 % - Parallel models with one pretrained possible but with some caveats
+\underline{\textbf{Target Techniques.}}
+
+% - One dataset, multiple supervised tasks possible
 % - Loss calculation adaptations: speech signals lu et al
 % - Loss calculation adaptations: weighted loss combinations
 % - Loss calculation adaptation: Teacher student model
@@ -188,10 +209,7 @@ To do this, an examination of specific techniques that are present in the litera
 
 % - RBM's not possible due to non-gd training
 
-% - One dataset, multiple supervised tasks possible
-% - Multichannel feature extraction available by input
 
-% - Signal processing scaling: data augmentation
 
 
 
@@ -202,21 +220,6 @@ To do this, an examination of specific techniques that are present in the litera
 % Make a table with things that require extensions
 % Make a table that overviews the possible/not possible
 
-
-
-\begin{table}[ht]
-	\caption{Core changes required} % title of Table
-	\centering % used for centering table
-	\begin{tabular}{p{0.2\textwidth}p{0.2\textwidth}p{0.2\textwidth}p{0.2\textwidth}p{0.2\textwidth}} % centered columns (4 columns)
-		\hline\hline %inserts double horizontal lines
-		Title &   \\ [0.5ex] % inserts table
-		%heading
-		\hline % inserts single horizontal line
-		\citet{park2020augmenting} Without & 177  & 75 & 24 + 2 & 25 + 10  \\ \hline
-		
-	\end{tabular}
-	\label{table:CoreChanges} % is used to refer this table in the text
-\end{table}
 
 
 
