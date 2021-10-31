@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  25 OCT 2021 01:08
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  31 OCT 2021 20:14
 entering extended mode
 **./ThesisText.tex
 (ThesisText.tex
@@ -1941,17 +1941,9 @@ Underfull \hbox (badness 10000) in paragraph at lines 86--87
  []
 
 
-Package natbib Warning: Citation `brown1996framework' on page 98 undefined on i
-nput line 152.
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 152--153
 
  []
-
-
-Package natbib Warning: Citation `brown1996framework' on page 98 undefined on i
-nput line 170.
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 170--171
@@ -2004,30 +1996,90 @@ Underfull \hbox (badness 10000) in paragraph at lines 194--195
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 233--233
-[]\OT1/cmr/m/n/12 Park et al.
+Underfull \hbox (badness 10000) in paragraph at lines 202--203
+
+ []
+
+[101]
+Underfull \hbox (badness 10000) in paragraph at lines 204--205
+
  []
 
 
-Overfull \hbox (59.99405pt too wide) in paragraph at lines 228--237
- [][] 
+Underfull \hbox (badness 10000) in paragraph at lines 206--207
+
  []
 
-[101] [102]
-Overfull \hbox (10.97643pt too wide) in paragraph at lines 273--274
+
+Underfull \hbox (badness 10000) in paragraph at lines 208--209
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 210--211
+
+ []
+
+[102]
+Underfull \hbox (badness 10000) in paragraph at lines 217--218
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 219--220
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 221--222
+
+ []
+
+[103]
+Underfull \hbox (badness 10000) in paragraph at lines 223--224
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 225--226
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 233--234
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 235--236
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 241--242
+
+ []
+
+[104]
+Underfull \hbox (badness 10000) in paragraph at lines 245--246
+
+ []
+
+[105]
+Overfull \hbox (10.97643pt too wide) in paragraph at lines 299--300
 []\OT1/cmr/m/n/12 Create mul-ti-ple in-put ob-jects from the same dataset: (DEM
 ON-STRATE)
  []
 
-[103] [104]) (Conclusion.tex [105]
+[106] [107]) (Conclusion.tex [108]
 Chapter 7.
-) (ThesisText.bbl [106
+) (ThesisText.bbl [109
 
 ]
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.53 \newblock Dcase-repo/dcase_
+l.50 \newblock Dcase-repo/dcase_
                                 util: A collection of utilities for detectio...
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
@@ -2035,7 +2087,7 @@ you left one out. Proceed, with fingers crossed.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.55 ...{https://github.com/DCASE-REPO/dcase_util}
+l.52 ...{https://github.com/DCASE-REPO/dcase_util}
                                                   .
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
@@ -2043,7 +2095,7 @@ you left one out. Proceed, with fingers crossed.
 ! Extra }, or forgotten $.
 \mbox  #1->\leavevmode \hbox {#1}
                                  
-l.55 ...{https://github.com/DCASE-REPO/dcase_util}
+l.52 ...{https://github.com/DCASE-REPO/dcase_util}
                                                   .
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -2054,7 +2106,7 @@ deleted material, e.g., by typing `I$}'.
 ! Extra }, or forgotten $.
 \nfss@text #1->{\mbox {#1}}
                            
-l.55 ...{https://github.com/DCASE-REPO/dcase_util}
+l.52 ...{https://github.com/DCASE-REPO/dcase_util}
                                                   .
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -2065,7 +2117,7 @@ deleted material, e.g., by typing `I$}'.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.56 
+l.53 
      
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
@@ -2073,7 +2125,7 @@ you left one out. Proceed, with fingers crossed.
 ! Missing } inserted.
 <inserted text> 
                 }
-l.56 
+l.53 
      
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
@@ -2088,7 +2140,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.58   Gagn{\'e}]{de2012deap}
+l.55   Gagn{\'e}]{de2012deap}
                              
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
@@ -2100,7 +2152,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.58   Gagn{\'e}]{de2012deap}
+l.55   Gagn{\'e}]{de2012deap}
                              
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
@@ -2112,29 +2164,29 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.58   Gagn{\'e}]{de2012deap}
+l.55   Gagn{\'e}]{de2012deap}
                              
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
 
-LaTeX Warning: Command \c invalid in math mode on input line 59.
+LaTeX Warning: Command \c invalid in math mode on input line 56.
 
 ! Please use \mathaccent for accents in math mode.
 <recently read> \accent 
                         
-l.59 Fran{\c{c}
+l.56 Fran{\c{c}
                }ois-Michel De~Rainville, F{\'e}lix-Antoine Fortin, Marc-Andr...
 I'm changing \accent to \mathaccent here; wish me luck.
 (Accents are not the same in formulas as they are in text.)
 
 
-LaTeX Warning: Command \' invalid in math mode on input line 59.
+LaTeX Warning: Command \' invalid in math mode on input line 56.
 
 ! Please use \mathaccent for accents in math mode.
 \add@accent ... \let \ignorespaces \relax \accent 
                                                   #1 #2\egroup \spacefactor ...
-l.59 Fran{\c{c}}ois-Michel De~Rainville, F{\'e
+l.56 Fran{\c{c}}ois-Michel De~Rainville, F{\'e
                                               }lix-Antoine Fortin, Marc-Andr...
 I'm changing \accent to \mathaccent here; wish me luck.
 (Accents are not the same in formulas as they are in text.)
@@ -2142,7 +2194,7 @@ I'm changing \accent to \mathaccent here; wish me luck.
 ! You can't use `\spacefactor' in math mode.
 \add@accent ... \accent #1 #2\egroup \spacefactor 
                                                   \accent@spacefactor 
-l.59 Fran{\c{c}}ois-Michel De~Rainville, F{\'e
+l.56 Fran{\c{c}}ois-Michel De~Rainville, F{\'e
                                               }lix-Antoine Fortin, Marc-Andr...
 Sorry, but I'm not programmed to handle this case;
 I'll just pretend that you didn't ask for it.
@@ -2150,12 +2202,12 @@ If you're in the wrong mode, you might be able to
 return to the right one by typing `I}' or `I$' or `I\par'.
 
 
-LaTeX Warning: Command \' invalid in math mode on input line 59.
+LaTeX Warning: Command \' invalid in math mode on input line 56.
 
 ! Please use \mathaccent for accents in math mode.
 \add@accent ... \let \ignorespaces \relax \accent 
                                                   #1 #2\egroup \spacefactor ...
-l.59 ...e, F{\'e}lix-Antoine Fortin, Marc-Andr{\'e
+l.56 ...e, F{\'e}lix-Antoine Fortin, Marc-Andr{\'e
                                                   }
 I'm changing \accent to \mathaccent here; wish me luck.
 (Accents are not the same in formulas as they are in text.)
@@ -2163,7 +2215,7 @@ I'm changing \accent to \mathaccent here; wish me luck.
 ! You can't use `\spacefactor' in math mode.
 \add@accent ... \accent #1 #2\egroup \spacefactor 
                                                   \accent@spacefactor 
-l.59 ...e, F{\'e}lix-Antoine Fortin, Marc-Andr{\'e
+l.56 ...e, F{\'e}lix-Antoine Fortin, Marc-Andr{\'e
                                                   }
 Sorry, but I'm not programmed to handle this case;
 I'll just pretend that you didn't ask for it.
@@ -2171,12 +2223,12 @@ If you're in the wrong mode, you might be able to
 return to the right one by typing `I}' or `I$' or `I\par'.
 
 
-LaTeX Warning: Command \' invalid in math mode on input line 60.
+LaTeX Warning: Command \' invalid in math mode on input line 57.
 
 ! Please use \mathaccent for accents in math mode.
 \add@accent ... \let \ignorespaces \relax \accent 
                                                   #1 #2\egroup \spacefactor ...
-l.60 ...ner, Marc Parizeau, and Christian Gagn{\'e
+l.57 ...ner, Marc Parizeau, and Christian Gagn{\'e
                                                   }.
 I'm changing \accent to \mathaccent here; wish me luck.
 (Accents are not the same in formulas as they are in text.)
@@ -2184,7 +2236,7 @@ I'm changing \accent to \mathaccent here; wish me luck.
 ! You can't use `\spacefactor' in math mode.
 \add@accent ... \accent #1 #2\egroup \spacefactor 
                                                   \accent@spacefactor 
-l.60 ...ner, Marc Parizeau, and Christian Gagn{\'e
+l.57 ...ner, Marc Parizeau, and Christian Gagn{\'e
                                                   }.
 Sorry, but I'm not programmed to handle this case;
 I'll just pretend that you didn't ask for it.
@@ -2194,7 +2246,7 @@ return to the right one by typing `I}' or `I$' or `I\par'.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.64 
+l.61 
      
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
@@ -2202,7 +2254,7 @@ you left one out. Proceed, with fingers crossed.
 ! Missing } inserted.
 <inserted text> 
                 }
-l.64 
+l.61 
      
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
@@ -2213,7 +2265,7 @@ my insertion and my current dilemma will both disappear.
 ! Missing } inserted.
 <inserted text> 
                 }
-l.64 
+l.61 
      
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
@@ -2225,7 +2277,7 @@ Missing character: There is no è in font cmex10!
 Missing character: There is no è in font cmex10!
 Missing character: There is no è in font cmex10!
 
-Overfull \hbox (2033.447pt too wide) in paragraph at lines 52--64
+Overfull \hbox (2033.447pt too wide) in paragraph at lines 49--61
 []\OT1/cmr/m/n/12 Dcase-Repo.  Dcase-repo/dcase$[]\OML/cmm/m/it/12 til \OT1/cmr
 /m/n/12 : \OML/cmm/m/it/12 Acollectionofutilitiesfordetectionandclassificationo
 facousticscenesandevents; \OT1/cmr/m/n/12 2021\OML/cmm/m/it/12 : URL[]$ 
@@ -2234,7 +2286,7 @@ facousticscenesandevents; \OT1/cmr/m/n/12 2021\OML/cmm/m/it/12 : URL[]$
 ! Extra }, or forgotten \endgroup.
 \par ...m \@noitemerr {\@@par }\fi \else {\@@par }
                                                   \fi 
-l.64 
+l.61 
      
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -2243,30 +2295,26 @@ the way to recover is to insert both the forgotten and the
 deleted material, e.g., by typing `I$}'.
 
 
-Underfull \hbox (badness 1616) in paragraph at lines 66--70
+Underfull \hbox (badness 1616) in paragraph at lines 63--67
 \OT1/cmr/m/n/12 in-ter-pretable weakly la-belled sound event de-tec-tion.  \OT1
 /cmr/m/it/12 arXiv preprint
  []
 
-[107
+[110
 
-] [108] [109] [110] [111])
-
-Package natbib Warning: There were undefined citations.
-
-[112] (ThesisText.aux)
+] [111] [112] [113] [114]) [115] (ThesisText.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 12783 strings out of 481212
- 271882 string characters out of 2905973
- 490325 words of memory out of 3000000
- 28115 multiletter control sequences out of 15000+200000
+ 12782 strings out of 481212
+ 271866 string characters out of 2905973
+ 490293 words of memory out of 3000000
+ 28114 multiletter control sequences out of 15000+200000
  541715 words of font info for 51 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 68i,11n,64p,2083b,306s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 68i,11n,64p,2083b,308s stack positions out of 5000i,500n,10000p,200000b,50000s
  <C:\Users\mrKC1\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm
 1200.pk><C:/Users/mrKC1/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfon
 ts/cm/cmbx12.pfb><C:/Users/mrKC1/AppData/Local/Programs/MiKTeX/fonts/type1/publ
@@ -2277,9 +2325,9 @@ s/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/mrKC1/AppData/Local
 /Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/mrKC1/AppD
 ata/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb><C:/Users/m
 rKC1/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on ThesisText.pdf (114 pages, 1526721 bytes).
+Output written on ThesisText.pdf (117 pages, 1536093 bytes).
 PDF statistics:
- 451 PDF objects out of 1000 (max. 8388607)
+ 461 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  118 words of extra memory for PDF output out of 10000 (max. 10000000)
 

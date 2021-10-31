@@ -94,43 +94,43 @@ Warning--empty year in dcase
 Warning--empty journal in georgiev2017heterogeneous
 You've used 49 entries,
             2773 wiz_defined-function locations,
-            847 strings with 15158 characters,
-and the built_in function-call counts, 28064 in all, are:
-= -- 2489
-> -- 1893
+            846 strings with 15079 characters,
+and the built_in function-call counts, 27805 in all, are:
+= -- 2463
+> -- 1884
 < -- 34
-+ -- 638
-- -- 588
-* -- 2316
-:= -- 4213
++ -- 635
+- -- 585
+* -- 2293
+:= -- 4188
 add.period$ -- 161
 call.type$ -- 49
-change.case$ -- 340
+change.case$ -- 339
 chr.to.int$ -- 48
 cite$ -- 101
-duplicate$ -- 1229
-empty$ -- 2093
-format.name$ -- 645
-if$ -- 5968
+duplicate$ -- 1215
+empty$ -- 2069
+format.name$ -- 644
+if$ -- 5903
 int.to.chr$ -- 2
 int.to.str$ -- 1
 missing$ -- 46
 newline$ -- 253
 num.names$ -- 196
-pop$ -- 732
+pop$ -- 727
 preamble$ -- 1
-purify$ -- 292
+purify$ -- 291
 quote$ -- 0
-skip$ -- 1013
+skip$ -- 1001
 stack$ -- 0
-substring$ -- 1040
-swap$ -- 242
-text.length$ -- 22
+substring$ -- 1008
+swap$ -- 232
+text.length$ -- 21
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 539
 warning$ -- 3
-while$ -- 234
+while$ -- 231
 width$ -- 0
-write$ -- 643
+write$ -- 642
 (There were 21 error messages)

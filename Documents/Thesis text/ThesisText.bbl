@@ -30,18 +30,15 @@ Nadia Bouassida, Han{\^e}ne Ben-Abdallah, and Fa{\"\i}ez Gargouri.
 \newblock A uml based design language for framework reuse.
 \newblock In \emph{OOIS 2001}, pages 211--221. Springer, 2001.
 
+\bibitem[Brown~Alan and Wallnau~Kurt(1996)]{brown1996framework}
+W~Brown~Alan and C~Wallnau~Kurt.
+\newblock A framework for systematic evaluation of software technologies.
+\newblock \emph{IEEE Software, September}, 1996.
+
 \bibitem[Caruana(1997)]{caruana1997multitask}
 Rich Caruana.
 \newblock Multitask learning.
 \newblock \emph{Machine learning}, 28\penalty0 (1):\penalty0 41--75, 1997.
-
-\bibitem[Cola{\c{c}}o et~al.(2020)Cola{\c{c}}o, Barros, and
-  Couto]{colacco2020drecpy}
-F{\'a}bio Cola{\c{c}}o, M{\'a}rcia Barros, and Francisco~M Couto.
-\newblock Drecpy: A python framework for developing deep learning-based
-  recommenders.
-\newblock In \emph{Fourteenth ACM Conference on Recommender Systems}, pages
-  675--680, 2020.
 
 \bibitem[Dcase()]{dcase}
 Dcase.
