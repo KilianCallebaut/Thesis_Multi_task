@@ -43,24 +43,31 @@ class ASVspoof2015(DataReader):
                                   sep=' ',
                                   header=None,
                                   names=['folder', 'file', 'method', 'source'])
+        self.truths['gender'] = 'male'
         truths_female = pd.read_csv(
             os.path.join(self.data_path, 'Joint_ASV_CM_protocol', 'ASV_female_development.ndx'), sep=' ',
             header=None,
             names=['folder', 'file', 'method', 'source'])
+        truths_female['gender'] = 'female'
         male_eval = pd.read_csv(os.path.join(self.data_path, 'Joint_ASV_CM_protocol', 'ASV_male_evaluation.ndx'),
                                 sep=' ', header=None,
                                 names=['folder', 'file', 'method', 'source'])
+        male_eval['gender'] = 'male'
         female_eval = pd.read_csv(os.path.join(self.data_path, 'Joint_ASV_CM_protocol', 'ASV_female_evaluation.ndx'),
                                   sep=' ',
                                   header=None,
                                   names=['folder', 'file', 'method', 'source'])
+        female_eval['gender'] = 'female'
         male_enrol = pd.read_csv(os.path.join(self.data_path, 'Joint_ASV_CM_protocol', 'ASV_male_enrolment.ndx'),
                                  sep=' ', header=None,
                                  names=['folder', 'file', 'method', 'source'])
+        male_enrol['gender'] = 'male'
         female_enrol = pd.read_csv(os.path.join(self.data_path, 'Joint_ASV_CM_protocol', 'ASV_female_enrolment.ndx'),
                                    sep=' ',
                                    header=None,
                                    names=['folder', 'file', 'method', 'source'])
+        truths_female['gender'] = 'female'
+
         # self.truths.append(truths_male)
         self.truths.append(truths_female)
         self.truths.append(male_eval)
@@ -106,16 +113,28 @@ class ASVspoof2015(DataReader):
         # distinct_labels = np.append(distinct_labels, 'unknown')
 
         targets = []
+        genders = ['male', 'female']
+        genders.sort()
+        targets_gender = []
         for i in range(self.truths.shape[0]):
             target = [int(distinct_labels[label_id] == self.truths.loc[i].folder)
-                      # if (self.truths.loc[i].method == 'genuine' or self.truths.loc[i].method == 'human')
-                      # else int(label_id == len(distinct_labels) - 1)
+                      if (self.truths.loc[i].method == 'genuine' or self.truths.loc[i].method == 'human')
+                      else int(label_id == len(distinct_labels) - 1)
                       for label_id in range(len(distinct_labels))]
             targets.append(target)
+            target = [int(self.truths.loc[i].gender == label) for label_id, label in enumerate(distinct_labels)]
+            targets_gender.append(target)
 
         taskDataset.add_task_and_targets(
             task=MultiClassTask(
                 name=self.get_task_name(),
                 output_labels=distinct_labels),
             targets=targets
+        )
+        taskDataset.add_task_and_targets(
+            task=MultiClassTask(
+                name='gender_detection',
+                output_labels=genders
+            ),
+            targets=targets_gender
         )

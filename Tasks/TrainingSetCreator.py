@@ -90,8 +90,7 @@ class ConcatTrainingSetCreator:
 
     def add_extraction_method(self,
                               extraction_method: ExtractionMethod,
-                              key: str = None,
-                              multiply: bool = True):
+                              key: str = None):
         self.__add__pipe__(addition=extraction_method,
                            dictionary=self.extraction_methods,
                            key=key)

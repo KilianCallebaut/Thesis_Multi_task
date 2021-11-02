@@ -74,7 +74,7 @@ class Ravdess(DataReader):
         perc = 0
         for file_idx in range(len(self.files)):
             file = self.files[file_idx]
-            if mode == 0:
+            if mode == 0 or mode == 2:
                 read_wav = self.preprocess_signal(self.load_wav(file['file']), **preprocess_parameters)
                 taskDataset.extract_and_add_input(read_wav)
                 if perc < (file_idx / len(self.files)) * 100:
@@ -101,10 +101,19 @@ class Ravdess(DataReader):
             targets = [f['emotion'] for f in self.files]
             taskname = self.get_task_name()
             grouping = [f['actor'] for f in self.files]
-
         distinct_targets = list(set(targets))
         targets = [[int(b == f) for b in distinct_targets] for f in targets]
         taskDataset.add_task_and_targets(
             targets=targets,
             task=MultiClassTask(name=taskname, output_labels=distinct_targets))
         taskDataset.add_grouping(grouping=grouping)
+
+        if self.mode == 2:
+            targets = ['male' if int(f['actor']) % 2 == 1 else 'female' for f in self.files]
+            taskname = 'gender_detection'
+            distinct_targets = list(set(targets))
+            distinct_targets.sort()
+            targets = [[int(b == f) for b in distinct_targets] for f in targets]
+            taskDataset.add_task_and_targets(
+                targets=targets,
+                task=MultiClassTask(name=taskname, output_labels=distinct_targets))

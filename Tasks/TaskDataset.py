@@ -431,8 +431,9 @@ class TaskDataset(Dataset):
                          '{}_{}_extraction_method_params'.format(taskname, self.extraction_method.name)))
 
         if self.index_mode:
-            return os.path.isdir(os.path.join(self.base_path, '{}_input_{}_separated'.format(taskname,
-                                                                                             self.extraction_method.name))) \
+            return os.path.isdir(
+                os.path.join(self.base_path,
+                             '{}_input_{}_separated'.format(taskname, self.extraction_method.name))) \
                    and check
         else:
             return os.path.isfile(

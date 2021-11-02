@@ -19,10 +19,16 @@ class HoldTaskDataset(TaskDataset):
                  index_mode=False,
                  testing_base_path: str = None):
         super().__init__(extraction_method, base_path, index_mode)
+        self.__init_test__(testing_base_path if testing_base_path else base_path)
 
+    ########################################################################################################
+    # Initializers
+    ########################################################################################################
+
+    def __init_test__(self, testing_base_path):
         self.test_set = TaskDataset(
             extraction_method=self.extraction_method,
-            base_path=testing_base_path if testing_base_path else base_path,
+            base_path=testing_base_path,
             index_mode=self.index_mode
         )
         self.test_indexes = []
@@ -176,6 +182,16 @@ class HoldTaskDataset(TaskDataset):
             for train, test in self.k_folds(random_state=random_state, n_splits=n_splits, kf=kf):
                 self.get_split_by_index(train_index=train, test_index=test)
                 yield self, self.test_set
+
+    def disconnect_test(self):
+        """
+        Disconnects the test set and resets the train_test generator function
+        :return: TaskDataset The test set
+        """
+        assert len(
+            self.test_set) > 0, 'There must be a test set present. Use the generate_train_test_set function to create one'
+        test = self.test_set
+        self.__init_test__(test.base_path)
 
     ########################################################################################################
     # Filtering

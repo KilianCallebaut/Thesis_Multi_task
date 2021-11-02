@@ -1,6 +1,6 @@
 \chapter{Evaluation}
 
-\section{Demonstrate Implementations}
+\section{Demonstrate Implementations} \label{evaluation:demonstrations}
 % Implementations: Georgiev, 2nd, Chen and own
 % Implementation: Test model on dataset
 % 
@@ -129,24 +129,9 @@ What should again be noted, is that the implementations without the framework di
 %- finding the meta parameters
 % comparing to baseline
 
-%THings that it demonstrates
-% How elements can be added and changed at will at any point
-% - Meta parameter search
-% - Architecture evaluation
-% - Expanding the dataset
-% How testing can be done
-% - How baseline tests can be performed by bringing in previous models 
-% - How comparative visualizations can be made and accessed
 
-% Add datasets
-% simple model structure
-% build pipeline
-% create validation set
-% test architecture and 
-% evaluate
-% loop to test meta parameters
-% Evaluate
-% Run eventual test and training
+
+
 
 
 Additional to the paper implementations, is an example case study which has been referred to multiple times in this work. The goal is to present how the framework aids the development of multi-task systems by conducting a development process. As stated in \cite{brown1996framework}, this form of evalution is "intended to reveal the broader charactersistics of a technology when it is applied to a representative “complete” problem in an application domain". This case study involves developing a multi-task, multi-dataset neural network which contain a few criteria: \\
@@ -163,7 +148,8 @@ Additional to the paper implementations, is an example case study which has been
 %Gender detection in ravdess, asvspoof and chen
 
 
-\section{Literature Evaluation}
+
+\section{Literature Evaluation} \label{evaluation:literature}
 
 %TODO: Dive in the literature and describe its implementation on the software, which components can be adjusted or nah
 
@@ -270,17 +256,24 @@ In the sense of the training function, the rigid structure which requires the de
 \begin{itemize}
 	\item \textbf{Modular:} 
 	%	Demonstrate the replaceability in the code
+	The framework is largely modular as a central design point. The framework presents developers with the loose tools to design and implement a multi-task pipeline at different levels. The DataReader gives a loose structure to extract a dataset's inputs, targets and additional task information. The DataReader's open design merely gives a common structure and tools to create a TaskDataset, as well as implement the quick reading mechanism, yet has no obligation to output a TaskDataset object. The TaskDataset and related structures offer a unified way to encapsulate the extracted dataset. The training and evaluation loop offer the ability to load batches of inputs and targets from a PyTorch Dataset, utilise them to predict the outcome using the neural network. To compose the pipeline, the TrainingSetCreator structure is in place, which creates the path from the raw datasets to the processed and transformed inputs for the training and evaluation mechanisms. The TaskDataset's use in the taining mechanisms and the TrainingSetCreator is not a full on dependency but does require specific requirements for an alternative to be met. For the Training and Evaluation mechanism, this is nothing more than the fact that an input and target batch are outputted in tuple form when getting an individual instance. If so, then it doesn't matter what type of Pytorch's Dataset is given as its input. The TrainingSetCreator however does utilise the added functions of the TaskDataset and the HoldTaskDataset. While this does add a dependency on the TaskDataset structure, the different phases - Data Reading, Data Loading and Training - are still completely independent from each other. Whithin each of those phases, there are numerous different elements that have been shown to be easily variable either at implementation level or at runtime, depending of the necessity. \\
 	\item \textbf{Extendible:} 
 	%	Extensibility is discussed in design section
+	The design's extensibility is discussed in its own implementation section \ref{Impl:Extendibility}. The framework builds atop of PyTorch's basics for the static data structures, which mimics its own extensibility. Every implementing class has constraints which would ensure its applicability in the rest of the system in case a developer needs to develop an extending implementation. The non-static datastructures, which refer to functions like the training loop and the TrainingSetCreator, make sure to keep its dependencies on a function basis, meaning that every function deals with one type of data structure and thus only those functions need to be extended. 
+	
+	The Framework's extensibility is mostly open due to its modularity. As the few requirements for the usage of objects in other classes are met, every functionality and more can be changed or added. Mainly the training and evaluation functions are defined pretty rigidly in the sense that they have to be completely reimplemented in certain cases. Otherwise, the extraction methods, the data transformations, the tasks, the loss functions and many more described above can be extended and introduced, without having to touch any other part of the framework. Section \ref{evaluation:literature} offers insight to the limits of the extensibility compared to the requirements that were posed in the literature. Especially the transformations of Datasets are completely open for extensibility even with the TrainingSetCreator, as they are called through their naming convention.\\
+	
 	\item \textbf{Fast prototyping:} 
 	% Demonstration implementations, comparison with implementation without
+	The speed of prototyping is achieved in two ways in the framework. The first is presented in section \ref{evaluation:demonstrations}, where it shows how a lot of papers' described methodologies can be shortened through usage of the system's functions. The second lies in the system's TrainingSetCreator structure, which automatically will form defined dataset pipelines and recalculate them if new parts are introduced. When fine tuning a new system, the developer can thus change variables and functionalities while the TrainingSetCreator will now what parts to recalculate on the fly. This way, both set implementations as well as iteratively designed and fine-tuned implementations of networks have reduced work loads. 
 	\item \textbf{Cutting Double Work:} 
 	% Demonstration of the research set-up
 %	\item \textbf{Developmental Side-rails:}
 %	%  
+	In section \ref{evaluation:demonstrations} as well as the previous item, it is discussed how the framework handles pipelines to avoid double recalculations, with section \ref{evaluation:literature} discussing it limits. However, finding the right meta-parameters and optimizing the process steps get cut through the TrainingSetCreator's management of pipeline parts. Furthermore, the quick reading functionality standardly offered through the DataReader prevents unnecessary recalculation of features which can take up a lot of computational resources.  
 	\item \textbf{Flexible:} 
 %	Demonstration + Dive in the literature
-
+	The flexibility as well as its limits have been thoroughly discussed in secion \ref{evaluation:literature} and the previous chapters. To summarize, the framework optimizes for numerous supervised learning cases, but still has some blind spots, especially for non-supervised training set-ups. When the data is encapsulated as a TaskDataset, the training and evaluation loops will have no trouble processing regardless of what it encapsulates.
 \end{itemize}
 
 \subsection{Funtional Requirements}
