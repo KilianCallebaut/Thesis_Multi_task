@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  31 OCT 2021 20:14
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  3 NOV 2021 18:19
 entering extended mode
 **./ThesisText.tex
 (ThesisText.tex
@@ -1941,7 +1941,27 @@ Underfull \hbox (badness 10000) in paragraph at lines 86--87
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 152--153
+Underfull \hbox (badness 10000) in paragraph at lines 156--157
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 158--159
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 164--165
+
+ []
+
+[98]
+Underfull \hbox (badness 10000) in paragraph at lines 166--167
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 168--169
 
  []
 
@@ -1950,8 +1970,13 @@ Underfull \hbox (badness 10000) in paragraph at lines 170--171
 
  []
 
-[98]
-Underfull \hbox (badness 10000) in paragraph at lines 172--173
+[99]
+Underfull \hbox (badness 10000) in paragraph at lines 174--175
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 176--177
 
  []
 
@@ -1965,17 +1990,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 180--181
 
  []
 
-[99]
-Underfull \hbox (badness 10000) in paragraph at lines 182--183
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 184--185
-
- []
-
-
+[100]
 Underfull \hbox (badness 10000) in paragraph at lines 188--189
 
  []
@@ -1985,43 +2000,43 @@ Underfull \hbox (badness 10000) in paragraph at lines 190--191
 
  []
 
-[100]
+
 Underfull \hbox (badness 10000) in paragraph at lines 192--193
 
  []
 
-
+[101]
 Underfull \hbox (badness 10000) in paragraph at lines 194--195
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 202--203
-
- []
-
-[101]
-Underfull \hbox (badness 10000) in paragraph at lines 204--205
+Underfull \hbox (badness 10000) in paragraph at lines 196--197
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 206--207
+Underfull \hbox (badness 10000) in paragraph at lines 203--204
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 208--209
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 210--211
+Underfull \hbox (badness 10000) in paragraph at lines 205--206
 
  []
 
 [102]
-Underfull \hbox (badness 10000) in paragraph at lines 217--218
+Underfull \hbox (badness 10000) in paragraph at lines 207--208
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 209--210
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 211--212
 
  []
 
@@ -2030,52 +2045,46 @@ Underfull \hbox (badness 10000) in paragraph at lines 219--220
 
  []
 
-
+[103]
 Underfull \hbox (badness 10000) in paragraph at lines 221--222
 
  []
 
-[103]
-Underfull \hbox (badness 10000) in paragraph at lines 223--224
+
+Underfull \hbox (badness 10000) in paragraph at lines 227--228
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 225--226
+Underfull \hbox (badness 10000) in paragraph at lines 231--232
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 233--234
+Underfull \hbox (badness 10000) in paragraph at lines 259--262
 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 235--236
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 241--242
+[104] [105]
+Underfull \hbox (badness 10000) in paragraph at lines 266--267
 
  []
 
-[104]
-Underfull \hbox (badness 10000) in paragraph at lines 245--246
-
- []
-
-[105]
-Overfull \hbox (10.97643pt too wide) in paragraph at lines 299--300
-[]\OT1/cmr/m/n/12 Create mul-ti-ple in-put ob-jects from the same dataset: (DEM
-ON-STRATE)
- []
-
-[106] [107]) (Conclusion.tex [108]
+[106] [107] [108] [109] [110] [111]) (Conclusion.tex [112]
 Chapter 7.
-) (ThesisText.bbl [109
 
-]
+Underfull \hbox (badness 10000) in paragraph at lines 13--14
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 15--16
+
+ []
+
+[113
+
+]) (ThesisText.bbl [114]
 ! Missing $ inserted.
 <inserted text> 
                 $
@@ -2300,18 +2309,18 @@ Underfull \hbox (badness 1616) in paragraph at lines 63--67
 /cmr/m/it/12 arXiv preprint
  []
 
-[110
+[115
 
-] [111] [112] [113] [114]) [115] (ThesisText.aux)
+] [116] [117] [118] [119]) [120] (ThesisText.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 12782 strings out of 481212
- 271866 string characters out of 2905973
- 490293 words of memory out of 3000000
- 28114 multiletter control sequences out of 15000+200000
+ 12784 strings out of 481212
+ 271916 string characters out of 2905973
+ 490315 words of memory out of 3000000
+ 28116 multiletter control sequences out of 15000+200000
  541715 words of font info for 51 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  68i,11n,64p,2083b,308s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -2325,9 +2334,9 @@ s/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/mrKC1/AppData/Local
 /Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/mrKC1/AppD
 ata/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb><C:/Users/m
 rKC1/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on ThesisText.pdf (117 pages, 1536093 bytes).
+Output written on ThesisText.pdf (122 pages, 1548290 bytes).
 PDF statistics:
- 461 PDF objects out of 1000 (max. 8388607)
+ 477 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  118 words of extra memory for PDF output out of 10000 (max. 10000000)
 

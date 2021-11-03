@@ -110,40 +110,40 @@ What should again be noted, is that the implementations without the framework di
 %???????????????????????
 
 %Toon in use case met experiment hoe ge een variatie kunt maken aan 1 element in de pijplijn, terwijl de rest intact blijft
-\section{Experiment use case}
-
-%- Describe the goal of making a huge functioning multi-task network
-% Describe the steps of iterative design, demonstrating how single line changes can be made while keeping the rest of the pipeline intact
-% Demonstrate the comparative capabilities in tensorboard
-% Analysis: implementing baseline 
-% iterative design of classifier
-% variation of meta parameters
-% 
-% architecture
-% design
-% construction
-% testing
-% deployment
-% maintenance
-%- Testing different variations
-%- finding the meta parameters
-% comparing to baseline
-
-
-
-
-
-
-Additional to the paper implementations, is an example case study which has been referred to multiple times in this work. The goal is to present how the framework aids the development of multi-task systems by conducting a development process. As stated in \cite{brown1996framework}, this form of evalution is "intended to reveal the broader charactersistics of a technology when it is applied to a representative “complete” problem in an application domain". This case study involves developing a multi-task, multi-dataset neural network which contain a few criteria: \\
-
-\begin{itemize}
-	\item There must be one task that is shared among multiple datasets
-	\item The individual accuracies must reach at least xxx
-	\item The system must be compared to a pre-trained baseline model
-	\item Multiple task types must be present in the combined sets
-	\item The individual performances must be compared to the Multi-Task model outputs
-	\item An extra dataset must be added after completion to test and then expand the training data
-\end{itemize}
+%\section{Experiment use case}
+%
+%%- Describe the goal of making a huge functioning multi-task network
+%% Describe the steps of iterative design, demonstrating how single line changes can be made while keeping the rest of the pipeline intact
+%% Demonstrate the comparative capabilities in tensorboard
+%% Analysis: implementing baseline 
+%% iterative design of classifier
+%% variation of meta parameters
+%% 
+%% architecture
+%% design
+%% construction
+%% testing
+%% deployment
+%% maintenance
+%%- Testing different variations
+%%- finding the meta parameters
+%% comparing to baseline
+%
+%
+%
+%
+%
+%
+%Additional to the paper implementations, is an example case study which has been referred to multiple times in this work. The goal is to present how the framework aids the development of multi-task systems by conducting a development process. As stated in \cite{brown1996framework}, this form of evalution is "intended to reveal the broader charactersistics of a technology when it is applied to a representative “complete” problem in an application domain". This case study involves developing a multi-task, multi-dataset neural network which contain a few criteria: \\
+%
+%\begin{itemize}
+%	\item There must be one task that is shared among multiple datasets
+%	\item The individual accuracies must reach at least xxx
+%	\item The system must be compared to a pre-trained baseline model
+%	\item Multiple task types must be present in the combined sets
+%	\item The individual performances must be compared to the Multi-Task model outputs
+%	\item An extra dataset must be added after completion to test and then expand the training data
+%\end{itemize}
 
 %Gender detection in ravdess, asvspoof and chen
 
@@ -252,6 +252,8 @@ In the sense of the training function, the rigid structure which requires the de
 
 \section{Fulfilment of the Requirements}
 
+This section contains a point by point discussion of the designated functional and non-functional requirements
+
 \subsection{Non-functional Requirements}
 \begin{itemize}
 	\item \textbf{Modular:} 
@@ -289,20 +291,26 @@ In the sense of the training function, the rigid structure which requires the de
 	% What preprocessing do we have for both signals and feature matrices
 	\item File storage abstraction: There are handles on the TaskDataset which can be called to store, load or check the TaskDataset to or from files, which are specific for the currently used extraction method and task.
 	\item Quick Reading: The DataReader automatically checks if there is a stored TaskDataset available for the given extraction\_method and task and loads it if so.
-	\item Create multiple input objects from the same dataset: (DEMONSTRATE) The framework is open ended in how the TaskDataset object is extracted from the data and allows extra parameters for the DataReader to be given at initialization. TaskDatasets are stored using the ExtractionMethod object's name and the (main) Task's name, so for every new variation of these will be automatically linked to different files.
+	\item Create multiple input objects from the same dataset: The framework is open ended in how the TaskDataset object is extracted from the data and allows extra parameters for the DataReader to be given at initialization. TaskDatasets are stored using the ExtractionMethod object's name and the (main) Task's name, so for every new variation of these will be automatically linked to different files.
 	\item Tasks and datasets are a many to many relationship: Tasks can be present in multiple datasets. The tasks need to have the same name, output labels and classification type in order to be seen as the same. When combined in the ConcatTaskDataset, the target vectors will automatically be placed in the same positions, which will make them be seen as the same task in the training function. Datasets can have multiple tasks to an unlimited degree in its list of extra tasks, which always combines them with a list of targets of the same amount of input instances. 
 \end{itemize}
 \subsubsection{Data Loading}
 \begin{itemize}
-	\item Combining datasets: Extended the ConcatTaskDataset, extra functions for the batching
-	\item Not requiring the combined datasets in memory:  Index mode implemented which forms a streaming context for the data to be stored and read from disk.
-	\item Train and test set generation: They implemented through the HoldTaskDataset
-	\item Transforming data: They implemented through handles on the TaskDataset which call upon the ExtractionMethod
-	\item Filtering data: Handle on the TaskDataset
-	\item Reusing data: It implemented, reusability is possible without reloading to different degrees
-	\item Batching multiple tasks: It implemented lol
-	\item Replicability: It implemented through storing the different checkpoints (which can be recreated by reloading the Results object), the calculation data in extractionmethods and 
-	\item Scalable Manipulation: In the TrainingSetCreator, manipulations can be added for one specified dataset or all at once.
+	\item Combining datasets: The ConcatTaskDataset can hold and present multiple datasets as a single bigger dataset, while helper functions allow multiple data instances to be batched. Furthermore, a data loader is provided which can randomly load batches from alternating tasks, which would forego the need to have a unified matrix size across tasks. The loss calculation present in the training and evaluation functions automatically pick apart the prediction outputs and only use the correct data for the related task's loss function. 
+%	Extended the ConcatTaskDataset, extra functions for the batching
+	\item Not requiring the combined datasets in memory:  Index mode implemented which forms a streaming context for the data to be stored and read from disk. The index mode can be automatically given as a parameter for initializing a TaskDataset, which makes it very easy to switch to. The more datasets are added, the more likely this scenario is, so a runtime switch between holding the data in memory or reading it from disk can both permit implementations to be executed and cut complicated redevelopment work.
+	\item Train and test set generation: The HoldTaskDataset is responsible for all train and test set generation functionalities added to a regular TaskDataset. TaskDataset functions can be called which will automatically be called accordingly on the Test set as well. The TrainingSetCreator can also be called which operates the training set generation and functions called to refine the TaskDataset in the correct order. Furthermore, there is support for k-fold validation in both these classes as well. Every new fold generated also rewinds normalizations which were based on training set metrics.
+	\item Transforming data: There are two functions present in the TaskDataset for transforming the data, one for scaling the input instances and one for further transformations like cutting the matrices into same sized frames. Both of these operations are implemented on an instance basis in the ExtractionMethod object given to the TaskDataset. The functions on the TaskDataset themselves simply call these to transform every individual input matrix. The TrainingSetCreator can dynamically add new transformations through the add\_transformation function, which operates based on names, making it open to extended implementations of the TaskDataset that have more functions. Also available is multiple TaskDatasets sharing the same ExtractionMethods, which would let them share the same metric calculations and thus perform the same transformations as if they were one unified dataset. The TrainingSetCreator can do this automatically at the command of one boolean at input. This is also the reason that the transformation and their calculation functions work instance based in stead of the whole dataset at once.
+%	They implemented through handles on the TaskDataset which call upon the ExtractionMethod
+	\item Filtering data: Data can be filtered through the sample labels function present on the TaskDataset. The developer can even use this to change the task itself by removing all instances with a specified label and remove its mention in the Task object automatically.
+%	Handle on the TaskDataset
+	\item Reusing data: The TrainingSetCreator is the class which manages the multi-dataset pipeline. Here, the DataReaders are given as input, while steps in the pipeline (e.g. pre-processing, filtering, transformation,...) can be dynamically added to one specific or all datasets. Only when the dataset creation function is called, do the actual TaskDatasets get created and stored. However, if any step is replaced after creation, the TrainingSetCreator will only reload or recalculate the affected dataset. To minimize unnecessary data usage, which exact present TaskDatasets get created can be determined by the developer, while all other unnecessary TaskDatasets get removed from memory.
+%	It implemented, reusability is possible without reloading to different degrees
+	\item Batching multiple tasks: Multiple tasks can be combined in multiple datasets. As mentioned before tasks and datasets are many-to-many relationships and the tricky issue is to fit a variable amount of tasks, connected target labels and the fact that tasks can be present in multiple TaskDatasets in batches which could include instances from any dataset. Therefore the padding system was developed which also has its limitations concerning targets that are not labels as identified in section \ref{evaluation:literature}.
+%	It implemented lol
+	\item Replicability: Extraction method objects are stored, including their calculations in order to recreate the extraction and the subsequent transformations. Beyond that, the system's randomness based functions like filtering make sure to include optional keys for pseudo random number generation to replicate the same pipelines as previous runs. The training mechanism also stores the model's state at every epoch, through the Results object. Recreating a Results object with the same name, pointing at the same folder location gives automated access for reloading old checkpoints and written metrics. Even more is the fact that the evaluation function further automates this system by including the opportunity to insert a blank model, which in cooperation with the Results object would load and evaluate these old models for all or a subset of the epochs.
+%	It implemented through storing the different checkpoints (which can be recreated by reloading the Results object), the calculation data in extractionmethods and 
+	\item Scalable Manipulation: In the TrainingSetCreator, manipulations can be added for one specified dataset or all at once. These manipulations do not only include the TaskDataset's methods, but also pre-processing parameters and ExtractionMethod objects, which can be replaced at runtime.
 \end{itemize}
 \subsubsection{Training}
 \begin{itemize}

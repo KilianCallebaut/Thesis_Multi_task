@@ -1,3 +1,34 @@
 \chapter{Conclusion}
 
+
+
 \section{Future Work}
+
+\subsection{More pre-made implementations}
+
+In order to be interesting for researchers to use the system, it is important that a lot of the existing extraction methods, transformations and other deep learning features are already available, which would cut a lot of precious development time. The current implementation's features are mostly the ones used in the implemented problems. Future work should round these features out more.
+
+\subsection{Additional Support for Data Reading and Model creation}
+
+The DataReader and model creation were intentionally left open ended. For the DataReader, it was already addressed in section \ref{evaluation:literature} that the framework could use a more scalable way of implementing and expanding pre-processing of signals which in its current state is offered through an optional function. Additionally more tools can also be provided to cut the work necessary to implement Data Reading structures which was demonstrated by the slightly higher LOC requirement in section \ref{evaluation:demonstrations}. \\
+
+Model creation was also left to remain purely in PyTorch, in order to refrain from imposing unwanted limits on the developer for designing these. However, builder tools could still be provided in order to help create dynamically adapting models for the uncertain number and types of tasks that can be inserted.\\
+
+\subsection{Debugging tools and statistics}
+
+Building on the last point, additional tools could be provided for debugging parts of the pipeline. As features get scaled to multiple datasets, it can occur that one dataset's inputs get rendered unusable through execution of transformations. The problem gets bigger due to the higher number of datasets that can be added. Health checks of the pipeline, which would include the models themselves, would also be of help. In case some sequence of pipeline parts causes the input to be unusable further up the pipeline, it is best that this is found before the whole dataset is extracted.\\
+
+Statistics are already present in evaluation, but could also be of use in the Datasets themselves. This would go hand in hand with debugging as easy evaluation of the matrix sizes, label distributions etc. would prevent mistakes to be made without being noticed.
+
+\subsection{Expanding Task Types}
+
+Another point that was made in \ref{evaluation:literature}, which was that the framework is mainly optimised for supervised labelled tasks, while other target structures might be more difficult to implement. Not only for targets is there limitation in the design, but the training and evaluation loop are rigid in their implementations and can quickly require the developer to reimplement them all together (e.g. when a mini-batching procedure is needed). These need to be addressed in the future, to allow for more multi-task implementations to be built using the framework. 
+
+\subsection{Optimizing implementation}
+
+The system mainly focuses on cutting development time and offering tools that allow iterative research of multi-task systems. The mantra was mainly to enable more than to perfect. What hasn't been looked at in detail is optimizing the developed pipelines in computational resources and execution time. Especially in the TrainingSetCreator, there is a great opportunity to optimize the calculations, after the pipeline is defined. Parallelization is an option when multiple datasets are present. Also in terms of optimal storage structure there are potentially better solutions to be found.
+
+\subsection{Evolving beyond audio data}
+
+The framework is built around audio data, but in theory can easily be expanded to other kinds of data like images. The main thing holding it back currently is how the transformations and extraction methods are all audio based, along with the DataReader's offered tools. Expanding the mediums would however also possibly lead to a wider range of input structures to be necessary which have to be investigated on a case-by-case basis. Still, a lot of the groundwork is already there and the shift would mainly require building more extensions to existing classes and creating divides for tools for audio and other forms of input.
+
