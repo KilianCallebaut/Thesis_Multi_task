@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  3 NOV 2021 18:19
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  4 NOV 2021 16:55
 entering extended mode
 **./ThesisText.tex
 (ThesisText.tex
@@ -2073,18 +2073,33 @@ Underfull \hbox (badness 10000) in paragraph at lines 266--267
 [106] [107] [108] [109] [110] [111]) (Conclusion.tex [112]
 Chapter 7.
 
-Underfull \hbox (badness 10000) in paragraph at lines 13--14
+Underfull \hbox (badness 10000) in paragraph at lines 3--4
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 15--16
+Underfull \hbox (badness 10000) in paragraph at lines 5--6
 
  []
 
 [113
 
-]) (ThesisText.bbl [114]
+]
+Underfull \hbox (badness 10000) in paragraph at lines 17--18
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 19--20
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 23--24
+
+ []
+
+[114] [115]) (ThesisText.bbl [116]
 ! Missing $ inserted.
 <inserted text> 
                 $
@@ -2309,9 +2324,9 @@ Underfull \hbox (badness 1616) in paragraph at lines 63--67
 /cmr/m/it/12 arXiv preprint
  []
 
-[115
+[117
 
-] [116] [117] [118] [119]) [120] (ThesisText.aux)
+] [118] [119] [120] [121]) [122] (ThesisText.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -2334,9 +2349,9 @@ s/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/mrKC1/AppData/Local
 /Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/mrKC1/AppD
 ata/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb><C:/Users/m
 rKC1/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on ThesisText.pdf (122 pages, 1548290 bytes).
+Output written on ThesisText.pdf (124 pages, 1552057 bytes).
 PDF statistics:
- 477 PDF objects out of 1000 (max. 8388607)
+ 483 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  118 words of extra memory for PDF output out of 10000 (max. 10000000)
 

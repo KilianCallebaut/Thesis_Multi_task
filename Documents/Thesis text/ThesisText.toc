@@ -73,9 +73,10 @@
 \contentsline {subsubsection}{Data Loading}{108}%
 \contentsline {subsubsection}{Training}{111}%
 \contentsline {chapter}{\numberline {7}Conclusion}{113}%
-\contentsline {section}{\numberline {7.1}Future Work}{113}%
-\contentsline {subsection}{\numberline {7.1.1}More pre-made implementations}{113}%
-\contentsline {subsection}{\numberline {7.1.2}Additional Support for Data Reading and Model creation}{113}%
-\contentsline {subsection}{\numberline {7.1.3}Expanding Task Types}{114}%
-\contentsline {subsection}{\numberline {7.1.4}Optimizing implementation}{114}%
-\contentsline {subsection}{\numberline {7.1.5}Evolving beyond audio data}{114}%
+\contentsline {section}{\numberline {7.1}Future Work}{114}%
+\contentsline {subsection}{\numberline {7.1.1}More pre-made implementations}{114}%
+\contentsline {subsection}{\numberline {7.1.2}Additional Support for Data Reading and Model creation}{114}%
+\contentsline {subsection}{\numberline {7.1.3}Debugging tools and statistics}{114}%
+\contentsline {subsection}{\numberline {7.1.4}Expanding Task Types}{115}%
+\contentsline {subsection}{\numberline {7.1.5}Optimizing implementation}{115}%
+\contentsline {subsection}{\numberline {7.1.6}Evolving beyond audio data}{116}%

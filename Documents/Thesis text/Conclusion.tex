@@ -1,8 +1,12 @@
 \chapter{Conclusion}
 
+The increasing number of audio tasks, datasets, methodologies and reasons to combine these, continuously opens up new ideas researchers can investigate. Promoting new developments in multi-task and multi-dataset research requires as much road blocks to be cleared as possible. This work focuses on clearing the combinatorial issues as well as offer features that can target multiple datasets at once. A literature survey was performed from which an analysis of the concerning fields were made as well as looked for similar frameworks. No frameworks were found to deal with multi-task issues, nor the problematic aspects of multi-dataset problems. From the analysis of the fields, key conclusions were made as to what structural qualities the framework needed to have. \\
 
+After the requirements were outlined, three in depth implementations were made of different problems that required alternating approaches. Staring from these, generalized solutions were made which would cut development time in the future significantly as well as offering the ability to freely vary different elements and parameters. Comparisons were made by making implementations that do not utilise the framework, which show significant reduction in the data loading and training phases for LOC. The literature was then examined on a per case basis, to investigate what mechanisms could not be implemented through the system or required a degree of work around. However, for supervised, labeled deep learning tasks of different kinds, which were the most popular in the examined papers, the framework already demonstrates the ability to reduce a lot of leg work.\\ 
 
 \section{Future Work}
+
+As mentioned in \cite{roberts1996evolving}, frameworks in essence can rarely be considered finished and will likely continue to evolve over time. In this section, some prominent challenges for future expansion are laid out.
 
 \subsection{More pre-made implementations}
 
@@ -18,7 +22,7 @@ Model creation was also left to remain purely in PyTorch, in order to refrain fr
 
 Building on the last point, additional tools could be provided for debugging parts of the pipeline. As features get scaled to multiple datasets, it can occur that one dataset's inputs get rendered unusable through execution of transformations. The problem gets bigger due to the higher number of datasets that can be added. Health checks of the pipeline, which would include the models themselves, would also be of help. In case some sequence of pipeline parts causes the input to be unusable further up the pipeline, it is best that this is found before the whole dataset is extracted.\\
 
-Statistics are already present in evaluation, but could also be of use in the Datasets themselves. This would go hand in hand with debugging as easy evaluation of the matrix sizes, label distributions etc. would prevent mistakes to be made without being noticed.
+Statistics are already present in evaluation, but could also be of use in the Datasets themselves. This would go hand in hand with debugging as easy evaluation of the matrix sizes, label distributions etc. would prevent mistakes to be made without being noticed. The success of deep learning often depends on the makeup of the dataset, including its balancing in terms of labels.
 
 \subsection{Expanding Task Types}
 
