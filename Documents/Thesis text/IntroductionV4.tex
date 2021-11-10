@@ -1,12 +1,42 @@
 \chapter{Introduction}
-TODO: Introduce the context of multi-task deep learning audio frameworks
+%TODO: Introduce the context of multi-task deep learning audio frameworks
 
+% A lot of new datasets
+% A lot of contextual information not being used
+% Combining information has seen a lot of interest in a plethora of ways
 
-\section{Example: Variating audio task interaction in Multi-Task Research}
-TODO: Introduce original experiment set-ups as a basis for explaining what kind of multi-task development can be done, what the structure is and what it has to deal with
+With the huge expansion of machine learning research and applications over the last years, comes a matching hunger for new data to drive the research forward. Seemingly on a yearly basis, datasets are enlarged or created which allow new recognition systems to function. Furthermore, new ways are continuously devised to combine information, be it from different datasets or from different tasks. Some machine learning goals are simply inherently too niche to build the extensive dataset for, which it would get in an ideal world. Researchers often have to get creative when it comes to utilising the information they have in order to build the systems that have the performances they need in a real life context.\\
+
+Audio recognition is a field where researchers especially have to get creative. Tasks like speech detection for example have to deal with an incredible amount of variation in terms of voices, genders, accents, background noise and language. Building datasets that can firmly cover these potential real world variations are nearly impossible. On top of that is it very hard to get an extensive, strongly labelled dataset for audio, even more so if the annotations are for certain sections in time only. \\
+
+For this reason, Multi-Task learning has very recently gained more and more attention as a way to enlarge the information available for performing a task. This has the potential to build further reaching recognition systems by combining recognition systems performing smaller, focused tasks which share their information. The objectives for using this techniques have grown quickly beyond simple performance improvement.\\
+
+However, implementing combinations of tasks and datasets can quickly scale in developmental complexity, as each one can have its own structure and getting the combined data to fit in a processable form for the systems often lead to complex solutions. On top of that, research is spurred by experimentation through varying parameters and subsystems later in the structure, which can in turn require developers to make changes back in the individual source structures. Problems should only be dealt with once. The process that a developer creates of extracting data from a dataset, applying various transformations, using it to train a recognition system and then evaluating that system is what will be referred to as the \textbf{Deep Learning Pipeline} and if that process involves the combination of multiple sets of data the \textbf{Multi Task Pipeline}. \\
+
+Building pipelines that draw together different sets of information can quickly become clutered with rigid functions and classes as it requires an immense amount of foresight to anticipate required functionalities. That goes even more in case the system being implemented is not set in stone beforehand and requires iterative design decisions based on intermediate evaluations. Research and development implementations usually is not simply about executing pre-made plans, which requires that their implementations are open for these changes and additions. Considering the growing amount of datasets, being able to quickly add them to built pipelines would be a big step in facilitating future work to be performed.\\
+
+This work tries to offer the tools necessary to efficiently implement combinatory multi-task pipelines, with attention to the variation of intermediate parts. \\
+
+\section{Example: General purpose multi-task classifier}
+%TODO: Introduce original experiment set-ups as a basis for explaining what kind of multi-task development can be done, what the structure is and what it has to deal with
+
+As an illustrating use case, imagine a scenario where a general purpose classifier has to be built using a multi-task network. It has to be able to output multiple annotations from an audio fragment at once. The developer has to decide which smaller tasks to use, combine multiple task specific datasets, figure out the best features to represent the audio, pre-process the data and of course develop a functioning neural network. General purpose classifiers could contain various annotation goals like:\\
+
+\begin{itemize}
+	\item Speech Activity Detection (SAD): Automatic detection of the presence of speech in an audio frame along with the exact moments it happens.
+	\item Acoustic Event Detection (AED): Detection, Identification and localization of specific sound events happening within an audio fragment.
+	\item Acoustic Scene Classification (ASC): Recognition of tye type of environment the audio fragment takes place in. 
+\end{itemize}
+
+Differences between tasks reveal its presence through these examples. AED and ASC for example are different in that ASC is a task dealing with analysing the background noise patterns of audio while AED needs to pinpoint the beginning and end of its subject. Combining these sorts of differences of tasks certainly have been used to improve the performance of one task \citep{imoto2020sound}, but in this example the goal would be to achieve good performance on all tasks involved. If that is the goal, researching a functioning general purpose classifier would likely involve comparison to single task models performances and different levels of combination. The Multi-Task Set-up might also be brought in as a way to compress computational requirements of having multiple single task models in place, which can be looked at and compared. In some cases one could also define all tasks as one single task and compare how it fares to the multi-task options.\\
+
+In essence if the goal is this open ended in terms of approaches as well as potential trade-offs, one would have to be able to create, test and compare the different task combinations as well as swap out and find the best working parameters for a number of the intermediate parts of the pipeline. Using pytorch, there certainly is support for creating models with numerous outputs, but the framework in terms of data encapsulation and manipulation is rather focused on single datasets. While there are structures which make it possible to combine different datasets, but creating batches of inputs and targets - especially ones where the sizes can vary - require either a lot of foresight or a lot of added development time. This would go even more for anticipating the variations which were mentioned. A lot of decisions in the pipeline for things like pre-processing and transforming the data would possibly have to be made for all tasks involved. \\
+
+Investigating the effectiveness of various multi-task set-ups quickly thus introduces a lot of cumbersome development overhead, which hampers the time available to actually develop the best conceivable systems. A lot of time from designing a system to the implementation would just go to waste dealing with the combinatorial aspects and making solutions applicable for multiple datasets and tasks at the same time. A lot of these issues can be anticipated and solved before a developer even starts. This work envisions to do exactly that, philosophising that a developer should only be worried about one part of the pipeline at a time, without having to worry that any other breaks down the line. This way, developers can develop and optimize pipelines as a whole. Adding datasets, tasks, manipulations as well as running and testing their work through singular lines could not only clear a lot of the road blocks for pure multi-task learning but grant opportunities for expanding datasets, easily offer common research functionalities and ready to go multi aspect evaluation of developed systems for any pytorch implementation.\\
+
 
 \section{Multi-Task Research}
-TODO: Go further in depth about the general state of audio multi-task research and why this system is needed in that. Why is a speed up in development needed in the field?
+%TODO: Go further in depth about the general state of audio multi-task research and why this system is needed in that. Why is a speed up in development needed in the field?
 
 Multi-task learning (MTL) is a machine learning paradigm where multiple different tasks are learned at the same time, exploiting underlying task relationships, to arrive at a shared representation. While the principle goal was to improve generalization accuracy of a machine learning system \citep{caruana1997multitask}, over the years multitask learning has found other uses, including speed of learning, improved intelligibility of learned models \citep{caruana1997multitask}, classification fairness \citep{oneto2019taking} and as a means to compress multiple parallel models \citep{georgiev2017heterogeneous}. This led to the paradigm finding its usage in multiple fields, including audio recognition.\\
 
@@ -15,36 +45,57 @@ The field of audio recognition is varied and ever expanding, due to a growing nu
 Usually, in order to achieve high performance, it is necessary to construct a focused detector, which targets a few classes per task. Only focusing on one set of targets with a fitting dataset however, ignores the wealth of information available in other task-specific datasets, as well as failing to leverage the fact that they might be calculating the same features, especially in the lower levels of the architecture \citep{tagliasacchi2020multi}. This does not only entail a possible waste of information (and thus performance) but also entails a waste of computational resources, as each task might not require its own dedicated model to achieve the same level of performance. Originally conventional methods like Gaussian Mixture Models (GMM) and State Vector Machines (SVM) were the main focus, but due to the impressive results in visual tasks deep learning architectures have seen a lot of attention.  The emergence of deep learning MTL set-ups is still fairly recent in audio recognition. While it has seen both successful \citep{tonami2019joint} applications and less successful \citep{sakti2016deep} when combining different tasks, very little is known about the exact circumstances when MTL works in audio recognition.\\
 
 \section{Developing Deep Learning Multi-Task Set-ups}
-TODO: Outline the steps in developing deep learning Multi-Task Set ups and how shortcuts can be made to speed up/improve the process. I.e. which problems have to be answered in the system. What developmental problems are you addressing?
+%TODO: Outline the steps in developing deep learning Multi-Task Set ups and how shortcuts can be made to speed up/improve the process. I.e. which problems have to be answered in the system. What developmental problems are you addressing?
 
-Issues to face:
+The process of developing multi-task set-ups depends on the context, use and goals of the system, but there are a number of steps that will almost certainly be present. In this section the intention is to outline the developmental steps with their correlated issues which will factor in how shortcuts can be made to improve the process. In essence, the job that needs to be done in both multi task as well as single task situations, is the construction of a pipeline going from raw datasets to fully trained and evaluated models. It is not very likely that this pipeline will be constructed statically. In stead, the final, best performing methodology will likely result from a process of constructing, replacing and tweaking parts in the pipeline until reaching the most satisfactory result.\\
+
+This work splits the pipeline up in three distinct phases. One is the Data Reading phase, where the data is extracted from datasets to forms which are processable by the models. The next is the Data Loading phase, where these formed inputs are further refined, combined and loaded to serve as input for the models to predict as well as update in the training phase. The last is then the actual Training and Evaluating phase, where the models get updated and various metrics are calculated measuring the performance of the process.\\
+
+PyTorch offers abstract classes which can consequently be inserted in its data loader functions, but extending these in a way to work with different forms of datasets can be quite the hassle. On top of that does it lack any dataset wide transformation functionalities, requiring the developer to implement those as well. While this is an annoying but manageable lacking aspect for single task problems, it becomes loathsome when trying to implement it for multiple datasets. Especially when the methodology is not set in stone beforehand and will be subject to potential, uncertain changes can this lead to a lot more debugging.\\
+
+This framework therefore offers to standardize the dataset form and with it bring a whole catalogue of functionalities, while taking care of the combinatorial issues. Through this, what used to be blocks of code for functionalities which possibly had to be adapted for individual datasets, get reduced to singular lines that add or replace new parts on the pipeline. Where the developer often had to go back and rework multiple parts to implement a new variation, they can be replaced at runtime.\\
+
+For every one of the described phases though, the specific issues that pop up need to be identified. The following is a summarizing overview of the identified hurdles:
 
 \textbf{Data Reading}
 \begin{itemize}
-	\item Developing valid input for loading and training for different datasets takes time and is error prone, while a lot of the processes are repetitive => DataReader to TaskDataset
-	\item While developing and testing different set ups, intermediate parts (e.g. the feature extraction method, file reading method, resampling method) as well as additional parts (e.g. resampling) often have to be varied and replaced, which might be a complex and time consuming process depending on the amount of rewrites and datasets required => Easily interchangeable pipeline pieces
-	\item Developing read/write functionalities per dataset is time consuming and potentially chaotic if done differently every time. Add to that the possibility of testing different set-ups for the same dataset which would require good file management. => Standardizing dataset read/write and automatic abstraction of reading when files are present
-	
-	\item loading in multiple datasets might be too memory intensive for a lot of systems 
+	\item Developing valid input for loading and training for different datasets takes time and is error prone, while a lot of the processes are repetitive.
+%	=> DataReader to TaskDataset
+	\item While developing and testing different set ups, intermediate parts (e.g. the feature extraction method, file reading method, resampling method) as well as additional parts (e.g. resampling) often have to be varied and replaced, which might be a complex and time consuming process depending on the amount of rewrites and datasets required.
+%	=> Easily interchangeable pipeline pieces
+	\item Developing read/write functionalities per dataset is time consuming and potentially chaotic if done differently every time. Add to that the possibility of testing different set-ups for the same dataset which would require good file management. 
+%	=> Standardizing dataset read/write and automatic abstraction of reading when files are present
+	\item Loading in multiple datasets might be too memory intensive for a lot of systems 
 	\item Running the code on a different system requires good datamanagement and changeable path locations
-	\item While some datasets have predefined train/test sets, others do not, which would require different handling of both cases which might be time consuming and error prone (===> actually a consequence of standardizing in this way, i.e. engineering problem)
-	\item Some Datasets can have multiple tasks on the same inputs (===> actually a consequence of standardizing in this way, i.e. engineering problem)
+	\item While some datasets have predefined train/test sets, others do not, which would require different handling of both cases which might be time consuming and error prone
+%	 (===> actually a consequence of standardizing in this way, i.e. engineering problem)
+	\item Some Datasets can have multiple tasks on the same inputs 
+%	(===> actually a consequence of standardizing in this way, i.e. engineering problem)
 \end{itemize}
 
 \textbf{Data Loading}
 \begin{itemize}
-	\item Each training procedure needs a train and test set, which for some datasets need to be created using k-fold validation set-ups and for some don't. When quickly trying to execute multiple set-ups this requires a lot of repetitive work. It's also error prone, as creating train/test sets the wrong way can cause data leaking and thus weaken the evaluation. (e.g. if the normalization is wrongfully calculated (-> the mean and stdev) on both the train and test set, the system will use information it shouldn't have and will perform unforeseenly worse on unseen data). => Abstraction to train/test set generation and handling
-	\item Additional features like transforming or filtering the data again take up development time to specify for each separate dataset as well as can be a gruesome process to apply after the data is read into matrices. => abstraction to dataset functions that don't rely on knowledge of the matrix structures
+	\item Each training procedure needs a train and test set, which for some datasets need to be created using k-fold validation set-ups and for some don't. When quickly trying to execute multiple set-ups this requires a lot of repetitive work. It's also error prone, as creating train/test sets the wrong way can cause data leaking and thus weaken the evaluation. (e.g. if the normalization is wrongfully calculated (-> the mean and stdev) on both the train and test set, the system will use information it shouldn't have and will perform unforeseenly worse on unseen data). 
+%	=> Abstraction to train/test set generation and handling
+	\item Additional features like transforming or filtering the data again take up development time to specify for each separate dataset as well as can be a gruesome process to apply after the data is read into matrices. 
+%	=> abstraction to dataset functions that don't rely on knowledge of the matrix structures
+	\item Manipulations are often dependent on the dataset and when a new dataset needs to be formed and manipulated after previous ones happened, the performed alterations need to be rewinded.
 \end{itemize}
 
 \textbf{Training}
 \begin{itemize}
-	\item Combining datasets from tasks can be done in numerous ways, which can impact performance on training. => Allow multiple and extendible ways to combine tasks in the training batches
-	\item In multi-task training, loss calculation is done by combining separate losses from tasks which can be done in numerous ways and might be interesting to explore => Allow multiple and extendible ways to combine losses in training
-	\item In general for multi-task research, lots of parameters and parts should be varied => Allow replacability of each part in training, without jeopardizing the training function
-	\item There are three types of task output structures in classification: binary, multi-class and multi-label outputs which each have to be handled uniquely while still being able to be combined => Abstraction of task type handling 
-	\item Calculating, storing and visualizing results in an efficient way for comparison is crucial and can take up valuable development/debugging time => abstraction to calculating, storing and saving results that allows for easy comparison between runs
-	\item Interrupted learning - the process of interrupting an ongoing training loop and restarting it later - requires good data management and saving of parameters to be loaded up again later, which is both error prone and time consuming => quick and easy way to restart an old run from a certain point
+	\item Combining datasets from tasks can be done in numerous ways, which can impact performance on training. A batch can be composed of inputs and targets from tasks in all sorts of orders and compositions, which should be open for the developer to define.
+%	=> Allow multiple and extendible ways to combine tasks in the training batches
+	\item In multi-task training, loss calculation is done by combining separate losses from tasks which can be done in numerous ways and might be interesting to explore 
+%	=> Allow multiple and extendible ways to combine losses in training
+	\item In general for multi-task research, lots of parameters and parts should be varied 
+%	=> Allow replacability of each part in training, without jeopardizing the training function
+	\item There are three types of task output structures in classification: binary, multi-class and multi-label outputs which each have to be handled uniquely while still being able to be combined 
+%	=> Abstraction of task type handling 
+	\item Calculating, storing and visualizing results in an efficient way for comparison is crucial and can take up valuable development/debugging time 
+%	=> abstraction to calculating, storing and saving results that allows for easy comparison between runs
+	\item Interrupted learning - the process of interrupting an ongoing training loop and restarting it later - requires good data management and saving of parameters to be loaded up again later, which is both error prone and time consuming 
+%	=> quick and easy way to restart an old run from a certain point
 \end{itemize}
 
 \textbf{Extra issues to be solved}
@@ -54,10 +105,35 @@ Issues to face:
 \end{itemize}
 
 \section{Challenges}
-TODO: Define the technological challenges in answering those problems. What problems/challenges do you face or have to take in account in developing such a system?
+%TODO: Define the technological challenges in answering those problems. What problems/challenges do you face or have to take in account in developing such a system?
+
+Providing a solution for the previous issues come with their own set of hurdles that a framework will face. This framework needs to possess enough expressiveness so that developers have the freedom to implement the pipelines they would be able to implement using PyTorch alone. This requires flexibility in the structures and extensibility so that new modifications and features do not require the developer to explicitly having to redo a lot of the work. The problem that providing a unifying way to handle multiple tasks and dataset pose are their dealing with their heterogenity and scaling the executed functions to all at once.\\
+
+This framework offers the tools to assemble a multi task pipeline in a setting which anticipate how researchers will use it. The problem it addresses are as follows: 1) Involving multiple datasets and tasks for constructing a trained deep learning model leads to a large amount of added complexity for dealing with the differences and applying the same functions to multiple sources 2) No framework which aids in multi-task learning is available at all despite that added complexity 3) Aside from the construction itself, development also involves varying and evaluating different intermediary parts. 
+
+%\begin{itemize}
+%	\item It is hard to anticipate the different ways the raw datasets can be structured and the developer must not be limited in any way in what they could or could not create a pipeline from.
+%	\item Standardizing inputs so that they can be manipulated and loaded in the same way requires a lot of flexibility in the resulting object. Problems will have to be anticipated in terms of granting the ability to encapsulate any form of input form in the object.
+%	\item Data from datasets can be both handled completely the same for each one or completely different before it is inserted into the model. Providing to scale features for multiple datasets at once must also be companioned by the option to define them for individual datasets.
+%	\item While making objects more robust can certainly avoid problems better, they can also introduce extra overhead which will make the system be unattractive to use for developers. 
+%	\item Developers should not be required to make changes in other parts of their pipeline if one part changes. On top of that is it necessary that they have control to change standard behaviour without having to redo the frameworks work.
+%	\item Ideally variations can be changed at runtime
+%\end{itemize}
 
 \section{Contributions}
-TODO: Outline what new your thesis works contributes.
+%TODO: Outline what new your thesis works contributes.
+
+This thesis contributes in the following ways:
+
+\begin{itemize}
+	\item A new developmental framework built on top of PyTorch which specifically aids to extract data from multiple datasets, apply manipulations, combine their data and use it to train and evaluate (multi-task) deep learning models.
+	\item A comparison of how much the framework cuts in terms of coding work compared to implementations without, along with a discussion on what the compression looks like
+	\item A review of the literature and discussion on the methodologies found in the literature and how the framework's expressiveness is able to cover its needs.
+	\item Multiple implemented use cases from which the framework was able to derive its generalizations.
+	\item A literature review on approaches and state of multi-task deep learning in audio recognition.
+\end{itemize}
 
 \section{Outline}
-TODO: Summarize the rest of the thesis' structure
+%TODO: Summarize the rest of the thesis' structure
+
+The thesis is structured as follows. First there is an investigation of the literature related to the frameworks domain and objectives. This delves deeper into the fields within audio recognition and multi-task learning as well as how the two come together and for which purposes. Also development frameworks are analysed through the literature, in an attempt to find similar work and knowledge on their development. Next, the exact problem the framework tries to solve is pinned down, including the imagined usage contexts and what specifications the system must adhere to. Following that is a description of the design of the framework. The high level approaches as well as how the generalization derivations were made. After that is a description of the exact implementation, considering its classes and set-up. Also present here is a deeper dive in the extendibility of the system, how and to what degree it is open for a developer to overwrite the framework's functions. Thereafter comes the evaluation. Lastly, concluding remarks are made, along with future directions the framework can take.
