@@ -4,79 +4,79 @@
 \contentsline {section}{\numberline {1.3}Developing Deep Learning Multi-Task Set-ups}{9}%
 \contentsline {section}{\numberline {1.4}Challenges}{12}%
 \contentsline {section}{\numberline {1.5}Contributions}{12}%
-\contentsline {section}{\numberline {1.6}Outline}{12}%
-\contentsline {chapter}{\numberline {2}Related Work}{13}%
-\contentsline {section}{\numberline {2.1}Audio Recognition}{13}%
-\contentsline {section}{\numberline {2.2}Multi-task Learning}{15}%
-\contentsline {section}{\numberline {2.3}Multi-task Deep Learning Audio Tasks}{17}%
-\contentsline {section}{\numberline {2.4}Development Frameworks}{24}%
-\contentsline {chapter}{\numberline {3}Problem Statement}{31}%
-\contentsline {section}{\numberline {3.1}Use Cases}{31}%
-\contentsline {subsection}{\numberline {3.1.1}Developing General Purpose Classifiers}{31}%
-\contentsline {subsection}{\numberline {3.1.2}Researching Multi-Task Set-ups}{32}%
-\contentsline {subsection}{\numberline {3.1.3}New Datasets}{33}%
-\contentsline {section}{\numberline {3.2}Stakeholders}{34}%
-\contentsline {subsection}{\numberline {3.2.1}Researchers}{34}%
-\contentsline {subsection}{\numberline {3.2.2}Developers}{34}%
-\contentsline {subsection}{\numberline {3.2.3}Newcomers}{34}%
-\contentsline {section}{\numberline {3.3}Design Principles}{35}%
-\contentsline {section}{\numberline {3.4}Non-functional Requirements}{37}%
-\contentsline {section}{\numberline {3.5}Functional Requirements}{37}%
-\contentsline {subsection}{\numberline {3.5.1}Data Reading}{38}%
-\contentsline {subsection}{\numberline {3.5.2}Data Loading}{39}%
-\contentsline {subsection}{\numberline {3.5.3}Training}{41}%
-\contentsline {chapter}{\numberline {4}System Design}{43}%
-\contentsline {section}{\numberline {4.1}Framework Design}{43}%
-\contentsline {section}{\numberline {4.2}Assumptions}{48}%
-\contentsline {section}{\numberline {4.3}Creating standardized objects}{48}%
-\contentsline {subsection}{\numberline {4.3.1}Variations}{50}%
-\contentsline {section}{\numberline {4.4}Manipulating datasets}{50}%
-\contentsline {section}{\numberline {4.5}Combining Datasets}{53}%
-\contentsline {section}{\numberline {4.6}Creating Model}{54}%
-\contentsline {section}{\numberline {4.7}Training and Evaluating Model}{55}%
-\contentsline {section}{\numberline {4.8}Three Implementations}{56}%
-\contentsline {chapter}{\numberline {5}Implementation}{65}%
-\contentsline {section}{\numberline {5.1}Technology}{65}%
-\contentsline {section}{\numberline {5.2}High Level Description}{65}%
-\contentsline {section}{\numberline {5.3}Data Standardization}{66}%
-\contentsline {subsection}{\numberline {5.3.1}Structure}{66}%
-\contentsline {subsection}{\numberline {5.3.2}DataReader}{68}%
-\contentsline {subsection}{\numberline {5.3.3}ExtractionMethod}{68}%
-\contentsline {subsection}{\numberline {5.3.4}TaskDataset}{71}%
-\contentsline {subsection}{\numberline {5.3.5}Example}{73}%
-\contentsline {section}{\numberline {5.4}Data Loading}{73}%
-\contentsline {subsection}{\numberline {5.4.1}Combining TaskDatasets}{74}%
-\contentsline {subsection}{\numberline {5.4.2}Generating Train and Test Sets}{75}%
-\contentsline {subsection}{\numberline {5.4.3}Preparing Inputs to same size}{76}%
-\contentsline {subsection}{\numberline {5.4.4}Scaling Inputs}{77}%
-\contentsline {subsection}{\numberline {5.4.5}Filtering Inputs}{78}%
-\contentsline {subsection}{\numberline {5.4.6}Loading Data}{78}%
-\contentsline {subsection}{\numberline {5.4.7}TrainingSetCreator}{80}%
-\contentsline {section}{\numberline {5.5}Training}{80}%
-\contentsline {subsection}{\numberline {5.5.1}Model Creation}{80}%
-\contentsline {subsection}{\numberline {5.5.2}Results Handling}{81}%
-\contentsline {subsection}{\numberline {5.5.3}Training Updating}{83}%
-\contentsline {subsection}{\numberline {5.5.4}Evaluation}{86}%
-\contentsline {section}{\numberline {5.6}Complementary tools}{87}%
-\contentsline {section}{\numberline {5.7}Extendibility}{87}%
-\contentsline {subsection}{\numberline {5.7.1}Classes that are meant to be extended}{87}%
-\contentsline {subsection}{\numberline {5.7.2}Classes that can be extended}{89}%
-\contentsline {subsection}{\numberline {5.7.3}Classes that should be extended from outside libraries}{90}%
-\contentsline {subsection}{\numberline {5.7.4}Classes that should not be extended}{90}%
-\contentsline {chapter}{\numberline {6}Evaluation}{93}%
-\contentsline {section}{\numberline {6.1}Demonstrate Implementations}{93}%
-\contentsline {section}{\numberline {6.2}Literature Evaluation}{102}%
-\contentsline {section}{\numberline {6.3}Fulfilment of the Requirements}{108}%
-\contentsline {subsection}{\numberline {6.3.1}Non-functional Requirements}{109}%
-\contentsline {subsection}{\numberline {6.3.2}Funtional Requirements}{111}%
-\contentsline {subsubsection}{Data Reading}{111}%
-\contentsline {subsubsection}{Data Loading}{112}%
-\contentsline {subsubsection}{Training}{115}%
-\contentsline {chapter}{\numberline {7}Conclusion}{117}%
-\contentsline {section}{\numberline {7.1}Future Work}{118}%
-\contentsline {subsection}{\numberline {7.1.1}More pre-made implementations}{118}%
-\contentsline {subsection}{\numberline {7.1.2}Additional Support for Data Reading and Model creation}{118}%
-\contentsline {subsection}{\numberline {7.1.3}Debugging tools and statistics}{118}%
-\contentsline {subsection}{\numberline {7.1.4}Expanding Task Types}{119}%
-\contentsline {subsection}{\numberline {7.1.5}Optimizing implementation}{119}%
-\contentsline {subsection}{\numberline {7.1.6}Evolving beyond audio data}{120}%
+\contentsline {section}{\numberline {1.6}Outline}{13}%
+\contentsline {chapter}{\numberline {2}Related Work}{14}%
+\contentsline {section}{\numberline {2.1}Audio Recognition}{14}%
+\contentsline {section}{\numberline {2.2}Multi-task Learning}{16}%
+\contentsline {section}{\numberline {2.3}Multi-task Deep Learning Audio Tasks}{18}%
+\contentsline {section}{\numberline {2.4}Development Frameworks}{25}%
+\contentsline {chapter}{\numberline {3}Problem Statement}{33}%
+\contentsline {section}{\numberline {3.1}Use Cases}{33}%
+\contentsline {subsection}{\numberline {3.1.1}Developing General Purpose Classifiers}{33}%
+\contentsline {subsection}{\numberline {3.1.2}Researching Multi-Task Set-ups}{34}%
+\contentsline {subsection}{\numberline {3.1.3}New Datasets}{35}%
+\contentsline {section}{\numberline {3.2}Stakeholders}{35}%
+\contentsline {subsection}{\numberline {3.2.1}Researchers}{36}%
+\contentsline {subsection}{\numberline {3.2.2}Developers}{36}%
+\contentsline {subsection}{\numberline {3.2.3}Newcomers}{36}%
+\contentsline {section}{\numberline {3.3}Design Principles}{37}%
+\contentsline {section}{\numberline {3.4}Non-functional Requirements}{38}%
+\contentsline {section}{\numberline {3.5}Functional Requirements}{39}%
+\contentsline {subsection}{\numberline {3.5.1}Data Reading}{40}%
+\contentsline {subsection}{\numberline {3.5.2}Data Loading}{41}%
+\contentsline {subsection}{\numberline {3.5.3}Training}{43}%
+\contentsline {chapter}{\numberline {4}System Design}{45}%
+\contentsline {section}{\numberline {4.1}Framework Design}{45}%
+\contentsline {section}{\numberline {4.2}Assumptions}{50}%
+\contentsline {section}{\numberline {4.3}Creating standardized objects}{50}%
+\contentsline {subsection}{\numberline {4.3.1}Variations}{52}%
+\contentsline {section}{\numberline {4.4}Manipulating datasets}{52}%
+\contentsline {section}{\numberline {4.5}Combining Datasets}{55}%
+\contentsline {section}{\numberline {4.6}Creating Model}{56}%
+\contentsline {section}{\numberline {4.7}Training and Evaluating Model}{57}%
+\contentsline {section}{\numberline {4.8}Three Implementations}{58}%
+\contentsline {chapter}{\numberline {5}Implementation}{67}%
+\contentsline {section}{\numberline {5.1}Technology}{67}%
+\contentsline {section}{\numberline {5.2}High Level Description}{67}%
+\contentsline {section}{\numberline {5.3}Data Standardization}{68}%
+\contentsline {subsection}{\numberline {5.3.1}Structure}{68}%
+\contentsline {subsection}{\numberline {5.3.2}DataReader}{70}%
+\contentsline {subsection}{\numberline {5.3.3}ExtractionMethod}{70}%
+\contentsline {subsection}{\numberline {5.3.4}TaskDataset}{73}%
+\contentsline {subsection}{\numberline {5.3.5}Example}{75}%
+\contentsline {section}{\numberline {5.4}Data Loading}{75}%
+\contentsline {subsection}{\numberline {5.4.1}Combining TaskDatasets}{76}%
+\contentsline {subsection}{\numberline {5.4.2}Generating Train and Test Sets}{77}%
+\contentsline {subsection}{\numberline {5.4.3}Preparing Inputs to same size}{78}%
+\contentsline {subsection}{\numberline {5.4.4}Scaling Inputs}{79}%
+\contentsline {subsection}{\numberline {5.4.5}Filtering Inputs}{80}%
+\contentsline {subsection}{\numberline {5.4.6}Loading Data}{80}%
+\contentsline {subsection}{\numberline {5.4.7}TrainingSetCreator}{82}%
+\contentsline {section}{\numberline {5.5}Training}{82}%
+\contentsline {subsection}{\numberline {5.5.1}Model Creation}{82}%
+\contentsline {subsection}{\numberline {5.5.2}Results Handling}{83}%
+\contentsline {subsection}{\numberline {5.5.3}Training Updating}{85}%
+\contentsline {subsection}{\numberline {5.5.4}Evaluation}{88}%
+\contentsline {section}{\numberline {5.6}Complementary tools}{89}%
+\contentsline {section}{\numberline {5.7}Extendibility}{89}%
+\contentsline {subsection}{\numberline {5.7.1}Classes that are meant to be extended}{89}%
+\contentsline {subsection}{\numberline {5.7.2}Classes that can be extended}{91}%
+\contentsline {subsection}{\numberline {5.7.3}Classes that should be extended from outside libraries}{92}%
+\contentsline {subsection}{\numberline {5.7.4}Classes that should not be extended}{92}%
+\contentsline {chapter}{\numberline {6}Evaluation}{95}%
+\contentsline {section}{\numberline {6.1}Demonstrate Implementations}{95}%
+\contentsline {section}{\numberline {6.2}Literature Evaluation}{104}%
+\contentsline {section}{\numberline {6.3}Fulfilment of the Requirements}{110}%
+\contentsline {subsection}{\numberline {6.3.1}Non-functional Requirements}{111}%
+\contentsline {subsection}{\numberline {6.3.2}Funtional Requirements}{113}%
+\contentsline {subsubsection}{Data Reading}{113}%
+\contentsline {subsubsection}{Data Loading}{114}%
+\contentsline {subsubsection}{Training}{117}%
+\contentsline {chapter}{\numberline {7}Conclusion}{119}%
+\contentsline {section}{\numberline {7.1}Future Work}{120}%
+\contentsline {subsection}{\numberline {7.1.1}More pre-made implementations}{120}%
+\contentsline {subsection}{\numberline {7.1.2}Additional Support for Data Reading and Model creation}{120}%
+\contentsline {subsection}{\numberline {7.1.3}Debugging tools and statistics}{120}%
+\contentsline {subsection}{\numberline {7.1.4}Expanding Task Types}{121}%
+\contentsline {subsection}{\numberline {7.1.5}Optimizing implementation}{121}%
+\contentsline {subsection}{\numberline {7.1.6}Evolving beyond audio data}{122}%

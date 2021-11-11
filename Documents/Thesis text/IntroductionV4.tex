@@ -66,6 +66,7 @@ For every one of the described phases though, the specific issues that pop up ne
 	\item Developing read/write functionalities per dataset is time consuming and potentially chaotic if done differently every time. Add to that the possibility of testing different set-ups for the same dataset which would require good file management. 
 %	=> Standardizing dataset read/write and automatic abstraction of reading when files are present
 	\item Loading in multiple datasets might be too memory intensive for a lot of systems 
+	\item Large datasets are already freely available \citep{fonseca2017freesound} \citep{gemmeke2017audio} \citep{piczak2015esc} online and in some instances \citep{paper2021tensorflow} one does not have actual access to the audio files themselves, but representations of them.
 	\item Running the code on a different system requires good datamanagement and changeable path locations
 	\item While some datasets have predefined train/test sets, others do not, which would require different handling of both cases which might be time consuming and error prone
 %	 (===> actually a consequence of standardizing in this way, i.e. engineering problem)
@@ -111,14 +112,7 @@ Providing a solution for the previous issues come with their own set of hurdles 
 
 This framework offers the tools to assemble a multi task pipeline in a setting which anticipate how researchers will use it. The problem it addresses are as follows: 1) Involving multiple datasets and tasks for constructing a trained deep learning model leads to a large amount of added complexity for dealing with the differences and applying the same functions to multiple sources 2) No framework which aids in multi-task learning is available at all despite that added complexity 3) Aside from the construction itself, development also involves varying and evaluating different intermediary parts. 
 
-%\begin{itemize}
-%	\item It is hard to anticipate the different ways the raw datasets can be structured and the developer must not be limited in any way in what they could or could not create a pipeline from.
-%	\item Standardizing inputs so that they can be manipulated and loaded in the same way requires a lot of flexibility in the resulting object. Problems will have to be anticipated in terms of granting the ability to encapsulate any form of input form in the object.
-%	\item Data from datasets can be both handled completely the same for each one or completely different before it is inserted into the model. Providing to scale features for multiple datasets at once must also be companioned by the option to define them for individual datasets.
-%	\item While making objects more robust can certainly avoid problems better, they can also introduce extra overhead which will make the system be unattractive to use for developers. 
-%	\item Developers should not be required to make changes in other parts of their pipeline if one part changes. On top of that is it necessary that they have control to change standard behaviour without having to redo the frameworks work.
-%	\item Ideally variations can be changed at runtime
-%\end{itemize}
+
 
 \section{Contributions}
 %TODO: Outline what new your thesis works contributes.
