@@ -1,9 +1,14 @@
 This is BibTeX, Version 0.99d
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: ThesisText.aux
-Reallocating 'name_of_file' (item size: 1) to 9 items.
-The style file: plainnat.bst
+Reallocating 'name_of_file' (item size: 1) to 10 items.
+The style file: IEEEtranN.bst
 Reallocating 'name_of_file' (item size: 1) to 11 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'wiz_functions' (item size: 4) to 6000 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
 Database file #1: references.bib
 Repeated entry---line 396 of file references.bib
  : @article{xia2019multi
@@ -89,48 +94,61 @@ Repeated entry---line 1005 of file references.bib
  : @inproceedings{komatsu2020scene
  :                                ,
 I'm skipping whatever remains of this entry
-Warning--empty journal in boregowda2018environmental
-Warning--empty year in dcase
+Repeated entry---line 1159 of file references.bib
+ : @inproceedings{wu2015asvspoof
+ :                              ,
+I'm skipping whatever remains of this entry
+-- IEEEtranN.bst version 1.14 (2015/08/26) by Michael Shell.
+-- http://www.michaelshell.org/tex/ieeetran/bibtex/
+-- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
+** Natbib version - not for normal IEEE work.
+Reallocating 'glb_str_end' (item size: 4) to 20 items.
+Reallocating 'glb_str_ptr' (item size: 4) to 20 items.
+Reallocating 'global_strs' (item size: 1) to 4000000 items.
 Warning--empty journal in georgiev2017heterogeneous
-You've used 49 entries,
-            2773 wiz_defined-function locations,
-            846 strings with 15079 characters,
-and the built_in function-call counts, 27805 in all, are:
-= -- 2463
-> -- 1884
-< -- 34
-+ -- 635
-- -- 585
-* -- 2293
-:= -- 4188
-add.period$ -- 161
-call.type$ -- 49
-change.case$ -- 339
-chr.to.int$ -- 48
-cite$ -- 101
-duplicate$ -- 1215
-empty$ -- 2069
-format.name$ -- 644
-if$ -- 5903
-int.to.chr$ -- 2
-int.to.str$ -- 1
-missing$ -- 46
-newline$ -- 253
-num.names$ -- 196
-pop$ -- 727
+Warning--empty journal in boregowda2018environmental
+Warning--empty journal in pols1977spectral
+
+Done.
+You've used 69 entries,
+            4855 wiz_defined-function locations,
+            1287 strings with 22847 characters,
+and the built_in function-call counts, 64148 in all, are:
+= -- 5362
+> -- 2362
+< -- 420
++ -- 1145
+- -- 552
+* -- 3686
+:= -- 9441
+add.period$ -- 150
+call.type$ -- 69
+change.case$ -- 138
+chr.to.int$ -- 1039
+cite$ -- 76
+duplicate$ -- 4174
+empty$ -- 4692
+format.name$ -- 687
+if$ -- 14535
+int.to.chr$ -- 3
+int.to.str$ -- 70
+missing$ -- 697
+newline$ -- 243
+num.names$ -- 195
+pop$ -- 1927
 preamble$ -- 1
-purify$ -- 291
-quote$ -- 0
-skip$ -- 1001
+purify$ -- 69
+quote$ -- 2
+skip$ -- 4611
 stack$ -- 0
-substring$ -- 1008
-swap$ -- 232
-text.length$ -- 21
+substring$ -- 2487
+swap$ -- 3038
+text.length$ -- 78
 text.prefix$ -- 0
-top$ -- 0
-type$ -- 539
+top$ -- 6
+type$ -- 1102
 warning$ -- 3
-while$ -- 231
+while$ -- 296
 width$ -- 0
-write$ -- 642
-(There were 21 error messages)
+write$ -- 792
+(There were 22 error messages)

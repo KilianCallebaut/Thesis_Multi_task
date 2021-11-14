@@ -2,6 +2,8 @@
 %TODO: Explain that this chapter is about defining the problem and what the solving system should be
 %TODO: clarify the analysis performed to identify the requirements
 
+As introduced, the thesis presents a framework to aid in the development of multi-task pipelines. Specifically, the problematic combinatorial aspects are targeted as well as offering a workflow for the pipeline construction which would allow new datasets, tasks and handling of these to be defined utilising less code and cutting execution time where possible. In this section this goal will be codified in exact terms, first explaining the considered eventual contexts in terms of use cases and stake holders, whereafter the general principles and goals for the design is outlined and the finally the non-functional and functional requirements are pinned down.\\
+
 \section{Use Cases}
 %TODO: Explain the need for requirements by clarifying examples
 
@@ -45,12 +47,12 @@ Take for example the case where a dataset from google was extended with more fin
 The developmental framework needs to take in account different stakeholders that are concerned with building and training a multi-task Neural Network. These have different objectives which leads to different necessities the framework has to provide.
 
 \subsection{Researchers}
-TODO: Who need to vary different parts of the pipeline and report on their effect
+%TODO: Who need to vary different parts of the pipeline and report on their effect
 
 Researchers are the people that, in this intended use of the word, would use the framework to figure out cause and effect relationships concerning multi-task neural networks. What this means in practice is that these people need to be able to vary the changeable variables in the system and evaluate the results. This framework should make this easier to vary one parameter modularly and provide quick and easy ways to visualize the results. Another thing is that the framework should provide opportunity for reproducibility of results.  
 
 \subsection{Developers}
-TODO: Who need to be able to build and train the best performing model
+%TODO: Who need to be able to build and train the best performing model
 
 Developers are the group of people that need to be able to build solutions for a given task as quick and easy as possible, but with opportunity to extend the framework in the places that likely can change. This necessitates that often used features - which take up needless time to develop - in a deep learning pipeline are already available and easy to use. This group likely models a system like this with the intension of deploying or executing on a different device, while their working device might be resource constrained. This both means that the framework needs to take usual resource bottlenecks in account as well as facilitate transitioning the execution environment to a different system.
 
@@ -60,7 +62,7 @@ The final group is the crowd for whom the framework and possibly the multi-task 
 
 \section{Design Principles}
 
-TODO: Outline the assumptions you make that the system is built on and the objectives the framework has to achieve to offer better developmental support
+%TODO: Outline the assumptions you make that the system is built on and the objectives the framework has to achieve to offer better developmental support
 
 Previous work done by \cite{roberts1996evolving} informally describes the requirement for frameworks being "simple enough to be learned, yet must provide enough features that it can be used quickly and hooks for the features that are likely to change". The goal of this platform is to facilitate research and development of deep learning multi-task algorithms for audio recognition purposes. This frameworks is built on top of the PyTorch library that already offers comprehensible and easy to use tools for developing deep learning models. However, this extension looks to alleviate the pain points the multi-task paradigm brings with it: extracting multiple datasets and tasks and combining them to train and test a single model. \\
 
@@ -87,7 +89,6 @@ From the observations made in the previous sections, a number of non-functional 
 	\item \textbf{Extendible:} The framework should provide open hooks for features and functionalities that likely require change. 
 	\item \textbf{Fast prototyping:} Developers using the framework should be met with an environment that provides them with the tools necessary to develop their own multi task pipelines fast.
 	\item \textbf{Cutting Double Work:} Anticipate that multi-task models will be designed through iterated variations and that the system can be run with largely the same variables without having to recalculate the same things as before.
-%	\item \textbf{Developmental Side-rails:} New developers using the framework should get a clear development structure and guiding through examples, warnings and hints.
 	\item \textbf{Flexible:} The framework should be able to dynamically handle possible differences in input and desired pipeline functionalities.
 
 \end{itemize}
@@ -96,7 +97,7 @@ From the observations made in the previous sections, a number of non-functional 
 
 The framework is a tool for building Deep Learning Multi-task pipelines, which this work distributes in three steps. The first step is the data reading. In this step, the raw datasets are read, features extracted from the instances and the results stored in objects which will serve as the input for the rest of the system. Then, the data loading happens, in which the multiple separate objects are prepared for the specific training set-up, combined and then served to train and evaluate the model. In the last step, training, the model is created, the data instances go through the model, the loss for each task gets calculated and combined which is used to optimize the model and the optimized model gets evaluated. 
 
-Further note should be made of the difference between datasets and tasks. A dataset can have multiple tasks and a task can have multiple datasets. A task is in essence the learning objective for the input and comes in different forms for the target labels. A data instance can belong to only one of two classes (binary tasks), only one of multiple classes (multi-class tasks), multiple classes at once (multi-label tasks) or have a continuous value for a class (regression tasks). The dataset is the collection of data instances that can be linked to the targets. The framework must deal with the fact that there can be multiple datasets and multiple tasks in a many to many relationship and that each can require different handling. 
+Further note should be made of the difference between datasets and tasks. A dataset can have multiple tasks and a task can have multiple datasets. A task is in essence the learning objective for the input and comes in different forms for the target labels. A data instance can belong to only one of two classes (binary tasks), only one of multiple classes (multi-class tasks), multiple classes at once (multi-label tasks) or have a continuous value for a class (regression tasks). The dataset is the collection of data instances that can be linked to the targets. The framework must deal with the fact that there can be multiple datasets and multiple tasks in a many to many relationship and that each can require different handling. These functional requirements were drawn up based on the analysis performed in the previous section \ref{RelatedWork}, along with considerations made to facilitate common actions performed during research. 
 
 The functional requirements will be grouped along the steps in the pipeline, keeping the non-functional requirements in mind and determining what is necessary to allow multiple different datasets and tasks. \\
 

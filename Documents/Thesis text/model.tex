@@ -4,14 +4,12 @@
 % Typing tasks
 % Typing combining methods
 
-TODO: What are the key decisions that were made and why?
-
 
 \section{Framework Design} \label{Design:Framework}
-TODO: Explain how the system was modeled based on the design requirements
-TODO: Explain the concept of hotspots
+%TODO: Explain how the system was modeled based on the design requirements
+%TODO: Explain the concept of hotspots
 
-Development frameworks have been defined by \cite{roberts1996evolving} as "reusable designs of all or part of a software system described by a set of abstract classes and the way instances of those classes collaborate". The bread and butter of framework design is developing abstractions that cut usual required work, while identifying the points where an implementing application likely requires to change. These variable points in an application domain are called hot-spots \cite{schmid1997systematic}. In the context of a framework, these are the points where the software allows to plug in application specific classes or subsystems. These hot-spots come in two forms: white-box and black-box hot-spots. White-box hot-spots require programming the plugged in blocks of code, while black-box hot-spots give the option to select from pre-implemented solutions. \\
+Development frameworks have been defined by \citet{roberts1996evolving} as "reusable designs of all or part of a software system described by a set of abstract classes and the way instances of those classes collaborate". The bread and butter of framework design is developing abstractions that cut usual required work, while identifying the points where an implementing application likely requires to change. These variable points in an application domain are called hot-spots \cite{schmid1997systematic}. In the context of a framework, these are the points where the software allows to plug in application specific classes or subsystems. These hot-spots come in two forms: white-box and black-box hot-spots. White-box hot-spots require programming the plugged in blocks of code, while black-box hot-spots give the option to select from pre-implemented solutions. \\
 
 Expanding existing ground work for deep learning systems with abstractions for developing and researching multi-task learning set-ups, means that the focus will be on providing abstractions cutting effort of combining datasets and tasks, but also that providing exhaustive possibilities are nearly impossible. Therefore, the design will only offer white-box solutions, but with a number of pre-made implementations addressing commonly available features in deep learning.\\
 
@@ -71,8 +69,35 @@ Before resuming to the detailed explanations of the operation designs, a small s
 	\item The training and evaluation loops should not required modification, as they are static for all (gradient descent based) applications, but they should take variable functionalities.
 	\item Hot spots for variation will likely have to be varied at each point within the runtime itself
 	\item Preprocessing will have to be both easily made the same for multiple datasets as have an individual process for each one
+	\item Introducing more execution time for creating and preparing the data for training and evaluation in the name of flexibility and added features is more acceptable than it is for executing the actual training and evaluation. Training and execution take significantly longer and can grow exponentially based on the dataset size and amount of epochs, while data preparation only has to be performed once before each run.
+	\item As soon as the implementation is made, the developer wants to walk away until the results are in. The developer must both be able to define the pipeline as the variations they want to investigate beforehand, while the system must offer checkpoints to restart in case a malfunction happened during execution.
+	\item Mistakes will be made.
 \end{itemize}
 
+
+\section{Key Decisions}
+
+%TODO: What are the key decisions that were made and why?
+% - Data Reader is a abstract extendible class
+% - Manipulations are hooks on the TaskDataset object itself
+% - The TrainingSetCreator is the way to assemble the pipeline
+% -- Transformations are called by name
+% -- training and eval is not included ==> because the option is left open for model definition to give as much space for the model as possible
+% -- training and evaluation mechanisms are functions with optional object inputs which can modify or add functionality
+% -- The test set is a taskdataset in the Holdtaskdatset, while the training set is just contained in the HoldTaskDataset itself
+% -- Extraction method and instance transformations are contained within the same object which is a decorator
+% -- The tasks are defined through their own objects
+
+Starting off, in order to give a clearer understanding of the ideas behind the design, a summary is made of the key design decisions and their reasoning behind this. From these ideas, the rest of the framework is filled out and constructed. In essence, the goal of what is supposed to be built - the pipeline - can be found illustrated in figure \ref{fig:simplifiedoverview}. To achieve this, the key structural options that were taken are as follows:
+
+\begin{enumerate}
+	\item Datasets and the way they are stored have an infinite amount of variations all of which can't be anticipated. The situation is to make sure that a developer is not limited by the systems finite amount of data structure assumptions, while still ensuring that they create an object which will have no issue in the rest of the system, as well as offer developmental time cutting tools in the extraction process. As a response, the framework in this stage was designed with an abstract DataReader class which the developer has to extend for their particular dataset, that gradually fills a TaskDataset which is the standardized object to encapsulate the data. The DataReader contains abstract functions that the developer has to implement, for which it has a predefined execution order. Ensuring validity happens through builder methods which verify the correctness of the input and the calling of the validation function in the DataReader that checks that the final object is correct.
+	\item For reasons of modularity, the choice was made to have all dataset manipulations be defined in the TaskDataset class itself and not some external class. This way, no external class has to make assumptions on the exact structure of the inputs and targets which makes it more feasible to create an extension to if required. These manipulations often work in relation with the ExtractionMethod object, which is a class that is responsible for the modification of singular feature matrix instances. This thus makes the functions on the TaskDataset responsible for navigating the structure and the ExtractionMethod responsible for changing the content of the structure.
+	\item The pipeline up until the initiation of training and/or evaluation is assembled through using the TrainingSetCreator. This consists of adding DataReaders, ExtractionMethod objects, filtering definitions, etc in a builder like pattern, which is consequently executed by calling its execution function. In other words the developer can add elements as they desire and consequently assemble the process the way they want after the fact. Adding elements to the TrainingSetCreator can be scaled to all involved datasets (if desired) this way and also be replaced after the fact without having to redefine the entire pipeline. 
+	\item Tasks and datasets are two different things and so tasks have become their own objects which can be present in multiple TaskDatasets. These objects contain all general task related data (e.g. the exact label names) as well as methods for handling their related outputs. The situation when tasks are present in multiple datasets is streamlined in the ConcatTaskDataset, where their related target labels are placed at the same positions.
+	\item The training and evaluation mechanisms are pretty singular functions, with some internal behaviour that can be redefined as it redirects them to an external object. This definition is pretty rigid as a way to reliably separate the complicated numerous combinatory possibilities into individual task handlings. Another thing is that, while performance was not a main objective in this work, it was to be avoided to introduce possibly too many extra redirections and overhead by completely disassembling its functionalities for the sake of flexibility. 
+	\item Building on the previous point, as discussed in \cite{roberts1996evolving}, more classes introduce more complexity, and so it was avoided to introduce too many specialized case handlings, unless when they were made extendible through a hot-spot. This explains more why instances like the training mechanism are structured the way they are - since they are essentially functions and object oriented definitions would assumably do more harm then good - as well as why manipulations are defined on the TaskDataset objects themselves and not through an external class.
+\end{enumerate}
 
 \section{Creating standardized objects} \label{Design:StandardizedObjects}
 
@@ -136,7 +161,7 @@ Not only does this add modularly replaceable sections in the handling of data, t
 
 
 \section{Creating Model} \label{Design:Model}
-TODO: Create visual representation of dev workflow
+%TODO: Create visual representation of dev workflow
 This framework is aimed at providing a facilitating extension to PyTorch for training and testing multi-head hard parameter sharing models. Model creation thus puts as little requirements on designing the actual models as possible. The rest of the system builds on Pytorch's classes as to ensure that the input would be valid for any PyTorch module. The only presumption the system has to make is that the output is a tuple with each entry being the predicted results for each task in the order of the task list from the input dataset. While no class was made that ensures the developer does this correctly - with the model creation being central, the developer should have the freedom to create whatever they want, adjusting the functionalities around it if necessary - there are two base multi-head networks, a CNN and a DNN, available which has variable layers based on the input. These also already include adaptations based on the type of task. In this area the mantra is that the developer knows best. \\
 
 
@@ -152,13 +177,99 @@ Especially the evaluation function dynamically uses this, as it can either take 
 
 Changing non-metric related functions - like early stopping - can be done by another extra object which can be given as input, namely the Training\_Utils object. This simply contains functions, for which the developer can write an extending object and give as input. \\ 
 
+\section{Comparing the steps} \label{Design:Comparing}
+
+In order to truly grasp what the design is offering in terms of developmental aid, a comparison is made to development without the framework. Considering that there is a lack of a comparative framework for building multi-task pipelines as well as to get working examples of multi-task implementations, three demonstrating implementations are taken \cite{pytorchmultitask} \cite{multiclasstutorial} \cite{multidataset}. These are tutorials on multi-task implementations in PyTorch which give a good sense on how research oriented implementations -which focus on simply getting the results and not developing a good maintainable system- are made. While these sorts of implementations will mainly be illustrative for implementations by more inexperienced developers, they are a good demonstration for the sorts of problems that arise by the lack of a framework which can be present to smaller degrees even in implementations by more experienced people.\\
+
+A comparison of the involved steps is drawn up:\\
+
+\fbox{
+	\begin{minipage}{\linewidth}
+		
+	{\large\textbf{ Development steps without the framework}}
+	\begin{enumerate}
+		\item Implement an extension to the PyTorch Dataset
+		\begin{itemize}
+			\item Either build a new extending class for each dataset or build a dataset structure which can be reutilized for all involved datasets
+			\item Define the data encapsulating structures (e.g. list of tensors for the input feature matrices)
+			\item Define the getter function, including what it returns which will be used later when iterating over the data, as well as which outputs will be batched together
+			\item Define the length function
+		\end{itemize}
+		\item Iterate over the raw dataset and extract the inputs and targets to the PyTorch Dataset extension(s)
+		\item Implementation and execution of the input transformations
+		\begin{itemize}
+			\item Either the transformation parameters are set in stone or they have to be calculated from the dataset
+		\end{itemize}
+		\item Implementation and execution of the input filtering functions
+		\item Creation of training and test set
+		\item Definition and implementation of the training and evaluation loops
+		\begin{itemize}
+			\item Multi-task loss calculation means separate calculations and subsequent combining of them
+		\end{itemize}
+		\item Output evaluation metric calculation and storage
+		\item Model creation
+		\item Execution of the training and evaluation mechanisms with the desired parameters
+		\item Implement and execute the visualization of the output evaluation metrics
+	\end{enumerate}
+\end{minipage}}
+\bigskip
+\bigskip
+
+\fbox{
+	\begin{minipage}{\linewidth}
+	
+	{\large\textbf{ Development steps with the framework}}
+	\begin{enumerate}
+		\item Extend the DataReader
+		\begin{enumerate}
+			\item Implement the data gathering/indexing function
+			\item Implement the input insertion
+			\item Implement the insertion of the targets AND the task
+	%		\item Optionally implement different modes of extracting the data based on inserted parameters
+		\end{enumerate}
+		\item Assemble the pipeline through the TrainingSetCreator:
+		\begin{enumerate}
+			\item Assemble and add the ExtractionMethod
+			\item Add parameters for filtering/sampling the data 
+			\item Add normalization call
+			\item Add transformation call
+		\end{enumerate}
+		\item Execute the pipeline
+		\begin{itemize}
+			\item Either return complete prepared datasets
+			\item Or a generation function for k-fold train/test generation
+		\end{itemize}
+		\item Model creation
+		\item Instantiate Result object
+		\item Insert data, model and Result object into train and evaluation mechanisms
+		\item Investigate and compare the results in TensorBoard
+	\end{enumerate}
+
+\end{minipage}}
+
+
+\bigskip
+\bigskip
+
+
+First, the easiest comparison to make is in terms of which steps exactly are being taken care of. Starting from the top, an extension has to be made in both cases for extracting the input. The difference is that without the framework there has to be an extension to the PyTorch dataset as well as subsequently iterating over and extracting workable data, while the framework only requires the iteration and then gradually the valid object can be built. Then, the dataset manipulations like transformations and sampling always have to be defined, implemented and executed. Compare that to the frameworks methodology using the ExtractionMethod class which can be assembled with premade function definitions how the developer wants and transformation executions become simple 1 line calls. Sampling is also readily available with parameters that define its functioning. Train and test set creation get reduced to a simple line call cutting its need to define. Implementation and evaluation loops no longer need to be defined, nor do the metric calculation and visualisation, both cases being reduced to simple 1 line calls to function. The model creation is still present and as much workload for both cases.\\
+
+While it is easy to point out how much the framework cuts in code compared to implementations which were only made for a single function, its inclusion is mainly meant to demonstrate how even these single function implementations can still be performed faster and clearer through the framework. However, there are two more subtle developmental problems which are targeted in this design. What these implementations do is performing pre-designed methodologies, which does not actually reflect how development works, meaning there is a hidden undercurrent of steps that can not be seen by laying the implementation steps side by side like this.\\ 
+
+The two extra aspects that are examined are modifications and expansions. In order to understand the modifications work load - how they arise in a development process, how a multi-task, multi-dataset setting can exacerbate the problem - consider why modifications are required and how these rigid systems would force them to be handled. Modifications are often required in order to get the implementation even working. In case the transformation function needs to change in \cite{pytorchmultitask} and \cite{multiclasstutorial}, because an error is given (e.g. the input matrix is resized to an incompatible size) the developer has to replace the code in multiple places and again execute the whole extraction process as well. If then there is still a fault which doesn't raise an error, but leads to invalid results, this has to be redone again. After that if there is no more error, but the results aren't optimal wherefor the transformation is varied to be optimized, the same thing happens multiple times and everything keeps getting recalculated from the raw datasets. Consider then that this has to be done for 1) multiple datasets 2) multiple elements (e.g. the extraction method) 3) multiple locations of their calls. Simply put, modification is an inseparable part of implementation as well as the whole development cycle and if it isn't anticipated, the high, error-prone, repetitive workload ensues. The framework reduces these type of calls to singular, extendible places as to avoid having to keep track of where to make modifications. An example of this is the HoldTaskDataset structure which automatically handles the correct redirection of the functionalities to the training set and test set where needed. Furthermore, when the interest lies in modifying and keeping track of the best results, using the framework offers the feature of replacing a part at runtime through the pipeline structure in the TrainingSetCreator. \\  
+
+The other aspect are expansions. One of the ideas of introducing this framework is to stimulate research, which in this regard means avoiding issues for experimentation. Extra steps, datasets, parameters and/or functions are insertable while the other parts of the pipeline are designed for flexibility. Looking at \cite{pytorchmultitask} for example, each input is linked to a set amount of different task labels. This means that the training module only works for that specific dataset, perhaps combined with others as long as they have the exact same structure. This framework is there to open the doors for unspecified amount of combinations of tasks and datasets. Not only experimentation is possible through this, but the gradual building of more complex pipeline structures for performance optimization as well. The key here in design is the flexibility of its structures and the extensibility to define new ways of handling the objects. Another important aspect is in its metric calculations and visualizations. The Results object offers both the option to have no limit on what a developer can add in terms of visualizations, but also includes the power to load old models and expand their visualizations.\\
+
+To reiterate, the referred examples are not particularly well written implementations, but do offer the opportunity to clearly indicate how the framework can simplify the process of implementing a multi-task system as well as quickly open it up to new opportunities. Aside from time saving shortcuts to implement one solution to a multi-task classification problem, the system also thinks about shortcuts in the optimization process as well as the experimentation process.\\
+
+
 \section{Three Implementations} \label{Design:Implementations}
 
-With the base strategies in the pipeline designed, it might seem complex without a clear reason why its abstractions were built. This section will give insight to how the framework was developed alongside giving clear examples of how the previous designs are instantiated. \\
+With the base strategies in the pipeline designed, it might seem complex without a clear reason why its abstractions were built. This section will give insight to how the framework was developed alongside giving clear examples of how the previous designs are instantiated. This is not meant to be taken in a way where the design followed from separate rudimentary implementations of this problem, but how the design was incrementally refined to serve more problems.\\
 
-The designing process for a framework is broken down by \cite{roberts1996evolving} as follows. Frameworks are reusable software patterns that facilitate the development of applications. Determining the correct abstractions must come from concrete examples, as it is nearly impossible to have to foresight to address the required functionalities from simply the domain. A number of abstractions do not become apparent until the framework has been reused. Generalizable solutions can only come from actually building the applications. \\
+The designing process for a framework is broken down by \citet{roberts1996evolving} as follows. Frameworks are reusable software patterns that facilitate the development of applications. Determining the correct abstractions must come from concrete examples, as it is nearly impossible to have to foresight to address the required functionalities from simply the domain. A number of abstractions do not become apparent until the framework has been reused. Generalizable solutions can only come from actually building the applications. \\
 
-What \citep{roberts1996evolving} propose as a simple step by step plan is to build three applications in the same problem domain which differ from each other each time. While the more applications get developed lead to a more generalizable framework, there has to be a cut off point as too many applications can make it impossible to actually finish the work. That being said, a framework is likely to continue to evolve after the three applications are made. What follows now is an explanation of the three applications that shaped the design of the framework, ending with conclusions drawn from them and further extensions. \\
+What \citet{roberts1996evolving} propose as a simple step by step plan is to build three applications in the same problem domain which differ from each other each time. While the more applications get developed lead to a more generalizable framework, there has to be a cut off point as too many applications can make it impossible to actually finish the work. That being said, a framework is likely to continue to evolve after the three applications are made. What follows now is an explanation of the three applications that shaped the design of the framework, ending with conclusions drawn from them and further extensions. \\
 
 {\large \textbf{Choice}} \\
 
@@ -169,17 +280,17 @@ First however, the choice of projects must be decided. Each of them will be acou
 
 {\large \textbf{Low-resource Multi-task Audio Sensing for Mobile and Embedded Devices via Shared Deep Neural Network Representations}} \\
 
-In the work done by \citep{georgiev2017low}, a Deep Neural Network is developed which tries to create a general purpose audio task model that addresses computational limitations of mobile, embedded and IOT devices. The approach is to bring 4 separate audio tasks together in one deep learning framework, for which they try out different configurations. Every task is tested combined in a multi-head network as well as separated after which they evaluate the effect on performance for each of them. The model that combined each in a single multi-head model was not significantly worse than the best performing one, making the multi-task set-up  a viable way to reduce resource requirements. \\
+In the work done by \citet{georgiev2017low}, a Deep Neural Network is developed which tries to create a general purpose audio task model that addresses computational limitations of mobile, embedded and IOT devices. The approach is to bring 4 separate audio tasks together in one deep learning framework, for which they try out different configurations. Every task is tested combined in a multi-head network as well as separated after which they evaluate the effect on performance for each of them. The model that combined each in a single multi-head model was not significantly worse than the best performing one, making the multi-task set-up  a viable way to reduce resource requirements. \\
 
-The chosen tasks here were Speaker Identification, Emotion Recognition, Stress Detection and Acoustic Scene Recognition. These are three background identification tasks, meaning they don't actually require to know what happens in an audio fragment and can take a longer time frame for labeling. To rebuild the actual set-up this work utilised the ASVSpoof database TODO: REFERENCE for the Speaker Identification task, the Ravdess database TODO: REFERENCE for emotional speech recognition task and the DCASE 2017 Acoustic Scene dataset TODO: Reference for the Acoustic Scene Recognition task. However, the authors used a self made dataset for the stress detection for which no suitable replacement was found. \\
+The chosen tasks here were Speaker Identification, Emotion Recognition, Stress Detection and Acoustic Scene Recognition. These are three background identification tasks, meaning they don't actually require to know what happens in an audio fragment and can take a longer time frame for labeling. To rebuild the actual set-up this work utilised the ASVSpoof database \cite{wu2015asvspoof} for the Speaker Identification task, the Ravdess database \cite{livingstone2012ravdess} for emotional speech recognition task and the DCASE 2017 Acoustic Scene dataset \cite{mesaros2017dcase}. The stress detection dataset was a subset of the Ravdess dataset with different audio lengths. \\
 
-For extracting features they utilised both MFCC TODO: REFERENCE and their own created summary of filter banks. This summary consists of creating different statistical aggregation metrics (e.g. the mean, the standard deviation, the median, ...) per coefficient from extracted log filter banks TODO: Reference. This creates a representation from an audio sample independent of time and requiring less space.\\
+For extracting features they utilised both MFCC \cite{pols1977spectral} and their own created summary of filter banks. This summary consists of creating different statistical aggregation metrics (e.g. the mean, the standard deviation, the median, ...) per coefficient from extracted log filter banks \cite{smith1987new}. This creates a representation from an audio sample independent of time and requiring less space.\\
 
 
 \begin{figure}
 	\centering
 	\includegraphics[width=1\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievModel"}
-	\caption{The Multi-Task pipeline and Model used in \cite{georgiev2017low}}
+	\caption{The Multi-Task pipeline and Model used in \citet{georgiev2017low}}
 	\label{fig:georgievmodel}
 \end{figure}
 
@@ -201,14 +312,14 @@ A few lessons have been made from recreating this exact set-up.
 \begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievObjectModel1"}
-	\caption{Object model instantiating the set-up from \cite{georgiev2017low} after the TaskDatasets are created}
+	\caption{Object model instantiating the set-up from \citet{georgiev2017low} after the TaskDatasets are created}
 	\label{fig:georgievobjectmodel1}
 \end{figure}
 
 \begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievObjectModel2"}
-	\caption{Object model instantiating the set-up from \cite{georgiev2017low} after the train and test sets are created along with the input objects for the Training}
+	\caption{Object model instantiating the set-up from \citet{georgiev2017low} after the train and test sets are created along with the input objects for the Training}
 	\label{fig:georgievobjectmodel2}
 \end{figure}
 
@@ -222,13 +333,13 @@ In the next object model, it is demonstrated then what the situation is after th
 
 {\large \textbf{A Multi-task Learning Approach Based on Convolutional Neural Network for Acoustic Scene Classification}} \\
 
-In this paper, by \citet{xu2019multi}, an Acoustic Event Detection (AED) task and a Acoustic Scene Recognition (ASR) task are put together in the same multi task framework. Here a Convolutional Neural Network is used for classification with AED being an auxiliary task for improving the ASR task. The training data for the ASR task comes from the DCASE 2017 acoustic scene dataset while for the AED task it comes from the DCASE 2017 sound event dataset. The evaluation data comes from their respective predefined evaluation datasets. The evaluation metric is not simply accuracy which was the case in the previous work but Unweighted Average Recall TODO: Reference.\\
+In this paper, by \citet{xu2019multi}, an Acoustic Event Detection (AED) task and a Acoustic Scene Classification (ASC) task are put together in the same multi task framework. Here a Convolutional Neural Network is used for classification with AED being an auxiliary task for improving the ASR task. The training data for the ASC task comes from the DCASE 2017 acoustic scene dataset while for the AED task it comes from the DCASE 2017 sound event dataset. The evaluation data comes from their respective predefined evaluation datasets. The evaluation metric is not simply accuracy which was the case in the previous work but Unweighted Average Recall.\\
 
 Again, a number of lessons have been made from recreating this set-up:
 
 \begin{itemize}
 	\item This work has two predefined test sets, yet only one is used for evaluation as the focus is only one of the two tasks. Developers need to simply be able to control what goes in the training set and the test set separately, so training and evaluation can happen independently. On the same note, the framework should not only be made for combined datasets but be as receptive for single datasets.
-	\item ASR and AED function differently. ASR is a task where one singular label is predicted for a whole sound file. AED detects whether or not a sound event is present at every time frame within a sound file. Multiple sound events - and thus multiple labels - can be given to a single feature matrix. These are respectively called multi-class tasks and multi-label tasks and the system thus needs the ability to combine both. They (often) require different loss calculation methods (in this case categorical cross entropy and binary cross entropy respectively), which thus should be decided in the system depending on the type of task. Following that the developer only should focus on one part of the pipeline at a time, the developer should be able to define the handling of the task when the task is defined (in other words in the Task object).
+	\item ASC and AED function differently. ASC is a task where one singular label is predicted for a whole sound file. AED detects whether or not a sound event is present at every time frame within a sound file. Multiple sound events - and thus multiple labels - can be given to a single feature matrix. These are respectively called multi-class tasks and multi-label tasks and the system thus needs the ability to combine both. They (often) require different loss calculation methods (in this case categorical cross entropy and binary cross entropy respectively), which thus should be decided in the system depending on the type of task. Following that the developer only should focus on one part of the pipeline at a time, the developer should be able to define the handling of the task when the task is defined (in other words in the Task object).
 	\item Alongside handling the model output depending on the task definition, the model output head for each task itself should be adaptable on its definition. Multi-class tasks need only one output, which in this case is achieved by a SoftMax layer. Multi-label  tasks need multiple output labels which happens here through a sigmoid layer defining the activation value for each label. The dynamic output of models is important when different task combinations are made for the same system.
 	\item There are numerous ways to evaluate the output of the system. Standard evaluation metrics should automatically be readily available, but the developer needs to be able to define their own required implementations easily. 
 	\item The DCASE audio files are not mono audio files but stereo. This means that there are two time series in parallel for which individual feature matrices have to be made and appended. It's also possibly desired that the audio files are converted to mono files.

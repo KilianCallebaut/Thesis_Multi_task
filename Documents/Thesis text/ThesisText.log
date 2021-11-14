@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  11 NOV 2021 16:40
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.17)  14 NOV 2021 21:43
 entering extended mode
 **./ThesisText.tex
 (ThesisText.tex
@@ -415,6 +415,10 @@ LaTeX Info: Redefining \addtolength on input line 81.
 )
 \c@@todonotes@numberoftodonotes=\count269
 )
+(C:\Users\mrKC1\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty
+\Urlmuskip=\muskip16
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
 (C:\Users\mrKC1\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdf
 mode.def
 File: l3backend-pdfmode.def 2020-08-07 L3 backend support: PDF mode
@@ -423,20 +427,20 @@ File: l3backend-pdfmode.def 2020-08-07 L3 backend support: PDF mode
 ) (ThesisText.aux)
 \openout1 = `ThesisText.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 11.
-LaTeX Font Info:    ... okay on input line 11.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 11.
-LaTeX Font Info:    ... okay on input line 11.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 11.
-LaTeX Font Info:    ... okay on input line 11.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 11.
-LaTeX Font Info:    ... okay on input line 11.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 11.
-LaTeX Font Info:    ... okay on input line 11.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 11.
-LaTeX Font Info:    ... okay on input line 11.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 11.
-LaTeX Font Info:    ... okay on input line 11.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
 
 (C:\Users\mrKC1\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
 ii
@@ -463,12 +467,12 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 Package todonotes Warning: The length marginparwidth is less than 2cm and will 
 most likely cause issues with the appearance of inserted todonotes. The issue c
 an be solved by adding a line like \setlength {\marginparwidth }{2cm} prior to 
-loading the todonotes package. on input line 11.
+loading the todonotes package. on input line 12.
 
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <14.4> on input line 12.
+(Font)              <14.4> on input line 13.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 12.
+(Font)              <7> on input line 13.
 [1
 
 {C:/Users/mrKC1/AppData/Local/MiKTeX/pdftex/config/pdftex.map}] [1]
@@ -590,18 +594,6 @@ Overfull \hbox (0.61816pt too wide) in paragraph at lines 64--66
 pling method)
  []
 
-
-Package natbib Warning: Citation `fonseca2017freesound' on page 10 undefined on
- input line 69.
-
-
-Package natbib Warning: Citation `piczak2015esc' on page 10 undefined on input 
-line 69.
-
-
-Package natbib Warning: Citation `paper2021tensorflow' on page 10 undefined on 
-input line 69.
-
 [10] [11]
 Underfull \hbox (badness 10000) in paragraph at lines 111--112
 
@@ -610,25 +602,9 @@ Underfull \hbox (badness 10000) in paragraph at lines 111--112
 [12]) (RelatedWork.tex [13]
 Chapter 2.
 
-Package natbib Warning: Citation `hannun2014deep' on page 14 undefined on input
- line 6.
-
-
-Package natbib Warning: Citation `abesser2020review' on page 14 undefined on in
-put line 6.
-
-
-Package natbib Warning: Citation `huang2019state' on page 14 undefined on input
- line 6.
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 6--7
 
  []
-
-
-Package natbib Warning: Citation `huang2019state' on page 14 undefined on input
- line 8.
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 8--9
@@ -687,11 +663,6 @@ Underfull \hbox (badness 10000) in paragraph at lines 52--53
  []
 
 [17]
-
-Package natbib Warning: Citation `ziaei2013prof' on page 18 undefined on input 
-line 64.
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 64--65
 
  []
@@ -708,48 +679,13 @@ Underfull \hbox (badness 10000) in paragraph at lines 76--76
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 77--77
-[]\OT1/cmr/m/n/12 Sakti et al.
- []
-
-
 Underfull \hbox (badness 4416) in paragraph at lines 77--77
 []\OT1/cmr/m/n/12 Automatic Speech Recog-ni-tion; Acous-tic
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 78--78
-[]\OT1/cmr/m/n/12 Georgiev
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 78--78
-\OT1/cmr/m/n/12 [2017]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 78--78
-\OT1/cmr/m/n/12 Georgiev
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 79--79
-[]\OT1/cmr/m/n/12 Kim et al.
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 80--80
-[]\OT1/cmr/m/n/12 Nwe et al.
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 81--81
-[]\OT1/cmr/m/n/12 Phan et al.
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 82--82
-[]\OT1/cmr/m/n/12 Sun et al.
+[]\OT1/cmr/m/n/12 Georgiev [][][]
  []
 
 
@@ -783,11 +719,6 @@ Underfull \hbox (badness 10000) in paragraph at lines 100--100
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 101--101
-[]\OT1/cmr/m/n/12 Phan et al.
- []
-
-
 Underfull \hbox (badness 1264) in paragraph at lines 102--102
 []\OT1/cmr/m/n/12 Tonami et al.
  []
@@ -798,23 +729,8 @@ Underfull \hbox (badness 10000) in paragraph at lines 102--102
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 103--103
-[]\OT1/cmr/m/n/12 Xia et al.
- []
-
-
 Underfull \hbox (badness 1540) in paragraph at lines 103--103
 \OT1/cmr/m/n/12 ging); Pre-dict frame po-si-tion in-for-ma-tion
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 105--105
-[]\OT1/cmr/m/n/12 Zeng et al.
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 106--106
-[]\OT1/cmr/m/n/12 Zeng et al.
  []
 
 
@@ -840,16 +756,6 @@ Underfull \hbox (badness 10000) in paragraph at lines 110--110
 
 Underfull \hbox (badness 4913) in paragraph at lines 111--111
 []\OT1/cmr/m/n/12 Huang et al.
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 112--112
-[]\OT1/cmr/m/n/12 Imoto et al.
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 113--113
-[]\OT1/cmr/m/n/12 Jung et al.
  []
 
 
@@ -887,12 +793,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 138--139
 
  []
 
-[19]
+
 Underfull \hbox (badness 10000) in paragraph at lines 140--141
 
  []
 
-
+[19]
 Overfull \hbox (3.12pt too wide) in paragraph at lines 143--144
 []\OT1/cmr/bx/n/12 Multi-Task Speech Recog-ni-tion Tasks. \OT1/cmr/m/n/12 For A
 u-to-matic Speech Recog-
@@ -948,17 +854,17 @@ Underfull \hbox (badness 10000) in paragraph at lines 163--164
 
  []
 
-[22]
+
 Underfull \hbox (badness 10000) in paragraph at lines 165--166
 
  []
 
-
+[22]
 Underfull \hbox (badness 10000) in paragraph at lines 168--169
 
  []
 
-[23]
+
 Underfull \hbox (badness 10000) in paragraph at lines 170--171
 
  []
@@ -968,7 +874,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 172--173
 
  []
 
-
+[23]
 Underfull \hbox (badness 10000) in paragraph at lines 174--175
 
  []
@@ -983,7 +889,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 179--180
 
  []
 
-[24]
+
 Underfull \hbox (badness 10000) in paragraph at lines 181--182
 
  []
@@ -993,7 +899,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 183--184
 
  []
 
-
+[24]
 Underfull \hbox (badness 10000) in paragraph at lines 185--186
 
  []
@@ -1003,12 +909,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 194--195
 
  []
 
-[25]
+
 Underfull \hbox (badness 10000) in paragraph at lines 196--197
 
  []
 
-<../../../../Documents/TU Delft/Thesis 2/System Explanation/BlackBox.png, id=97
+<../../../../Documents/TU Delft/Thesis 2/System Explanation/BlackBox.png, id=94
 , 117.43875pt x 94.10156pt>
 File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/BlackBox.png G
 raphic file (type png)
@@ -1016,7 +922,7 @@ raphic file (type png)
 Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
 tion/BlackBox.png  used on input line 200.
 (pdftex.def)             Requested size: 191.10214pt x 153.12714pt.
-<../../../../Documents/TU Delft/Thesis 2/System Explanation/WhiteBox.png, id=98
+<../../../../Documents/TU Delft/Thesis 2/System Explanation/WhiteBox.png, id=95
 , 100.12407pt x 91.84312pt>
 File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/WhiteBox.png G
 raphic file (type png)
@@ -1029,8 +935,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 205--206
 
  []
 
-[26 <../../../../Documents/TU Delft/Thesis 2/System Explanation/BlackBox.png> <
-../../../../Documents/TU Delft/Thesis 2/System Explanation/WhiteBox.png>]
+[25]
 Underfull \hbox (badness 10000) in paragraph at lines 216--217
 
  []
@@ -1040,73 +945,28 @@ Underfull \hbox (badness 10000) in paragraph at lines 218--219
 
  []
 
-
-Package natbib Warning: Citation `dong2017tensorlayer' on page 27 undefined on 
-input line 220.
-
-
-Package natbib Warning: Citation `tokui2019chainer' on page 27 undefined on inp
-ut line 220.
-
-
-Package natbib Warning: Citation `chen2019selene' on page 27 undefined on input
- line 220.
-
-
-Package natbib Warning: Citation `tensorflow' on page 27 undefined on input lin
-e 220.
-
-
-Package natbib Warning: Citation `nguyen2019machine' on page 27 undefined on in
-put line 220.
-
-
-Package natbib Warning: Citation `dong2017tensorlayer' on page 27 undefined on 
-input line 220.
-
-
+[26 <../../../../Documents/TU Delft/Thesis 2/System Explanation/BlackBox.png> <
+../../../../Documents/TU Delft/Thesis 2/System Explanation/WhiteBox.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 220--221
 
  []
-
-[27]
-
-Package natbib Warning: Citation `chen2019selene' on page 28 undefined on input
- line 222.
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 222--223
 
  []
 
-
-Package natbib Warning: Citation `tokui2019chainer' on page 28 undefined on inp
-ut line 224.
-
-
+[27]
 Underfull \hbox (badness 10000) in paragraph at lines 224--225
 
  []
-
-[28]
-
-Package natbib Warning: Citation `dong2017tensorlayer' on page 29 undefined on 
-input line 226.
-
-
-Package natbib Warning: Citation `tokui2019chainer' on page 29 undefined on inp
-ut line 226.
-
-
-Package natbib Warning: Citation `chen2019selene' on page 29 undefined on input
- line 226.
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 226--227
 
  []
 
-
+[28]
 Underfull \hbox (badness 10000) in paragraph at lines 229--230
 
  []
@@ -1119,24 +979,24 @@ Underfull \hbox (badness 10000) in paragraph at lines 231--232
 ) (ProblemStatement.tex [29] [30] [31] [32]
 Chapter 3.
 
-Underfull \hbox (badness 10000) in paragraph at lines 13--14
+Underfull \hbox (badness 10000) in paragraph at lines 5--6
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 15--16
 
  []
 
 [33
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 15--16
-
- []
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 17--18
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 22--23
+Underfull \hbox (badness 10000) in paragraph at lines 19--20
 
  []
 
@@ -1146,7 +1006,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 24--25
  []
 
 [34]
-Underfull \hbox (badness 10000) in paragraph at lines 34--35
+Underfull \hbox (badness 10000) in paragraph at lines 26--27
 
  []
 
@@ -1155,12 +1015,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 36--37
 
  []
 
-[35] [36]
-Underfull \hbox (badness 10000) in paragraph at lines 65--66
+
+Underfull \hbox (badness 10000) in paragraph at lines 38--39
 
  []
 
-
+[35] [36]
 Underfull \hbox (badness 10000) in paragraph at lines 67--68
 
  []
@@ -1195,28 +1055,38 @@ Underfull \hbox (badness 10000) in paragraph at lines 79--80
 
  []
 
+
+Underfull \hbox (badness 10000) in paragraph at lines 81--82
+
+ []
+
 [38] [39]
-Overfull \hbox (4.46951pt too wide) in paragraph at lines 101--102
+Overfull \hbox (4.46951pt too wide) in paragraph at lines 102--103
 []\OT1/cmr/m/n/12 The func-tional re-quire-ments will be grouped along the step
 s in the pipeline,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 101--102
+Underfull \hbox (badness 10000) in paragraph at lines 102--103
 
  []
 
 [40] [41] [42] [43]) (Model.tex [44]
 Chapter 4.
 
-Underfull \hbox (badness 10000) in paragraph at lines 14--15
+Underfull \hbox (badness 10000) in paragraph at lines 12--13
 
  []
 
 
-Overfull \hbox (1.98898pt too wide) in paragraph at lines 16--17
+Overfull \hbox (1.98898pt too wide) in paragraph at lines 14--15
 \OT1/cmr/m/n/12 the fo-cus will be on pro-vid-ing ab-strac-tions cut-ting ef-fo
 rt of com-bin-ing datasets
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 14--15
+
  []
 
 
@@ -1227,10 +1097,6 @@ Underfull \hbox (badness 10000) in paragraph at lines 16--17
 [45
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 18--19
-
- []
-
 <../../../../Documents/TU Delft/Thesis 2/System Explanation/CompleteSystemDiagr
 am.png, id=165, 2271.48625pt x 1262.7175pt>
 File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/CompleteSystem
@@ -1238,15 +1104,20 @@ Diagram.png Graphic file (type png)
 <use ../../../../Documents/TU Delft/Thesis 2/System Explanation/CompleteSystemD
 iagram.png>
 Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
-tion/CompleteSystemDiagram.png  used on input line 24.
+tion/CompleteSystemDiagram.png  used on input line 22.
 (pdftex.def)             Requested size: 390.0pt x 216.79782pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 29--30
+Underfull \hbox (badness 10000) in paragraph at lines 27--28
 
  []
 
 [46 <../../../../Documents/TU Delft/Thesis 2/System Explanation/CompleteSystemD
 iagram.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 40--41
+
+ []
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 42--43
 
  []
@@ -1261,11 +1132,6 @@ Underfull \hbox (badness 10000) in paragraph at lines 46--47
 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 48--49
-
- []
-
 <../../../../Documents/TU Delft/Thesis 2/System Explanation/CompletePatternDiag
 ram.png, id=174, 2271.48625pt x 1259.70625pt>
 File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/CompletePatter
@@ -1273,9 +1139,15 @@ nDiagram.png Graphic file (type png)
 <use ../../../../Documents/TU Delft/Thesis 2/System Explanation/CompletePattern
 Diagram.png>
 Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
-tion/CompletePatternDiagram.png  used on input line 52.
+tion/CompletePatternDiagram.png  used on input line 50.
 (pdftex.def)             Requested size: 390.0pt x 216.28082pt.
 
+Underfull \hbox (badness 10000) in paragraph at lines 55--56
+
+ []
+
+[48 <../../../../Documents/TU Delft/Thesis 2/System Explanation/CompletePattern
+Diagram.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 57--58
 
  []
@@ -1285,89 +1157,28 @@ Underfull \hbox (badness 10000) in paragraph at lines 59--60
 
  []
 
-[48]
-Underfull \hbox (badness 10000) in paragraph at lines 61--62
-
- []
-
-[49 <../../../../Documents/TU Delft/Thesis 2/System Explanation/CompletePattern
-Diagram.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 79--80
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 82--83
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 84--85
-
- []
-
-[50]
-Underfull \hbox (badness 10000) in paragraph at lines 86--87
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 88--89
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 93--94
-
- []
-
-[51]
-Underfull \hbox (badness 10000) in paragraph at lines 95--96
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 97--98
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 99--100
-
- []
-
-
+[49] [50] [51]
 Underfull \hbox (badness 10000) in paragraph at lines 104--105
 
  []
 
+
+Underfull \hbox (badness 10000) in paragraph at lines 107--108
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 109--110
+
+ []
+
 [52]
-Underfull \hbox (badness 10000) in paragraph at lines 106--107
+Underfull \hbox (badness 10000) in paragraph at lines 111--112
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 108--109
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 110--111
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 112--113
-
- []
-
-[53]
-Underfull \hbox (badness 10000) in paragraph at lines 114--115
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 116--117
+Underfull \hbox (badness 10000) in paragraph at lines 113--114
 
  []
 
@@ -1376,78 +1187,83 @@ Underfull \hbox (badness 10000) in paragraph at lines 118--119
 
  []
 
-[54]
+[53]
+Underfull \hbox (badness 10000) in paragraph at lines 120--121
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 122--123
+
+ []
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 124--125
 
  []
 
-<../../../../Documents/TU Delft/Thesis 2/System Explanation/SequenceDiagram.png
-, id=198, 1416.29124pt x 804.00375pt>
-File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/SequenceDiagra
-m.png Graphic file (type png)
-<use ../../../../Documents/TU Delft/Thesis 2/System Explanation/SequenceDiagram
-.png>
-Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
-tion/SequenceDiagram.png  used on input line 128.
-(pdftex.def)             Requested size: 390.0pt x 221.39001pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 129--130
+
+ []
+
+[54]
+Underfull \hbox (badness 10000) in paragraph at lines 131--132
+
+ []
+
 
 Underfull \hbox (badness 10000) in paragraph at lines 133--134
 
  []
 
-[55 <../../../../Documents/TU Delft/Thesis 2/System Explanation/SequenceDiagram
-.png>]
+
 Underfull \hbox (badness 10000) in paragraph at lines 135--136
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 139--141
+Underfull \hbox (badness 10000) in paragraph at lines 137--138
+
+ []
+
+[55]
+Underfull \hbox (badness 10000) in paragraph at lines 139--140
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 145--146
+Underfull \hbox (badness 10000) in paragraph at lines 141--142
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 143--144
 
  []
 
 [56]
-Underfull \hbox (badness 10000) in paragraph at lines 147--148
-
- []
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 149--150
 
  []
 
+<../../../../Documents/TU Delft/Thesis 2/System Explanation/SequenceDiagram.png
+, id=204, 1416.29124pt x 804.00375pt>
+File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/SequenceDiagra
+m.png Graphic file (type png)
+<use ../../../../Documents/TU Delft/Thesis 2/System Explanation/SequenceDiagram
+.png>
+Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
+tion/SequenceDiagram.png  used on input line 153.
+(pdftex.def)             Requested size: 390.0pt x 221.39001pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 151--152
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 153--154
-
- []
-
-[57]
-Underfull \hbox (badness 10000) in paragraph at lines 157--158
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 159--160
+Underfull \hbox (badness 10000) in paragraph at lines 158--159
 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 161--162
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 163--164
+[57 <../../../../Documents/TU Delft/Thesis 2/System Explanation/SequenceDiagram
+.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 160--161
 
  []
 
@@ -1456,20 +1272,14 @@ Underfull \hbox (badness 10000) in paragraph at lines 165--166
 
  []
 
-[58]
+
 Underfull \hbox (badness 10000) in paragraph at lines 170--171
 
  []
 
-
+[58]
 Underfull \hbox (badness 10000) in paragraph at lines 172--173
 
- []
-
-
-Overfull \hbox (12.76404pt too wide) in paragraph at lines 174--175
-\OT1/cmr/m/n/12 TODO: REF-ER-ENCE for the Speaker Iden-ti-fi-ca-tion task, the 
-Ravdess database
  []
 
 
@@ -1482,82 +1292,176 @@ Underfull \hbox (badness 10000) in paragraph at lines 176--177
 
  []
 
+
+Underfull \hbox (badness 10000) in paragraph at lines 178--179
+
+ []
+
 [59]
+Underfull \hbox (badness 10000) in paragraph at lines 182--183
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 184--185
+
+ []
+
+
+Overfull \hbox (28.34143pt too wide) in paragraph at lines 214--217
+[][]
+ []
+
+[60]
+Overfull \hbox (28.34143pt too wide) in paragraph at lines 248--249
+[][] 
+ []
+
+[61]
+Underfull \hbox (badness 10000) in paragraph at lines 255--256
+
+ []
+
+[62]
+Underfull \hbox (badness 10000) in paragraph at lines 257--258
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 259--260
+
+ []
+
+[63]
+Underfull \hbox (badness 10000) in paragraph at lines 261--262
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 263--264
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 268--269
+
+ []
+
+[64]
+Underfull \hbox (badness 10000) in paragraph at lines 270--271
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 272--273
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 274--275
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 276--277
+
+ []
+
+[65]
+Underfull \hbox (badness 10000) in paragraph at lines 281--282
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 283--284
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 285--286
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 287--288
+
+ []
+
 <../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievModel.png, 
-id=216, 436.63126pt x 274.77657pt>
+id=235, 436.63126pt x 274.77657pt>
 File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievModel.
 png Graphic file (type png)
 <use ../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievModel.p
 ng>
 Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
-tion/GeorgievModel.png  used on input line 181.
+tion/GeorgievModel.png  used on input line 292.
 (pdftex.def)             Requested size: 390.0pt x 245.43083pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 186--187
+Underfull \hbox (badness 10000) in paragraph at lines 297--298
 
  []
 
-[60 <../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievModel.p
-ng>]
+[66] [67 <../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievMo
+del.png>]
 <../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievObjectModel
-1.png, id=221, 1175.39125pt x 1384.17125pt>
+1.png, id=243, 1175.39125pt x 1384.17125pt>
 File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievObject
 Model1.png Graphic file (type png)
 <use ../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievObjectM
 odel1.png>
 Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
-tion/GeorgievObjectModel1.png  used on input line 203.
+tion/GeorgievObjectModel1.png  used on input line 314.
 (pdftex.def)             Requested size: 390.0pt x 459.27017pt.
 <../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievObjectModel
-2.png, id=222, 2018.54124pt x 1877.0125pt>
+2.png, id=244, 2018.54124pt x 1877.0125pt>
 File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievObject
 Model2.png Graphic file (type png)
 <use ../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievObjectM
 odel2.png>
 Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
-tion/GeorgievObjectModel2.png  used on input line 210.
+tion/GeorgievObjectModel2.png  used on input line 321.
 (pdftex.def)             Requested size: 390.0pt x 362.65067pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 216--217
+Underfull \hbox (badness 10000) in paragraph at lines 327--328
 
  []
 
-[61] [62 <../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievOb
-jectModel1.png>] [63 <../../../../Documents/TU Delft/Thesis 2/System Explanatio
+
+Underfull \hbox (badness 10000) in paragraph at lines 329--330
+
+ []
+
+[68] [69 <../../../../Documents/TU Delft/Thesis 2/System Explanation/GeorgievOb
+jectModel1.png>] [70 <../../../../Documents/TU Delft/Thesis 2/System Explanatio
 n/GeorgievObjectModel2.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 218--219
+Underfull \hbox (badness 10000) in paragraph at lines 331--332
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 220--221
+Underfull \hbox (badness 10000) in paragraph at lines 334--335
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 223--224
+Underfull \hbox (badness 10000) in paragraph at lines 336--337
+
+ []
+
+[71]
+Underfull \hbox (badness 10000) in paragraph at lines 348--349
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 225--226
+Underfull \hbox (badness 10000) in paragraph at lines 350--351
 
  []
 
-[64]
-Underfull \hbox (badness 10000) in paragraph at lines 237--238
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 239--240
-
- []
-
-[65]) (Implementation.tex [66]
+) (Implementation.tex [72]
 Chapter 5.
 <../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOverview.
-png, id=244, 1215.54124pt x 452.69125pt>
+png, id=263, 1215.54124pt x 452.69125pt>
 File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOver
 view.png Graphic file (type png)
 <use ../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOverv
@@ -1575,14 +1479,14 @@ Underfull \hbox (badness 10000) in paragraph at lines 26--27
 
  []
 
-[67
+[73
 
 ]
 Underfull \hbox (badness 10000) in paragraph at lines 30--31
 
  []
 
-[68 <../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOverv
+[74 <../../../../Documents/TU Delft/Thesis 2/System Explanation/SimplifiedOverv
 iew.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 32--33
 
@@ -1604,9 +1508,9 @@ Underfull \hbox (badness 10000) in paragraph at lines 36--37
 
  []
 
-[69]
+[75]
 <../../../../Documents/TU Delft/Thesis 2/System Explanation/DataReadingFlow.png
-, id=255, 308.65312pt x 558.58687pt>
+, id=274, 308.65312pt x 558.58687pt>
 File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/DataReadingFlo
 w.png Graphic file (type png)
 <use ../../../../Documents/TU Delft/Thesis 2/System Explanation/DataReadingFlow
@@ -1615,7 +1519,7 @@ Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
 tion/DataReadingFlow.png  used on input line 45.
 (pdftex.def)             Requested size: 195.0pt x 352.90883pt.
 <../../../../Documents/TU Delft/Thesis 2/System Explanation/DataReaderSnip.png,
- id=256, 545.78906pt x 392.21532pt>
+ id=275, 545.78906pt x 392.21532pt>
 File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/DataReaderSnip
 .png Graphic file (type png)
 <use ../../../../Documents/TU Delft/Thesis 2/System Explanation/DataReaderSnip.
@@ -1623,11 +1527,11 @@ png>
 Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
 tion/DataReaderSnip.png  used on input line 52.
 (pdftex.def)             Requested size: 390.0pt x 280.26425pt.
- [70] [71 <../../../../Documents/TU Delft/Thesis 2/System Explanation/DataReadi
-ngFlow.png>] [72 <../../../../Documents/TU Delft/Thesis 2/System Explanation/Da
+ [76] [77 <../../../../Documents/TU Delft/Thesis 2/System Explanation/DataReadi
+ngFlow.png>] [78 <../../../../Documents/TU Delft/Thesis 2/System Explanation/Da
 taReaderSnip.png>]
 <../../../../Documents/TU Delft/Thesis 2/System Explanation/ExtractionMethodSni
-p.png, id=269, 717.43031pt x 199.49532pt>
+p.png, id=288, 717.43031pt x 199.49532pt>
 File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/ExtractionMeth
 odSnip.png Graphic file (type png)
 <use ../../../../Documents/TU Delft/Thesis 2/System Explanation/ExtractionMetho
@@ -1645,7 +1549,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 81--82
 
  []
 
-[73 <../../../../Documents/TU Delft/Thesis 2/System Explanation/ExtractionMetho
+[79 <../../../../Documents/TU Delft/Thesis 2/System Explanation/ExtractionMetho
 dSnip.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 83--84
 
@@ -1657,7 +1561,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 85--86
  []
 
 
-LaTeX Warning: Reference `fig:taskdataset-structure' on page 74 undefined on in
+LaTeX Warning: Reference `fig:taskdataset-structure' on page 80 undefined on in
 put line 87.
 
 
@@ -1670,13 +1574,13 @@ Underfull \hbox (badness 10000) in paragraph at lines 90--91
 
  []
 
-[74]
+[80]
 Underfull \hbox (badness 10000) in paragraph at lines 94--95
 
  []
 
 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatasetAddInput
-sSnip.png, id=277, 698.61pt x 198.7425pt>
+sSnip.png, id=296, 698.61pt x 198.7425pt>
 File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatasetAdd
 InputsSnip.png Graphic file (type png)
 <use ../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatasetAddI
@@ -1685,7 +1589,7 @@ Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
 tion/TaskDatasetAddInputsSnip.png  used on input line 99.
 (pdftex.def)             Requested size: 390.0pt x 110.94931pt.
 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatasetAddTarge
-tsSnip.png, id=278, 644.4075pt x 279.29344pt>
+tsSnip.png, id=297, 644.4075pt x 279.29344pt>
 File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatasetAdd
 TargetsSnip.png Graphic file (type png)
 <use ../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatasetAddT
@@ -1703,7 +1607,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 123--124
 
  []
 
-[75 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatasetAddI
+[81 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatasetAddI
 nputsSnip.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 125--126
 
@@ -1714,7 +1618,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 127--128
 
  []
 
-[76 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatasetAddT
+[82 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TaskDatasetAddT
 argetsSnip.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 129--130
 
@@ -1726,7 +1630,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 131--132
  []
 
 
-LaTeX Warning: Reference `fig:taskdataset-structure' on page 77 undefined on in
+LaTeX Warning: Reference `fig:taskdataset-structure' on page 83 undefined on in
 put line 138.
 
 
@@ -1734,7 +1638,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 138--139
 
  []
 
-[77]
+[83]
 Underfull \hbox (badness 10000) in paragraph at lines 140--142
 
  []
@@ -1749,7 +1653,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 147--148
 
  []
 
-[78]
+[84]
 Underfull \hbox (badness 10000) in paragraph at lines 151--152
 
  []
@@ -1764,7 +1668,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 155--156
 
  []
 
-[79]
+[85]
 Underfull \hbox (badness 10000) in paragraph at lines 157--158
 
  []
@@ -1784,13 +1688,13 @@ Underfull \hbox (badness 10000) in paragraph at lines 168--169
 
  []
 
-[80]
+[86]
 Underfull \hbox (badness 10000) in paragraph at lines 170--171
 
  []
 
 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TrainingSetCreatorO
-perationsSnip.png, id=300, 649.67719pt x 328.97906pt>
+perationsSnip.png, id=319, 649.67719pt x 328.97906pt>
 File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/TrainingSetCre
 atorOperationsSnip.png Graphic file (type png)
 <use ../../../../Documents/TU Delft/Thesis 2/System Explanation/TrainingSetCrea
@@ -1799,7 +1703,7 @@ Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
 tion/TrainingSetCreatorOperationsSnip.png  used on input line 177.
 (pdftex.def)             Requested size: 390.0pt x 197.48935pt.
 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TrainingSetExecutio
-nExampleSnip.png, id=301, 679.03688pt x 121.20282pt>
+nExampleSnip.png, id=320, 679.03688pt x 121.20282pt>
 File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/TrainingSetExe
 cutionExampleSnip.png Graphic file (type png)
 <use ../../../../Documents/TU Delft/Thesis 2/System Explanation/TrainingSetExec
@@ -1812,7 +1716,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 192--193
 
  []
 
-[81 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TrainingSetCrea
+[87 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TrainingSetCrea
 torOperationsSnip.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 196--197
 
@@ -1824,7 +1728,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 198--199
  []
 
 <../../../../Documents/TU Delft/Thesis 2/System Explanation/completeTrainingSni
-p.png, id=306, 680.5425pt x 534.49687pt>
+p.png, id=325, 680.5425pt x 534.49687pt>
 File: ../../../../Documents/TU Delft/Thesis 2/System Explanation/completeTraini
 ngSnip.png Graphic file (type png)
 <use ../../../../Documents/TU Delft/Thesis 2/System Explanation/completeTrainin
@@ -1832,7 +1736,7 @@ gSnip.png>
 Package pdftex.def Info: ../../../../Documents/TU Delft/Thesis 2/System Explana
 tion/completeTrainingSnip.png  used on input line 202.
 (pdftex.def)             Requested size: 390.0pt x 306.30568pt.
-[82 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TrainingSetExec
+[88 <../../../../Documents/TU Delft/Thesis 2/System Explanation/TrainingSetExec
 utionExampleSnip.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 209--210
 
@@ -1843,7 +1747,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 211--212
 
  []
 
-[83 <../../../../Documents/TU Delft/Thesis 2/System Explanation/completeTrainin
+[89 <../../../../Documents/TU Delft/Thesis 2/System Explanation/completeTrainin
 gSnip.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 213--214
 
@@ -1859,7 +1763,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 217--218
 
  []
 
-[84]
+[90]
 Underfull \hbox (badness 10000) in paragraph at lines 219--220
 
  []
@@ -1874,7 +1778,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 227--228
 
  []
 
-[85]
+[91]
 Underfull \hbox (badness 10000) in paragraph at lines 229--230
 
  []
@@ -1894,7 +1798,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 239--240
 
  []
 
-[86]
+[92]
 Underfull \hbox (badness 10000) in paragraph at lines 241--242
 
  []
@@ -1904,7 +1808,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 245--246
 
  []
 
-[87]
+[93]
 Underfull \hbox (badness 10000) in paragraph at lines 247--248
 
  []
@@ -1924,12 +1828,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 255--256
 
  []
 
-[88]
+[94]
 Underfull \hbox (badness 10000) in paragraph at lines 267--268
 
  []
 
-[89]
+[95]
 Underfull \hbox (badness 10000) in paragraph at lines 276--277
 
  []
@@ -1944,7 +1848,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 282--283
 
  []
 
-[90]
+[96]
 Overfull \hbox (2.57825pt too wide) in paragraph at lines 284--285
 \OT1/cmr/m/n/12 The \OT1/cmr/bx/n/12 Hold-Task-Dataset\OT1/cmr/m/n/12 , \OT1/cm
 r/bx/n/12 Train-Task-Dataset \OT1/cmr/m/n/12 and \OT1/cmr/bx/n/12 Test-Task-Dat
@@ -1966,7 +1870,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 288--289
 
  []
 
-[91]
+[97]
 Underfull \hbox (badness 10000) in paragraph at lines 292--293
 
  []
@@ -1987,12 +1891,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 298--299
 
  []
 
-[92]
+[98]
 Underfull \hbox (badness 10000) in paragraph at lines 300--301
 
  []
 
-[93]) (EvaluationV2.tex [94]
+[99]) (EvaluationV2.tex [100]
 Chapter 6.
 
 Underfull \hbox (badness 4279) in paragraph at lines 22--22
@@ -2002,16 +1906,6 @@ Underfull \hbox (badness 4279) in paragraph at lines 22--22
 
 Underfull \hbox (badness 5622) in paragraph at lines 22--22
 []\OT1/cmr/m/n/12 Data Load-ing
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 25--25
-[]\OT1/cmr/m/n/12 Park et al.
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 26--26
-[]\OT1/cmr/m/n/12 Park et al.
  []
 
 
@@ -2034,20 +1928,21 @@ Underfull \hbox (badness 10000) in paragraph at lines 36--37
 
  []
 
-[95
+[101
 
 ]
 Underfull \hbox (badness 10000) in paragraph at lines 38--39
 
  []
 
-[96]
+[102]
 Underfull \hbox (badness 10000) in paragraph at lines 40--41
 
  []
 
 
-LaTeX Warning: Reference `table:metric' on page 97 undefined on input line 42.
+LaTeX Warning: Reference `table:metric' on page 103 undefined on input line 42.
+
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 42--43
@@ -2064,7 +1959,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 46--47
 
  []
 
-[97]
+[103]
 Underfull \hbox (badness 10000) in paragraph at lines 48--49
 
  []
@@ -2074,12 +1969,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 50--51
 
  []
 
-[98]
+[104]
 Underfull \hbox (badness 10000) in paragraph at lines 52--53
 
  []
 
-<screenshot005.png, id=363, 706.89093pt x 478.78876pt>
+<screenshot005.png, id=382, 706.89093pt x 478.78876pt>
 File: screenshot005.png Graphic file (type png)
 <use screenshot005.png>
 Package pdftex.def Info: screenshot005.png  used on input line 57.
@@ -2089,7 +1984,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 63--64
 
  []
 
-[99] [100 <./screenshot005.png>]
+[105] [106 <./screenshot005.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 65--66
 
  []
@@ -2099,12 +1994,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 67--68
 
  []
 
-<screenshot002.png, id=371, 684.30656pt x 435.12563pt>
+<screenshot002.png, id=390, 684.30656pt x 435.12563pt>
 File: screenshot002.png Graphic file (type png)
 <use screenshot002.png>
 Package pdftex.def Info: screenshot002.png  used on input line 72.
 (pdftex.def)             Requested size: 390.0pt x 247.99098pt.
-<screenshot003.png, id=372, 700.86844pt x 529.22719pt>
+<screenshot003.png, id=391, 700.86844pt x 529.22719pt>
 File: screenshot003.png Graphic file (type png)
 <use screenshot003.png>
 Package pdftex.def Info: screenshot003.png  used on input line 79.
@@ -2114,7 +2009,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 84--85
 
  []
 
-[101] [102 <./screenshot002.png>] [103 <./screenshot003.png>]
+[107] [108 <./screenshot002.png>] [109 <./screenshot003.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 86--87
 
  []
@@ -2134,7 +2029,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 164--165
 
  []
 
-[104]
+[110]
 Underfull \hbox (badness 10000) in paragraph at lines 166--167
 
  []
@@ -2149,7 +2044,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 170--171
 
  []
 
-[105]
+[111]
 Underfull \hbox (badness 10000) in paragraph at lines 174--175
 
  []
@@ -2169,7 +2064,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 180--181
 
  []
 
-[106]
+[112]
 Underfull \hbox (badness 10000) in paragraph at lines 188--189
 
  []
@@ -2184,12 +2079,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 192--193
 
  []
 
-[107]
+
 Underfull \hbox (badness 10000) in paragraph at lines 194--195
 
  []
 
-
+[113]
 Underfull \hbox (badness 10000) in paragraph at lines 196--197
 
  []
@@ -2204,7 +2099,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 205--206
 
  []
 
-[108]
+[114]
 Underfull \hbox (badness 10000) in paragraph at lines 207--208
 
  []
@@ -2224,12 +2119,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 219--220
 
  []
 
-[109]
+
 Underfull \hbox (badness 10000) in paragraph at lines 221--222
 
  []
 
-
+[115]
 Underfull \hbox (badness 10000) in paragraph at lines 227--228
 
  []
@@ -2244,12 +2139,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 259--262
 
  []
 
-[110] [111]
+[116]
 Underfull \hbox (badness 10000) in paragraph at lines 266--267
 
  []
 
-[112] [113] [114] [115] [116] [117]) (Conclusion.tex [118]
+[117] [118] [119] [120] [121] [122]) (Conclusion.tex [123]
 Chapter 7.
 
 Underfull \hbox (badness 10000) in paragraph at lines 3--4
@@ -2261,7 +2156,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 5--6
 
  []
 
-[119
+[124
 
 ]
 Underfull \hbox (badness 10000) in paragraph at lines 17--18
@@ -2278,263 +2173,48 @@ Underfull \hbox (badness 10000) in paragraph at lines 23--24
 
  []
 
-[120] [121]) (ThesisText.bbl [122]
-! Missing $ inserted.
-<inserted text> 
-                $
-l.50 \newblock Dcase-repo/dcase_
-                                util: A collection of utilities for detectio...
-I've inserted a begin-math/end-math symbol since I think
-you left one out. Proceed, with fingers crossed.
+[125] [126]) (ThesisText.bbl [127] [128
 
-! Missing $ inserted.
-<inserted text> 
-                $
-l.52 ...{https://github.com/DCASE-REPO/dcase_util}
-                                                  .
-I've inserted a begin-math/end-math symbol since I think
-you left one out. Proceed, with fingers crossed.
-
-! Extra }, or forgotten $.
-\mbox  #1->\leavevmode \hbox {#1}
-                                 
-l.52 ...{https://github.com/DCASE-REPO/dcase_util}
-                                                  .
-I've deleted a group-closing symbol because it seems to be
-spurious, as in `$x}$'. But perhaps the } is legitimate and
-you forgot something else, as in `\hbox{$x}'. In such cases
-the way to recover is to insert both the forgotten and the
-deleted material, e.g., by typing `I$}'.
-
-! Extra }, or forgotten $.
-\nfss@text #1->{\mbox {#1}}
-                           
-l.52 ...{https://github.com/DCASE-REPO/dcase_util}
-                                                  .
-I've deleted a group-closing symbol because it seems to be
-spurious, as in `$x}$'. But perhaps the } is legitimate and
-you forgot something else, as in `\hbox{$x}'. In such cases
-the way to recover is to insert both the forgotten and the
-deleted material, e.g., by typing `I$}'.
-
-! Missing $ inserted.
-<inserted text> 
-                $
-l.53 
-     
-I've inserted a begin-math/end-math symbol since I think
-you left one out. Proceed, with fingers crossed.
-
-! Missing } inserted.
-<inserted text> 
-                }
-l.53 
-     
-I've inserted something that you may have forgotten.
-(See the <inserted text> above.)
-With luck, this will get me unwedged. But if you
-really didn't forget anything, try typing `2' now; then
-my insertion and my current dilemma will both disappear.
-
-
-! LaTeX Error: Command \item invalid in math mode.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.55   Gagn{\'e}]{de2012deap}
-                             
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-! LaTeX Error: Something's wrong--perhaps a missing \item.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.55   Gagn{\'e}]{de2012deap}
-                             
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-! LaTeX Error: Something's wrong--perhaps a missing \item.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.55   Gagn{\'e}]{de2012deap}
-                             
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-LaTeX Warning: Command \c invalid in math mode on input line 56.
-
-! Please use \mathaccent for accents in math mode.
-<recently read> \accent 
-                        
-l.56 Fran{\c{c}
-               }ois-Michel De~Rainville, F{\'e}lix-Antoine Fortin, Marc-Andr...
-I'm changing \accent to \mathaccent here; wish me luck.
-(Accents are not the same in formulas as they are in text.)
-
-
-LaTeX Warning: Command \' invalid in math mode on input line 56.
-
-! Please use \mathaccent for accents in math mode.
-\add@accent ... \let \ignorespaces \relax \accent 
-                                                  #1 #2\egroup \spacefactor ...
-l.56 Fran{\c{c}}ois-Michel De~Rainville, F{\'e
-                                              }lix-Antoine Fortin, Marc-Andr...
-I'm changing \accent to \mathaccent here; wish me luck.
-(Accents are not the same in formulas as they are in text.)
-
-! You can't use `\spacefactor' in math mode.
-\add@accent ... \accent #1 #2\egroup \spacefactor 
-                                                  \accent@spacefactor 
-l.56 Fran{\c{c}}ois-Michel De~Rainville, F{\'e
-                                              }lix-Antoine Fortin, Marc-Andr...
-Sorry, but I'm not programmed to handle this case;
-I'll just pretend that you didn't ask for it.
-If you're in the wrong mode, you might be able to
-return to the right one by typing `I}' or `I$' or `I\par'.
-
-
-LaTeX Warning: Command \' invalid in math mode on input line 56.
-
-! Please use \mathaccent for accents in math mode.
-\add@accent ... \let \ignorespaces \relax \accent 
-                                                  #1 #2\egroup \spacefactor ...
-l.56 ...e, F{\'e}lix-Antoine Fortin, Marc-Andr{\'e
-                                                  }
-I'm changing \accent to \mathaccent here; wish me luck.
-(Accents are not the same in formulas as they are in text.)
-
-! You can't use `\spacefactor' in math mode.
-\add@accent ... \accent #1 #2\egroup \spacefactor 
-                                                  \accent@spacefactor 
-l.56 ...e, F{\'e}lix-Antoine Fortin, Marc-Andr{\'e
-                                                  }
-Sorry, but I'm not programmed to handle this case;
-I'll just pretend that you didn't ask for it.
-If you're in the wrong mode, you might be able to
-return to the right one by typing `I}' or `I$' or `I\par'.
-
-
-LaTeX Warning: Command \' invalid in math mode on input line 57.
-
-! Please use \mathaccent for accents in math mode.
-\add@accent ... \let \ignorespaces \relax \accent 
-                                                  #1 #2\egroup \spacefactor ...
-l.57 ...ner, Marc Parizeau, and Christian Gagn{\'e
-                                                  }.
-I'm changing \accent to \mathaccent here; wish me luck.
-(Accents are not the same in formulas as they are in text.)
-
-! You can't use `\spacefactor' in math mode.
-\add@accent ... \accent #1 #2\egroup \spacefactor 
-                                                  \accent@spacefactor 
-l.57 ...ner, Marc Parizeau, and Christian Gagn{\'e
-                                                  }.
-Sorry, but I'm not programmed to handle this case;
-I'll just pretend that you didn't ask for it.
-If you're in the wrong mode, you might be able to
-return to the right one by typing `I}' or `I$' or `I\par'.
-
-! Missing $ inserted.
-<inserted text> 
-                $
-l.61 
-     
-I've inserted a begin-math/end-math symbol since I think
-you left one out. Proceed, with fingers crossed.
-
-! Missing } inserted.
-<inserted text> 
-                }
-l.61 
-     
-I've inserted something that you may have forgotten.
-(See the <inserted text> above.)
-With luck, this will get me unwedged. But if you
-really didn't forget anything, try typing `2' now; then
-my insertion and my current dilemma will both disappear.
-
-! Missing } inserted.
-<inserted text> 
-                }
-l.61 
-     
-I've inserted something that you may have forgotten.
-(See the <inserted text> above.)
-With luck, this will get me unwedged. But if you
-really didn't forget anything, try typing `2' now; then
-my insertion and my current dilemma will both disappear.
-
-Missing character: There is no è in font cmex10!
-Missing character: There is no è in font cmex10!
-Missing character: There is no è in font cmex10!
-
-Overfull \hbox (2033.447pt too wide) in paragraph at lines 49--61
-[]\OT1/cmr/m/n/12 Dcase-Repo.  Dcase-repo/dcase$[]\OML/cmm/m/it/12 til \OT1/cmr
-/m/n/12 : \OML/cmm/m/it/12 Acollectionofutilitiesfordetectionandclassificationo
-facousticscenesandevents; \OT1/cmr/m/n/12 2021\OML/cmm/m/it/12 : URL[]$ 
+]
+Underfull \hbox (badness 1173) in paragraph at lines 107--110
+\OT1/cmr/m/n/12 R. Prenger, S. Satheesh, S. Sen-gupta, A. Coates \OT1/cmr/m/it/
+12 et al.\OT1/cmr/m/n/12 , ``Deep
  []
 
-! Extra }, or forgotten \endgroup.
-\par ...m \@noitemerr {\@@par }\fi \else {\@@par }
-                                                  \fi 
-l.61 
-     
-I've deleted a group-closing symbol because it seems to be
-spurious, as in `$x}$'. But perhaps the } is legitimate and
-you forgot something else, as in `\hbox{$x}'. In such cases
-the way to recover is to insert both the forgotten and the
-deleted material, e.g., by typing `I$}'.
-
-
-Underfull \hbox (badness 1616) in paragraph at lines 63--67
-\OT1/cmr/m/n/12 in-ter-pretable weakly la-belled sound event de-tec-tion.  \OT1
-/cmr/m/it/12 arXiv preprint
+[129] [130] [131] [132]
+Underfull \hbox (badness 2376) in paragraph at lines 293--296
+[]\OT1/cmr/m/n/12 J.-w. Jung, H.-j. Shim, J.-h. Kim, S.-b. Kim, and H.-J. Yu,
  []
 
-[123
+[133]
+Overfull \hbox (9.16534pt too wide) in paragraph at lines 404--408
+\OT1/cmr/m/n/12 unbalanced-[]data-[]loading-[]for-[]multi-[]task-[]learning-[]i
+n-[]pytorch-[]e030ad5033b$ 
+ []
 
-] [124] [125] [126] [127])
-
-Package natbib Warning: There were undefined citations.
-
-[128] (ThesisText.aux)
+[134]) [135] (ThesisText.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 12784 strings out of 481212
- 271916 string characters out of 2905973
- 490319 words of memory out of 3000000
- 28116 multiletter control sequences out of 15000+200000
- 541715 words of font info for 51 fonts, out of 3000000 for 9000
+ 12919 strings out of 481212
+ 274370 string characters out of 2905973
+ 493736 words of memory out of 3000000
+ 28248 multiletter control sequences out of 15000+200000
+ 541546 words of font info for 50 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 68i,11n,64p,2083b,308s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 68i,11n,64p,2083b,410s stack positions out of 5000i,500n,10000p,200000b,50000s
  <C:\Users\mrKC1\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm
 1200.pk><C:/Users/mrKC1/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfon
 ts/cm/cmbx12.pfb><C:/Users/mrKC1/AppData/Local/Programs/MiKTeX/fonts/type1/publ
-ic/amsfonts/cm/cmmi12.pfb><C:/Users/mrKC1/AppData/Local/Programs/MiKTeX/fonts/t
-ype1/public/amsfonts/cm/cmmi8.pfb><C:/Users/mrKC1/AppData/Local/Programs/MiKTeX
-/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/mrKC1/AppData/Local/Program
-s/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/mrKC1/AppData/Local
-/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/mrKC1/AppD
-ata/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb><C:/Users/m
-rKC1/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on ThesisText.pdf (130 pages, 1568991 bytes).
+ic/amsfonts/cm/cmr12.pfb><C:/Users/mrKC1/AppData/Local/Programs/MiKTeX/fonts/ty
+pe1/public/amsfonts/cm/cmr17.pfb><C:/Users/mrKC1/AppData/Local/Programs/MiKTeX/
+fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/mrKC1/AppData/Local/Programs
+/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb>
+Output written on ThesisText.pdf (137 pages, 1557118 bytes).
 PDF statistics:
- 502 PDF objects out of 1000 (max. 8388607)
+ 512 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  118 words of extra memory for PDF output out of 10000 (max. 10000000)
 
