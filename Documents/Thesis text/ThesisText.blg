@@ -1,154 +1,157 @@
 This is BibTeX, Version 0.99d
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: ThesisText.aux
-Reallocating 'name_of_file' (item size: 1) to 10 items.
-The style file: IEEEtranN.bst
+Reallocating 'name_of_file' (item size: 1) to 9 items.
+The style file: plainnat.bst
 Reallocating 'name_of_file' (item size: 1) to 11 items.
-Reallocating 'singl_function' (item size: 4) to 100 items.
-Reallocating 'singl_function' (item size: 4) to 100 items.
-Reallocating 'singl_function' (item size: 4) to 100 items.
-Reallocating 'wiz_functions' (item size: 4) to 6000 items.
-Reallocating 'singl_function' (item size: 4) to 100 items.
 Database file #1: references.bib
-Repeated entry---line 396 of file references.bib
+Repeated entry---line 416 of file references.bib
  : @article{xia2019multi
  :                      ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 516 of file references.bib
+Repeated entry---line 536 of file references.bib
  : @article{georgiev2017heterogeneous
  :                                   ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 533 of file references.bib
+Repeated entry---line 553 of file references.bib
  : @article{tagliasacchi2020multi
  :                               ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 585 of file references.bib
+Repeated entry---line 605 of file references.bib
  : @article{xia2019multi
  :                      ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 596 of file references.bib
+Repeated entry---line 616 of file references.bib
  : @inproceedings{tonami2019joint
  :                               ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 627 of file references.bib
+Repeated entry---line 647 of file references.bib
  : @inproceedings{sakti2016deep
  :                             ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 803 of file references.bib
+Repeated entry---line 823 of file references.bib
  : @inproceedings{lu2004multitask
  :                               ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 820 of file references.bib
+Repeated entry---line 840 of file references.bib
  : @inproceedings{kim2017speech
  :                             ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 844 of file references.bib
+Repeated entry---line 864 of file references.bib
  : @article{wu2020domain
  :                      ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 851 of file references.bib
+Repeated entry---line 871 of file references.bib
  : @inproceedings{sun2017compressed
  :                                 ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 859 of file references.bib
+Repeated entry---line 879 of file references.bib
  : @article{lopez2019keyword
  :                          ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 865 of file references.bib
+Repeated entry---line 885 of file references.bib
  : @inproceedings{panchapagesan2016multi
  :                                      ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 874 of file references.bib
+Repeated entry---line 894 of file references.bib
  : @inproceedings{nwe2017convolutional
  :                                    ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 908 of file references.bib
+Repeated entry---line 928 of file references.bib
  : @article{schmid1997systematic
  :                              ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 933 of file references.bib
+Repeated entry---line 953 of file references.bib
  : @inproceedings{de2012deap
  :                          ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 940 of file references.bib
+Repeated entry---line 960 of file references.bib
  : @article{paszke2019pytorch
  :                           ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 977 of file references.bib
+Repeated entry---line 997 of file references.bib
  : @inproceedings{oneto2019taking
  :                               ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 985 of file references.bib
+Repeated entry---line 1005 of file references.bib
  : @article{lee2019label
  :                      ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 991 of file references.bib
+Repeated entry---line 1011 of file references.bib
  : @inproceedings{seltzer2013multi
  :                                ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 999 of file references.bib
+Repeated entry---line 1019 of file references.bib
  : @article{phan2017dnn
  :                     ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 1005 of file references.bib
+Repeated entry---line 1025 of file references.bib
  : @inproceedings{komatsu2020scene
  :                                ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 1159 of file references.bib
+Warning--entry type for "tensorflow" isn't style-file defined
+--line 1135 of file references.bib
+Warning--entry type for "multiclasstutorial" isn't style-file defined
+--line 1154 of file references.bib
+Warning--entry type for "pytorchmultitask" isn't style-file defined
+--line 1161 of file references.bib
+Warning--entry type for "multidataset" isn't style-file defined
+--line 1167 of file references.bib
+Repeated entry---line 1179 of file references.bib
  : @inproceedings{wu2015asvspoof
  :                              ,
 I'm skipping whatever remains of this entry
--- IEEEtranN.bst version 1.14 (2015/08/26) by Michael Shell.
--- http://www.michaelshell.org/tex/ieeetran/bibtex/
--- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
-** Natbib version - not for normal IEEE work.
-Reallocating 'glb_str_end' (item size: 4) to 20 items.
-Reallocating 'glb_str_ptr' (item size: 4) to 20 items.
-Reallocating 'global_strs' (item size: 1) to 4000000 items.
-Warning--empty journal in georgiev2017heterogeneous
+Warning--to sort, need author or key in tensorflow
+Warning--to sort, need author or key in pytorchmultitask
+Warning--to sort, need author or key in multiclasstutorial
+Warning--to sort, need author or key in multidataset
+Warning--empty year in multiclasstutorial
+Warning--empty year in multidataset
+Warning--empty year in pytorchmultitask
+Warning--empty year in tensorflow
 Warning--empty journal in boregowda2018environmental
+Warning--empty year in dcase
+Warning--empty journal in georgiev2017heterogeneous
 Warning--empty journal in pols1977spectral
-
-Done.
-You've used 69 entries,
-            4855 wiz_defined-function locations,
-            1287 strings with 22847 characters,
-and the built_in function-call counts, 64148 in all, are:
-= -- 5362
-> -- 2362
-< -- 420
-+ -- 1145
-- -- 552
-* -- 3686
-:= -- 9441
-add.period$ -- 150
-call.type$ -- 69
-change.case$ -- 138
-chr.to.int$ -- 1039
-cite$ -- 76
-duplicate$ -- 4174
-empty$ -- 4692
-format.name$ -- 687
-if$ -- 14535
+You've used 72 entries,
+            2773 wiz_defined-function locations,
+            952 strings with 20005 characters,
+and the built_in function-call counts, 40040 in all, are:
+= -- 3522
+> -- 2705
+< -- 48
++ -- 917
+- -- 843
+* -- 3290
+:= -- 5966
+add.period$ -- 228
+call.type$ -- 72
+change.case$ -- 492
+chr.to.int$ -- 70
+cite$ -- 160
+duplicate$ -- 1760
+empty$ -- 3024
+format.name$ -- 926
+if$ -- 8525
 int.to.chr$ -- 3
-int.to.str$ -- 70
-missing$ -- 697
-newline$ -- 243
-num.names$ -- 195
-pop$ -- 1927
+int.to.str$ -- 1
+missing$ -- 65
+newline$ -- 364
+num.names$ -- 272
+pop$ -- 1088
 preamble$ -- 1
-purify$ -- 69
-quote$ -- 2
-skip$ -- 4611
+purify$ -- 421
+quote$ -- 0
+skip$ -- 1473
 stack$ -- 0
-substring$ -- 2487
-swap$ -- 3038
-text.length$ -- 78
+substring$ -- 1398
+swap$ -- 336
+text.length$ -- 28
 text.prefix$ -- 0
-top$ -- 6
-type$ -- 1102
-warning$ -- 3
-while$ -- 296
+top$ -- 0
+type$ -- 792
+warning$ -- 12
+while$ -- 316
 width$ -- 0
-write$ -- 792
+write$ -- 922
 (There were 22 error messages)

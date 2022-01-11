@@ -16,7 +16,7 @@ Expanding existing ground work for deep learning systems with abstractions for d
 The nature of variability in the envisioned use is not static for a developed application. Researching multi-task set-ups requires implementing and executing multiple variations and comparing their results. The hot-spots thus have to be variable at run-time while ensuring the validity of the pipeline and differentiability of the different instantiations. Furthermore, in the interest of fast development, every variation in dataset handling must both be able to be implemented for one specific dataset or implemented for all at once.\\
 
 
-TODO: Class diagram is pretty detailed, include higher level explanation
+%TODO: Class diagram is pretty detailed, include higher level explanation
 \begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{"../../../../Documents/TU Delft/Thesis 2/System Explanation/CompleteSystemDiagram"}
@@ -345,17 +345,35 @@ Again, a number of lessons have been made from recreating this set-up:
 	\item The DCASE audio files are not mono audio files but stereo. This means that there are two time series in parallel for which individual feature matrices have to be made and appended. It's also possibly desired that the audio files are converted to mono files.
 \end{itemize}
 
-TODO: Model instantiation and explain \\
+%TODO: Model instantiation and explain \\
 
-{\large \textbf{Finding the best }}\\
+{\large \textbf{Reporting the interaction between tasks}}\\ \label{Design:implementations:experiment}
 
+In an effort to create a research like use case setting, which pushes some of the boundaries of the system as well as require the framework to be able to implement a more exploratory experimentation methodology, an exemplary experiment was devised and created. In this work, numerous datasets are extracted and combined in a multi-task model in order to investigate their resulting effect on each other and whether they are consistent when varying parts of the pipeline. The chosen datasets and tasks where Speaker Identification from the ASVspoof dataset \cite{wu2015asvspoof}, Sound Context Recognition from the Ambient acoustic context dataset \cite{park2020augmenting}, Acoustic Scene Classification from the DCASE 2017 Acoustic Scene Task dataset  and Acoustic Event Classification from the DCASE 2017 Acoustic Event Task dataset \cite{mesaros2017dcase}, Audio tagging from the FreeSound FSDKaggle 2018 dataset \cite{fonseca2017freesound}, Speech Emotion Recognition and Stress detection from the Ravdess dataset \cite{livingstone2012ravdess} and Keyword Detection from the Speech Commands dataset  \cite{warden2018speech}. \\
 
+With this set-up the goal is not to be able to recreate an existing work, but to efficiently implement an exploratory experiment with varying parts. The idea is to run the pipeline for each singular dataset, two-by-two, three-by-three and then all combined in a singular function. What is of interest is whether patterns emerge when two tasks are learned together that are consistent. For this the patterns are thus noted from investigating the difference between single task and dual tasks. These patterns are then tracked when: a third task is added, all tasks are combined, a different extraction method is used and a different model is used. The extracted features chosen were the MelSpectrogram and the MFCC features. The two models were the ones from the previous two implementations which were a DNN and a CNN. \\
 
+This requires from the framework that:
+\begin{itemize}
+	\item All the datasets can be extracted to TaskDatasets
+	\item The extraction method can be efficiëntly switched out
+	\item The model can be efficiëntly changed and instantiated with a different amount of heads
+	\item A large number of different results can be clearly compared in multiple aspects
+\end{itemize}
 
+Earlier it was mentioned that the assumption was that a developer wants to walk away until the results are in. Therefore, the whole process and its variations are implemented in automated loops which weren't to be touched after initialization.\\
 
-
-
-Explain further extensions
+The resulting lessons are as follows:
+\begin{itemize}
+	\item The SpeechCommands dataset is an online dataset that can be accessed through a generator function from a library, but does not actually provide the sound files. Pre-processing and input insertion should not assume sound files are available. The generator function also means that before iteration, the raw dataset can't be accessed through indexing and its size can't be known (unless metadata is available). The framework should be able to build the taskdataset in this iterator-style setting with its builder functions.
+	\item When switching out the extraction method the whole dataset has to be recalculated and the quick reading functionalities have to be able to differentiate between the used extraction methods.
+	\item The model has to be able to switch as well adapt the number and type of heads depending on the current combination. This shows that there are unvarying parameters (like in this instance the amount of layers) and varying parameters (like the amount of heads). 
+	\item The audio clip sizes vary significantly between datasets. The developer must be able to exactly control how they want to handle this. Transformations and their calculation functions therefore must be able to be executed both as if the combined datasets were one and for each one separate. To illustrate this: a developer can either choose to reform all feature matrices from all datasets to a singular size, but that might mean that too much information is lost for the more extreme matrix sizes. 
+	\item Building on the previous point, one of the reasons that a developer might want to make their feature matrices of equal sizes is so that they can be batched together. Another possibility is that they want to keep their sizes intact internally for each dataset. Loading the data in the first case is covered by the standard PyTorch DataLoader behaviour as it can make random batches from each dataset it likes. However the second case where each batch is from a specific dataset is not, but should standardly be present as a way to ensure that different dataset combinations are possible out of the box.
+	\item Observations in previous works like \citet{tonami2019joint} note that detection of events from AED combined with ASC did not improve if they were present in multiple scenes. Individual label detection performances must be able to be observed separately. 
+	\item When trying to find working parameters as well as debug, a smaller validation set should be form-able, so that the whole dataset doesn't have to be involved.
+	\item As not to waste unnecessary time in these sort of huge iterations of combinations, the dataset must be able to switch between a streaming context for larger (combined) datasets and loading the data in memory for smaller (combined) datasets.
+\end{itemize}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

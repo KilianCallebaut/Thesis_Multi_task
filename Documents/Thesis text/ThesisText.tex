@@ -1,11 +1,11 @@
 \documentclass[12pt]{report}
 \usepackage{graphicx}
-\usepackage{natbib}
+\usepackage[numbers]{natbib}
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage{url}
 
 % Title Page
-\title{Thesis}
+\title{CombinaTorch - Creating a Multi-Task, Multi-Dataset Framework for Deep Learning}
 \author{Kilian Callebaut}
 
 
@@ -14,12 +14,16 @@
 	
 	
 	\begin{abstract}
-		Abstract
+		In highly complex sources of data for pattern recognition, like audio, it is hard to obtain a set of information that is both extensively annotated and includes the wide variety of interfering noises that real life applications would encounter. In order to address these issues, information sharing techniques were devised, known as multi-task learning. These forms of learning algorithms learn multiple tasks at the same time, sharing numerical updates of their parameters. By doing this, a whole new amount of opportunities are opened up to mix and match tasks and datasets and the amount of applications of this are growing.
+		
+		However, while more and more promising results have been achieved using multi-task set-ups, there is an added amount of developmental complexity by having to deal with multiple datasets and tasks. This complexity grows significantly the more differences there are in the combinations. Furthermore, research requires experimentation and comparison of different set-ups, which is quickly complicated by the combinations, compared to single task set-ups. In order to promote research in this field, these developmental roadblocks must be cleared up. So far however, no framework seems to aid in the development of multi-dataset, let alone multi-task set-ups.
+		
+		This work addresses the technical difficulties in implementing, evaluating and experimenting with multi-task set-ups. By devising the multi-task set-up as a pipeline going from the raw datasets to trained and evaluated models with interchangeable parts, a framework is built that brings the development closer to single dataset, single task learning set-ups. The idea is for developers to only have to focus on implementing single pipeline parts, with the freedom to assemble and re-assemble them without having to worry about the combinatorial problems. This starts by investigating the current literature, where the fields in audio recognition and multi-task learning are analysed, specifically for how and what they research and consecutively how these areas came together. Frameworks for the development of deep learning are also examined, determining which lessons to take in tackling this issue and finding the current state of affairs. This study provides the basis for the developmental software framework, CombinaTorch, built on top of PyTorch, that allows free assembly of multi-task pipelines. The framework is subsequently used to implement several set-ups described in the literature, where their comparative reduction in amount of work is assessed. In order to validate the expressiveness of the framework, another delve into the literature is made, discussing several scenarios and their implementation viability with the framework.
 	\end{abstract}
 
 	\tableofcontents
 
-
+	\input{Prefacetex.tex}
 	\input{IntroductionV4.tex} %8 pages
 	\input{RelatedWork.tex} %20 pages
 	\input{ProblemStatement.tex} %10 pages
@@ -31,8 +35,8 @@
 
 	
 	
-%\bibliographystyle{plainnat} 
-\bibliographystyle{plain} 
+\bibliographystyle{plainnat} 
+%\bibliographystyle{plain} 
 %\bibliographystyle{IEEEtranN} 
 \bibliography{references}
 	

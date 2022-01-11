@@ -64,11 +64,11 @@ def main(argv):
                                                             r"Thesis_Datasets\Automatic Speaker Verification Spoofing "
                                                             r"and Countermeasures Challenge 2015\DS_10283_853"),
                                      ))
-    # csc.add_data_reader(
-    #     ChenAudiosetDataset(object_path=os.path.join(data_base, 'ChenAudiosetDataset'),
-    #                         data_path=os.path.join(drive + r':\Thesis_Datasets\audioset_chen\audioset_filtered'),
-    #                         )
-    # )
+    csc.add_data_reader(
+        ChenAudiosetDataset(object_path=os.path.join(data_base, 'ChenAudiosetDataset'),
+                            data_path=os.path.join(drive + r':\Thesis_Datasets\audioset_chen\audioset_filtered'),
+                            )
+    )
     csc.add_data_reader(DCASE2017_SS(object_path=os.path.join(data_base, 'DCASE2017_SS_{}'),
                                      data_path=os.path.join(drive + ":", r'Thesis_Datasets\DCASE2017')))
     csc.add_data_reader(DCASE2017_SE(object_path=os.path.join(data_base, 'DCASE2017_SE_{}'),
@@ -89,14 +89,15 @@ def main(argv):
                                        ))
 
     csc.add_signal_preprocessing(preprocess_dict=dict(resample_to=32000, mono=True))
+    csc.add_transformation_call('prepare_fit')
+    csc.add_transformation_call('prepare_inputs')
+    csc.add_transformation_call('normalize_fit')
+    csc.add_transformation_call('normalize_inputs')
     for ex in range(2):
         csc.add_extraction_method(
             MelSpectrogramExtractionMethod(**extraction_params)) if ex == 0 else csc.add_extraction_method(
             MFCCExtractionMethod(**extraction_params))
-        csc.add_transformation_call('prepare_fit')
-        csc.add_transformation_call('prepare_inputs')
-        csc.add_transformation_call('normalize_fit')
-        csc.add_transformation_call('normalize_inputs')
+
 
         keys = list(csc.get_keys())
         comb_iterator = itertools.chain(*map(lambda x: itertools.combinations(keys, x), range(0, 2)))
