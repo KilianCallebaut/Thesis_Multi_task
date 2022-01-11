@@ -3,7 +3,7 @@ from typing import List
 from torch.utils.data import ConcatDataset
 
 from Tasks.Task import Task
-from Tasks.TaskDataset import TaskDataset
+from Tasks.TaskDatasets.TaskDataset import TaskDataset
 
 
 class ConcatTaskDataset(ConcatDataset):

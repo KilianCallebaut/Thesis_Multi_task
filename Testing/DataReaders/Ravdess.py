@@ -41,9 +41,9 @@ class Ravdess(DataReader):
         speech_folder = 'Audio_Speech_Actors_01-24'
         self.files = []
         for fold in [song_folder, speech_folder]:
-            for _, songs, _ in os.walk(os.path.join(self.data_path, fold)):
+            for _, songs, _ in os.walk(os.path.join(self.get_data_path(), fold)):
                 for ss_dir in songs:
-                    for file in os.listdir(os.path.join(self.data_path, song_folder, ss_dir)):
+                    for file in os.listdir(os.path.join(self.get_data_path(), song_folder, ss_dir)):
                         mod, voc, em, emi, stat, rep, act = file[:-4].split('-')
                         self.files.append(
                             {'modality': mod,  # (01 = full-AV, 02 = video-only, 03 = audio-only)
@@ -55,7 +55,7 @@ class Ravdess(DataReader):
                              # 01 = "Kids are talking by the door", 02 = "Dogs are sitting by the door"
                              'repetition': rep,  # 1st or 2nd rep
                              'actor': act,  # Odd numbered are male, even female
-                             'file': os.path.join(self.data_path, song_folder, ss_dir, file)
+                             'file': os.path.join(self.get_data_path(), song_folder, ss_dir, file)
                              }
                         )
 

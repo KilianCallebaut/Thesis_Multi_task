@@ -51,7 +51,7 @@ class ParkAudiosetDataset(DataReader):
         labels = []
         wav_files = []
 
-        for _, dirs, _ in os.walk(self.data_path):
+        for _, dirs, _ in os.walk(self.get_data_path()):
             cdt = len(dirs)
             cd = 0
             cn = 0
@@ -63,11 +63,11 @@ class ParkAudiosetDataset(DataReader):
                 cd += 1
                 lab_dir = []
                 wav_dir = []
-                for file in os.listdir(os.path.join(self.data_path, dir)):
-                    filepath = os.path.join(self.data_path, dir, file)
+                for file in os.listdir(os.path.join(self.get_data_path(), dir)):
+                    filepath = os.path.join(self.get_data_path(), dir, file)
                     if file.endswith('.txt'):
                         name = file.split('_labels.txt')[0]
-                        wav_loc = os.path.join(self.data_path, dir, name + '.wav')
+                        wav_loc = os.path.join(self.get_data_path(), dir, name + '.wav')
                         lab = pd.read_csv(filepath, names=['id', 'str', 'full'])['full'].values
                         wav_dir.append(wav_loc)
                         lab_dir.append(lab)

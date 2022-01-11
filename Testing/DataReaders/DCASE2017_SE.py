@@ -45,7 +45,7 @@ class DCASE2017_SE(DataReader):
 
     def load_files(self):
         self.devdataset = TUTSoundEvents_2017_DevelopmentSet(
-            data_path=self.data_path,
+            data_path=self.get_data_path(),
             log_system_progress=False,
             show_progress_in_console=True,
             use_ascii_progress_bar=True,
@@ -56,7 +56,7 @@ class DCASE2017_SE(DataReader):
 
         ).initialize()
         self.evaldataset = TUTSoundEvents_2017_EvaluationSet(
-            data_path=self.data_path,
+            data_path=self.get_data_path(),
             log_system_progress=False,
             show_progress_in_console=True,
             use_ascii_progress_bar=True,

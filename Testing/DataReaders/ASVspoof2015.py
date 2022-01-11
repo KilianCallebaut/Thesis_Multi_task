@@ -36,33 +36,33 @@ class ASVspoof2015(DataReader):
                os.path.isfile(self.get_path())
 
     def load_files(self):
-        # self.truths = pd.read_csv(os.path.join(self.data_path, 'CM_protocol', 'cm_train.trn'), sep=' ', header=None,
+        # self.truths = pd.read_csv(os.path.join(self.get_data_path(), 'CM_protocol', 'cm_train.trn'), sep=' ', header=None,
         #                           names=['folder', 'file', 'method', 'source'])
         # self.truths = self.truths.append(add)
-        self.truths = pd.read_csv(os.path.join(self.data_path, 'Joint_ASV_CM_protocol', 'ASV_male_development.ndx'),
+        self.truths = pd.read_csv(os.path.join(self.get_data_path(), 'Joint_ASV_CM_protocol', 'ASV_male_development.ndx'),
                                   sep=' ',
                                   header=None,
                                   names=['folder', 'file', 'method', 'source'])
         self.truths['gender'] = 'male'
         truths_female = pd.read_csv(
-            os.path.join(self.data_path, 'Joint_ASV_CM_protocol', 'ASV_female_development.ndx'), sep=' ',
+            os.path.join(self.get_data_path(), 'Joint_ASV_CM_protocol', 'ASV_female_development.ndx'), sep=' ',
             header=None,
             names=['folder', 'file', 'method', 'source'])
         truths_female['gender'] = 'female'
-        male_eval = pd.read_csv(os.path.join(self.data_path, 'Joint_ASV_CM_protocol', 'ASV_male_evaluation.ndx'),
+        male_eval = pd.read_csv(os.path.join(self.get_data_path(), 'Joint_ASV_CM_protocol', 'ASV_male_evaluation.ndx'),
                                 sep=' ', header=None,
                                 names=['folder', 'file', 'method', 'source'])
         male_eval['gender'] = 'male'
-        female_eval = pd.read_csv(os.path.join(self.data_path, 'Joint_ASV_CM_protocol', 'ASV_female_evaluation.ndx'),
+        female_eval = pd.read_csv(os.path.join(self.get_data_path(), 'Joint_ASV_CM_protocol', 'ASV_female_evaluation.ndx'),
                                   sep=' ',
                                   header=None,
                                   names=['folder', 'file', 'method', 'source'])
         female_eval['gender'] = 'female'
-        male_enrol = pd.read_csv(os.path.join(self.data_path, 'Joint_ASV_CM_protocol', 'ASV_male_enrolment.ndx'),
+        male_enrol = pd.read_csv(os.path.join(self.get_data_path(), 'Joint_ASV_CM_protocol', 'ASV_male_enrolment.ndx'),
                                  sep=' ', header=None,
                                  names=['folder', 'file', 'method', 'source'])
         male_enrol['gender'] = 'male'
-        female_enrol = pd.read_csv(os.path.join(self.data_path, 'Joint_ASV_CM_protocol', 'ASV_female_enrolment.ndx'),
+        female_enrol = pd.read_csv(os.path.join(self.get_data_path(), 'Joint_ASV_CM_protocol', 'ASV_female_enrolment.ndx'),
                                    sep=' ',
                                    header=None,
                                    names=['folder', 'file', 'method', 'source'])
@@ -78,7 +78,7 @@ class ASVspoof2015(DataReader):
         # self.truths = self.truths[(self.truths.method == 'human')]
         self.truths.sort_values(['folder', 'file'], inplace=True)
 
-        self.files = [os.path.join(self.data_path, 'wav', x[0], x[1]) for x in self.truths.to_numpy()]
+        self.files = [os.path.join(self.get_data_path(), 'wav', x[0], x[1]) for x in self.truths.to_numpy()]
 
     def read_files(self, taskDataset: HoldTaskDataset, **kwargs) -> HoldTaskDataset:
         info = joblib.load(self.get_path())

@@ -64,9 +64,9 @@ class ChenAudiosetDataset(DataReader):
         files = []
         np_objects = []
         wav_files = []
-        print(os.path.join(self.data_path, self.train_dir))
+        print(os.path.join(self.get_data_path(), self.train_dir))
 
-        for _, dirs, _ in os.walk(os.path.join(self.data_path, self.train_dir)):
+        for _, dirs, _ in os.walk(os.path.join(self.get_data_path(), self.train_dir)):
             cdt = len(dirs)
             cd = 0
             cn = 0
@@ -79,8 +79,8 @@ class ChenAudiosetDataset(DataReader):
                 filedir = []
                 np_dir = []
                 wav_dir = []
-                for file in os.listdir(os.path.join(self.data_path, self.train_dir, dir)):
-                    filepath = os.path.join(self.data_path, self.train_dir, dir, file)
+                for file in os.listdir(os.path.join(self.get_data_path(), self.train_dir, dir)):
+                    filepath = os.path.join(self.get_data_path(), self.train_dir, dir, file)
                     if file.endswith('.npy'):
                         np_obj = np.load(filepath, allow_pickle=True)
                         filedir.append(np_obj.item())
@@ -89,7 +89,7 @@ class ChenAudiosetDataset(DataReader):
                         np_dir.append(np_obj)
 
                         wav_loc = np_obj.item()['wav_file'].split(r'/')[6]
-                        wav_loc = os.path.join(self.data_path, self.train_dir, dir, wav_loc)
+                        wav_loc = os.path.join(self.get_data_path(), self.train_dir, dir, wav_loc)
                         wav_dir.append(wav_loc)
 
                 files.append(filedir)
@@ -146,7 +146,7 @@ class ChenAudiosetDataset(DataReader):
 
     def calculate_targets(self):
         targets = [[l[2] for l in x['labels']] for f in self.files for x in f if
-                   os.path.join(self.data_path, *x['wav_file'].split(r'/')[4:]) not in self.skip_files]
+                   os.path.join(self.get_data_path(), *x['wav_file'].split(r'/')[4:]) not in self.skip_files]
         if self.mode == 1 or self.mode == 2:
             targets = [self.group_events(e) for e in targets]
         # distinct_targets = list(set([x for l in targets for x in l if x != 'None of the above']))

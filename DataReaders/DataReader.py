@@ -19,6 +19,12 @@ class DataReader(ABC):
                  object_path: str = None,
                  data_path: str = None,
                  **kwargs):
+        """
+        Initializes static DataReader variables.
+        :param object_path: Path to where the extracted feature files have to be stored
+        :param data_path: Path where the raw datasets are stored
+        :param kwargs: extra arguments
+        """
         if object_path:
             self.object_path = object_path
         if data_path:
@@ -57,7 +63,6 @@ class DataReader(ABC):
             self.write_files(taskDataset, **kwargs)
         return taskDataset
 
-    @abstractmethod
     def get_base_path(self) -> dict:
         """"
         Returns a dictionary with the path to the folder containing the extracted files.
@@ -65,10 +70,21 @@ class DataReader(ABC):
         base_path as a key if not.
         See HoldTaskDataset
         """
-        pass
+        return dict(base_path=self.object_path)
+
+    def get_data_path(self) -> str:
+        """
+        Returns the path directing to the storage location of the raw dataset files
+        :return: String of the storage location
+        """
+        return self.data_path
 
     @abstractmethod
     def get_task_name(self) -> str:
+        """
+        Get the task name
+        :return: The task name
+        """
         pass
 
     @abstractmethod
@@ -106,21 +122,44 @@ class DataReader(ABC):
 
     def __create_taskDataset__(self, extraction_method: ExtractionMethod, index_mode) -> HoldTaskDataset:
         assert 'base_path' in self.get_base_path() or (
-                'training_base_path' in self.get_base_path() and 'testing_base_path' in self.get_base_path()), 'base_path or training_base_path and testing_base_path keys required'
+                'training_base_path' in self.get_base_path() and 'testing_base_path' in self.get_base_path()), 'base_path or training_base_path and testing_base_path keys required '
         return HoldTaskDataset(extraction_method=extraction_method,
                                index_mode=index_mode,
                                **self.get_base_path())
 
     def check_files(self, taskDataset, **kwargs):
+        """
+        Check if the there are already extracted files present for the task.
+        :param taskDataset: The TaskDataset object to check the files for.
+        :param kwargs: Additional arguments
+        :return: Whether or not files are present under the current task name
+        """
         return taskDataset.check(self.get_task_name())
 
     def read_files(self, taskDataset: HoldTaskDataset, **kwargs):
+        """
+        Read the files into the TaskDataset
+        :param taskDataset: The TaskDataset object with extracted feature files.
+        :param kwargs: Additional arguments.
+        """
         taskDataset.load(self.get_task_name())
 
     def write_files(self, taskDataset: HoldTaskDataset, **kwargs):
+        """
+        Stores the TaskDataset in files determined by its stored locations
+        :param taskDataset: The TaskDataset object to store
+        :param kwargs: Additional parameters
+        """
         taskDataset.save()
 
     def resample(self, sig, sample_rate, resample_to):
+        """
+        Manual resampling method
+        :param sig: Signal to be resampled
+        :param sample_rate: The original sample_rate
+        :param resample_to: The objective sample_rate
+        :return: Signal, samplerate of the resampled signal
+        """
         secs = len(sig) / sample_rate
         return signal.resample(sig, int(secs * resample_to)), resample_to
 
@@ -128,6 +167,13 @@ class DataReader(ABC):
                           sig_samplerate: Tuple[np.ndarray, int],
                           resample_to: int = None,
                           mono: bool = True) -> Tuple[np.ndarray, int]:
+        """
+        Apply several preprocessing techniques to the signal
+        :param sig_samplerate: The signal and samplerate
+        :param resample_to: Samplerate to resample to in case the signal needs to be resampled
+        :param mono: Boolean indicating if a stereo signal needs to be reconfigured to a mono signal
+        :return: Preprocessed signal and samplerate
+        """
 
         if sig_samplerate[0].dtype != np.dtype('float32'):
             sig_samplerate = (sig_samplerate[0].astype('float32'), sig_samplerate[1])
@@ -145,6 +191,13 @@ class DataReader(ABC):
                           sig_sample_rate: Tuple[np.ndarray, int],
                           time_resolution: float,
                           time_overlap: float = None):
+        """
+        Divide signal up in windows of specified time resolution and overlap.
+        :param sig_sample_rate: [Signal, samplerate] signal and the sample rate in tuple form
+        :param time_resolution: Window size (in s)
+        :param time_overlap: Window overlap (in s)
+        :return: List of signals according to the given resolution and overlap
+        """
         window_size = math.floor(sig_sample_rate[1] * time_resolution)
         window_hop = math.floor(sig_sample_rate[1] * time_overlap) if time_overlap else window_size
 
@@ -169,6 +222,11 @@ class DataReader(ABC):
         return windowed_signals
 
     def load_wav(self, loc) -> Tuple[np.ndarray, int]:
+        """
+        Loads the wav file into a tuple of [signal, sample rate] by the given path
+        :param loc: The path of the audio file
+        :return: [signal, sample rate] tuple containing the signal and samplerate
+        """
         sig, fs = soundfile.read(loc)
 
         if sig.shape[0] == 0:

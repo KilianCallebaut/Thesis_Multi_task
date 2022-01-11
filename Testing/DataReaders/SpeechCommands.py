@@ -27,7 +27,7 @@ class SpeechCommands(DataReader):
 
     def load_files(self):
         self.ds, self.ds_info = tfds.load('speech_commands', split=['train', 'test'], shuffle_files=False,
-                                          data_dir=self.data_path, with_info=True)
+                                          data_dir=self.get_data_path(), with_info=True)
         print('Done loading Speech Commands dataset')
 
     def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict, **kwargs):

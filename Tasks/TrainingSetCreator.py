@@ -11,6 +11,10 @@ from Tasks.TaskDataset import TaskDataset
 
 
 class ConcatTrainingSetCreator:
+    """
+    Pipeline creator used to assemble and execute extraction and pre-processing of raw datasets into valid input for
+    multi-task learning schemes.
+    """
 
     def __init__(self,
                  random_state: Optional[int] = None,
@@ -19,6 +23,14 @@ class ConcatTrainingSetCreator:
                  recalculate: bool = False,
                  multiply: bool = True
                  ):
+        """
+        Initializes the pipeline creator
+        :param random_state: Optional seed for reproducability of splits etc.
+        :param nr_runs: Number of runs in k-fold validation
+        :param index_mode: Boolean to activate index mode which turns the TaskDataset into a streaming set-up reading files from disk in stead of loading into memory
+        :param recalculate: Recalculate the extracted features every time in stead of using the stored results
+        :param multiply: Make a copy of the pipeline additions. Only use this in case the combined datasets need to be processed as if they were one big dataset.
+        """
         self.random_state = random_state
         self.nr_runs = nr_runs
         self.index_mode = index_mode
@@ -39,9 +51,17 @@ class ConcatTrainingSetCreator:
         self.model = None
 
     def get_keys(self):
+        """
+        Returns the keys of the datareaders present in the TrainingSetCreator
+        :return: All the keys of the DataReaders.
+        """
         return self.data_readers.keys()
 
     def reset_taskDatasets(self, class_list: List[str] = None):
+        """
+        Clears the created TaskDatasets.
+        :param class_list: List of DataReader keys whos TaskDatasets have to be cleared
+        """
         if class_list and self.taskdatasets:
             for k in self.taskdatasets.keys():
                 if k not in class_list:
@@ -53,6 +73,12 @@ class ConcatTrainingSetCreator:
     def add_data_reader(self,
                         data_reader: DataReader,
                         name=None):
+        """
+        Adds a new DataReader entry point to the pipeline creator.
+        :param data_reader:
+        :param name:
+        :return:
+        """
         self.data_readers[name if name else type(data_reader).__name__] = data_reader
 
     def __add__pipe__(self,

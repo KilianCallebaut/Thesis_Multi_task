@@ -33,12 +33,12 @@ class FSDKaggle2018(DataReader):
         return 'FSDKaggle2018'
 
     def load_files(self):
-        self.file_labels = pd.read_csv(os.path.join(self.data_path, 'train.csv'))
-        self.file_labels_val = pd.read_csv(os.path.join(self.data_path, 'test_post_competition.csv'))
+        self.file_labels = pd.read_csv(os.path.join(self.get_data_path(), 'train.csv'))
+        self.file_labels_val = pd.read_csv(os.path.join(self.get_data_path(), 'test_post_competition.csv'))
 
     def calculate_input(self, taskDataset: HoldTaskDataset, preprocess_parameters: dict, **kwargs):
         perc = 0
-        files = [os.path.join(self.data_path, self.audio_folder, name) for name in self.file_labels['fname']]
+        files = [os.path.join(self.get_data_path(), self.audio_folder, name) for name in self.file_labels['fname']]
         for audio_idx in range(len(files)):
             path = files[audio_idx]
             try:
@@ -52,7 +52,7 @@ class FSDKaggle2018(DataReader):
                 perc += 1
 
         self.skipped = []
-        files = [os.path.join(self.data_path, 'audio_test', name) for name in self.file_labels_val['fname']]
+        files = [os.path.join(self.get_data_path(), 'audio_test', name) for name in self.file_labels_val['fname']]
         for audio_idx in range(len(files)):
             path = files[audio_idx]
             try:
