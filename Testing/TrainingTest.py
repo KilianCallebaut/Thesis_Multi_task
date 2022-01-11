@@ -4,18 +4,18 @@ from random import randrange
 
 import torch
 
-from DataReaders.ExtractionMethod import LibMelSpectrogram
+from DataReaders.ExtractionMethod import  MelSpectrogramExtractionMethod
 from MultiTask.MultiTaskHardSharingConvolutional import MultiTaskHardSharingConvolutional
-from Tasks.ConcatTaskDataset import ConcatTaskDataset
+from Tasks.TaskDatasets.ConcatTaskDataset import ConcatTaskDataset
 from Tasks.Task import MultiClassTask
-from Tasks.TaskDataset import TaskDataset
+from Tasks.TaskDatasets.TaskDataset import TaskDataset
 from Training.Training import Training
 
 
 def test_single_task_Multi_Class(argv):
     if not os.path.isdir('./TestPath'):
         os.mkdir('./TestPath')
-    extraction_method = LibMelSpectrogram()
+    extraction_method = MelSpectrogramExtractionMethod()
     dataset = TaskDataset(inputs=[torch.rand(100, 100) for _ in range(64)],
                           targets=[[randrange(1) for _ in range(5)] for _ in range(64)],
                           task=MultiClassTask(name='Test', output_labels=[0, 1, 2, 3, 4]),
@@ -43,7 +43,7 @@ def test_single_task_Multi_Class(argv):
     print('ran')
 
 def test_single_task_Multi_Class_TrainingSetCreator(argv):
-    extraction_method = LibMelSpectrogram()
+    extraction_method = MelSpectrogramExtractionMethod()
     dataset = TaskDataset(inputs=[torch.rand(100, 100) for _ in range(64)],
                           targets=[[randrange(1) for _ in range(5)] for _ in range(64)],
                           task=MultiClassTask(name='Test', output_labels=[0, 1, 2, 3, 4]),

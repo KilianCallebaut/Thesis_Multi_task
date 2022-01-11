@@ -1,7 +1,7 @@
 data
 Datasets
 ExternalClassifiers
-Tests/runs
+Examples/runs
 runs
 venv
 Training/__pycache__
